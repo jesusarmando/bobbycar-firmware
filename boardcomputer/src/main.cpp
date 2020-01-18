@@ -8,27 +8,11 @@
 
 #include <array>
 
+#include "../../common.h"
+
 bool toggle{false};
 
-typedef struct {
-    uint16_t start;
-
-    int16_t enableL, enableR;
-    int16_t pwmL, pwmR;
-    int16_t ctrlTypL, ctrlTypR;
-    int16_t ctrlModL, ctrlModR;
-    int16_t iMotMaxL, iMotMaxR;
-    int16_t iDcMaxL, iDcMaxR;
-    int16_t nMotMaxL, nMotMaxR;
-    int16_t phaseAdvMaxL, phaseAdvMaxR;
-    int16_t fieldWeakMaxL, fieldWeakMaxR;
-
-    int16_t buzzerFreq, buzzerPattern, poweroff;
-
-    uint16_t  checksum;
-} Serialcommand;
-
-Serialcommand command;
+Command command;
 
 StaticJsonDocument<1024> doc;
 
@@ -53,19 +37,8 @@ struct Controller {
 
 void Send()
 {
-    command.start = 0xAAAA;
-    uint16_t checksum = command.start ^
-            command.enableL ^ command.enableR ^
-            command.pwmL ^ command.pwmR ^
-            command.ctrlTypL ^ command.ctrlTypR ^
-            command.ctrlModL ^ command.ctrlModR ^
-            command.iMotMaxL ^ command.iMotMaxR ^
-            command.iDcMaxL ^ command.iDcMaxR ^
-            command.nMotMaxL ^ command.nMotMaxR ^
-            command.phaseAdvMaxL ^ command.phaseAdvMaxR ^
-            command.fieldWeakMaxL ^ command.fieldWeakMaxR ^
-            command.buzzerFreq ^ command.buzzerPattern ^ command.poweroff;
-    command.checksum = checksum;
+    command.start = Command::VALID_HEADER;
+    command.checksum = calculateChecksum(command);
     Serial1.write((uint8_t *) &command, sizeof(command));
     Serial2.write((uint8_t *) &command, sizeof(command));
 }
@@ -76,16 +49,8 @@ Adafruit_SSD1306 display(128, 64, &Wire, 4);
 
 void setup()
 {
-    command.enableL = command.enableR = 1;
-    command.ctrlTypL = command.ctrlTypR = 2;
-    command.ctrlModL = command.ctrlModR = 3;
-    command.buzzerFreq = command.buzzerPattern = 0;
-    command.iMotMaxL = command.iMotMaxR = 15;
-    command.iDcMaxL = command.iDcMaxR = 17;
-    command.nMotMaxL = command.nMotMaxR = 5000;
-    command.fieldWeakMaxL = command.fieldWeakMaxR = 10;
-    command.phaseAdvMaxL = command.phaseAdvMaxR = 40;
-    command.poweroff = 0;
+    command.left.enable = true;
+    command.right.enable = true;
 
     Serial.begin(115200);
     Serial.println("setup()");
@@ -183,7 +148,8 @@ void loop()
     else
         pwm = gas_hebel - brems_hebel;
 
-    command.pwmL = command.pwmR = pwm;
+    command.left.pwm = pwm;
+    command.right.pwm = pwm;
 
     switch (screen)
     {
@@ -222,16 +188,16 @@ void loop()
             toggle = !toggle;
             command.poweroff = toggle;
             break;
-        case '0': command.buzzerFreq = 0; break;
-        case '1': command.buzzerFreq = 1; break;
-        case '2': command.buzzerFreq = 2; break;
-        case '3': command.buzzerFreq = 3; break;
-        case '4': command.buzzerFreq = 4; break;
-        case '5': command.buzzerFreq = 5; break;
-        case '6': command.buzzerFreq = 6; break;
-        case '7': command.buzzerFreq = 7; break;
-        case '8': command.buzzerFreq = 8; break;
-        case '9': command.buzzerFreq = 9; break;
+        case '0': command.buzzer.freq = 0; break;
+        case '1': command.buzzer.freq = 1; break;
+        case '2': command.buzzer.freq = 2; break;
+        case '3': command.buzzer.freq = 3; break;
+        case '4': command.buzzer.freq = 4; break;
+        case '5': command.buzzer.freq = 5; break;
+        case '6': command.buzzer.freq = 6; break;
+        case '7': command.buzzer.freq = 7; break;
+        case '8': command.buzzer.freq = 8; break;
+        case '9': command.buzzer.freq = 9; break;
         }
     }
 

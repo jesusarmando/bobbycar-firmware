@@ -1,8 +1,4 @@
-// Define to prevent recursive inclusion
-#ifndef CONFIG_H
-#define CONFIG_H
-
-#include "stm32f1xx_hal.h"
+#pragma once
 
 #define PWM_FREQ            16000     // PWM frequency in Hz
 #define DEAD_TIME              48     // PWM deadtime
@@ -82,11 +78,8 @@
 
 // ############################### INPUT ###############################
 
-// ############################## DEFAULT SETTINGS ############################
-// Default settings will be applied at the end of this config file if not set before
-#define INACTIVITY_TIMEOUT      	8     // Minutes of not driving until poweroff. it is not very precise.
-#define BEEPS_BACKWARD          	1     // 0 or 1
-// #define SUPPORT_BUTTONS							// Define for buttons support on ADC, Nunchuck
+// ###### CONTROL VIA UART (serial) ######
+#define SERIAL_TIMEOUT          160                     // [-] Serial timeout duration for the received data. 160 ~= 0.8 sec. Calculation: 0.8 sec / 0.005 sec
 
 /* FILTER is in fixdt(0,16,16): VAL_fixedPoint = VAL_floatingPoint * 2^16. In this case 6553 = 0.1 * 2^16
  * Value of COEFFICIENT is in fixdt(1,16,14)
