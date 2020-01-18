@@ -22,20 +22,11 @@ set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
 add_definitions(-DUSE_HAL_DRIVER -DSTM32F103xE)
 
 include_directories(
-    Inc
+    other
     Drivers/STM32F1xx_HAL_Driver/Inc
     Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
     Drivers/CMSIS/Device/ST/STM32F1xx/Include
     Drivers/CMSIS/Include
-)
-
-set(headers
-    Inc/BLDC_controller.h
-    Inc/config.h
-    Inc/defines.h
-    Inc/rtwtypes.h
-    Inc/stm32f1xx_hal_conf.h
-    Inc/stm32f1xx_it.h
 )
 
 add_executable(firmware.elf
@@ -56,12 +47,15 @@ add_executable(firmware.elf
     Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c
     Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
 
-    Src/BLDC_controller.c
-    Src/BLDC_controller_data.c
-    Src/main.cpp
-    Src/stm32f1xx_it.c
-    Src/system_stm32f1xx.c
-    ${headers}
+    other/BLDC_controller.c
+    other/BLDC_controller_data.c
+    other/stm32f1xx_it.c
+    other/system_stm32f1xx.c
+    
+    config.h
+    common.h
+    defines.h
+    main.cpp
 )
 
 add_custom_command(OUTPUT firmware.hex

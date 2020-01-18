@@ -1,5 +1,4 @@
 #pragma once
-#include "stm32f1xx_hal.h"
 
 #define PWM_FREQ            16000     // PWM frequency in Hz
 #define DEAD_TIME              48     // PWM deadtime
@@ -79,7 +78,6 @@
 // ############################### INPUT ###############################
 
 // ###### CONTROL VIA UART (serial) ######
-#define START_FRAME             0xAAAA                  // [-] Start frame definition for serial commands
 #define SERIAL_TIMEOUT          160                     // [-] Serial timeout duration for the received data. 160 ~= 0.8 sec. Calculation: 0.8 sec / 0.005 sec
 
 #define USART2_BAUD             38400                   // UART2 baud rate (long wired cable)
