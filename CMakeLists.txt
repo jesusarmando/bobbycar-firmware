@@ -31,17 +31,11 @@ include_directories(
 
 set(headers
     Inc/BLDC_controller.h
-    Inc/comms.h
     Inc/config.h
     Inc/defines.h
-    Inc/eeprom.h
-    Inc/hd44780.h
-    Inc/pcf8574.h
     Inc/rtwtypes.h
-    Inc/setup.h
     Inc/stm32f1xx_hal_conf.h
     Inc/stm32f1xx_it.h
-
 )
 
 add_executable(firmware.elf
@@ -61,16 +55,10 @@ add_executable(firmware.elf
     Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c
     Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c
     Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
+
     Src/BLDC_controller.c
     Src/BLDC_controller_data.c
-    Src/bldc.c
-    Src/comms.c
-    Src/control.c
-    Src/eeprom.c
-    Src/hd44780.c
     Src/main.c
-    Src/pcf8574.c
-    Src/setup.c
     Src/stm32f1xx_it.c
     Src/system_stm32f1xx.c
     ${headers}
