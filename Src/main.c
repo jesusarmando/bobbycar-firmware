@@ -52,12 +52,6 @@ volatile adc_buf_t adc_buffer;
 
 static int16_t pwm_margin = 100;        /* This margin allows to always have a window in the PWM signal for proper Phase currents measurement */
 
-static int16_t curDC_max = (I_DC_MAX * A2BIT_CONV);
-int16_t curL_phaA = 0, curL_phaB = 0, curL_DC = 0;
-int16_t curR_phaB = 0, curR_phaC = 0, curR_DC = 0;
-uint8_t errCode_Left = 0;
-uint8_t errCode_Right = 0;
-
 volatile uint32_t timeout;
 
 uint8_t buzzerFreq          = 0;
@@ -127,7 +121,6 @@ static volatile Serialcommand command;
 static int16_t timeoutCntSerial   = 0;  // Timeout counter for Rx Serial command
 #endif
 static uint8_t timeoutFlagSerial  = 0;  // Timeout Flag for Rx Serial command: 0 = OK, 1 = Problem detected (line disconnected or wrong Rx data)
-
 
 uint8_t        enableL       = 0;        // initially motors are disabled for SAFETY
 uint8_t        enableLReq    = 0;
@@ -624,24 +617,24 @@ void DMA1_Channel1_IRQHandler(void) {
   }
 
   // Get Left motor currents
-  curL_phaA = (int16_t)(offsetrl1 - adc_buffer.rl1);
-  curL_phaB = (int16_t)(offsetrl2 - adc_buffer.rl2);
-  curL_DC   = (int16_t)(offsetdcl - adc_buffer.dcl);
+  int16_t curL_phaA = (int16_t)(offsetrl1 - adc_buffer.rl1);
+  int16_t curL_phaB = (int16_t)(offsetrl2 - adc_buffer.rl2);
+  int16_t curL_DC   = (int16_t)(offsetdcl - adc_buffer.dcl);
 
   // Get Right motor currents
-  curR_phaB = (int16_t)(offsetrr1 - adc_buffer.rr1);
-  curR_phaC = (int16_t)(offsetrr2 - adc_buffer.rr2);
-  curR_DC   = (int16_t)(offsetdcr - adc_buffer.dcr);
+  int16_t curR_phaB = (int16_t)(offsetrr1 - adc_buffer.rr1);
+  int16_t curR_phaC = (int16_t)(offsetrr2 - adc_buffer.rr2);
+  int16_t curR_DC   = (int16_t)(offsetdcr - adc_buffer.dcr);
 
   // Disable PWM when current limit is reached (current chopping)
   // This is the Level 2 of current protection. The Level 1 should kick in first given by I_MOT_MAX
-  if(ABS(curL_DC) > curDC_max || timeout > TIMEOUT || enableL == 0) {
+  if(ABS(curL_DC) > (iDcMaxL * A2BIT_CONV) || timeout > TIMEOUT || enableL == 0) {
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
   } else {
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
   }
 
-  if(ABS(curR_DC)  > curDC_max || timeout > TIMEOUT || enableR == 0) {
+  if(ABS(curR_DC)  > (iDcMaxR * A2BIT_CONV) || timeout > TIMEOUT || enableR == 0) {
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
   } else {
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
@@ -659,8 +652,6 @@ void DMA1_Channel1_IRQHandler(void) {
 
   // ############################### MOTOR CONTROL ###############################
 
-  int ul, vl, wl;
-  int ur, vr, wr;
   static boolean_T OverrunFlag = false;
 
   /* Check for overrun */
@@ -670,7 +661,8 @@ void DMA1_Channel1_IRQHandler(void) {
   OverrunFlag = true;
 
   /* Make sure to stop BOTH motors in case of an error */
-  int8_t enableLFin = enableL && !errCode_Left && !errCode_Right;
+  int8_t enableLFin = enableL && !rtY_Left.z_errCode && !rtY_Right.z_errCode;
+  int8_t enableRFin = enableR && !rtY_Left.z_errCode && !rtY_Right.z_errCode;
 
   // ========================= LEFT MOTOR ============================
     // Get hall sensors values
@@ -699,12 +691,9 @@ void DMA1_Channel1_IRQHandler(void) {
     BLDC_controller_step(rtM_Left);
 
     /* Get motor outputs here */
-    ul            = rtY_Left.DC_phaA;
-    vl            = rtY_Left.DC_phaB;
-    wl            = rtY_Left.DC_phaC;
-    errCode_Left  = rtY_Left.z_errCode;
-  // motSpeedLeft = rtY_Left.n_mot;
-  // motAngleLeft = rtY_Left.a_elecAngle;
+    int ul            = rtY_Left.DC_phaA;
+    int vl            = rtY_Left.DC_phaB;
+    int wl            = rtY_Left.DC_phaC;
 
     /* Apply commands */
     LEFT_TIM->LEFT_TIM_U    = (uint16_t)CLAMP(ul + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
@@ -712,9 +701,6 @@ void DMA1_Channel1_IRQHandler(void) {
     LEFT_TIM->LEFT_TIM_W    = (uint16_t)CLAMP(wl + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
   // =================================================================
 
-
-    /* Make sure to stop BOTH motors in case of an error */
-    int8_t enableRFin = enableR && !errCode_Left && !errCode_Right;
 
   // ========================= RIGHT MOTOR ===========================
     // Get hall sensors values
@@ -743,12 +729,9 @@ void DMA1_Channel1_IRQHandler(void) {
     BLDC_controller_step(rtM_Right);
 
     /* Get motor outputs here */
-    ur            = rtY_Right.DC_phaA;
-    vr            = rtY_Right.DC_phaB;
-    wr            = rtY_Right.DC_phaC;
-    errCode_Right = rtY_Right.z_errCode;
- // motSpeedRight = rtY_Right.n_mot;
- // motAngleRight = rtY_Right.a_elecAngle;
+    int ur            = rtY_Right.DC_phaA;
+    int vr            = rtY_Right.DC_phaB;
+    int wr            = rtY_Right.DC_phaC;
 
     /* Apply commands */
     RIGHT_TIM->RIGHT_TIM_U  = (uint16_t)CLAMP(ur + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
