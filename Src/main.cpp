@@ -96,7 +96,14 @@ struct {
         int pwm = 0;
         uint8_t ctrlTyp = CTRL_TYP_SEL;
         uint8_t ctrlMod = CTRL_MOD_REQ;
+        int16_t iMotMax = I_MOT_MAX;
+        int16_t iDcMax = I_DC_MAX;
+        int16_t nMotMax = N_MOT_MAX;
+        int16_t fieldWeakMax = FIELD_WEAK_MAX;
+        int16_t phaseAdvMax = PHASE_ADV_MAX;
     } actual, requested;
+
+    uint32_t chops = 0;
 } left, right;
 
 extern "C" const P rtP_Left; // default settings defined in BLDC_controller_data.c
@@ -122,36 +129,8 @@ volatile struct {
 int16_t timeoutCntSerial   = 0;  // Timeout counter for Rx Serial command
 uint8_t timeoutFlagSerial  = 0;  // Timeout Flag for Rx Serial command: 0 = OK, 1 = Problem detected (line disconnected or wrong Rx data)
 
-int16_t iMotMaxLReq = I_MOT_MAX;
-volatile int16_t iMotMaxL = I_MOT_MAX;
-int16_t iMotMaxRReq = I_MOT_MAX;
-volatile int16_t iMotMaxR = I_MOT_MAX;
-
-int16_t iDcMaxLReq = I_DC_MAX;
-volatile int16_t iDcMaxL = I_DC_MAX;
-int16_t iDcMaxRReq = I_DC_MAX;
-volatile int16_t iDcMaxR = I_DC_MAX;
-
-int16_t nMotMaxLReq = N_MOT_MAX;
-volatile int16_t nMotMaxL = N_MOT_MAX;
-int16_t nMotMaxRReq = N_MOT_MAX;
-volatile int16_t nMotMaxR = N_MOT_MAX;
-
-int16_t fieldWeakMaxLReq = FIELD_WEAK_MAX;
-volatile int16_t fieldWeakMaxL = FIELD_WEAK_MAX;
-int16_t fieldWeakMaxRReq = FIELD_WEAK_MAX;
-volatile int16_t fieldWeakMaxR = FIELD_WEAK_MAX;
-
-int16_t phaseAdvMaxLReq = PHASE_ADV_MAX;
-volatile int16_t phaseAdvMaxL = PHASE_ADV_MAX;
-int16_t phaseAdvMaxRReq = PHASE_ADV_MAX;
-volatile int16_t phaseAdvMaxR = PHASE_ADV_MAX;
-
 uint32_t inactivity_timeout_counter;
 uint32_t main_loop_counter;
-
-uint32_t chopsL = 0;
-uint32_t chopsR = 0;
 
 namespace {
 void filtLowPass32(int16_t u, uint16_t coef, int32_t *y);
@@ -218,11 +197,11 @@ int main() {
   left.rtP.b_selPhaABCurrMeas   = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
   left.rtP.z_ctrlTypSel         = left.actual.ctrlTyp;
   left.rtP.b_diagEna            = DIAG_ENA;
-  left.rtP.i_max                = (iMotMaxL * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-  left.rtP.n_max                = nMotMaxL << 4;                       // fixdt(1,16,4)
+  left.rtP.i_max                = (left.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+  left.rtP.n_max                = left.actual.nMotMax << 4;                       // fixdt(1,16,4)
   left.rtP.b_fieldWeakEna       = FIELD_WEAK_ENA;
-  left.rtP.id_fieldWeakMax      = (fieldWeakMaxL * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-  left.rtP.a_phaAdvMax          = phaseAdvMaxL << 4;                   // fixdt(1,16,4)
+  left.rtP.id_fieldWeakMax      = (left.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+  left.rtP.a_phaAdvMax          = left.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
   left.rtP.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
   left.rtP.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
 
@@ -230,11 +209,11 @@ int main() {
   right.rtP.b_selPhaABCurrMeas  = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
   right.rtP.z_ctrlTypSel         = right.actual.ctrlTyp;
   right.rtP.b_diagEna            = DIAG_ENA;
-  right.rtP.i_max                = (iMotMaxR * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-  right.rtP.n_max                = nMotMaxR << 4;                       // fixdt(1,16,4)
+  right.rtP.i_max                = (right.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+  right.rtP.n_max                = right.actual.nMotMax << 4;                       // fixdt(1,16,4)
   right.rtP.b_fieldWeakEna       = FIELD_WEAK_ENA;
-  right.rtP.id_fieldWeakMax      = (fieldWeakMaxR * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-  right.rtP.a_phaAdvMax          = phaseAdvMaxR << 4;                   // fixdt(1,16,4)
+  right.rtP.id_fieldWeakMax      = (right.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+  right.rtP.a_phaAdvMax          = right.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
   right.rtP.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
   right.rtP.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
 
@@ -308,23 +287,23 @@ int main() {
             left.requested.ctrlMod = command.ctrlModL;
             right.requested.ctrlMod = command.ctrlModR;
 
+            left.requested.iMotMax = command.iMotMaxL;
+            right.requested.iMotMax = command.iMotMaxR;
+
+            left.requested.iDcMax = command.iDcMaxL;
+            right.requested.iDcMax = command.iDcMaxR;
+
+            left.requested.nMotMax = command.nMotMaxL;
+            right.requested.nMotMax = command.nMotMaxR;
+
+            left.requested.fieldWeakMax = command.fieldWeakMaxL;
+            right.requested.fieldWeakMax = command.fieldWeakMaxR;
+
+            left.requested.phaseAdvMax = command.phaseAdvMaxL;
+            right.requested.phaseAdvMax = command.phaseAdvMaxR;
+
             buzzerFreqReq = command.buzzerFreq;
             buzzerPatternReq = command.buzzerPattern;
-
-            iMotMaxLReq = command.iMotMaxL;
-            iMotMaxRReq = command.iMotMaxR;
-
-            iDcMaxLReq = command.iDcMaxL;
-            iDcMaxRReq = command.iDcMaxR;
-
-            nMotMaxLReq = command.nMotMaxL;
-            nMotMaxRReq = command.nMotMaxR;
-
-            fieldWeakMaxLReq = command.fieldWeakMaxL;
-            fieldWeakMaxRReq = command.fieldWeakMaxR;
-
-            phaseAdvMaxLReq = command.phaseAdvMaxL;
-            phaseAdvMaxRReq = command.phaseAdvMaxR;
 
             if (command.poweroff)
                 poweroff();
@@ -363,23 +342,23 @@ int main() {
         left.actual.ctrlMod = 0;                                // OPEN_MODE request. This will bring the motor power to 0 in a controlled way
         right.actual.ctrlMod = 0;                                // OPEN_MODE request. This will bring the motor power to 0 in a controlled way
 
+        left.actual.iMotMax = I_MOT_MAX;
+        right.actual.iMotMax = I_MOT_MAX;
+
+        left.actual.iDcMax = I_DC_MAX;
+        right.actual.iDcMax = I_DC_MAX;
+
+        left.actual.nMotMax = N_MOT_MAX;
+        right.actual.nMotMax = N_MOT_MAX;
+
+        left.actual.fieldWeakMax = FIELD_WEAK_MAX;
+        right.actual.fieldWeakMax = FIELD_WEAK_MAX;
+
+        left.actual.phaseAdvMax = PHASE_ADV_MAX;
+        right.actual.phaseAdvMax = PHASE_ADV_MAX;
+
         buzzerFreq    = 24;
         buzzerPattern = 1;
-
-        iMotMaxL = I_MOT_MAX;
-        iMotMaxR = I_MOT_MAX;
-
-        iDcMaxL = I_DC_MAX;
-        iDcMaxR = I_DC_MAX;
-
-        nMotMaxL = N_MOT_MAX;
-        nMotMaxR = N_MOT_MAX;
-
-        fieldWeakMaxL = FIELD_WEAK_MAX;
-        fieldWeakMaxR = FIELD_WEAK_MAX;
-
-        phaseAdvMaxL = PHASE_ADV_MAX;
-        phaseAdvMaxR = PHASE_ADV_MAX;
     }
     else
     {
@@ -395,23 +374,23 @@ int main() {
         left.actual.ctrlMod = left.requested.ctrlMod;
         right.actual.ctrlMod = right.requested.ctrlMod;
 
+        left.actual.iMotMax = left.requested.iMotMax;
+        right.actual.iMotMax = right.requested.iMotMax;
+
+        left.actual.iDcMax = left.requested.iDcMax;
+        right.actual.iDcMax = right.requested.iDcMax;
+
+        left.actual.nMotMax = left.requested.nMotMax;
+        right.actual.nMotMax = right.requested.nMotMax;
+
+        left.actual.fieldWeakMax = left.requested.fieldWeakMax;
+        right.actual.fieldWeakMax = right.requested.fieldWeakMax;
+
+        left.actual.phaseAdvMax = left.requested.phaseAdvMax;
+        right.actual.phaseAdvMax = right.requested.phaseAdvMax;
+
         buzzerFreq = buzzerFreqReq;
         buzzerPattern = buzzerPatternReq;
-
-        iMotMaxL = iMotMaxLReq;
-        iMotMaxR = iMotMaxRReq;
-
-        iDcMaxL = iDcMaxLReq;
-        iDcMaxR = iDcMaxRReq;
-
-        nMotMaxL = nMotMaxLReq;
-        nMotMaxR = nMotMaxRReq;
-
-        fieldWeakMaxL = fieldWeakMaxLReq;
-        fieldWeakMaxR = fieldWeakMaxRReq;
-
-        phaseAdvMaxL = phaseAdvMaxLReq;
-        phaseAdvMaxR = phaseAdvMaxRReq;
     }
     timeout = 0;
 
@@ -473,9 +452,9 @@ int main() {
                                         board_temp_deg_c,
                                         left.rtU.b_hallA, left.rtU.b_hallB, left.rtU.b_hallC,
                                         right.rtU.b_hallA, right.rtU.b_hallB, right.rtU.b_hallC,
-                                        chopsL, chopsR);
-                  chopsL = 0;
-                  chopsR = 0;
+                                        left.chops, right.chops);
+                  left.chops = 0;
+                  right.chops = 0;
 
                   if(UART_DMA_CHANNEL->CNDTR == 0) {
                     UART_DMA_CHANNEL->CCR    &= ~DMA_CCR_EN;
@@ -538,9 +517,9 @@ extern "C" void DMA1_Channel1_IRQHandler() {
   int16_t curR_phaC = (int16_t)(offsetrr2 - adc_buffer.rr2);
   int16_t curR_DC   = (int16_t)(offsetdcr - adc_buffer.dcr);
 
-  const int8_t chopL = std::abs(curL_DC) > (iDcMaxL * A2BIT_CONV);
+  const int8_t chopL = std::abs(curL_DC) > (left.actual.iDcMax * A2BIT_CONV);
   if (chopL)
-      chopsL++;
+      left.chops++;
 
   // Disable PWM when current limit is reached (current chopping)
   // This is the Level 2 of current protection. The Level 1 should kick in first given by I_MOT_MAX
@@ -550,9 +529,9 @@ extern "C" void DMA1_Channel1_IRQHandler() {
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
   }
 
-  const int8_t chopR = std::abs(curR_DC) > (iDcMaxR * A2BIT_CONV);
+  const int8_t chopR = std::abs(curR_DC) > (right.actual.iDcMax * A2BIT_CONV);
   if (chopR)
-      chopsR++;
+      right.chops++;
 
   if(chopR || timeout > TIMEOUT || right.actual.enable == 0) {
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
@@ -595,10 +574,10 @@ extern "C" void DMA1_Channel1_IRQHandler() {
 
     /* Set motor inputs here */
     left.rtP.z_ctrlTypSel         = left.actual.ctrlTyp;
-    left.rtP.i_max                = (iMotMaxL * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    left.rtP.n_max                = nMotMaxL << 4;                       // fixdt(1,16,4)
-    left.rtP.id_fieldWeakMax      = (fieldWeakMaxL * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    left.rtP.a_phaAdvMax          = phaseAdvMaxL << 4;                   // fixdt(1,16,4)
+    left.rtP.i_max                = (left.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    left.rtP.n_max                = left.actual.nMotMax << 4;                       // fixdt(1,16,4)
+    left.rtP.id_fieldWeakMax      = (left.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    left.rtP.a_phaAdvMax          = left.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
 
     left.rtU.b_motEna     = enableLFin;
     left.rtU.z_ctrlModReq = left.actual.ctrlMod;
@@ -633,10 +612,10 @@ extern "C" void DMA1_Channel1_IRQHandler() {
 
     /* Set motor inputs here */
     right.rtP.z_ctrlTypSel         = right.actual.ctrlTyp;
-    right.rtP.i_max                = (iMotMaxR * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    right.rtP.n_max                = nMotMaxR << 4;                       // fixdt(1,16,4)
-    right.rtP.id_fieldWeakMax      = (fieldWeakMaxR * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    right.rtP.a_phaAdvMax          = phaseAdvMaxR << 4;                   // fixdt(1,16,4)
+    right.rtP.i_max                = (right.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    right.rtP.n_max                = right.actual.nMotMax << 4;                       // fixdt(1,16,4)
+    right.rtP.id_fieldWeakMax      = (right.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    right.rtP.a_phaAdvMax          = right.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
 
     right.rtU.b_motEna      = enableRFin;
     right.rtU.z_ctrlModReq  = right.actual.ctrlMod;
