@@ -3,3 +3,4 @@
 .pioenvs/
 .vscode/
 01_Matlab/slprj/
+build/
