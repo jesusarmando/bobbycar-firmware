@@ -85,37 +85,11 @@
 #define USART3_BAUD             38400                   // UART3 baud rate (short wired cable)
 #define USART3_WORDLENGTH       UART_WORDLENGTH_8B      // UART_WORDLENGTH_8B or UART_WORDLENGTH_9B
 
-//USART2
-#define UART_DMA_CHANNEL DMA1_Channel7
-//USART3
-//#define UART_DMA_CHANNEL DMA1_Channel2
-
-// ############################### MOTOR CONTROL #########################
-// Control selections
-#define CTRL_TYP_SEL    2                       // [-] Control type selection: 0 = Commutation , 1 = Sinusoidal, 2 = FOC Field Oriented Control (default)
-#define CTRL_MOD_REQ    3                       // [-] Control mode request: 0 = Open mode, 1 = VOLTAGE mode (default), 2 = SPEED mode, 3 = TORQUE mode. Note: SPEED and TORQUE modes are only available for FOC!
 #define DIAG_ENA        1                       // [-] Motor Diagnostics enable flag: 0 = Disabled, 1 = Enabled (default)
 
-// Limitation settings
-#define I_MOT_MAX       15                      // [A] Maximum motor current limit
-#define I_DC_MAX        17                      // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
-#define N_MOT_MAX       1000                    // [rpm] Maximum motor speed limit
-
-// Field Weakening / Phase Advance
 #define FIELD_WEAK_ENA  1                       // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
-#define FIELD_WEAK_MAX  10                       // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
-#define PHASE_ADV_MAX   40                      // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
 #define FIELD_WEAK_HI   1500                    // [-] Input target High threshold for reaching maximum Field Weakening / Phase Advance. Do NOT set this higher than 1500.
-#define FIELD_WEAK_LO   1000                    // [-] Input target Low threshold for starting Field Weakening / Phase Advance. Do NOT set this higher than 1000.
-
-// Data checks - Do NOT touch
-#if (FIELD_WEAK_ENA == 0)
-  #undef  FIELD_WEAK_HI                       
-  #define FIELD_WEAK_HI 1000                    // [-] This prevents the input target going beyond 1000 when Field Weakening is not enabled
-#endif
-#define INPUT_MAX   MAX( 1000, FIELD_WEAK_HI)   // [-] Defines the Input target maximum limitation        
-#define INPUT_MIN   MIN(-1000,-FIELD_WEAK_HI)   // [-] Defines the Input target minimum limitation 
-#define INPUT_MID   INPUT_MAX / 2      
+#define FIELD_WEAK_LO   1000                    // [-] Input target Low threshold for starting Field Weakening / Phase Advance. Do NOT set this higher than 1000.    
 
 /* GENERAL NOTES:
  * 1. The above parameters are over-writing the default motor parameters. For all the available parameters check BLDC_controller_data.c

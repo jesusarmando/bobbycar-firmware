@@ -165,7 +165,7 @@ int main()
 
     left.rtP = rtP_Left;
     left.rtP.b_selPhaABCurrMeas   = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
-    left.rtP.z_ctrlTypSel         = left.actual.ctrlTyp;
+    left.rtP.z_ctrlTypSel         = uint8_t(left.actual.ctrlTyp);
     left.rtP.b_diagEna            = DIAG_ENA;
     left.rtP.i_max                = (left.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
     left.rtP.n_max                = left.actual.nMotMax << 4;                       // fixdt(1,16,4)
@@ -181,7 +181,7 @@ int main()
 
     right.rtP = rtP_Left;
     right.rtP.b_selPhaABCurrMeas  = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
-    right.rtP.z_ctrlTypSel         = right.actual.ctrlTyp;
+    right.rtP.z_ctrlTypSel         = uint8_t(right.actual.ctrlTyp);
     right.rtP.b_diagEna            = DIAG_ENA;
     right.rtP.i_max                = (right.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
     right.rtP.n_max                = right.actual.nMotMax << 4;                       // fixdt(1,16,4)
@@ -208,7 +208,9 @@ int main()
 
     HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);
 
+#define UART_DMA_CHANNEL DMA1_Channel7
     UART2_Init();
+//#define UART_DMA_CHANNEL DMA1_Channel2
     //UART3_Init();
 
     HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, sizeof(command));
@@ -342,14 +344,14 @@ extern "C" void DMA1_Channel1_IRQHandler() {
     uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
 
     /* Set motor inputs here */
-    left.rtP.z_ctrlTypSel         = left.actual.ctrlTyp;
+    left.rtP.z_ctrlTypSel         = uint8_t(left.actual.ctrlTyp);
     left.rtP.i_max                = (left.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
     left.rtP.n_max                = left.actual.nMotMax << 4;                       // fixdt(1,16,4)
     left.rtP.id_fieldWeakMax      = (left.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
     left.rtP.a_phaAdvMax          = left.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
 
     left.rtU.b_motEna     = enableLFin;
-    left.rtU.z_ctrlModReq = left.actual.ctrlMod;
+    left.rtU.z_ctrlModReq = uint8_t(left.actual.ctrlMod);
     left.rtU.r_inpTgt     = left.actual.pwm;
     left.rtU.b_hallA      = hall_ul;
     left.rtU.b_hallB      = hall_vl;
@@ -380,14 +382,14 @@ extern "C" void DMA1_Channel1_IRQHandler() {
     uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
 
     /* Set motor inputs here */
-    right.rtP.z_ctrlTypSel         = right.actual.ctrlTyp;
+    right.rtP.z_ctrlTypSel         = uint8_t(right.actual.ctrlTyp);
     right.rtP.i_max                = (right.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
     right.rtP.n_max                = right.actual.nMotMax << 4;                       // fixdt(1,16,4)
     right.rtP.id_fieldWeakMax      = (right.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
     right.rtP.a_phaAdvMax          = right.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
 
     right.rtU.b_motEna      = enableRFin;
-    right.rtU.z_ctrlModReq  = right.actual.ctrlMod;
+    right.rtU.z_ctrlModReq  = uint8_t(right.actual.ctrlMod);
     right.rtU.r_inpTgt      = right.actual.pwm;
     right.rtU.b_hallA       = hall_ur;
     right.rtU.b_hallB       = hall_vr;
@@ -1057,17 +1059,7 @@ void handleIncomingMessage()
 
     if (timeoutFlagSerial)
     {
-        left.actual = right.actual = {
-                .enable = 1,
-                .pwm = 0,
-                .ctrlTyp = 2,
-                .ctrlMod = 0, // OPEN_MODE request. This will bring the motor power to 0 in a controlled way
-                .iMotMax = I_MOT_MAX,
-                .iDcMax = I_DC_MAX,
-                .nMotMax = N_MOT_MAX,
-                .fieldWeakMax = FIELD_WEAK_MAX,
-                .phaseAdvMax = PHASE_ADV_MAX
-        };
+        left.actual = right.actual = {.enable=true};
 
         buzzer.actual = { 24, 1 };
     }
