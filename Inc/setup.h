@@ -20,12 +20,3 @@
 */
 
 #pragma once
-
-#include "stm32f1xx_hal.h"
-
-void MX_GPIO_Init(void);
-void MX_TIM_Init(void);
-void MX_ADC1_Init(void);
-void MX_ADC2_Init(void);
-void UART2_Init(void);
-void UART3_Init(void);

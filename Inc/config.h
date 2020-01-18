@@ -11,8 +11,9 @@
 // or use VARIANT environment variable for example like "make -e VARIANT=VARIANT_NUNCHUK". Select only one at a time.
 #if !defined(PLATFORMIO)
   //#define VARIANT_ADC         // Variant for control via ADC input
-  //#define VARIANT_USART       // Variant for Serial control via USART3 input
-  //#define VARIANT_NUNCHUK     // Variant for Nunchuk controlled vehicle build
+  #define VARIANT_USART2      // Variant for Serial control via USART2 input
+  //#define VARIANT_USART3      // Variant for Serial control via USART3 input
+  //#define VARIANT_NUNCHUCK    // Variant for Nunchuck controlled vehicle build
   //#define VARIANT_PPM         // Variant for RC-Remote with PPM-Sum Signal
   //#define VARIANT_IBUS        // Variant for RC-Remotes with FLYSKY IBUS
   //#define VARIANT_HOVERCAR    // Variant for HOVERCAR build
@@ -98,55 +99,8 @@
 
 
 
-// ############################### MOTOR CONTROL #########################
-/* GENERAL NOTES:
- * 1. The parameters here are over-writing the default motor parameters. For all the available parameters check BLDC_controller_data.c
- * 2. The parameters are represented in fixed point data type for a more efficient code execution
- * 3. For calibrating the fixed-point parameters use the Fixed-Point Viewer tool (see <https://github.com/EmanuelFeru/FixedPointViewer>)
- * 4. For more details regarding the parameters and the working principle of the controller please consult the Simulink model
- * 5. A webview was created, so Matlab/Simulink installation is not needed, unless you want to regenerate the code.
- * The webview is an html page that can be opened with browsers like: Microsoft Internet Explorer or Microsoft Edge
- *
- * NOTES Field Weakening / Phase Advance:
- * 1. The Field Weakening is a linear interpolation from 0 to FIELD_WEAK_MAX or PHASE_ADV_MAX (depeding if FOC or SIN is selected, respectively)
- * 2. The Field Weakening starts engaging at FIELD_WEAK_LO and reaches the maximum value at FIELD_WEAK_HI
- * 3. If you re-calibrate the Field Weakening please take all the safety measures! The motors can spin very fast!
 
-   Inputs:
-    - cmd1 and cmd2: analog normalized input values. INPUT_MIN to INPUT_MAX
-    - button1 and button2: digital input values. 0 or 1
-    - adc_buffer.l_tx2 and adc_buffer.l_rx2: unfiltered ADC values (you do not need them). 0 to 4095
-   Outputs:
-    - speedR and speedL: normal driving INPUT_MIN to INPUT_MAX
-*/
-// Control selections
-#define CTRL_TYP_SEL    2               // [-] Control type selection: 0 = Commutation , 1 = Sinusoidal, 2 = FOC Field Oriented Control (default)
-#define CTRL_MOD_REQ    1               // [-] Control mode request: 0 = Open mode, 1 = VOLTAGE mode (default), 2 = SPEED mode, 3 = TORQUE mode. Note: SPEED and TORQUE modes are only available for FOC!
-#define DIAG_ENA        1               // [-] Motor Diagnostics enable flag: 0 = Disabled, 1 = Enabled (default)
-
-// Limitation settings
-#define I_MOT_MAX       15              // [A] Maximum motor current limit
-#define I_DC_MAX        17              // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
-#define N_MOT_MAX       1000            // [rpm] Maximum motor speed limit
-
-// Field Weakening / Phase Advance
-#define FIELD_WEAK_ENA  0               // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
-#define FIELD_WEAK_MAX  5               // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
-#define PHASE_ADV_MAX   25              // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
-#define FIELD_WEAK_HI   1500            // [-] Input target High threshold for reaching maximum Field Weakening / Phase Advance. Do NOT set this higher than 1500.
-#define FIELD_WEAK_LO   1000            // [-] Input target Low threshold for starting Field Weakening / Phase Advance. Do NOT set this higher than 1000.
-
-// Data checks - Do NOT touch
-#if (FIELD_WEAK_ENA == 0)
-  #undef  FIELD_WEAK_HI
-  #define FIELD_WEAK_HI 1000            // [-] This prevents the input target going beyond 1000 when Field Weakening is not enabled
-#endif
-#define INPUT_MAX MAX( 1000, FIELD_WEAK_HI)   // [-] Defines the Input target maximum limitation
-#define INPUT_MIN MIN(-1000,-FIELD_WEAK_HI)   // [-] Defines the Input target minimum limitation
-#define INPUT_MID INPUT_MAX / 2
-// ########################### END OF MOTOR CONTROL ########################
-
-
+// ############################### INPUT ###############################
 
 // ############################## DEFAULT SETTINGS ############################
 // Default settings will be applied at the end of this config file if not set before
@@ -166,7 +120,26 @@
 #define DEFAULT_STEER_COEFFICIENT   8192  // Defualt for STEER_COEFFICIENT 0.5f [-] higher value == stronger. [0, 65535] = [-2.0 - 2.0]. In this case  8192 = 0.5 * 2^14. If you do not want any steering, set it to 0.
 // ######################### END OF DEFAULT SETTINGS ##########################
 
+#if defined(VARIANT_ADC) || defined(VARIANT_HOVERCAR)
+  #define CONTROL_SERIAL_USART2                      // left sensor board cable, disable if ADC or PPM is used! For Arduino control check the hoverSerial.ino
+  #define FEEDBACK_SERIAL_USART2                     // left sensor board cable, disable if ADC or PPM is used!
+  // #define DEBUG_SERIAL_USART2                        // left sensor board cable, disable if ADC or PPM is used!
 
+  // #define CONTROL_SERIAL_USART3                      // right sensor board cable, disable if I2C (nunchuck or lcd) is used! For Arduino control check the hoverSerial.ino
+  // #define FEEDBACK_SERIAL_USART3                     // right sensor board cable, disable if I2C (nunchuck or lcd) is used!
+  #define DEBUG_SERIAL_USART3                        // right sensor board cable, disable if I2C (nunchuck or lcd) is used!  
+#elif defined(VARIANT_USART2)
+  #define CONTROL_SERIAL_USART2                      // left sensor board cable, disable if ADC or PPM is used! For Arduino control check the hoverSerial.ino
+  #define FEEDBACK_SERIAL_USART2                     // left sensor board cable, disable if ADC or PPM is used!
+  // #define DEBUG_SERIAL_USART2                        // left sensor board cable, disable if ADC or PPM is used!
+
+  // #define CONTROL_SERIAL_USART3                      // right sensor board cable, disable if I2C (nunchuck or lcd) is used! For Arduino control check the hoverSerial.ino
+  // #define FEEDBACK_SERIAL_USART3                     // right sensor board cable, disable if I2C (nunchuck or lcd) is used!
+  // #define DEBUG_SERIAL_USART3                        // right sensor board cable, disable if I2C (nunchuck or lcd) is used!
+#elif defined(VARIANT_USART3)
+  // #define CONTROL_SERIAL_USART2                      // left sensor board cable, disable if ADC or PPM is used! For Arduino control check the hoverSerial.ino
+  // #define FEEDBACK_SERIAL_USART2                     // left sensor board cable, disable if ADC or PPM is used!
+  // #define DEBUG_SERIAL_USART2                        // left sensor board cable, disable if ADC or PPM is used!
 
 // ############################### DEBUG SERIAL ###############################
 /* Connect GND and RX of a 3.3v uart-usb adapter to the left (USART2) or right sensor board cable (USART3)
@@ -263,16 +236,24 @@
 #endif
 // ############################# END OF VARIANT_NUNCHUK SETTINGS #########################
 
+// ############################### MOTOR CONTROL #########################
+// Control selections
+#define CTRL_TYP_SEL    2                       // [-] Control type selection: 0 = Commutation , 1 = Sinusoidal, 2 = FOC Field Oriented Control (default)
+#define CTRL_MOD_REQ    3                       // [-] Control mode request: 0 = Open mode, 1 = VOLTAGE mode (default), 2 = SPEED mode, 3 = TORQUE mode. Note: SPEED and TORQUE modes are only available for FOC!
+#define DIAG_ENA        1                       // [-] Motor Diagnostics enable flag: 0 = Disabled, 1 = Enabled (default)
 
 
-// ################################# VARIANT_PPM SETTINGS ##############################
-#ifdef VARIANT_PPM
-/* ###### CONTROL VIA RC REMOTE ######
- * left sensor board cable. Channel 1: steering, Channel 2: speed.
- * https://gist.github.com/peterpoetzi/1b63a4a844162196613871767189bd05
-*/
-  #define CONTROL_PPM                 // use PPM-Sum as input. disable CONTROL_SERIAL_USART2!
-  #define PPM_NUM_CHANNELS    6       // total number of PPM channels to receive, even if they are not used.
+// Field Weakening / Phase Advance
+#define FIELD_WEAK_ENA  1                       // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
+#define FIELD_WEAK_MAX  10                       // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
+#define PHASE_ADV_MAX   40                      // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
+#define FIELD_WEAK_HI   1500                    // [-] Input target High threshold for reaching maximum Field Weakening / Phase Advance. Do NOT set this higher than 1500.
+#define FIELD_WEAK_LO   1000                    // [-] Input target Low threshold for starting Field Weakening / Phase Advance. Do NOT set this higher than 1000.
+
+// Data checks - Do NOT touch
+#if (FIELD_WEAK_ENA == 0)
+  #undef  FIELD_WEAK_HI                       
+  #define FIELD_WEAK_HI 1000                    // [-] This prevents the input target going beyond 1000 when Field Weakening is not enabled
 #endif
 // ############################# END OF VARIANT_PPM SETTINGS ############################
 
@@ -399,8 +380,8 @@
 
 
 // ############################### VALIDATE SETTINGS ###############################
-#if !defined(VARIANT_ADC) && !defined(VARIANT_USART) && !defined(VARIANT_NUNCHUK) && !defined(VARIANT_PPM) && !defined(VARIANT_IBUS) && \
-    !defined(VARIANT_HOVERCAR) && !defined(VARIANT_HOVERBOARD) && !defined(VARIANT_TRANSPOTTER)
+
+#if !defined(VARIANT_ADC) && !defined(VARIANT_USART2) && !defined(VARIANT_USART3) && !defined(VARIANT_HOVERCAR) && !defined(VARIANT_TRANSPOTTER) && !defined(VARIANT_NUNCHUCK) && !defined(VARIANT_PPM)&& !defined(VARIANT_IBUS)
   #error Variant not defined! Please check platformio.ini or Inc/config.h for available variants.
 #endif
 
@@ -436,12 +417,8 @@
   #error CONTROL_NUNCHUK and SERIAL_USART3 not allowed. It is on the same cable.
 #endif
 
-#if (defined(DEBUG_SERIAL_USART3) || defined(CONTROL_SERIAL_USART3)) && defined(DEBUG_I2C_LCD)
-  #error DEBUG_I2C_LCD and SERIAL_USART3 not allowed. It is on the same cable.
-#endif
-
-#if defined(CONTROL_PPM) && defined(CONTROL_ADC) && defined(CONTROL_NUNCHUK) || defined(CONTROL_PPM) && defined(CONTROL_ADC) || defined(CONTROL_ADC) && defined(CONTROL_NUNCHUK) || defined(CONTROL_PPM) && defined(CONTROL_NUNCHUK)
-  #error only 1 input method allowed. use CONTROL_PPM or CONTROL_ADC or CONTROL_NUNCHUK.
+#if defined(CONTROL_PPM) && defined(CONTROL_ADC) && defined(CONTROL_NUNCHUCK) || defined(CONTROL_PPM) && defined(CONTROL_ADC) || defined(CONTROL_ADC) && defined(CONTROL_NUNCHUCK) || defined(CONTROL_PPM) && defined(CONTROL_NUNCHUCK)
+  #error only 1 input method allowed. use CONTROL_PPM or CONTROL_ADC or CONTROL_NUNCHUCK.
 #endif
 
 #if defined(ADC_PROTECT_ENA) && ((ADC1_MIN - ADC_PROTECT_THRESH) <= 0 || (ADC1_MAX + ADC_PROTECT_THRESH) >= 4096)
@@ -457,7 +434,3 @@
 #if defined(CONTROL_PPM) && !defined(PPM_NUM_CHANNELS)
   #error Total number of PPM channels needs to be set
 #endif
-// ############################# END OF VALIDATE SETTINGS ############################
-
-#endif
-
