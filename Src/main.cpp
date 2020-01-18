@@ -61,10 +61,10 @@ volatile struct {
 
 volatile uint32_t timeout;
 
-uint8_t buzzerFreq          = 0;
-uint8_t buzzerFreqReq       = 0;
-uint8_t buzzerPattern       = 0;
-uint8_t buzzerPatternReq    = 0;
+uint8_t buzzerFreq       = 0;
+uint8_t buzzerFreqReq    = 0;
+uint8_t buzzerPattern    = 0;
+uint8_t buzzerPatternReq = 0;
 
 uint32_t buzzerTimer = 0;
 
@@ -76,7 +76,7 @@ int16_t offsetrr2    = 2000;
 int16_t offsetdcl    = 2000;
 int16_t offsetdcr    = 2000;
 
-int16_t        batVoltage       = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE;
+int16_t batVoltage       = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE;
 int32_t batVoltageFixdt  = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE << 20;  // Fixed-point filter output initialized at 400 V*100/cell = 4 V/cell converted to fixed-point
 
 // Matlab includes and defines - from auto-code generation
@@ -90,50 +90,37 @@ struct {
     DW    rtDW;   /* Observable states */
     ExtU  rtU;    /* External inputs */
     ExtY  rtY;    /* External outputs */
+
+    struct {
+        bool enable = false;
+        int pwm = 0;
+        uint8_t ctrlTyp = CTRL_TYP_SEL;
+        uint8_t ctrlMod = CTRL_MOD_REQ;
+    } actual, requested;
 } left, right;
 
-extern "C" const P rtP_Left;
+extern "C" const P rtP_Left; // default settings defined in BLDC_controller_data.c
 
-typedef struct{
-  uint16_t start;
+volatile struct {
+    uint16_t start;
 
-  int16_t enableL, enableR;
-  int16_t pwmL, pwmR;
-  int16_t ctrlTypL, ctrlTypR;
-  int16_t ctrlModL, ctrlModR;
-  int16_t iMotMaxL, iMotMaxR;
-  int16_t iDcMaxL, iDcMaxR;
-  int16_t nMotMaxL, nMotMaxR;
-  int16_t phaseAdvMaxL, phaseAdvMaxR;
-  int16_t fieldWeakMaxL, fieldWeakMaxR;
+    int16_t enableL, enableR;
+    int16_t pwmL, pwmR;
+    int16_t ctrlTypL, ctrlTypR;
+    int16_t ctrlModL, ctrlModR;
+    int16_t iMotMaxL, iMotMaxR;
+    int16_t iDcMaxL, iDcMaxR;
+    int16_t nMotMaxL, nMotMaxR;
+    int16_t phaseAdvMaxL, phaseAdvMaxR;
+    int16_t fieldWeakMaxL, fieldWeakMaxR;
 
-  int16_t buzzerFreq, buzzerPattern, poweroff;
+    int16_t buzzerFreq, buzzerPattern, poweroff;
 
-  uint16_t  checksum;
-} Serialcommand;
-volatile Serialcommand command;
+    uint16_t  checksum;
+} command;
+
 int16_t timeoutCntSerial   = 0;  // Timeout counter for Rx Serial command
 uint8_t timeoutFlagSerial  = 0;  // Timeout Flag for Rx Serial command: 0 = OK, 1 = Problem detected (line disconnected or wrong Rx data)
-
-uint8_t        enableL       = 0;        // initially motors are disabled for SAFETY
-uint8_t        enableLReq    = 0;
-uint8_t        enableR       = 0;        // initially motors are disabled for SAFETY
-uint8_t        enableRReq    = 0;
-
-int pwmLReq = 0;
-volatile int pwmL = 0;
-int pwmRReq = 0;
-volatile int pwmR = 0;
-
-uint8_t ctrlTypLReq = CTRL_TYP_SEL;
-volatile uint8_t ctrlTypL    = CTRL_TYP_SEL;   // Final control mode request
-uint8_t ctrlTypRReq = CTRL_TYP_SEL;
-volatile uint8_t ctrlTypR    = CTRL_TYP_SEL;   // Final control mode request
-
-uint8_t ctrlModLReq = CTRL_MOD_REQ;
-volatile uint8_t ctrlModL    = CTRL_MOD_REQ;   // Final control mode request
-uint8_t ctrlModRReq = CTRL_MOD_REQ;
-volatile uint8_t ctrlModR    = CTRL_MOD_REQ;   // Final control mode request
 
 int16_t iMotMaxLReq = I_MOT_MAX;
 volatile int16_t iMotMaxL = I_MOT_MAX;
@@ -171,25 +158,25 @@ void filtLowPass32(int16_t u, uint16_t coef, int32_t *y);
 
 void rateLimiter16(int16_t u, int16_t rate, int16_t *y);
 
-void SystemClock_Config(void);
+void SystemClock_Config();
 
-void UART2_Init(void);
+void UART2_Init();
 
-void UART3_Init(void);
+//void UART3_Init();
 
-void MX_GPIO_Init(void);
+void MX_GPIO_Init();
 
-void MX_TIM_Init(void);
+void MX_TIM_Init();
 
-void MX_ADC1_Init(void);
+void MX_ADC1_Init();
 
-void MX_ADC2_Init(void);
+void MX_ADC2_Init();
 
-void poweroff(void);
+void poweroff();
 
 } // anonymous namespace
 
-int main(void) {
+int main() {
 
   HAL_Init();
   __HAL_RCC_AFIO_CLK_ENABLE();
@@ -229,7 +216,7 @@ int main(void) {
   /* Set BLDC controller parameters */ 
   left.rtP = rtP_Left;
   left.rtP.b_selPhaABCurrMeas   = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
-  left.rtP.z_ctrlTypSel         = ctrlTypL;
+  left.rtP.z_ctrlTypSel         = left.actual.ctrlTyp;
   left.rtP.b_diagEna            = DIAG_ENA;
   left.rtP.i_max                = (iMotMaxL * A2BIT_CONV) << 4;        // fixdt(1,16,4)
   left.rtP.n_max                = nMotMaxL << 4;                       // fixdt(1,16,4)
@@ -241,7 +228,7 @@ int main(void) {
 
   right.rtP = rtP_Left;
   right.rtP.b_selPhaABCurrMeas  = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
-  right.rtP.z_ctrlTypSel         = ctrlTypR;
+  right.rtP.z_ctrlTypSel         = right.actual.ctrlTyp;
   right.rtP.b_diagEna            = DIAG_ENA;
   right.rtP.i_max                = (iMotMaxR * A2BIT_CONV) << 4;        // fixdt(1,16,4)
   right.rtP.n_max                = nMotMaxR << 4;                       // fixdt(1,16,4)
@@ -309,17 +296,17 @@ int main(void) {
         }
         else
         {
-            enableLReq = command.enableL;
-            enableRReq = command.enableR;
+            left.requested.enable = command.enableL;
+            right.requested.enable = command.enableR;
 
-            pwmLReq = command.pwmL;
-            pwmRReq = command.pwmR;
+            left.requested.pwm = command.pwmL;
+            right.requested.pwm = command.pwmR;
 
-            ctrlTypLReq = command.ctrlTypL;
-            ctrlTypRReq = command.ctrlTypR;
+            left.requested.ctrlTyp = command.ctrlTypL;
+            right.requested.ctrlTyp = command.ctrlTypR;
 
-            ctrlModLReq = command.ctrlModL;
-            ctrlModRReq = command.ctrlModR;
+            left.requested.ctrlMod = command.ctrlModL;
+            right.requested.ctrlMod = command.ctrlModR;
 
             buzzerFreqReq = command.buzzerFreq;
             buzzerPatternReq = command.buzzerPattern;
@@ -364,17 +351,17 @@ int main(void) {
 
     if (timeoutFlagSerial)
     {
-        enableL = 1;
-        enableR = 1;
+        left.actual.enable = 1;
+        right.actual.enable = 1;
 
-        pwmL = 0;
-        pwmR = 0;
+        left.actual.pwm = 0;
+        right.actual.pwm = 0;
 
-        ctrlTypL = 2;
-        ctrlTypR = 2;
+        left.actual.ctrlTyp = 2;
+        right.actual.ctrlTyp = 2;
 
-        ctrlModL  = 0;                                // OPEN_MODE request. This will bring the motor power to 0 in a controlled way
-        ctrlModR  = 0;                                // OPEN_MODE request. This will bring the motor power to 0 in a controlled way
+        left.actual.ctrlMod = 0;                                // OPEN_MODE request. This will bring the motor power to 0 in a controlled way
+        right.actual.ctrlMod = 0;                                // OPEN_MODE request. This will bring the motor power to 0 in a controlled way
 
         buzzerFreq    = 24;
         buzzerPattern = 1;
@@ -396,17 +383,17 @@ int main(void) {
     }
     else
     {
-        enableL = enableLReq;
-        enableR = enableRReq;
+        left.actual.enable = left.requested.enable;
+        right.actual.enable = right.requested.enable;
 
-        pwmL = pwmLReq;
-        pwmR = pwmRReq;
+        left.actual.pwm = left.requested.pwm;
+        right.actual.pwm = right.requested.pwm;
 
-        ctrlTypL = ctrlTypLReq;
-        ctrlTypR = ctrlTypRReq;
+        left.actual.ctrlTyp = left.requested.ctrlTyp;
+        right.actual.ctrlTyp = right.requested.ctrlTyp;
 
-        ctrlModL  = ctrlModLReq;
-        ctrlModR  = ctrlModRReq;
+        left.actual.ctrlMod = left.requested.ctrlMod;
+        right.actual.ctrlMod = right.requested.ctrlMod;
 
         buzzerFreq = buzzerFreqReq;
         buzzerPattern = buzzerPatternReq;
@@ -502,24 +489,13 @@ int main(void) {
     HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
     // ####### POWEROFF BY POWER-BUTTON #######
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
-      enableL = enableR = 0;                                             // disable motors
+      left.actual.enable = right.actual.enable = 0;                                             // disable motors
       while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}    // wait until button is released
       if(__HAL_RCC_GET_FLAG(RCC_FLAG_SFTRST)) {               // do not power off after software reset (from a programmer/debugger)
         __HAL_RCC_CLEAR_RESET_FLAGS();                        // clear reset flags
       } else {
         poweroff();                                           // release power-latch
       }
-    }
-
-
-    // ####### INACTIVITY TIMEOUT #######
-    if (abs(pwmL) > 25 || abs(pwmR) > 50) {
-      inactivity_timeout_counter = 0;
-    } else {
-      inactivity_timeout_counter ++;
-    }
-    if (inactivity_timeout_counter > (INACTIVITY_TIMEOUT * 60 * 1000) / (DELAY_IN_MAIN_LOOP + 1)) {  // rest of main loop needs maybe 1ms
-      poweroff();
     }
 
     main_loop_counter++;
@@ -530,7 +506,7 @@ int main(void) {
 // =================================
 // DMA interrupt frequency =~ 16 kHz
 // =================================
-extern "C" void DMA1_Channel1_IRQHandler(void) {
+extern "C" void DMA1_Channel1_IRQHandler() {
 
   DMA1->IFCR = DMA_IFCR_CTCIF1;
   // HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
@@ -568,7 +544,7 @@ extern "C" void DMA1_Channel1_IRQHandler(void) {
 
   // Disable PWM when current limit is reached (current chopping)
   // This is the Level 2 of current protection. The Level 1 should kick in first given by I_MOT_MAX
-  if(chopL || timeout > TIMEOUT || enableL == 0) {
+  if(chopL || timeout > TIMEOUT || left.actual.enable == 0) {
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
   } else {
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
@@ -578,7 +554,7 @@ extern "C" void DMA1_Channel1_IRQHandler(void) {
   if (chopR)
       chopsR++;
 
-  if(chopR || timeout > TIMEOUT || enableR == 0) {
+  if(chopR || timeout > TIMEOUT || right.actual.enable == 0) {
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
   } else {
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
@@ -608,8 +584,8 @@ extern "C" void DMA1_Channel1_IRQHandler(void) {
   constexpr int32_t pwm_margin = 100;        /* This margin allows to always have a window in the PWM signal for proper Phase currents measurement */
 
   /* Make sure to stop BOTH motors in case of an error */
-  int8_t enableLFin = enableL && !left.rtY.z_errCode && !right.rtY.z_errCode;
-  int8_t enableRFin = enableR && !left.rtY.z_errCode && !right.rtY.z_errCode;
+  const bool enableLFin = left.actual.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
+  const bool enableRFin = right.actual.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
 
   // ========================= LEFT MOTOR ============================
     // Get hall sensors values
@@ -618,15 +594,15 @@ extern "C" void DMA1_Channel1_IRQHandler(void) {
     uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
 
     /* Set motor inputs here */
-    left.rtP.z_ctrlTypSel         = ctrlTypL;
+    left.rtP.z_ctrlTypSel         = left.actual.ctrlTyp;
     left.rtP.i_max                = (iMotMaxL * A2BIT_CONV) << 4;        // fixdt(1,16,4)
     left.rtP.n_max                = nMotMaxL << 4;                       // fixdt(1,16,4)
     left.rtP.id_fieldWeakMax      = (fieldWeakMaxL * A2BIT_CONV) << 4;   // fixdt(1,16,4)
     left.rtP.a_phaAdvMax          = phaseAdvMaxL << 4;                   // fixdt(1,16,4)
 
     left.rtU.b_motEna     = enableLFin;
-    left.rtU.z_ctrlModReq = ctrlModL;
-    left.rtU.r_inpTgt     = pwmL;
+    left.rtU.z_ctrlModReq = left.actual.ctrlMod;
+    left.rtU.r_inpTgt     = left.actual.pwm;
     left.rtU.b_hallA      = hall_ul;
     left.rtU.b_hallB      = hall_vl;
     left.rtU.b_hallC      = hall_wl;
@@ -656,15 +632,15 @@ extern "C" void DMA1_Channel1_IRQHandler(void) {
     uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
 
     /* Set motor inputs here */
-    right.rtP.z_ctrlTypSel         = ctrlTypR;
+    right.rtP.z_ctrlTypSel         = right.actual.ctrlTyp;
     right.rtP.i_max                = (iMotMaxR * A2BIT_CONV) << 4;        // fixdt(1,16,4)
     right.rtP.n_max                = nMotMaxR << 4;                       // fixdt(1,16,4)
     right.rtP.id_fieldWeakMax      = (fieldWeakMaxR * A2BIT_CONV) << 4;   // fixdt(1,16,4)
     right.rtP.a_phaAdvMax          = phaseAdvMaxR << 4;                   // fixdt(1,16,4)
 
     right.rtU.b_motEna      = enableRFin;
-    right.rtU.z_ctrlModReq  = ctrlModR;
-    right.rtU.r_inpTgt      = pwmR;
+    right.rtU.z_ctrlModReq  = right.actual.ctrlMod;
+    right.rtU.r_inpTgt      = right.actual.pwm;
     right.rtU.b_hallA       = hall_ur;
     right.rtU.b_hallB       = hall_vr;
     right.rtU.b_hallC       = hall_wr;
@@ -745,7 +721,7 @@ void rateLimiter16(int16_t u, int16_t rate, int16_t *y)
 
 /** System Clock Configuration
 */
-void SystemClock_Config(void) {
+void SystemClock_Config() {
   RCC_OscInitTypeDef RCC_OscInitStruct;
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_PeriphCLKInitTypeDef PeriphClkInit;
@@ -787,7 +763,7 @@ void SystemClock_Config(void) {
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-void UART2_Init(void) {
+void UART2_Init() {
 
   /* The code below is commented out - otwerwise Serial Receive does not work */
   // #ifdef CONTROL_SERIAL_USART2
@@ -858,7 +834,7 @@ void UART2_Init(void) {
     DMA1->IFCR              = DMA_IFCR_CTCIF7 | DMA_IFCR_CHTIF7 | DMA_IFCR_CGIF7;
 }
 
-//void UART3_Init(void) {
+//void UART3_Init() {
 
 //  /* The code below is commented out - otwerwise Serial Receive does not work */
 //  // #ifdef CONTROL_SERIAL_USART3
@@ -941,7 +917,7 @@ void UART2_Init(void) {
 //  #endif
 //}
 
-void MX_GPIO_Init(void) {
+void MX_GPIO_Init() {
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
@@ -1058,7 +1034,7 @@ void MX_GPIO_Init(void) {
   HAL_GPIO_Init(RIGHT_TIM_WL_PORT, &GPIO_InitStruct);
 }
 
-void MX_TIM_Init(void) {
+void MX_TIM_Init() {
   __HAL_RCC_TIM1_CLK_ENABLE();
   __HAL_RCC_TIM8_CLK_ENABLE();
 
@@ -1163,7 +1139,7 @@ void MX_TIM_Init(void) {
   __HAL_TIM_ENABLE(&htim_right);
 }
 
-void MX_ADC1_Init(void) {
+void MX_ADC1_Init() {
   ADC_MultiModeTypeDef multimode;
   ADC_ChannelConfTypeDef sConfig;
 
@@ -1230,7 +1206,7 @@ void MX_ADC1_Init(void) {
 }
 
 /* ADC2 init function */
-void MX_ADC2_Init(void) {
+void MX_ADC2_Init() {
   ADC_ChannelConfTypeDef sConfig;
 
   __HAL_RCC_ADC2_CLK_ENABLE();
@@ -1277,10 +1253,10 @@ void MX_ADC2_Init(void) {
   __HAL_ADC_ENABLE(&hadc2);
 }
 
-void poweroff(void) {
+void poweroff() {
   //  if (abs(speed) < 20) {  // wait for the speed to drop, then shut down -> this is commented out for SAFETY reasons
         buzzerPattern = 0;
-        enableL = enableR = 0;
+        left.actual.enable = right.actual.enable = 0;
         for (int i = 0; i < 8; i++) {
             buzzerFreq = (uint8_t)i;
             HAL_Delay(100);
