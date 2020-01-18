@@ -24,10 +24,7 @@
 #include "BLDC_controller.h"
 #include "stm32f1xx_hal.h"
 #include "defines.h"
-#include "setup.h"
 #include "config.h"
-#include "comms.h"
-#include "eeprom.h"
 
 void MX_GPIO_Init(void);
 void UART2_Init(void);
