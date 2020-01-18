@@ -40,18 +40,16 @@ TIM_HandleTypeDef htim_left;
 ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc2;
 UART_HandleTypeDef huart2;
-UART_HandleTypeDef huart3;
-static UART_HandleTypeDef huart;
+//UART_HandleTypeDef huart3;
+UART_HandleTypeDef huart;
 
 DMA_HandleTypeDef hdma_usart2_rx;
-DMA_HandleTypeDef hdma_usart2_tx;
-DMA_HandleTypeDef hdma_usart3_rx;
-DMA_HandleTypeDef hdma_usart3_tx;
+ DMA_HandleTypeDef hdma_usart2_tx;
 volatile adc_buf_t adc_buffer;
 
 // ###############################################################################
 
-static int16_t pwm_margin = 100;        /* This margin allows to always have a window in the PWM signal for proper Phase currents measurement */
+int16_t pwm_margin = 100;        /* This margin allows to always have a window in the PWM signal for proper Phase currents measurement */
 
 volatile uint32_t timeout;
 
@@ -60,20 +58,20 @@ uint8_t buzzerFreqReq       = 0;
 uint8_t buzzerPattern       = 0;
 uint8_t buzzerPatternReq    = 0;
 
-static uint32_t buzzerTimer = 0;
+uint32_t buzzerTimer = 0;
 
-static const uint16_t pwm_res  = 64000000 / 2 / PWM_FREQ; // = 2000
+const uint16_t pwm_res  = 64000000 / 2 / PWM_FREQ; // = 2000
 
-static uint16_t offsetcount = 0;
-static int16_t offsetrl1    = 2000;
-static int16_t offsetrl2    = 2000;
-static int16_t offsetrr1    = 2000;
-static int16_t offsetrr2    = 2000;
-static int16_t offsetdcl    = 2000;
-static int16_t offsetdcr    = 2000;
+uint16_t offsetcount = 0;
+int16_t offsetrl1    = 2000;
+int16_t offsetrl2    = 2000;
+int16_t offsetrr1    = 2000;
+int16_t offsetrr2    = 2000;
+int16_t offsetdcl    = 2000;
+int16_t offsetdcr    = 2000;
 
 int16_t        batVoltage       = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE;
-static int32_t batVoltageFixdt  = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE << 20;  // Fixed-point filter output initialized at 400 V*100/cell = 4 V/cell converted to fixed-point
+int32_t batVoltageFixdt  = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE << 20;  // Fixed-point filter output initialized at 400 V*100/cell = 4 V/cell converted to fixed-point
 
 // Matlab includes and defines - from auto-code generation
 // ###############################################################################
@@ -118,10 +116,10 @@ typedef struct{
 
   uint16_t  checksum;
 } Serialcommand;
-static volatile Serialcommand command;
-static int16_t timeoutCntSerial   = 0;  // Timeout counter for Rx Serial command
+volatile Serialcommand command;
+int16_t timeoutCntSerial   = 0;  // Timeout counter for Rx Serial command
 #endif
-static uint8_t timeoutFlagSerial  = 0;  // Timeout Flag for Rx Serial command: 0 = OK, 1 = Problem detected (line disconnected or wrong Rx data)
+uint8_t timeoutFlagSerial  = 0;  // Timeout Flag for Rx Serial command: 0 = OK, 1 = Problem detected (line disconnected or wrong Rx data)
 
 uint8_t        enableL       = 0;        // initially motors are disabled for SAFETY
 uint8_t        enableLReq    = 0;
@@ -168,8 +166,11 @@ volatile int16_t phaseAdvMaxL = PHASE_ADV_MAX;
 int16_t phaseAdvMaxRReq = PHASE_ADV_MAX;
 volatile int16_t phaseAdvMaxR = PHASE_ADV_MAX;
 
-static uint32_t inactivity_timeout_counter;
-static uint32_t main_loop_counter;
+uint32_t inactivity_timeout_counter;
+uint32_t main_loop_counter;
+
+uint32_t chopsL = 0;
+uint32_t chopsR = 0;
 
 void poweroff(void) {
   //  if (abs(speed) < 20) {  // wait for the speed to drop, then shut down -> this is commented out for SAFETY reasons
@@ -179,8 +180,9 @@ void poweroff(void) {
             buzzerFreq = (uint8_t)i;
             HAL_Delay(100);
         }
-        HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, GPIO_PIN_RESET);
-        while(1) {}
+        HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+        for (int i = 0; i < 5; i++)
+            HAL_Delay(1000);
   //  }
 }
 
@@ -290,8 +292,6 @@ int main(void) {
 
   while(1) {
     HAL_Delay(DELAY_IN_MAIN_LOOP); //delay in ms
-
-    #if defined CONTROL_SERIAL_USART2 || defined CONTROL_SERIAL_USART3
 
     uint16_t checksum = command.start ^
             command.enableL ^ command.enableR ^
@@ -432,20 +432,75 @@ int main(void) {
     }
     timeout = 0;
 
-    #endif
 
     // ####### CALC BOARD TEMPERATURE #######
     filtLowPass32(adc_buffer.temp, TEMP_FILT_COEF, &board_temp_adcFixdt);
     board_temp_adcFilt  = (int16_t)(board_temp_adcFixdt >> 20);  // convert fixed-point to integer
     board_temp_deg_c    = (TEMP_CAL_HIGH_DEG_C - TEMP_CAL_LOW_DEG_C) * (board_temp_adcFilt - TEMP_CAL_LOW_ADC) / (TEMP_CAL_HIGH_ADC - TEMP_CAL_LOW_ADC) + TEMP_CAL_LOW_DEG_C;
 
-    if (main_loop_counter % 25 == 0) {    // Send data periodically
+#define FIELD_leftAngle "a"
+#define FIELD_rightAngle "b"
+#define FIELD_leftSpeed "c"
+#define FIELD_rightSpeed "d"
+#define FIELD_leftCurrent "e"
+#define FIELD_rightCurrent "f"
+#define FIELD_leftError "g"
+#define FIELD_rightError "h"
+#define FIELD_batVoltage "i"
+#define FIELD_boardTemp "j"
+#define FIELD_hallLA "k"
+#define FIELD_hallLB "l"
+#define FIELD_hallLC "m"
+#define FIELD_hallRA "n"
+#define FIELD_hallRB "o"
+#define FIELD_hallRC "p"
+#define FIELD_chopsL "q"
+#define FIELD_chopsR "r"
 
-      #if defined(FEEDBACK_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART3)
+    if (main_loop_counter % 25 == 0) {    // Send data periodically
         if(UART_DMA_CHANNEL->CNDTR == 0) {
-          // TODO send feedback
-        }
-      #endif      
+                  int strLength;
+                  char uart_buf[512];
+                  strLength = sprintf((char *)(uintptr_t)uart_buf,
+                                        "{ "
+                                          "\"" FIELD_leftAngle "\": %i, "
+                                          "\"" FIELD_rightAngle "\": %i, "
+                                          "\"" FIELD_leftSpeed "\": %i, "
+                                          "\"" FIELD_rightSpeed "\": %i, "
+                                          "\"" FIELD_leftCurrent "\": %i, "
+                                          "\"" FIELD_rightCurrent "\": %i, "
+                                          "\"" FIELD_leftError "\": %i, "
+                                          "\"" FIELD_rightError "\": %i, "
+                                          "\"" FIELD_batVoltage "\": %i, "
+                                          "\"" FIELD_boardTemp "\": %i, "
+                                          "\"" FIELD_hallLA "\": %i, "
+                                          "\"" FIELD_hallLB "\": %i, "
+                                          "\"" FIELD_hallLC "\": %i, "
+                                          "\"" FIELD_hallRA "\": %i, "
+                                          "\"" FIELD_hallRB "\": %i, "
+                                          "\"" FIELD_hallRC "\": %i, "
+                                          "\"" FIELD_chopsL "\": %i, "
+                                          "\"" FIELD_chopsR "\": %i "
+                                        "}\n",
+                                        rtY_Left.a_elecAngle, rtY_Right.a_elecAngle,
+                                        rtY_Left.n_mot, rtY_Right.n_mot,
+                                        rtU_Left.i_DCLink, rtU_Right.i_DCLink,
+                                        rtY_Left.z_errCode, rtY_Right.z_errCode,
+                                        (batVoltage * BAT_CALIB_REAL_VOLTAGE / BAT_CALIB_ADC),
+                                        board_temp_deg_c,
+                                        rtU_Left.b_hallA, rtU_Left.b_hallB, rtU_Left.b_hallC,
+                                        rtU_Right.b_hallA, rtU_Right.b_hallB, rtU_Right.b_hallC,
+                                        chopsL, chopsR);
+                  chopsL = 0;
+                  chopsR = 0;
+
+                  if(UART_DMA_CHANNEL->CNDTR == 0) {
+                    UART_DMA_CHANNEL->CCR    &= ~DMA_CCR_EN;
+                    UART_DMA_CHANNEL->CNDTR   = strLength;
+                    UART_DMA_CHANNEL->CMAR    = uart_buf;
+                    UART_DMA_CHANNEL->CCR    |= DMA_CCR_EN;
+                  }
+                }
     }    
 
     HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
@@ -475,14 +530,6 @@ int main(void) {
     timeout++;
   }
 }
-
-#ifdef VARIANT_TRANSPOTTER
-  void saveConfig() {
-    HAL_FLASH_Unlock();
-    EE_WriteVariable(VirtAddVarTab[0], saveValue);
-    HAL_FLASH_Lock();
-  }
-#endif
 
 void longBeep(uint8_t freq){
     buzzerFreq = freq;
@@ -627,15 +674,23 @@ void DMA1_Channel1_IRQHandler(void) {
   int16_t curR_phaC = (int16_t)(offsetrr2 - adc_buffer.rr2);
   int16_t curR_DC   = (int16_t)(offsetdcr - adc_buffer.dcr);
 
+  const int8_t chopL = ABS(curL_DC) > (iDcMaxL * A2BIT_CONV);
+  if (chopL)
+      chopsL++;
+
   // Disable PWM when current limit is reached (current chopping)
   // This is the Level 2 of current protection. The Level 1 should kick in first given by I_MOT_MAX
-  if(ABS(curL_DC) > (iDcMaxL * A2BIT_CONV) || timeout > TIMEOUT || enableL == 0) {
+  if(chopL || timeout > TIMEOUT || enableL == 0) {
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
   } else {
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
   }
 
-  if(ABS(curR_DC)  > (iDcMaxR * A2BIT_CONV) || timeout > TIMEOUT || enableR == 0) {
+  const int8_t chopR = ABS(curR_DC) > (iDcMaxR * A2BIT_CONV);
+  if (chopR)
+      chopsR++;
+
+  if(chopR || timeout > TIMEOUT || enableR == 0) {
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
   } else {
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
@@ -776,11 +831,7 @@ void UART2_Init(void) {
   huart2.Init.Parity        = UART_PARITY_NONE;
   huart2.Init.HwFlowCtl     = UART_HWCONTROL_NONE;
   huart2.Init.OverSampling  = UART_OVERSAMPLING_16;
-  #if defined(CONTROL_SERIAL_USART2)
-    huart2.Init.Mode        = UART_MODE_TX_RX;
-  #elif defined(DEBUG_SERIAL_USART2)
-    huart2.Init.Mode        = UART_MODE_TX;
-  #endif
+  huart2.Init.Mode        = UART_MODE_TX_RX;
   HAL_UART_Init(&huart2);
 
   #if defined(FEEDBACK_SERIAL_USART2) || defined(DEBUG_SERIAL_USART2)
