@@ -41,6 +41,9 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
+//DMA_HandleTypeDef hdma_usart3_rx;
+//DMA_HandleTypeDef hdma_usart3_tx;
+
 volatile struct {
     uint16_t dcr;
     uint16_t dcl;
@@ -81,20 +84,15 @@ int32_t batVoltageFixdt  = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VO
 #include "BLDC_controller.h"      /* Model's header file */
 #include "rtwtypes.h"
 
-RT_MODEL rtM_Left_;               /* Real-time model */
-RT_MODEL rtM_Right_;              /* Real-time model */
-RT_MODEL *const rtM_Left    = &rtM_Left_;
-RT_MODEL *const rtM_Right   = &rtM_Right_;
+struct {
+    RT_MODEL rtM; /* Real-time model */
+    P     rtP;    /* Block parameters (auto storage) */
+    DW    rtDW;   /* Observable states */
+    ExtU  rtU;    /* External inputs */
+    ExtY  rtY;    /* External outputs */
+} left, right;
 
-extern "C" P     rtP_Left;                   /* Block parameters (auto storage) */
-DW    rtDW_Left;                  /* Observable states */
-ExtU  rtU_Left;                   /* External inputs */
-ExtY  rtY_Left;                   /* External outputs */
-
-P     rtP_Right;                  /* Block parameters (auto storage) */
-DW    rtDW_Right;                 /* Observable states */
-ExtU  rtU_Right;                  /* External inputs */
-ExtY  rtY_Right;                  /* External outputs */
+extern "C" const P rtP_Left;
 
 typedef struct{
   uint16_t start;
@@ -229,44 +227,45 @@ int main(void) {
 // ###############################################################################
   
   /* Set BLDC controller parameters */ 
-  rtP_Left.b_selPhaABCurrMeas   = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
-  rtP_Left.z_ctrlTypSel         = ctrlTypL;
-  rtP_Left.b_diagEna            = DIAG_ENA; 
-  rtP_Left.i_max                = (iMotMaxL * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-  rtP_Left.n_max                = nMotMaxL << 4;                       // fixdt(1,16,4)
-  rtP_Left.b_fieldWeakEna       = FIELD_WEAK_ENA; 
-  rtP_Left.id_fieldWeakMax      = (fieldWeakMaxL * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-  rtP_Left.a_phaAdvMax          = phaseAdvMaxL << 4;                   // fixdt(1,16,4)
-  rtP_Left.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
-  rtP_Left.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
+  left.rtP = rtP_Left;
+  left.rtP.b_selPhaABCurrMeas   = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
+  left.rtP.z_ctrlTypSel         = ctrlTypL;
+  left.rtP.b_diagEna            = DIAG_ENA;
+  left.rtP.i_max                = (iMotMaxL * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+  left.rtP.n_max                = nMotMaxL << 4;                       // fixdt(1,16,4)
+  left.rtP.b_fieldWeakEna       = FIELD_WEAK_ENA;
+  left.rtP.id_fieldWeakMax      = (fieldWeakMaxL * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+  left.rtP.a_phaAdvMax          = phaseAdvMaxL << 4;                   // fixdt(1,16,4)
+  left.rtP.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
+  left.rtP.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
 
-  rtP_Right                     = rtP_Left;     // Copy the Left motor parameters to the Right motor parameters
-  rtP_Right.b_selPhaABCurrMeas  = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
-  rtP_Left.z_ctrlTypSel         = ctrlTypR;
-  rtP_Left.b_diagEna            = DIAG_ENA;
-  rtP_Left.i_max                = (iMotMaxR * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-  rtP_Left.n_max                = nMotMaxR << 4;                       // fixdt(1,16,4)
-  rtP_Left.b_fieldWeakEna       = FIELD_WEAK_ENA;
-  rtP_Left.id_fieldWeakMax      = (fieldWeakMaxR * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-  rtP_Left.a_phaAdvMax          = phaseAdvMaxR << 4;                   // fixdt(1,16,4)
-  rtP_Left.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
-  rtP_Left.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
+  right.rtP = rtP_Left;
+  right.rtP.b_selPhaABCurrMeas  = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
+  right.rtP.z_ctrlTypSel         = ctrlTypR;
+  right.rtP.b_diagEna            = DIAG_ENA;
+  right.rtP.i_max                = (iMotMaxR * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+  right.rtP.n_max                = nMotMaxR << 4;                       // fixdt(1,16,4)
+  right.rtP.b_fieldWeakEna       = FIELD_WEAK_ENA;
+  right.rtP.id_fieldWeakMax      = (fieldWeakMaxR * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+  right.rtP.a_phaAdvMax          = phaseAdvMaxR << 4;                   // fixdt(1,16,4)
+  right.rtP.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
+  right.rtP.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
 
   /* Pack LEFT motor data into RTM */
-  rtM_Left->defaultParam        = &rtP_Left;
-  rtM_Left->dwork               = &rtDW_Left;
-  rtM_Left->inputs              = &rtU_Left;
-  rtM_Left->outputs             = &rtY_Left;
+  left.rtM.defaultParam        = &left.rtP;
+  left.rtM.dwork               = &left.rtDW;
+  left.rtM.inputs              = &left.rtU;
+  left.rtM.outputs             = &left.rtY;
 
   /* Pack RIGHT motor data into RTM */
-  rtM_Right->defaultParam       = &rtP_Right;
-  rtM_Right->dwork              = &rtDW_Right;
-  rtM_Right->inputs             = &rtU_Right;
-  rtM_Right->outputs            = &rtY_Right;
+  right.rtM.defaultParam       = &right.rtP;
+  right.rtM.dwork              = &right.rtDW;
+  right.rtM.inputs             = &right.rtU;
+  right.rtM.outputs            = &right.rtY;
 
   /* Initialize BLDC controllers */
-  BLDC_controller_initialize(rtM_Left);
-  BLDC_controller_initialize(rtM_Right);
+  BLDC_controller_initialize(&left.rtM);
+  BLDC_controller_initialize(&right.rtM);
 
 // ###############################################################################
 
@@ -479,14 +478,14 @@ int main(void) {
                                           "\"" FIELD_chopsL "\": %i, "
                                           "\"" FIELD_chopsR "\": %i "
                                         "}\n",
-                                        rtY_Left.a_elecAngle, rtY_Right.a_elecAngle,
-                                        rtY_Left.n_mot, rtY_Right.n_mot,
-                                        rtU_Left.i_DCLink, rtU_Right.i_DCLink,
-                                        rtY_Left.z_errCode, rtY_Right.z_errCode,
+                                        left.rtY.a_elecAngle, right.rtY.a_elecAngle,
+                                        left.rtY.n_mot, right.rtY.n_mot,
+                                        left.rtU.i_DCLink, right.rtU.i_DCLink,
+                                        left.rtY.z_errCode, right.rtY.z_errCode,
                                         (batVoltage * BAT_CALIB_REAL_VOLTAGE / BAT_CALIB_ADC),
                                         board_temp_deg_c,
-                                        rtU_Left.b_hallA, rtU_Left.b_hallB, rtU_Left.b_hallC,
-                                        rtU_Right.b_hallA, rtU_Right.b_hallB, rtU_Right.b_hallC,
+                                        left.rtU.b_hallA, left.rtU.b_hallB, left.rtU.b_hallC,
+                                        right.rtU.b_hallA, right.rtU.b_hallB, right.rtU.b_hallC,
                                         chopsL, chopsR);
                   chopsL = 0;
                   chopsR = 0;
@@ -609,8 +608,8 @@ extern "C" void DMA1_Channel1_IRQHandler(void) {
   constexpr int32_t pwm_margin = 100;        /* This margin allows to always have a window in the PWM signal for proper Phase currents measurement */
 
   /* Make sure to stop BOTH motors in case of an error */
-  int8_t enableLFin = enableL && !rtY_Left.z_errCode && !rtY_Right.z_errCode;
-  int8_t enableRFin = enableR && !rtY_Left.z_errCode && !rtY_Right.z_errCode;
+  int8_t enableLFin = enableL && !left.rtY.z_errCode && !right.rtY.z_errCode;
+  int8_t enableRFin = enableR && !left.rtY.z_errCode && !right.rtY.z_errCode;
 
   // ========================= LEFT MOTOR ============================
     // Get hall sensors values
@@ -619,29 +618,29 @@ extern "C" void DMA1_Channel1_IRQHandler(void) {
     uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
 
     /* Set motor inputs here */
-    rtP_Left.z_ctrlTypSel         = ctrlTypL;
-    rtP_Left.i_max                = (iMotMaxL * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    rtP_Left.n_max                = nMotMaxL << 4;                       // fixdt(1,16,4)
-    rtP_Left.id_fieldWeakMax      = (fieldWeakMaxL * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    rtP_Left.a_phaAdvMax          = phaseAdvMaxL << 4;                   // fixdt(1,16,4)
+    left.rtP.z_ctrlTypSel         = ctrlTypL;
+    left.rtP.i_max                = (iMotMaxL * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    left.rtP.n_max                = nMotMaxL << 4;                       // fixdt(1,16,4)
+    left.rtP.id_fieldWeakMax      = (fieldWeakMaxL * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    left.rtP.a_phaAdvMax          = phaseAdvMaxL << 4;                   // fixdt(1,16,4)
 
-    rtU_Left.b_motEna     = enableLFin;
-    rtU_Left.z_ctrlModReq = ctrlModL;
-    rtU_Left.r_inpTgt     = pwmL;
-    rtU_Left.b_hallA      = hall_ul;
-    rtU_Left.b_hallB      = hall_vl;
-    rtU_Left.b_hallC      = hall_wl;
-    rtU_Left.i_phaAB      = curL_phaA;
-    rtU_Left.i_phaBC      = curL_phaB;
-    rtU_Left.i_DCLink     = curL_DC;
+    left.rtU.b_motEna     = enableLFin;
+    left.rtU.z_ctrlModReq = ctrlModL;
+    left.rtU.r_inpTgt     = pwmL;
+    left.rtU.b_hallA      = hall_ul;
+    left.rtU.b_hallB      = hall_vl;
+    left.rtU.b_hallC      = hall_wl;
+    left.rtU.i_phaAB      = curL_phaA;
+    left.rtU.i_phaBC      = curL_phaB;
+    left.rtU.i_DCLink     = curL_DC;
 
     /* Step the controller */
-    BLDC_controller_step(rtM_Left);
+    BLDC_controller_step(&left.rtM);
 
     /* Get motor outputs here */
-    int ul            = rtY_Left.DC_phaA;
-    int vl            = rtY_Left.DC_phaB;
-    int wl            = rtY_Left.DC_phaC;
+    int ul            = left.rtY.DC_phaA;
+    int vl            = left.rtY.DC_phaB;
+    int wl            = left.rtY.DC_phaC;
 
     /* Apply commands */
     LEFT_TIM->LEFT_TIM_U    = (uint16_t)std::clamp(ul + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
@@ -657,29 +656,29 @@ extern "C" void DMA1_Channel1_IRQHandler(void) {
     uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
 
     /* Set motor inputs here */
-    rtP_Left.z_ctrlTypSel         = ctrlTypR;
-    rtP_Left.i_max                = (iMotMaxR * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    rtP_Left.n_max                = nMotMaxR << 4;                       // fixdt(1,16,4)
-    rtP_Left.id_fieldWeakMax      = (fieldWeakMaxR * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    rtP_Left.a_phaAdvMax          = phaseAdvMaxR << 4;                   // fixdt(1,16,4)
+    right.rtP.z_ctrlTypSel         = ctrlTypR;
+    right.rtP.i_max                = (iMotMaxR * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    right.rtP.n_max                = nMotMaxR << 4;                       // fixdt(1,16,4)
+    right.rtP.id_fieldWeakMax      = (fieldWeakMaxR * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    right.rtP.a_phaAdvMax          = phaseAdvMaxR << 4;                   // fixdt(1,16,4)
 
-    rtU_Right.b_motEna      = enableRFin;
-    rtU_Right.z_ctrlModReq  = ctrlModR;
-    rtU_Right.r_inpTgt      = pwmR;
-    rtU_Right.b_hallA       = hall_ur;
-    rtU_Right.b_hallB       = hall_vr;
-    rtU_Right.b_hallC       = hall_wr;
-    rtU_Right.i_phaAB       = curR_phaB;
-    rtU_Right.i_phaBC       = curR_phaC;
-    rtU_Right.i_DCLink      = curR_DC;
+    right.rtU.b_motEna      = enableRFin;
+    right.rtU.z_ctrlModReq  = ctrlModR;
+    right.rtU.r_inpTgt      = pwmR;
+    right.rtU.b_hallA       = hall_ur;
+    right.rtU.b_hallB       = hall_vr;
+    right.rtU.b_hallC       = hall_wr;
+    right.rtU.i_phaAB       = curR_phaB;
+    right.rtU.i_phaBC       = curR_phaC;
+    right.rtU.i_DCLink      = curR_DC;
 
     /* Step the controller */
-    BLDC_controller_step(rtM_Right);
+    BLDC_controller_step(&right.rtM);
 
     /* Get motor outputs here */
-    int ur            = rtY_Right.DC_phaA;
-    int vr            = rtY_Right.DC_phaB;
-    int wr            = rtY_Right.DC_phaC;
+    int ur            = right.rtY.DC_phaA;
+    int vr            = right.rtY.DC_phaB;
+    int wr            = right.rtY.DC_phaC;
 
     /* Apply commands */
     RIGHT_TIM->RIGHT_TIM_U  = (uint16_t)std::clamp(ur + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
@@ -709,7 +708,8 @@ namespace {
   */
 void filtLowPass32(int16_t u, uint16_t coef, int32_t *y)
 {
-  int tmp;
+  int
+          tmp;
   
   tmp = (int16_t)(u << 4) - (*y >> 16);  
   tmp = std::clamp(tmp, -32768, 32767);  // Overflow protection
