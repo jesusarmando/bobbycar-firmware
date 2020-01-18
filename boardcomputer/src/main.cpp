@@ -49,8 +49,8 @@ Adafruit_SSD1306 display(128, 64, &Wire, 4);
 
 void setup()
 {
-    command.left.enable = true;
-    command.right.enable = true;
+    command.left.enable = command.right.enable = true;
+    command.left.ctrlMod = command.right.ctrlMod = ControlMode::Torque;
 
     Serial.begin(115200);
     Serial.println("setup()");
