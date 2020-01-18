@@ -61,13 +61,6 @@ volatile struct {
 
 volatile uint32_t timeout;
 
-uint8_t buzzerFreq       = 0;
-uint8_t buzzerFreqReq    = 0;
-uint8_t buzzerPattern    = 0;
-uint8_t buzzerPatternReq = 0;
-
-uint32_t buzzerTimer = 0;
-
 uint16_t offsetcount = 0;
 int16_t offsetrl1    = 2000;
 int16_t offsetrl2    = 2000;
@@ -78,11 +71,6 @@ int16_t offsetdcr    = 2000;
 
 int16_t batVoltage       = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE;
 int32_t batVoltageFixdt  = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE << 20;  // Fixed-point filter output initialized at 400 V*100/cell = 4 V/cell converted to fixed-point
-
-// Matlab includes and defines - from auto-code generation
-// ###############################################################################
-#include "BLDC_controller.h"      /* Model's header file */
-#include "rtwtypes.h"
 
 struct {
     RT_MODEL rtM; /* Real-time model */
@@ -105,6 +93,15 @@ struct {
 
     uint32_t chops = 0;
 } left, right;
+
+struct {
+    struct {
+        uint8_t freq = 0;
+        uint8_t pattern = 0;
+    } actual, requested;
+
+    uint32_t timer = 0;
+} buzzer;
 
 extern "C" const P rtP_Left; // default settings defined in BLDC_controller_data.c
 
@@ -236,10 +233,10 @@ int main() {
 // ###############################################################################
 
   for (int i = 8; i >= 0; i--) {
-    buzzerFreq = (uint8_t)i;
-    HAL_Delay(100);
+      buzzer.actual.freq = (uint8_t)i;
+      HAL_Delay(100);
   }
-  buzzerFreq = 0;
+  buzzer.actual.freq = 0;
 
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);
 
@@ -302,8 +299,8 @@ int main() {
             left.requested.phaseAdvMax = command.phaseAdvMaxL;
             right.requested.phaseAdvMax = command.phaseAdvMaxR;
 
-            buzzerFreqReq = command.buzzerFreq;
-            buzzerPatternReq = command.buzzerPattern;
+            buzzer.requested.freq = command.buzzerFreq;
+            buzzer.requested.pattern = command.buzzerPattern;
 
             if (command.poweroff)
                 poweroff();
@@ -357,8 +354,8 @@ int main() {
         left.actual.phaseAdvMax = PHASE_ADV_MAX;
         right.actual.phaseAdvMax = PHASE_ADV_MAX;
 
-        buzzerFreq    = 24;
-        buzzerPattern = 1;
+        buzzer.actual.freq    = 24;
+        buzzer.actual.pattern = 1;
     }
     else
     {
@@ -389,8 +386,8 @@ int main() {
         left.actual.phaseAdvMax = left.requested.phaseAdvMax;
         right.actual.phaseAdvMax = right.requested.phaseAdvMax;
 
-        buzzerFreq = buzzerFreqReq;
-        buzzerPattern = buzzerPatternReq;
+        buzzer.actual.freq = buzzer.requested.freq;
+        buzzer.actual.pattern = buzzer.requested.pattern;
     }
     timeout = 0;
 
@@ -502,7 +499,7 @@ extern "C" void DMA1_Channel1_IRQHandler() {
     return;
   }
 
-  if (buzzerTimer % 1000 == 0) {  // because you get float rounding errors if it would run every time -> not any more, everything converted to fixed-point
+  if (buzzer.timer % 1000 == 0) {  // because you get float rounding errors if it would run every time -> not any more, everything converted to fixed-point
     filtLowPass32(adc_buffer.batt1, BAT_FILT_COEF, &batVoltageFixdt);
     batVoltage = (int16_t)(batVoltageFixdt >> 20);  // convert fixed-point to integer
   }
@@ -540,9 +537,9 @@ extern "C" void DMA1_Channel1_IRQHandler() {
   }
 
   //create square wave for buzzer
-  buzzerTimer++;
-  if (buzzerFreq != 0 && (buzzerTimer / 5000) % (buzzerPattern + 1) == 0) {
-    if (buzzerTimer % buzzerFreq == 0) {
+  buzzer.timer++;
+  if (buzzer.actual.freq != 0 && (buzzer.timer / 5000) % (buzzer.actual.pattern + 1) == 0) {
+    if (buzzer.timer % buzzer.actual.freq == 0) {
       HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
     }
   } else {
@@ -1234,10 +1231,10 @@ void MX_ADC2_Init() {
 
 void poweroff() {
   //  if (abs(speed) < 20) {  // wait for the speed to drop, then shut down -> this is commented out for SAFETY reasons
-        buzzerPattern = 0;
+        buzzer.actual.pattern = 0;
         left.actual.enable = right.actual.enable = 0;
         for (int i = 0; i < 8; i++) {
-            buzzerFreq = (uint8_t)i;
+            buzzer.actual.freq = (uint8_t)i;
             HAL_Delay(100);
         }
         HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, GPIO_PIN_RESET);
