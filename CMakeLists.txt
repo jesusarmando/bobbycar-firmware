@@ -58,7 +58,7 @@ add_executable(firmware.elf
 
     Src/BLDC_controller.c
     Src/BLDC_controller_data.c
-    Src/main.c
+    Src/main.cpp
     Src/stm32f1xx_it.c
     Src/system_stm32f1xx.c
     ${headers}

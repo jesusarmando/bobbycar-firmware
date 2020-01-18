@@ -21,10 +21,13 @@
 */
 
 #include <stdlib.h> // for abs()
-#include "BLDC_controller.h"
 #include "stm32f1xx_hal.h"
 #include "defines.h"
 #include "config.h"
+
+extern "C" {
+#include "BLDC_controller.h"
+}
 
 void MX_GPIO_Init(void);
 void UART2_Init(void);
@@ -80,7 +83,7 @@ RT_MODEL rtM_Right_;              /* Real-time model */
 RT_MODEL *const rtM_Left    = &rtM_Left_;
 RT_MODEL *const rtM_Right   = &rtM_Right_;
 
-P     rtP_Left;                   /* Block parameters (auto storage) */
+extern "C" P     rtP_Left;                   /* Block parameters (auto storage) */
 DW    rtDW_Left;                  /* Observable states */
 ExtU  rtU_Left;                   /* External inputs */
 ExtY  rtY_Left;                   /* External outputs */
@@ -177,7 +180,7 @@ void poweroff(void) {
             buzzerFreq = (uint8_t)i;
             HAL_Delay(100);
         }
-        HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+        HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, GPIO_PIN_RESET);
         for (int i = 0; i < 5; i++)
             HAL_Delay(1000);
   //  }
@@ -213,7 +216,7 @@ int main(void) {
   MX_ADC1_Init();
   MX_ADC2_Init();
 
-  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);
+  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, GPIO_PIN_SET);
 
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Start(&hadc2);
@@ -269,7 +272,7 @@ int main(void) {
   }
   buzzerFreq = 0;
 
-  HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+  HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);
 
   #if defined(CONTROL_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART2) || defined(DEBUG_SERIAL_USART2)
     UART2_Init();
@@ -494,7 +497,7 @@ int main(void) {
                   if(UART_DMA_CHANNEL->CNDTR == 0) {
                     UART_DMA_CHANNEL->CCR    &= ~DMA_CCR_EN;
                     UART_DMA_CHANNEL->CNDTR   = strLength;
-                    UART_DMA_CHANNEL->CMAR    = uart_buf;
+                    UART_DMA_CHANNEL->CMAR    = uint64_t(&uart_buf);
                     UART_DMA_CHANNEL->CCR    |= DMA_CCR_EN;
                   }
                 }
@@ -639,7 +642,7 @@ void SystemClock_Config(void) {
 // =================================
 // DMA interrupt frequency =~ 16 kHz
 // =================================
-void DMA1_Channel1_IRQHandler(void) {
+extern "C" void DMA1_Channel1_IRQHandler(void) {
 
   DMA1->IFCR = DMA_IFCR_CTCIF1;
   // HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
@@ -700,7 +703,7 @@ void DMA1_Channel1_IRQHandler(void) {
       HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
     }
   } else {
-      HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
+      HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
   }
 
   // ############################### MOTOR CONTROL ###############################
