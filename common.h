@@ -19,7 +19,7 @@ enum class ControlMode : uint8_t {
     Torque // Only with FieldOrientedControl
 };
 
-struct MotorConfiguration {
+struct MotorState {
     bool enable = false;
     int16_t pwm = 0;
     ControlType ctrlTyp = ControlType::FieldOrientedControl;
@@ -31,7 +31,7 @@ struct MotorConfiguration {
     int16_t phaseAdvMax = 40;              // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
 };
 
-struct BuzzerConfiguration {
+struct BuzzerState {
     uint8_t freq = 0;
     uint8_t pattern = 0;
 };
@@ -42,9 +42,9 @@ struct Command {
 
     uint16_t start;
 
-    MotorConfiguration left, right;
+    MotorState left, right;
 
-    BuzzerConfiguration buzzer;
+    BuzzerState buzzer;
 
     bool poweroff = false;
     bool led = false;
@@ -65,6 +65,44 @@ uint16_t calculateChecksum(Command command) {
             command.left.fieldWeakMax ^ command.right.fieldWeakMax ^
             command.buzzer.freq ^ command.buzzer.pattern ^
             command.poweroff ^ command.led;
+}
+
+struct MotorFeedback {
+    int16_t   angle = 0;
+    int16_t   speed = 0;
+    uint8_t   error = 0;
+    int16_t   current = 0;
+    uint32_t  chops = 0;
+    bool      hallA = false,
+              hallB = false,
+              hallC = false;
+};
+
+struct Feedback {
+    static constexpr uint16_t VALID_HEADER = 0xAAAA;
+    static constexpr uint16_t INVALID_HEADER = 0xFFFF;
+
+    uint16_t start;
+
+    MotorFeedback left, right;
+
+    int16_t   batVoltage = 0;
+    int16_t   boardTemp = 0;
+
+    uint16_t checksum;
+};
+
+uint16_t calculateChecksum(Feedback feedback) {
+    return feedback.start ^
+            feedback.left.angle ^ feedback.right.angle ^
+            feedback.left.speed ^ feedback.right.speed ^
+            feedback.left.error ^ feedback.right.error ^
+            feedback.left.current ^ feedback.right.current ^
+            feedback.left.chops ^ feedback.right.chops ^
+            feedback.left.hallA ^ feedback.left.hallB ^ feedback.left.hallC ^
+            feedback.right.hallA ^ feedback.right.hallB ^ feedback.right.hallC ^
+            feedback.batVoltage ^
+            feedback.boardTemp;
 }
 
 }

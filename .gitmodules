@@ -4,6 +4,3 @@
 [submodule "boardcomputer/lib/Adafruit_SSD1306"]
 	path = boardcomputer/lib/Adafruit_SSD1306
 	url = https://github.com/adafruit/Adafruit_SSD1306.git
-[submodule "boardcomputer/lib/ArduinoJson"]
-	path = boardcomputer/lib/ArduinoJson
-	url = https://github.com/bblanchon/ArduinoJson.git
