@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <ArduinoJson.h>
 #include <HardwareSerial.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -10,33 +9,37 @@
 
 #include "../../common.h"
 
+namespace {
 bool power_toggle{false};
 bool led_toggle{false};
 
 Command command;
 
-StaticJsonDocument<1024> doc;
+int lastSendCommand = millis();
+int lastAlive = millis();
+
+Adafruit_SSD1306 display(128, 64, &Wire, 4);
+
+enum { ScreenA, ScreenB, ScreenC } screen { ScreenA };
+unsigned long lastScreenSwitch = 0;
 
 struct Controller {
-    struct {
-      unsigned long time = 0;
-      int16_t   leftAngle, rightAngle;
-      int16_t   leftSpeed, rightSpeed;
-      uint16_t  leftError, rightError;
-      int16_t   leftCurrent, rightCurrent;
-      int16_t   batVoltage;
-      int16_t   boardTemp;
-      int16_t   hallLA, hallLB, hallLC;
-      int16_t   hallRA, hallRB, hallRC;
-    } feedback;
+    Controller(HardwareSerial &serial) : serial{serial} {}
 
-    std::array<char, 4096> messageBuffer {};
-    std::array<char, 4096>::iterator bufferIter;
+    HardwareSerial &serial;
+    Feedback feedback, newFeedback;
 
-    Controller() : bufferIter{messageBuffer.begin()} {}
-} first, second;
+    uint8_t idx = 0;                        // Index for new data pointer
+    uint16_t bufStartFrame;                 // Buffer Start Frame
+    byte *p;                                // Pointer declaration for the new received data
+    byte incomingByte;
+    byte incomingBytePrev;
+};
+std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
+Controller &first{controllers[0]},
+           &second{controllers[1]};
 
-void Send()
+void sendCommand()
 {
     command.start = Command::VALID_HEADER;
     command.checksum = calculateChecksum(command);
@@ -44,9 +47,61 @@ void Send()
     Serial2.write((uint8_t *) &command, sizeof(command));
 }
 
-int last = millis();
+void receiveFeedback()
+{
+    for (Controller &controller : controllers)
+    {
+        // Check for new data availability in the Serial buffer
+        while (controller.serial.available())
+        {
+            controller.incomingByte    = controller.serial.read();                                // Read the incoming byte
+            controller.bufStartFrame = ((uint16_t)(controller.incomingBytePrev) << 8) +  controller.incomingByte; // Construct the start frame
 
-Adafruit_SSD1306 display(128, 64, &Wire, 4);
+            //Serial.printf("received: %x\r\n", controller.incomingByte);
+
+            // Copy received data
+            if (controller.bufStartFrame == Feedback::VALID_HEADER) {                     // Initialize if new data is detected
+                controller.p   = (byte *)&controller.newFeedback;
+                *controller.p++  = controller.incomingBytePrev;
+                *controller.p++  = controller.incomingByte;
+                controller.idx  = 2;
+            } else if (controller.idx >= 2 && controller.idx < sizeof(controller.feedback)) { // Save the new received data
+                *controller.p++  = controller.incomingByte;
+                controller.idx++;
+            }
+
+            // Check if we reached the end of the package
+            if (controller.idx == sizeof(controller.feedback)) {
+                uint16_t checksum = calculateChecksum(controller.newFeedback);
+
+                // Check validity of the new data
+                if (controller.newFeedback.start == Feedback::VALID_HEADER && checksum == controller.newFeedback.checksum) {
+                    // Copy the new data
+                    memcpy(&controller.feedback, &controller.newFeedback, sizeof(controller.feedback));
+
+                    Serial.println("parsed");
+                } else {
+                    Serial.println("Non-valid data skipped");
+
+                    if (controller.newFeedback.start == Feedback::VALID_HEADER)
+                        Serial.println("header matched");
+                    else
+                        Serial.println("header did not match");
+
+                    if (checksum == controller.newFeedback.checksum)
+                        Serial.println("checksum matched");
+                    else
+                        Serial.println("checksum did not match");
+                }
+                controller.idx = 0; // Reset the index (it prevents to enter in this if condition in the next cycle)
+            }
+
+            // Update previous states
+            controller.incomingBytePrev  = controller.incomingByte;
+        }
+    }
+}
+}
 
 void setup()
 {
@@ -58,7 +113,7 @@ void setup()
 
     Serial1.begin(38400, SERIAL_8N1, 25, 27);
 
-    Serial2.begin(38400, SERIAL_8N1, 18, 19);
+    Serial2.begin(38400, SERIAL_8N1, 13, 15);
 
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
     {
@@ -69,15 +124,7 @@ void setup()
     display.setTextSize(1);
     display.setTextColor(WHITE);
     display.cp437(true);
-
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.print("Initializing...");
-    display.display();
 }
-
-enum { ScreenA, ScreenB, ScreenC } screen { ScreenA };
-unsigned long lastScreenSwitch = 0;
 
 void loop()
 {
@@ -162,20 +209,20 @@ void loop()
         display.printf("tempera: %i - %i\n", first.feedback.boardTemp, second.feedback.boardTemp);
         break;
     case ScreenB:
-        display.printf("speed: %i - %i\n", first.feedback.leftSpeed, first.feedback.rightSpeed);
-        display.printf("       %i - %i\n", second.feedback.leftSpeed, second.feedback.rightSpeed);
-        display.printf("current: %i - %i\n", first.feedback.leftCurrent, first.feedback.rightCurrent);
-        display.printf("         %i - %i\n", second.feedback.leftCurrent, second.feedback.rightCurrent);
-        display.printf("error: %i - %i\n", first.feedback.leftError, first.feedback.rightError);
-        display.printf("       %i - %i\n", second.feedback.leftError, second.feedback.rightError);
+        display.printf("speed: %i - %i\n", first.feedback.left.speed, first.feedback.right.speed);
+        display.printf("       %i - %i\n", second.feedback.left.speed, second.feedback.right.speed);
+        display.printf("current: %i - %i\n", first.feedback.left.current, first.feedback.right.current);
+        display.printf("         %i - %i\n", second.feedback.left.current, second.feedback.right.current);
+        display.printf("error: %i - %i\n", first.feedback.left.error, first.feedback.right.error);
+        display.printf("       %i - %i\n", second.feedback.left.error, second.feedback.right.error);
         break;
     case ScreenC:
-        display.printf("angle: %i - %i\n", first.feedback.leftAngle, first.feedback.rightAngle);
-        display.printf("       %i - %i\n", second.feedback.leftAngle, second.feedback.rightAngle);
-        display.printf("halls: %i %i %i\n", first.feedback.hallLA, first.feedback.hallLB, first.feedback.hallLC);
-        display.printf("       %i %i %i\n", first.feedback.hallRA, first.feedback.hallRB, first.feedback.hallRC);
-        display.printf("       %i %i %i\n", second.feedback.hallLA, second.feedback.hallLB, second.feedback.hallLC);
-        display.printf("       %i %i %i\n", second.feedback.hallRA, second.feedback.hallRB, second.feedback.hallRC);
+        display.printf("angle: %i - %i\n", first.feedback.left.angle, first.feedback.right.angle);
+        display.printf("       %i - %i\n", second.feedback.left.angle, second.feedback.right.angle);
+        display.printf("halls: %d %d %d\n", first.feedback.left.hallA, first.feedback.left.hallB, first.feedback.left.hallC);
+        display.printf("       %d %d %d\n", first.feedback.right.hallA, first.feedback.right.hallB, first.feedback.left.hallC);
+        display.printf("       %d %d %d\n", second.feedback.left.hallA, second.feedback.left.hallB, second.feedback.left.hallC);
+        display.printf("       %d %d %d\n", second.feedback.right.hallA, second.feedback.right.hallB, second.feedback.left.hallC);
     }
 
     display.display();
@@ -210,10 +257,16 @@ void loop()
     }
 
     const auto now = millis();
-    if (now - last > 50)
+    if (now - lastSendCommand > 50)
     {
-        last = now;
-        Send();
+        lastSendCommand = now;
+        sendCommand();
+    }
+
+    if (now - lastAlive > 100)
+    {
+        lastAlive = now;
+        Serial.println("alive");
     }
 
     if (now - lastScreenSwitch > 2000)
@@ -227,69 +280,5 @@ void loop()
         }
     }
 
-    const auto handle_serial = [now](HardwareSerial &serial, Controller &controller){
-        while (serial.available())
-        {
-            *controller.bufferIter = char(serial.read());
-            if (*controller.bufferIter == '\n')
-            {
-                DeserializationError error = deserializeJson(doc, controller.messageBuffer.begin(),
-                                                             std::distance(controller.messageBuffer.begin(), controller.bufferIter));
-
-                if (error)
-                {
-                    Serial.print(F("deserializeJson() failed 1: "));
-                    Serial.println(error.c_str());
-                }
-                else
-                {
-#define FIELD_leftAngle "a"
-#define FIELD_rightAngle "b"
-#define FIELD_leftSpeed "c"
-#define FIELD_rightSpeed "d"
-#define FIELD_leftCurrent "e"
-#define FIELD_rightCurrent "f"
-#define FIELD_leftError "g"
-#define FIELD_rightError "h"
-#define FIELD_batVoltage "i"
-#define FIELD_boardTemp "j"
-#define FIELD_hallLA "k"
-#define FIELD_hallLB "l"
-#define FIELD_hallLC "m"
-#define FIELD_hallRA "n"
-#define FIELD_hallRB "o"
-#define FIELD_hallRC "p"
-#define FIELD_chopsL "q"
-#define FIELD_chopsR "r"
-
-                    controller.feedback.time = now;
-                    controller.feedback.leftAngle = doc[F(FIELD_leftAngle)].as<int16_t>();
-                    controller.feedback.rightAngle = doc[F(FIELD_rightAngle)].as<int16_t>();
-                    controller.feedback.leftSpeed = doc[F(FIELD_leftSpeed)].as<int16_t>();
-                    controller.feedback.rightSpeed = doc[F(FIELD_rightSpeed)].as<int16_t>();
-                    controller.feedback.leftCurrent = doc[F(FIELD_leftCurrent)].as<int16_t>();
-                    controller.feedback.rightCurrent = doc[F(FIELD_rightCurrent)].as<int16_t>();
-                    controller.feedback.leftError =doc[F(FIELD_leftError)].as<uint16_t>();
-                    controller.feedback.rightError =doc[F(FIELD_rightError)].as<uint16_t>();
-                    controller.feedback.batVoltage = doc[F(FIELD_batVoltage)].as<int16_t>();
-                    controller.feedback.boardTemp = doc[F(FIELD_boardTemp)].as<int16_t>();
-                    controller.feedback.hallLA = doc[F(FIELD_hallLA)].as<int16_t>();
-                    controller.feedback.hallLB = doc[F(FIELD_hallLB)].as<int16_t>();
-                    controller.feedback.hallLC = doc[F(FIELD_hallLC)].as<int16_t>();
-                    controller.feedback.hallRA = doc[F(FIELD_hallRA)].as<int16_t>();
-                    controller.feedback.hallRB = doc[F(FIELD_hallRB)].as<int16_t>();
-                    controller.feedback.hallRC = doc[F(FIELD_hallRC)].as<int16_t>();
-
-                    Serial.println("parsed");
-                }
-
-                controller.bufferIter = controller.messageBuffer.begin();
-            }
-            else
-                controller.bufferIter++;
-        }
-    };
-
-    handle_serial(Serial1, first);
-    handle_serial(Serial2, second);
+    receiveFeedback();
 }

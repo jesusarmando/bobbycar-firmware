@@ -80,6 +80,10 @@ int16_t offsetdcr    = 2000;
 int16_t batVoltage       = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE;
 int32_t batVoltageFixdt  = (400 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE << 20;  // Fixed-point filter output initialized at 400 V*100/cell = 4 V/cell converted to fixed-point
 
+int32_t board_temp_adcFixdt = adc_buffer.temp << 20;  // Fixed-point filter output initialized with current ADC converted to fixed-point
+int16_t board_temp_adcFilt  = adc_buffer.temp;
+int16_t board_temp_deg_c;
+
 struct {
     RT_MODEL rtM; /* Real-time model */
     P     rtP;    /* Block parameters (auto storage) */
@@ -87,19 +91,20 @@ struct {
     ExtU  rtU;    /* External inputs */
     ExtY  rtY;    /* External outputs */
 
-    MotorConfiguration actual, requested;
+    MotorState actual, requested;
 
     uint32_t chops = 0;
 } left, right;
 
 struct {
-    BuzzerConfiguration actual, requested;
+    BuzzerState actual, requested;
 
     uint32_t timer = 0;
 } buzzer;
 
 Command command;
 
+Feedback feedback;
 
 
 
@@ -123,9 +128,9 @@ void MX_ADC2_Init();
 
 void poweroff();
 
-void handleIncomingMessage();
+void parseCommand();
 
-void sendStatusUpdate();
+void sendFeedback();
 
 } // anonymous namespace
 
@@ -213,14 +218,10 @@ int main()
 
     HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, sizeof(command));
 
-    int32_t board_temp_adcFixdt = adc_buffer.temp << 20;  // Fixed-point filter output initialized with current ADC converted to fixed-point
-    int16_t board_temp_adcFilt  = adc_buffer.temp;
-    int16_t board_temp_deg_c;
-
     while(1) {
         HAL_Delay(DELAY_IN_MAIN_LOOP); //delay in ms
 
-        handleIncomingMessage();
+        parseCommand();
 
         timeout = 0;
 
@@ -229,7 +230,7 @@ int main()
         board_temp_adcFilt  = (int16_t)(board_temp_adcFixdt >> 20);  // convert fixed-point to integer
         board_temp_deg_c    = (TEMP_CAL_HIGH_DEG_C - TEMP_CAL_LOW_DEG_C) * (board_temp_adcFilt - TEMP_CAL_LOW_ADC) / (TEMP_CAL_HIGH_ADC - TEMP_CAL_LOW_ADC) + TEMP_CAL_LOW_DEG_C;
 
-        sendStatusUpdate();
+        sendFeedback();
 
         if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN))
         {
@@ -253,89 +254,88 @@ int main()
 // DMA interrupt frequency =~ 16 kHz
 // =================================
 extern "C" void DMA1_Channel1_IRQHandler() {
+    DMA1->IFCR = DMA_IFCR_CTCIF1;
 
-  DMA1->IFCR = DMA_IFCR_CTCIF1;
-
-  if(offsetcount < 2000) {  // calibrate ADC offsets
-    offsetcount++;
-    offsetrl1 = (adc_buffer.rl1 + offsetrl1) / 2;
-    offsetrl2 = (adc_buffer.rl2 + offsetrl2) / 2;
-    offsetrr1 = (adc_buffer.rr1 + offsetrr1) / 2;
-    offsetrr2 = (adc_buffer.rr2 + offsetrr2) / 2;
-    offsetdcl = (adc_buffer.dcl + offsetdcl) / 2;
-    offsetdcr = (adc_buffer.dcr + offsetdcr) / 2;
-    return;
-  }
-
-  if (buzzer.timer % 1000 == 0) {  // because you get float rounding errors if it would run every time -> not any more, everything converted to fixed-point
-    filtLowPass32(adc_buffer.batt1, BAT_FILT_COEF, &batVoltageFixdt);
-    batVoltage = (int16_t)(batVoltageFixdt >> 20);  // convert fixed-point to integer
-  }
-
-  // Get Left motor currents
-  int16_t curL_phaA = (int16_t)(offsetrl1 - adc_buffer.rl1);
-  int16_t curL_phaB = (int16_t)(offsetrl2 - adc_buffer.rl2);
-  int16_t curL_DC   = (int16_t)(offsetdcl - adc_buffer.dcl);
-
-  // Get Right motor currents
-  int16_t curR_phaB = (int16_t)(offsetrr1 - adc_buffer.rr1);
-  int16_t curR_phaC = (int16_t)(offsetrr2 - adc_buffer.rr2);
-  int16_t curR_DC   = (int16_t)(offsetdcr - adc_buffer.dcr);
-
-  const int8_t chopL = std::abs(curL_DC) > (left.actual.iDcMax * A2BIT_CONV);
-  if (chopL)
-      left.chops++;
-
-  // Disable PWM when current limit is reached (current chopping)
-  // This is the Level 2 of current protection. The Level 1 should kick in first given by I_MOT_MAX
-  if(chopL || timeout > TIMEOUT || left.actual.enable == 0) {
-    LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
-  } else {
-    LEFT_TIM->BDTR |= TIM_BDTR_MOE;
-  }
-
-  const int8_t chopR = std::abs(curR_DC) > (right.actual.iDcMax * A2BIT_CONV);
-  if (chopR)
-      right.chops++;
-
-  if(chopR || timeout > TIMEOUT || right.actual.enable == 0) {
-    RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
-  } else {
-    RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
-  }
-
-  //create square wave for buzzer
-  buzzer.timer++;
-  if (buzzer.actual.freq != 0 && (buzzer.timer / 5000) % (buzzer.actual.pattern + 1) == 0) {
-    if (buzzer.timer % buzzer.actual.freq == 0) {
-      HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+    if(offsetcount < 2000) {  // calibrate ADC offsets
+        offsetcount++;
+        offsetrl1 = (adc_buffer.rl1 + offsetrl1) / 2;
+        offsetrl2 = (adc_buffer.rl2 + offsetrl2) / 2;
+        offsetrr1 = (adc_buffer.rr1 + offsetrr1) / 2;
+        offsetrr2 = (adc_buffer.rr2 + offsetrr2) / 2;
+        offsetdcl = (adc_buffer.dcl + offsetdcl) / 2;
+        offsetdcr = (adc_buffer.dcr + offsetdcr) / 2;
+        return;
     }
-  } else {
-      HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
-  }
 
-  // ############################### MOTOR CONTROL ###############################
+    if (buzzer.timer % 1000 == 0) {  // because you get float rounding errors if it would run every time -> not any more, everything converted to fixed-point
+        filtLowPass32(adc_buffer.batt1, BAT_FILT_COEF, &batVoltageFixdt);
+        batVoltage = (int16_t)(batVoltageFixdt >> 20);  // convert fixed-point to integer
+    }
 
-  static boolean_T OverrunFlag = false;
+    // Get Left motor currents
+    int16_t curL_phaA = (int16_t)(offsetrl1 - adc_buffer.rl1);
+    int16_t curL_phaB = (int16_t)(offsetrl2 - adc_buffer.rl2);
+    int16_t curL_DC   = (int16_t)(offsetdcl - adc_buffer.dcl);
 
-  /* Check for overrun */
-  if (OverrunFlag) {
-    return;
-  }
-  OverrunFlag = true;
+    // Get Right motor currents
+    int16_t curR_phaB = (int16_t)(offsetrr1 - adc_buffer.rr1);
+    int16_t curR_phaC = (int16_t)(offsetrr2 - adc_buffer.rr2);
+    int16_t curR_DC   = (int16_t)(offsetdcr - adc_buffer.dcr);
 
-  constexpr int32_t pwm_res  = 64000000 / 2 / PWM_FREQ; // = 2000
-  constexpr int32_t pwm_margin = 100;        /* This margin allows to always have a window in the PWM signal for proper Phase currents measurement */
+    const int8_t chopL = std::abs(curL_DC) > (left.actual.iDcMax * A2BIT_CONV);
+    if (chopL)
+        left.chops++;
 
-  /* Make sure to stop BOTH motors in case of an error */
-  const bool enableLFin = left.actual.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
-  const bool enableRFin = right.actual.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
+    const int8_t chopR = std::abs(curR_DC) > (right.actual.iDcMax * A2BIT_CONV);
+    if (chopR)
+        right.chops++;
 
-  // ========================= LEFT MOTOR ============================
+    // Disable PWM when current limit is reached (current chopping)
+    // This is the Level 2 of current protection. The Level 1 should kick in first given by I_MOT_MAX
+    if(chopL || timeout > TIMEOUT || left.actual.enable == 0) {
+      LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
+    } else {
+      LEFT_TIM->BDTR |= TIM_BDTR_MOE;
+    }
+
+    if(chopR || timeout > TIMEOUT || right.actual.enable == 0) {
+      RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
+    } else {
+      RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
+    }
+
+    //create square wave for buzzer
+    buzzer.timer++;
+    if (buzzer.actual.freq != 0 && (buzzer.timer / 5000) % (buzzer.actual.pattern + 1) == 0) {
+      if (buzzer.timer % buzzer.actual.freq == 0) {
+        HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+      }
+    } else {
+        HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, GPIO_PIN_RESET);
+    }
+
+    // ############################### MOTOR CONTROL ###############################
+
+    static boolean_T OverrunFlag = false;
+
+    /* Check for overrun */
+    if (OverrunFlag) {
+      return;
+    }
+    OverrunFlag = true;
+
+    constexpr int32_t pwm_res  = 64000000 / 2 / PWM_FREQ; // = 2000
+    constexpr int32_t pwm_margin = 100;        /* This margin allows to always have a window in the PWM signal for proper Phase currents measurement */
+
+    /* Make sure to stop BOTH motors in case of an error */
+    const bool enableLFin = left.actual.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
+    const bool enableRFin = right.actual.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
+
+    // ========================= LEFT MOTOR ============================
     // Get hall sensors values
-    uint8_t hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
-    uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
-    uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
+    bool hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
+    bool hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
+    bool hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
 
     /* Set motor inputs here */
     left.rtP.z_ctrlTypSel         = uint8_t(left.actual.ctrlTyp);
@@ -366,14 +366,14 @@ extern "C" void DMA1_Channel1_IRQHandler() {
     LEFT_TIM->LEFT_TIM_U    = (uint16_t)std::clamp(ul + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
     LEFT_TIM->LEFT_TIM_V    = (uint16_t)std::clamp(vl + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
     LEFT_TIM->LEFT_TIM_W    = (uint16_t)std::clamp(wl + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
-  // =================================================================
+    // =================================================================
 
 
-  // ========================= RIGHT MOTOR ===========================
+    // ========================= RIGHT MOTOR ===========================
     // Get hall sensors values
-    uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
-    uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
-    uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
+    bool hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
+    bool hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
+    bool hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
 
     /* Set motor inputs here */
     right.rtP.z_ctrlTypSel         = uint8_t(right.actual.ctrlTyp);
@@ -404,10 +404,10 @@ extern "C" void DMA1_Channel1_IRQHandler() {
     RIGHT_TIM->RIGHT_TIM_U  = (uint16_t)std::clamp(ur + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
     RIGHT_TIM->RIGHT_TIM_V  = (uint16_t)std::clamp(vr + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
     RIGHT_TIM->RIGHT_TIM_W  = (uint16_t)std::clamp(wr + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
-  // =================================================================
+    // =================================================================
 
-  /* Indicate task complete */
-  OverrunFlag = false;
+    /* Indicate task complete */
+    OverrunFlag = false;
 }
 
 namespace {
@@ -1011,7 +1011,7 @@ void poweroff() {
   //  }
 }
 
-void handleIncomingMessage()
+void parseCommand()
 {
     uint16_t checksum = calculateChecksum(command);
     if (command.start == Command::VALID_HEADER && command.checksum == checksum)
@@ -1070,71 +1070,46 @@ void handleIncomingMessage()
     }
 }
 
-void sendStatusUpdate()
+void sendFeedback()
 {
-#define FIELD_leftAngle "a"
-#define FIELD_rightAngle "b"
-#define FIELD_leftSpeed "c"
-#define FIELD_rightSpeed "d"
-#define FIELD_leftCurrent "e"
-#define FIELD_rightCurrent "f"
-#define FIELD_leftError "g"
-#define FIELD_rightError "h"
-#define FIELD_batVoltage "i"
-#define FIELD_boardTemp "j"
-#define FIELD_hallLA "k"
-#define FIELD_hallLB "l"
-#define FIELD_hallLC "m"
-#define FIELD_hallRA "n"
-#define FIELD_hallRB "o"
-#define FIELD_hallRC "p"
-#define FIELD_chopsL "q"
-#define FIELD_chopsR "r"
-
-    if (main_loop_counter % 25 == 0) {    // Send data periodically
+    if (main_loop_counter % 50 == 0) {    // Send data periodically
         if(UART_DMA_CHANNEL->CNDTR == 0) {
-                  int strLength;
-                  char uart_buf[512];
-                  strLength = sprintf((char *)(uintptr_t)uart_buf,
-                                        "{ "
-                                          "\"" FIELD_leftAngle "\": %i, "
-                                          "\"" FIELD_rightAngle "\": %i, "
-                                          "\"" FIELD_leftSpeed "\": %i, "
-                                          "\"" FIELD_rightSpeed "\": %i, "
-                                          "\"" FIELD_leftCurrent "\": %i, "
-                                          "\"" FIELD_rightCurrent "\": %i, "
-                                          "\"" FIELD_leftError "\": %i, "
-                                          "\"" FIELD_rightError "\": %i, "
-                                          "\"" FIELD_batVoltage "\": %i, "
-                                          "\"" FIELD_boardTemp "\": %i, "
-                                          "\"" FIELD_hallLA "\": %i, "
-                                          "\"" FIELD_hallLB "\": %i, "
-                                          "\"" FIELD_hallLC "\": %i, "
-                                          "\"" FIELD_hallRA "\": %i, "
-                                          "\"" FIELD_hallRB "\": %i, "
-                                          "\"" FIELD_hallRC "\": %i, "
-                                          "\"" FIELD_chopsL "\": %i, "
-                                          "\"" FIELD_chopsR "\": %i "
-                                        "}\n",
-                                        left.rtY.a_elecAngle, right.rtY.a_elecAngle,
-                                        left.rtY.n_mot, right.rtY.n_mot,
-                                        left.rtU.i_DCLink, right.rtU.i_DCLink,
-                                        left.rtY.z_errCode, right.rtY.z_errCode,
-                                        (batVoltage * BAT_CALIB_REAL_VOLTAGE / BAT_CALIB_ADC),
-                                        0/*board_temp_deg_c*/,
-                                        left.rtU.b_hallA, left.rtU.b_hallB, left.rtU.b_hallC,
-                                        right.rtU.b_hallA, right.rtU.b_hallB, right.rtU.b_hallC,
-                                        left.chops, right.chops);
-                  left.chops = 0;
-                  right.chops = 0;
+            feedback.start = Feedback::VALID_HEADER;
 
-                  if(UART_DMA_CHANNEL->CNDTR == 0) {
-                    UART_DMA_CHANNEL->CCR    &= ~DMA_CCR_EN;
-                    UART_DMA_CHANNEL->CNDTR   = strLength;
-                    UART_DMA_CHANNEL->CMAR    = uint64_t(&uart_buf);
-                    UART_DMA_CHANNEL->CCR    |= DMA_CCR_EN;
-                  }
-                }
+            feedback.left.angle = left.rtY.a_elecAngle;
+            feedback.right.angle = right.rtY.a_elecAngle;
+
+            feedback.left.speed = left.rtY.n_mot;
+            feedback.right.speed = right.rtY.n_mot;
+
+            feedback.left.error = left.rtY.z_errCode;
+            feedback.right.error = right.rtY.z_errCode;
+
+            feedback.left.current = left.rtU.i_DCLink;
+            feedback.right.current = right.rtU.i_DCLink;
+
+            feedback.left.chops = left.chops;
+            feedback.right.chops = right.chops;
+            left.chops = 0;
+            right.chops = 0;
+
+            feedback.left.hallA = left.rtU.b_hallA;
+            feedback.left.hallB = left.rtU.b_hallB;
+            feedback.left.hallC = left.rtU.b_hallC;
+            feedback.right.hallA = right.rtU.b_hallA;
+            feedback.right.hallB = right.rtU.b_hallB;
+            feedback.right.hallC = right.rtU.b_hallC;
+
+            feedback.batVoltage = batVoltage * BAT_CALIB_REAL_VOLTAGE / BAT_CALIB_ADC;
+            feedback.boardTemp = board_temp_deg_c;
+
+            feedback.checksum = calculateChecksum(feedback);
+
+            UART_DMA_CHANNEL->CCR    &= ~DMA_CCR_EN;
+            UART_DMA_CHANNEL->CNDTR   = sizeof(feedback);
+            UART_DMA_CHANNEL->CMAR    = uint64_t(&feedback);
+            UART_DMA_CHANNEL->CCR    |= DMA_CCR_EN;
+        }
     }
 }
 
