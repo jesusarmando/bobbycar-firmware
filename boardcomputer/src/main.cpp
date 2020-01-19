@@ -10,7 +10,8 @@
 
 #include "../../common.h"
 
-bool toggle{false};
+bool power_toggle{false};
+bool led_toggle{false};
 
 Command command;
 
@@ -185,8 +186,15 @@ void loop()
         {
         case 't':
         case 'T':
-            toggle = !toggle;
-            command.poweroff = toggle;
+            power_toggle = !power_toggle;
+            Serial.printf("power: %d\n", power_toggle);
+            command.poweroff = power_toggle;
+            break;
+        case 'l':
+        case 'L':
+            led_toggle = !led_toggle;
+            Serial.printf("led: %d\n", led_toggle);
+            command.led = led_toggle;
             break;
         case '0': command.buzzer.freq = 0; break;
         case '1': command.buzzer.freq = 1; break;

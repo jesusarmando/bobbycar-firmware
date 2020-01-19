@@ -20,7 +20,7 @@ enum class ControlMode : uint8_t {
 };
 
 struct MotorConfiguration {
-    int16_t enable = false;
+    bool enable = false;
     int16_t pwm = 0;
     ControlType ctrlTyp = ControlType::FieldOrientedControl;
     ControlMode ctrlMod = ControlMode::OpenMode;
@@ -46,7 +46,8 @@ struct Command {
 
     BuzzerConfiguration buzzer;
 
-    int16_t poweroff = 0;
+    bool poweroff = false;
+    bool led = false;
 
     uint16_t checksum;
 };
@@ -63,7 +64,7 @@ uint16_t calculateChecksum(Command command) {
             command.left.phaseAdvMax ^ command.right.phaseAdvMax ^
             command.left.fieldWeakMax ^ command.right.fieldWeakMax ^
             command.buzzer.freq ^ command.buzzer.pattern ^
-            command.poweroff;
+            command.poweroff ^ command.led;
 }
 
 }
