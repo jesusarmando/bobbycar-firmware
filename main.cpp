@@ -164,32 +164,32 @@ int main()
     HAL_ADC_Start(&hadc2);
 
     left.rtP = rtP_Left;
-    left.rtP.b_selPhaABCurrMeas   = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
-    left.rtP.z_ctrlTypSel         = uint8_t(left.actual.ctrlTyp);
-    left.rtP.b_diagEna            = DIAG_ENA;
-    left.rtP.i_max                = (left.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    left.rtP.n_max                = left.actual.nMotMax << 4;                       // fixdt(1,16,4)
-    left.rtP.b_fieldWeakEna       = FIELD_WEAK_ENA;
-    left.rtP.id_fieldWeakMax      = (left.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    left.rtP.a_phaAdvMax          = left.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
-    left.rtP.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
-    left.rtP.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
+    left.rtP.b_selPhaABCurrMeas  = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
+    left.rtP.z_ctrlTypSel        = uint8_t(left.actual.ctrlTyp);
+    left.rtP.b_diagEna           = DIAG_ENA;
+    left.rtP.i_max               = (left.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    left.rtP.n_max               = left.actual.nMotMax << 4;                       // fixdt(1,16,4)
+    left.rtP.b_fieldWeakEna      = FIELD_WEAK_ENA;
+    left.rtP.id_fieldWeakMax     = (left.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    left.rtP.a_phaAdvMax         = left.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
+    left.rtP.r_fieldWeakHi       = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
+    left.rtP.r_fieldWeakLo       = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
     left.rtM.defaultParam        = &left.rtP;
     left.rtM.dwork               = &left.rtDW;
     left.rtM.inputs              = &left.rtU;
     left.rtM.outputs             = &left.rtY;
 
     right.rtP = rtP_Left;
-    right.rtP.b_selPhaABCurrMeas  = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
-    right.rtP.z_ctrlTypSel         = uint8_t(right.actual.ctrlTyp);
-    right.rtP.b_diagEna            = DIAG_ENA;
-    right.rtP.i_max                = (right.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    right.rtP.n_max                = right.actual.nMotMax << 4;                       // fixdt(1,16,4)
-    right.rtP.b_fieldWeakEna       = FIELD_WEAK_ENA;
-    right.rtP.id_fieldWeakMax      = (right.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    right.rtP.a_phaAdvMax          = right.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
-    right.rtP.r_fieldWeakHi        = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
-    right.rtP.r_fieldWeakLo        = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
+    right.rtP.b_selPhaABCurrMeas = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
+    right.rtP.z_ctrlTypSel       = uint8_t(right.actual.ctrlTyp);
+    right.rtP.b_diagEna          = DIAG_ENA;
+    right.rtP.i_max              = (right.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    right.rtP.n_max              = right.actual.nMotMax << 4;                       // fixdt(1,16,4)
+    right.rtP.b_fieldWeakEna     = FIELD_WEAK_ENA;
+    right.rtP.id_fieldWeakMax    = (right.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    right.rtP.a_phaAdvMax        = right.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
+    right.rtP.r_fieldWeakHi      = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
+    right.rtP.r_fieldWeakLo      = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
     right.rtM.defaultParam       = &right.rtP;
     right.rtM.dwork              = &right.rtDW;
     right.rtM.inputs             = &right.rtU;
@@ -205,8 +205,6 @@ int main()
         HAL_Delay(100);
     }
     buzzer.actual.freq = 0;
-
-    HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);
 
 #define UART_DMA_CHANNEL DMA1_Channel7
     UART2_Init();
@@ -233,8 +231,6 @@ int main()
 
         sendStatusUpdate();
 
-        //HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
-
         if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN))
         {
             left.actual.enable = right.actual.enable = 0;           // disable motors
@@ -259,8 +255,6 @@ int main()
 extern "C" void DMA1_Channel1_IRQHandler() {
 
   DMA1->IFCR = DMA_IFCR_CTCIF1;
-  // HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
-  // HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
 
   if(offsetcount < 2000) {  // calibrate ADC offsets
     offsetcount++;
@@ -1037,6 +1031,8 @@ void handleIncomingMessage()
             if (command.poweroff)
                 poweroff();
 
+            HAL_GPIO_WritePin(LED_PORT, LED_PIN, command.led ? GPIO_PIN_RESET : GPIO_PIN_SET);
+
             command.start     = Command::INVALID_HEADER;                 // Change the Start Frame for timeout detection in the next cycle
             timeoutCntSerial  = 0;                      // Reset the timeout counter
         }
@@ -1062,6 +1058,8 @@ void handleIncomingMessage()
         left.actual = right.actual = {.enable=true};
 
         buzzer.actual = { 24, 1 };
+
+        HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_RESET);
     }
     else
     {
