@@ -13,7 +13,7 @@ set(CMAKE_CXX_FLAGS "${COMMON_FLAGS} -std=c++17")
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_EXE_LINKER_FLAGS "-specs=nosys.specs -T${CMAKE_SOURCE_DIR}/STM32F103RCTx_FLASH.ld -lc -lm -lnosys -lstdc++ -Wl,--gc-sections -Wl,-Map=${CMAKE_BINARY_DIR}/hover.map,--cref")
+set(CMAKE_EXE_LINKER_FLAGS "-specs=nosys.specs -T${CMAKE_SOURCE_DIR}/other/STM32F103RCTx_FLASH.ld -lc -lm -lnosys -lstdc++ -Wl,--gc-sections -Wl,-Map=${CMAKE_BINARY_DIR}/hover.map,--cref")
 
 set(CMAKE_SHARED_LIBRARY_LINK_ASM_FLAGS)
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)
@@ -30,7 +30,6 @@ include_directories(
 )
 
 add_executable(firmware.elf
-    startup_stm32f103xe.s
     Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c
     Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c
     Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c
@@ -49,9 +48,9 @@ add_executable(firmware.elf
 
     other/BLDC_controller.c
     other/BLDC_controller_data.c
-    other/stm32f1xx_it.c
+    other/startup_stm32f103xe.s
     other/system_stm32f1xx.c
-    
+
     config.h
     common.h
     defines.h

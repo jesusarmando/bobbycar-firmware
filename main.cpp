@@ -250,10 +250,9 @@ int main()
     }
 }
 
-// =================================
-// DMA interrupt frequency =~ 16 kHz
-// =================================
-extern "C" void DMA1_Channel1_IRQHandler() {
+namespace {
+void updateMotors()
+{
     DMA1->IFCR = DMA_IFCR_CTCIF1;
 
     if(offsetcount < 2000) {  // calibrate ADC offsets
@@ -410,18 +409,17 @@ extern "C" void DMA1_Channel1_IRQHandler() {
     OverrunFlag = false;
 }
 
-namespace {
 // ===========================================================
   /* Low pass filter fixed-point 32 bits: fixdt(1,32,20)
   * Max:  2047.9375
   * Min: -2048
   * Res:  0.0625
-  * 
+  *
   * Inputs:       u     = int16
   * Outputs:      y     = fixdt(1,32,20)
   * Parameters:   coef  = fixdt(0,16,16) = [0,65535U]
-  * 
-  * Example: 
+  *
+  * Example:
   * If coef = 0.8 (in floating point), then coef = 0.8 * 2^16 = 52429 (in fixed-point)
   * filtLowPass16(u, 52429, &y);
   * yint = (int16_t)(y >> 20); // the integer output is the fixed-point ouput shifted by 20 bits
@@ -1114,3 +1112,164 @@ void sendFeedback()
 }
 
 } // anonymous namespace
+
+/******************************************************************************/
+/*            Cortex-M3 Processor Interruption and Exception Handlers         */
+/******************************************************************************/
+
+/**
+* @brief This function handles Non maskable interrupt.
+*/
+extern "C" void NMI_Handler() {
+  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+
+  /* USER CODE END NonMaskableInt_IRQn 0 */
+  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+
+  /* USER CODE END NonMaskableInt_IRQn 1 */
+}
+
+/**
+* @brief This function handles Hard fault interrupt.
+*/
+extern "C" void HardFault_Handler() {
+  /* USER CODE BEGIN HardFault_IRQn 0 */
+
+  /* USER CODE END HardFault_IRQn 0 */
+  while(1) {
+  }
+  /* USER CODE BEGIN HardFault_IRQn 1 */
+
+  /* USER CODE END HardFault_IRQn 1 */
+}
+
+/**
+* @brief This function handles Memory management fault.
+*/
+extern "C" void MemManage_Handler() {
+  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+
+  /* USER CODE END MemoryManagement_IRQn 0 */
+  while(1) {
+  }
+  /* USER CODE BEGIN MemoryManagement_IRQn 1 */
+
+  /* USER CODE END MemoryManagement_IRQn 1 */
+}
+
+/**
+* @brief This function handles Prefetch fault, memory access fault.
+*/
+extern "C" void BusFault_Handler() {
+  /* USER CODE BEGIN BusFault_IRQn 0 */
+
+  /* USER CODE END BusFault_IRQn 0 */
+  while(1) {
+  }
+  /* USER CODE BEGIN BusFault_IRQn 1 */
+
+  /* USER CODE END BusFault_IRQn 1 */
+}
+
+/**
+* @brief This function handles Undefined instruction or illegal state.
+*/
+extern "C" void UsageFault_Handler() {
+  /* USER CODE BEGIN UsageFault_IRQn 0 */
+
+  /* USER CODE END UsageFault_IRQn 0 */
+  while(1) {
+  }
+  /* USER CODE BEGIN UsageFault_IRQn 1 */
+
+  /* USER CODE END UsageFault_IRQn 1 */
+}
+
+/**
+* @brief This function handles System service call via SWI instruction.
+*/
+extern "C" void SVC_Handler() {
+  /* USER CODE BEGIN SVCall_IRQn 0 */
+
+  /* USER CODE END SVCall_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 1 */
+
+  /* USER CODE END SVCall_IRQn 1 */
+}
+
+/**
+* @brief This function handles Debug monitor.
+*/
+extern "C" void DebugMon_Handler() {
+  /* USER CODE BEGIN DebugMonitor_IRQn 0 */
+
+  /* USER CODE END DebugMonitor_IRQn 0 */
+  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+
+  /* USER CODE END DebugMonitor_IRQn 1 */
+}
+
+/**
+* @brief This function handles Pendable request for system service.
+*/
+extern "C" void PendSV_Handler() {
+  /* USER CODE BEGIN PendSV_IRQn 0 */
+
+  /* USER CODE END PendSV_IRQn 0 */
+  /* USER CODE BEGIN PendSV_IRQn 1 */
+
+  /* USER CODE END PendSV_IRQn 1 */
+}
+
+/**
+* @brief This function handles System tick timer.
+*/
+#ifdef CONTROL_PPM
+extern "C" void PPM_SysTick_Callback();
+#endif
+
+extern "C" void SysTick_Handler() {
+  /* USER CODE BEGIN SysTick_IRQn 0 */
+
+  /* USER CODE END SysTick_IRQn 0 */
+  HAL_IncTick();
+  HAL_SYSTICK_IRQHandler();
+  /* USER CODE BEGIN SysTick_IRQn 1 */
+#ifdef CONTROL_PPM
+  PPM_SysTick_Callback();
+#endif
+  /* USER CODE END SysTick_IRQn 1 */
+}
+
+// =================================
+// DMA interrupt frequency =~ 16 kHz
+// =================================
+extern "C" void DMA1_Channel1_IRQHandler()
+{
+    updateMotors();
+}
+
+extern "C" void DMA1_Channel6_IRQHandler()
+{
+  /* USER CODE BEGIN DMA1_Channel4_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel4_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_rx);
+  /* USER CODE BEGIN DMA1_Channel4_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel4_IRQn 1 */
+}
+
+/**
+* @brief This function handles DMA1 channel5 global interrupt.
+*/
+extern "C" void DMA1_Channel7_IRQHandler()
+{
+  /* USER CODE BEGIN DMA1_Channel5_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel5_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_tx);
+  /* USER CODE BEGIN DMA1_Channel5_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel5_IRQn 1 */
+}
