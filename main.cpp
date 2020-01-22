@@ -65,7 +65,6 @@ volatile struct {
 
 volatile uint32_t timeout;
 int16_t timeoutCntSerial   = 0;  // Timeout counter for Rx Serial command
-uint8_t timeoutFlagSerial  = 0;  // Timeout Flag for Rx Serial command: 0 = OK, 1 = Problem detected (line disconnected or wrong Rx data)
 
 uint32_t main_loop_counter;
 
@@ -91,26 +90,24 @@ struct {
     ExtU  rtU;    /* External inputs */
     ExtY  rtY;    /* External outputs */
 
-    MotorState actual, requested;
+    MotorState state;
 
     uint32_t chops = 0;
 } left, right;
 
 struct {
-    BuzzerState actual, requested;
+    BuzzerState state;
 
     uint32_t timer = 0;
 } buzzer;
 
-Command command;
+std::array<uint8_T, sizeof(Command)*2> command_buffer;
 
 Feedback feedback;
 
 
 
 void filtLowPass32(int16_t u, uint16_t coef, int32_t *y);
-
-void rateLimiter16(int16_t u, int16_t rate, int16_t *y);
 
 void SystemClock_Config();
 
@@ -170,13 +167,13 @@ int main()
 
     left.rtP = rtP_Left;
     left.rtP.b_selPhaABCurrMeas  = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
-    left.rtP.z_ctrlTypSel        = uint8_t(left.actual.ctrlTyp);
+    left.rtP.z_ctrlTypSel        = uint8_t(left.state.ctrlTyp);
     left.rtP.b_diagEna           = DIAG_ENA;
-    left.rtP.i_max               = (left.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    left.rtP.n_max               = left.actual.nMotMax << 4;                       // fixdt(1,16,4)
+    left.rtP.i_max               = (left.state.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    left.rtP.n_max               = left.state.nMotMax << 4;                       // fixdt(1,16,4)
     left.rtP.b_fieldWeakEna      = FIELD_WEAK_ENA;
-    left.rtP.id_fieldWeakMax     = (left.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    left.rtP.a_phaAdvMax         = left.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
+    left.rtP.id_fieldWeakMax     = (left.state.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    left.rtP.a_phaAdvMax         = left.state.phaseAdvMax << 4;                   // fixdt(1,16,4)
     left.rtP.r_fieldWeakHi       = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
     left.rtP.r_fieldWeakLo       = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
     left.rtM.defaultParam        = &left.rtP;
@@ -186,13 +183,13 @@ int main()
 
     right.rtP = rtP_Left;
     right.rtP.b_selPhaABCurrMeas = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
-    right.rtP.z_ctrlTypSel       = uint8_t(right.actual.ctrlTyp);
+    right.rtP.z_ctrlTypSel       = uint8_t(right.state.ctrlTyp);
     right.rtP.b_diagEna          = DIAG_ENA;
-    right.rtP.i_max              = (right.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    right.rtP.n_max              = right.actual.nMotMax << 4;                       // fixdt(1,16,4)
+    right.rtP.i_max              = (right.state.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    right.rtP.n_max              = right.state.nMotMax << 4;                       // fixdt(1,16,4)
     right.rtP.b_fieldWeakEna     = FIELD_WEAK_ENA;
-    right.rtP.id_fieldWeakMax    = (right.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    right.rtP.a_phaAdvMax        = right.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
+    right.rtP.id_fieldWeakMax    = (right.state.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    right.rtP.a_phaAdvMax        = right.state.phaseAdvMax << 4;                   // fixdt(1,16,4)
     right.rtP.r_fieldWeakHi      = FIELD_WEAK_HI << 4;                   // fixdt(1,16,4)
     right.rtP.r_fieldWeakLo      = FIELD_WEAK_LO << 4;                   // fixdt(1,16,4)
     right.rtM.defaultParam       = &right.rtP;
@@ -206,17 +203,17 @@ int main()
 
     for (int i = 8; i >= 0; i--)
     {
-        buzzer.actual.freq = (uint8_t)i;
+        buzzer.state.freq = (uint8_t)i;
         HAL_Delay(100);
     }
-    buzzer.actual.freq = 0;
+    buzzer.state.freq = 0;
 
 #define UART_DMA_CHANNEL DMA1_Channel7
     UART2_Init();
 //#define UART_DMA_CHANNEL DMA1_Channel2
     //UART3_Init();
 
-    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, sizeof(command));
+    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command_buffer, sizeof(command_buffer));
 
     while(1) {
         HAL_Delay(DELAY_IN_MAIN_LOOP); //delay in ms
@@ -234,7 +231,7 @@ int main()
 
         if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN))
         {
-            left.actual.enable = right.actual.enable = 0;           // disable motors
+            left.state.enable = right.state.enable = 0;           // disable motors
 
             while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}    // wait until button is released
 
@@ -281,23 +278,23 @@ void updateMotors()
     int16_t curR_phaC = (int16_t)(offsetrr2 - adc_buffer.rr2);
     int16_t curR_DC   = (int16_t)(offsetdcr - adc_buffer.dcr);
 
-    const int8_t chopL = std::abs(curL_DC) > (left.actual.iDcMax * A2BIT_CONV);
+    const int8_t chopL = std::abs(curL_DC) > (left.state.iDcMax * A2BIT_CONV);
     if (chopL)
         left.chops++;
 
-    const int8_t chopR = std::abs(curR_DC) > (right.actual.iDcMax * A2BIT_CONV);
+    const int8_t chopR = std::abs(curR_DC) > (right.state.iDcMax * A2BIT_CONV);
     if (chopR)
         right.chops++;
 
     // Disable PWM when current limit is reached (current chopping)
     // This is the Level 2 of current protection. The Level 1 should kick in first given by I_MOT_MAX
-    if(chopL || timeout > TIMEOUT || left.actual.enable == 0) {
+    if(chopL || timeout > TIMEOUT || left.state.enable == 0) {
       LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
     } else {
       LEFT_TIM->BDTR |= TIM_BDTR_MOE;
     }
 
-    if(chopR || timeout > TIMEOUT || right.actual.enable == 0) {
+    if(chopR || timeout > TIMEOUT || right.state.enable == 0) {
       RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
     } else {
       RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
@@ -305,8 +302,8 @@ void updateMotors()
 
     //create square wave for buzzer
     buzzer.timer++;
-    if (buzzer.actual.freq != 0 && (buzzer.timer / 5000) % (buzzer.actual.pattern + 1) == 0) {
-      if (buzzer.timer % buzzer.actual.freq == 0) {
+    if (buzzer.state.freq != 0 && (buzzer.timer / 5000) % (buzzer.state.pattern + 1) == 0) {
+      if (buzzer.timer % buzzer.state.freq == 0) {
         HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
       }
     } else {
@@ -327,8 +324,8 @@ void updateMotors()
     constexpr int32_t pwm_margin = 100;        /* This margin allows to always have a window in the PWM signal for proper Phase currents measurement */
 
     /* Make sure to stop BOTH motors in case of an error */
-    const bool enableLFin = left.actual.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
-    const bool enableRFin = right.actual.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
+    const bool enableLFin = left.state.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
+    const bool enableRFin = right.state.enable && left.rtY.z_errCode == 0 && right.rtY.z_errCode == 0;
 
     // ========================= LEFT MOTOR ============================
     // Get hall sensors values
@@ -337,15 +334,15 @@ void updateMotors()
     bool hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
 
     /* Set motor inputs here */
-    left.rtP.z_ctrlTypSel         = uint8_t(left.actual.ctrlTyp);
-    left.rtP.i_max                = (left.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    left.rtP.n_max                = left.actual.nMotMax << 4;                       // fixdt(1,16,4)
-    left.rtP.id_fieldWeakMax      = (left.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    left.rtP.a_phaAdvMax          = left.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
+    left.rtP.z_ctrlTypSel         = uint8_t(left.state.ctrlTyp);
+    left.rtP.i_max                = (left.state.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    left.rtP.n_max                = left.state.nMotMax << 4;                       // fixdt(1,16,4)
+    left.rtP.id_fieldWeakMax      = (left.state.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    left.rtP.a_phaAdvMax          = left.state.phaseAdvMax << 4;                   // fixdt(1,16,4)
 
     left.rtU.b_motEna     = enableLFin;
-    left.rtU.z_ctrlModReq = uint8_t(left.actual.ctrlMod);
-    left.rtU.r_inpTgt     = left.actual.pwm;
+    left.rtU.z_ctrlModReq = uint8_t(left.state.ctrlMod);
+    left.rtU.r_inpTgt     = left.state.pwm;
     left.rtU.b_hallA      = hall_ul;
     left.rtU.b_hallB      = hall_vl;
     left.rtU.b_hallC      = hall_wl;
@@ -375,15 +372,15 @@ void updateMotors()
     bool hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
 
     /* Set motor inputs here */
-    right.rtP.z_ctrlTypSel         = uint8_t(right.actual.ctrlTyp);
-    right.rtP.i_max                = (right.actual.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
-    right.rtP.n_max                = right.actual.nMotMax << 4;                       // fixdt(1,16,4)
-    right.rtP.id_fieldWeakMax      = (right.actual.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
-    right.rtP.a_phaAdvMax          = right.actual.phaseAdvMax << 4;                   // fixdt(1,16,4)
+    right.rtP.z_ctrlTypSel         = uint8_t(right.state.ctrlTyp);
+    right.rtP.i_max                = (right.state.iMotMax * A2BIT_CONV) << 4;        // fixdt(1,16,4)
+    right.rtP.n_max                = right.state.nMotMax << 4;                       // fixdt(1,16,4)
+    right.rtP.id_fieldWeakMax      = (right.state.fieldWeakMax * A2BIT_CONV) << 4;   // fixdt(1,16,4)
+    right.rtP.a_phaAdvMax          = right.state.phaseAdvMax << 4;                   // fixdt(1,16,4)
 
     right.rtU.b_motEna      = enableRFin;
-    right.rtU.z_ctrlModReq  = uint8_t(right.actual.ctrlMod);
-    right.rtU.r_inpTgt      = right.actual.pwm;
+    right.rtU.z_ctrlModReq  = uint8_t(right.state.ctrlMod);
+    right.rtU.r_inpTgt      = right.state.pwm;
     right.rtU.b_hallA       = hall_ur;
     right.rtU.b_hallB       = hall_vr;
     right.rtU.b_hallC       = hall_wr;
@@ -431,31 +428,6 @@ void filtLowPass32(int16_t u, uint16_t coef, int32_t *y)
     tmp = (int16_t)(u << 4) - (*y >> 16);
     tmp = std::clamp(tmp, -32768, 32767);  // Overflow protection
     *y  = coef * tmp + (*y);
-}
-
-// ===========================================================
-  /* rateLimiter16(int16_t u, int16_t rate, int16_t *y);
-  * Inputs:       u     = int16
-  * Outputs:      y     = fixdt(1,16,4)
-  * Parameters:   rate  = fixdt(1,16,4) = [0, 32767] Do NOT make rate negative (>32767)
-  */
-void rateLimiter16(int16_t u, int16_t rate, int16_t *y)
-{
-    int16_t q0;
-    int16_t q1;
-
-    q0 = (u << 4)  - *y;
-
-    if (q0 > rate) {
-    q0 = rate;
-    } else {
-    q1 = -rate;
-    if (q0 < q1) {
-      q0 = q1;
-    }
-    }
-
-    *y = q0 + *y;
 }
 
 // ===========================================================
@@ -997,10 +969,10 @@ void MX_ADC2_Init() {
 
 void poweroff() {
   //  if (abs(speed) < 20) {  // wait for the speed to drop, then shut down -> this is commented out for SAFETY reasons
-        buzzer.actual.pattern = 0;
-        left.actual.enable = right.actual.enable = 0;
+        buzzer.state.pattern = 0;
+        left.state.enable = right.state.enable = 0;
         for (int i = 0; i < 8; i++) {
-            buzzer.actual.freq = (uint8_t)i;
+            buzzer.state.freq = (uint8_t)i;
             HAL_Delay(100);
         }
         HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, GPIO_PIN_RESET);
@@ -1011,60 +983,55 @@ void poweroff() {
 
 void parseCommand()
 {
-    uint16_t checksum = calculateChecksum(command);
-    if (command.start == Command::VALID_HEADER && command.checksum == checksum)
+    bool any_parsed{false};
+
+    for (unsigned int i = 0; i < sizeof(Command); i++)
     {
-        if (timeoutFlagSerial)                        // Check for previous timeout flag
-        {
-            if (timeoutCntSerial-- <= 0)              // Timeout de-qualification
-                timeoutFlagSerial = 0;                // Timeout flag cleared
-        }
-        else
-        {
-            left.requested = command.left;
-            right.requested = command.right;
+        Command &command = *reinterpret_cast<Command*>(uint64_t(&command_buffer[i]));
 
-            buzzer.requested = command.buzzer;
+        if (command.start != Command::VALID_HEADER)
+            continue;
 
-            if (command.poweroff)
-                poweroff();
+        uint16_t checksum = calculateChecksum(command);
+        if (command.checksum != checksum)
+            continue;
 
-            HAL_GPIO_WritePin(LED_PORT, LED_PIN, command.led ? GPIO_PIN_RESET : GPIO_PIN_SET);
+        left.state = command.left;
+        right.state = command.right;
 
-            command.start     = Command::INVALID_HEADER;                 // Change the Start Frame for timeout detection in the next cycle
-            timeoutCntSerial  = 0;                      // Reset the timeout counter
-        }
-    }
-    else
-    {
-        if (timeoutCntSerial++ >= SERIAL_TIMEOUT) // Timeout qualification
-        {
-            timeoutFlagSerial = 1;                      // Timeout detected
-            timeoutCntSerial  = SERIAL_TIMEOUT;         // Limit timout counter value
-        }
+        buzzer.state = command.buzzer;
 
-        // Check periodically the received Start Frame. If it is NOT OK, most probably we are out-of-sync. Try to re-sync by reseting the DMA
-        if (main_loop_counter % 25 == 0 && command.start != Command::VALID_HEADER && command.start != Command::INVALID_HEADER)
-        {
-            HAL_UART_DMAStop(&huart2);
-            HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, sizeof(command));
-        }
+        if (command.poweroff)
+            poweroff();
+
+        HAL_GPIO_WritePin(LED_PORT, LED_PIN, command.led ? GPIO_PIN_RESET : GPIO_PIN_SET);
+
+        command.start     = Command::INVALID_HEADER; // Change the Start Frame for timeout detection in the next cycle
+        timeoutCntSerial  = 0;                       // Reset the timeout counter
+
+        any_parsed = true;
+        break;
     }
 
-    if (timeoutFlagSerial)
+    if (!any_parsed)
     {
-        left.actual = right.actual = {.enable=true};
+        if (timeoutCntSerial++ >= 100) // Timeout qualification
+        {
+            timeoutCntSerial  = 100; // Limit timout counter value
 
-        buzzer.actual = { 24, 1 };
+            left.state = right.state = {.enable=true};
 
-        HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_RESET);
-    }
-    else
-    {
-        left.actual = left.requested;
-        right.actual = right.requested;
+            buzzer.state = { 24, 1 };
 
-        buzzer.actual = buzzer.requested;
+            HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_RESET);
+
+            // Check periodically the received Start Frame. Try to re-sync by reseting the DMA
+            if (main_loop_counter % 25 == 0)
+            {
+                HAL_UART_DMAStop(&huart2);
+                HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command_buffer, sizeof(command_buffer));
+            }
+        }
     }
 }
 
@@ -1100,6 +1067,7 @@ void sendFeedback()
 
             feedback.batVoltage = batVoltage * BAT_CALIB_REAL_VOLTAGE / BAT_CALIB_ADC;
             feedback.boardTemp = board_temp_deg_c;
+            feedback.timeoutCntSerial = timeoutCntSerial;
 
             feedback.checksum = calculateChecksum(feedback);
 
