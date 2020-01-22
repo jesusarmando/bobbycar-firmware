@@ -10,6 +10,10 @@
 #include "../../common.h"
 
 namespace {
+constexpr auto gasMin = 0, gasMax = 4096,
+               bremsMin = 0, bremsMax = 4096;
+constexpr auto gasPin = 0, bremsPin = 0;
+
 bool power_toggle{false};
 bool led_toggle{false};
 
@@ -101,6 +105,11 @@ void receiveFeedback()
         }
     }
 }
+
+template<typename T>
+T scaleBetween(const T &value, const T &minInput, const T &maxInput, const T &minOutput, const T &maxOutput) {
+  return (maxInput - minInput) * (value - minOutput) / (maxOutput - minOutput) + minInput;
+}
 }
 
 void setup()
@@ -185,19 +194,20 @@ void loop()
     const auto raw_brems = analogRead(35);
 
 
-    auto gas_hebel = raw_gas/4096.*1000.;
+    auto gas_hebel = scaleBetween<float>(raw_gas, 0., 4096., 0., 1000.);
     gas_hebel = (gas_hebel * gas_hebel) / 1000;
-    auto brems_hebel = raw_brems/4096.*500.;
+    auto brems_hebel = scaleBetween<float>(raw_brems, 0., 4096., 0., 1000.);
     //gas_hebel = (gas_hebel * gas_hebel) / 1000;
 
     int16_t pwm;
     if (gas_hebel >= 950.)
-        pwm = gas_hebel + brems_hebel;
+        pwm = gas_hebel + (brems_hebel/2.);
     else
         pwm = gas_hebel - brems_hebel;
 
     command.left.pwm = pwm;
     command.right.pwm = pwm;
+    command.buzzer = {};
 
     switch (screen)
     {
@@ -205,8 +215,8 @@ void loop()
         display.printf("potis: %i - %i\n", raw_gas, raw_brems);
         display.printf("filtered: %i - %i\n", (int16_t)gas_hebel, (int16_t)brems_hebel);
         display.printf("pwm: %i\n\n", pwm);
-        display.printf("voltage: %i - %i\n", first.feedback.batVoltage, second.feedback.batVoltage);
-        display.printf("tempera: %i - %i\n", first.feedback.boardTemp, second.feedback.boardTemp);
+        display.printf("voltage: %fV - %fV\n", first.feedback.batVoltage/100., second.feedback.batVoltage/100.);
+        display.printf("tempera: %f°C - %f°C\n", first.feedback.boardTemp/100., second.feedback.boardTemp/100.);
         break;
     case ScreenB:
         display.printf("speed: %i - %i\n", first.feedback.left.speed, first.feedback.right.speed);
@@ -269,7 +279,7 @@ void loop()
         Serial.println("alive");
     }
 
-    if (now - lastScreenSwitch > 2000)
+    if (now - lastScreenSwitch > 5000)
     {
         lastScreenSwitch = now;
         switch(screen)

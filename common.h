@@ -31,10 +31,27 @@ struct MotorState {
     int16_t phaseAdvMax = 40;              // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
 };
 
+uint16_t calculateChecksum(MotorState state) {
+    return
+        uint16_t(state.enable) ^
+        state.pwm ^
+        uint16_t(state.ctrlTyp) ^
+        uint16_t(state.ctrlMod) ^
+        state.iMotMax ^
+        state.iDcMax ^
+        state.nMotMax ^
+        state.fieldWeakMax ^
+        state.phaseAdvMax;
+}
+
 struct BuzzerState {
     uint8_t freq = 0;
     uint8_t pattern = 0;
 };
+
+uint16_t calculateChecksum(BuzzerState state) {
+    return state.freq ^ state.pattern;
+}
 
 struct Command {
     static constexpr uint16_t VALID_HEADER = 0xAAAA;
@@ -54,17 +71,11 @@ struct Command {
 
 uint16_t calculateChecksum(Command command) {
     return command.start ^
-            command.left.enable ^ uint16_t(command.right.enable) ^
-            command.left.pwm ^ command.right.pwm ^
-            uint8_t(command.left.ctrlTyp) ^ uint8_t(command.right.ctrlTyp) ^
-            uint8_t(command.left.ctrlMod) ^ uint8_t(command.right.ctrlMod) ^
-            command.left.iMotMax ^ command.right.iMotMax ^
-            command.left.iDcMax ^ command.right.iDcMax ^
-            command.left.nMotMax ^ command.right.nMotMax ^
-            command.left.phaseAdvMax ^ command.right.phaseAdvMax ^
-            command.left.fieldWeakMax ^ command.right.fieldWeakMax ^
-            command.buzzer.freq ^ command.buzzer.pattern ^
-            command.poweroff ^ command.led;
+           calculateChecksum(command.left) ^
+           calculateChecksum(command.right) ^
+           calculateChecksum(command.buzzer) ^
+           command.poweroff ^
+           command.led;
 }
 
 struct MotorFeedback {
@@ -78,6 +89,13 @@ struct MotorFeedback {
               hallC = false;
 };
 
+uint16_t calculateChecksum(MotorFeedback feedback) {
+    return feedback.angle ^ feedback.speed ^
+           feedback.error ^ feedback.current ^
+           feedback.chops ^
+           feedback.hallA ^ feedback.hallB ^ feedback.hallC;
+}
+
 struct Feedback {
     static constexpr uint16_t VALID_HEADER = 0xAAAA;
     static constexpr uint16_t INVALID_HEADER = 0xFFFF;
@@ -89,20 +107,18 @@ struct Feedback {
     int16_t   batVoltage = 0;
     int16_t   boardTemp = 0;
 
+    int16_t timeoutCntSerial   = 0;
+
     uint16_t checksum;
 };
 
 uint16_t calculateChecksum(Feedback feedback) {
     return feedback.start ^
-            feedback.left.angle ^ feedback.right.angle ^
-            feedback.left.speed ^ feedback.right.speed ^
-            feedback.left.error ^ feedback.right.error ^
-            feedback.left.current ^ feedback.right.current ^
-            feedback.left.chops ^ feedback.right.chops ^
-            feedback.left.hallA ^ feedback.left.hallB ^ feedback.left.hallC ^
-            feedback.right.hallA ^ feedback.right.hallB ^ feedback.right.hallC ^
-            feedback.batVoltage ^
-            feedback.boardTemp;
+           calculateChecksum(feedback.left) ^
+           calculateChecksum(feedback.right) ^
+           feedback.batVoltage ^
+           feedback.boardTemp ^
+           feedback.timeoutCntSerial;
 }
 
 }
