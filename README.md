@@ -1,4 +1,7 @@
 # bobbycar-firmware
+Development happens inside QtCreator, no other shitty IDEs.
+
+To compile software for the two hoverboard controllers:
 ```
 git clone --recursive git@github.com:0xFEEDC0DE64/bobbycar-firmware.git
 mkdir -v build_bobbycar-firmware
@@ -7,6 +10,16 @@ cmake ../bobbycar-firmware
 make unlock0 # needed only once
 make flash
 ```
+
+To compile the software for the ESP32 board computer with display:
+```
+git clone --recursive git@github.com:0xFEEDC0DE64/bobbycar-firmware.git
+cd build_bobbycar-firmware/boardcomputer
+platformio init --ide qtcreator
+platformio run --target upload
+```
+
+TODO: connection diagrams between boardcomputer, displays, potis and motor controllers.
 
 ## with Field Oriented Control (FOC)
 
