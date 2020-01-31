@@ -101,8 +101,7 @@ struct {
     uint32_t timer = 0;
 } buzzer;
 
-std::array<uint8_T, sizeof(Command)*2> command_buffer;
-
+Command command;
 Feedback feedback;
 
 
@@ -213,7 +212,7 @@ int main()
 //#define UART_DMA_CHANNEL DMA1_Channel2
     //UART3_Init();
 
-    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command_buffer, sizeof(command_buffer));
+    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, sizeof(command));
 
     while(1) {
         HAL_Delay(DELAY_IN_MAIN_LOOP); //delay in ms
@@ -985,10 +984,8 @@ void parseCommand()
 {
     bool any_parsed{false};
 
-    for (unsigned int i = 0; i < sizeof(Command); i++)
+    for (int i = 0; i < 1; i++)
     {
-        Command &command = *reinterpret_cast<Command*>(uint64_t(&command_buffer[i]));
-
         if (command.start != Command::VALID_HEADER)
             continue;
 
@@ -1029,7 +1026,7 @@ void parseCommand()
             if (main_loop_counter % 25 == 0)
             {
                 HAL_UART_DMAStop(&huart2);
-                HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command_buffer, sizeof(command_buffer));
+                HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, sizeof(command));
             }
         }
     }
