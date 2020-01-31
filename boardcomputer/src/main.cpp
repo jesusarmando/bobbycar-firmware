@@ -10,9 +10,9 @@
 #include "../../common.h"
 
 namespace {
-constexpr auto gasMin = 0, gasMax = 4096,
-               bremsMin = 0, bremsMax = 4096;
-constexpr auto gasPin = 0, bremsPin = 0;
+constexpr auto gasMin = 800., gasMax = 3700.,
+               bremsMin = 1300., bremsMax = 4000.;
+constexpr auto gasPin = 33, bremsPin = 35;
 
 bool power_toggle{false};
 bool led_toggle{false};
@@ -107,8 +107,17 @@ void receiveFeedback()
 }
 
 template<typename T>
-T scaleBetween(const T &value, const T &minInput, const T &maxInput, const T &minOutput, const T &maxOutput) {
-  return (maxInput - minInput) * (value - minOutput) / (maxOutput - minOutput) + minInput;
+T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+template<typename T>
+T scaleBetweenWithFixes(T x, T in_min, T in_max, T out_min, T out_max) {
+    if (x < in_min)
+        x = in_min;
+    else if (x > in_max)
+        x = in_max;
+
+    return scaleBetween(x, in_min, in_max, out_min, out_max);
 }
 }
 
@@ -185,19 +194,20 @@ void loop()
     display.clearDisplay();
     display.setCursor(0, 0);
 
-    analogRead(33);
+    analogRead(gasPin);
     delay(2);
-    const auto raw_gas = analogRead(33);
+    const auto raw_gas = analogRead(gasPin);
 
-    analogRead(35);
+    analogRead(bremsPin);
     delay(2);
-    const auto raw_brems = analogRead(35);
+    const auto raw_brems = analogRead(bremsPin);
 
 
-    auto gas_hebel = scaleBetween<float>(raw_gas, 0., 4096., 0., 1000.);
+    auto gas_hebel = scaleBetweenWithFixes<float>(raw_gas, gasMin, gasMax, 0., 1000.);
     gas_hebel = (gas_hebel * gas_hebel) / 1000;
-    auto brems_hebel = scaleBetween<float>(raw_brems, 0., 4096., 0., 1000.);
-    //gas_hebel = (gas_hebel * gas_hebel) / 1000;
+
+    auto brems_hebel = scaleBetweenWithFixes<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
+    brems_hebel = (brems_hebel * brems_hebel) / 1000;
 
     int16_t pwm;
     if (gas_hebel >= 950.)
@@ -205,18 +215,28 @@ void loop()
     else
         pwm = gas_hebel - brems_hebel;
 
-    command.left.pwm = pwm;
-    command.right.pwm = pwm;
+    command.left = {};
+    command.left.enable=true,
+    command.left.pwm=pwm,
+    command.left.ctrlTyp=ControlType::FieldOrientedControl,
+    command.left.ctrlMod=ControlMode::Torque,
+    command.left.iMotMax=20,
+    command.left.iDcMax=23,
+    command.left.nMotMax=5000,
+    command.left.fieldWeakMax=13;
+
+    command.right = command.left;
+
     command.buzzer = {};
 
     switch (screen)
     {
     case ScreenA:
         display.printf("potis: %i - %i\n", raw_gas, raw_brems);
-        display.printf("filtered: %i - %i\n", (int16_t)gas_hebel, (int16_t)brems_hebel);
+        display.printf("filtered: %.1f - %.1f\n", gas_hebel, brems_hebel);
         display.printf("pwm: %i\n\n", pwm);
-        display.printf("voltage: %fV - %fV\n", first.feedback.batVoltage/100., second.feedback.batVoltage/100.);
-        display.printf("tempera: %f°C - %f°C\n", first.feedback.boardTemp/100., second.feedback.boardTemp/100.);
+        display.printf("voltage: %.1fV - %.1fV\n", first.feedback.batVoltage/100., second.feedback.batVoltage/100.);
+        display.printf("tempera: %.1fC - %.1fC\n", first.feedback.boardTemp/100., second.feedback.boardTemp/100.);
         break;
     case ScreenB:
         display.printf("speed: %i - %i\n", first.feedback.left.speed, first.feedback.right.speed);
@@ -279,7 +299,7 @@ void loop()
         Serial.println("alive");
     }
 
-    if (now - lastScreenSwitch > 5000)
+    if (false && now - lastScreenSwitch > 5000)
     {
         lastScreenSwitch = now;
         switch(screen)
