@@ -1,11 +1,15 @@
 #include <Arduino.h>
+#include <DNSServer.h>
 #include <HardwareSerial.h>
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <ESPAsyncWebServer.h>
+
+#include <WiFi.h>
+#include <ESPmDNS.h>
 
 #include <array>
+#include <algorithm>
+#include <functional>
+#include <stdint.h>
 
 #include "../../common.h"
 
@@ -14,18 +18,74 @@ constexpr auto gasMin = 800., gasMax = 3700.,
                bremsMin = 1300., bremsMax = 4000.;
 constexpr auto gasPin = 33, bremsPin = 35;
 
-bool power_toggle{false};
-bool led_toggle{false};
+template<typename T>
+T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
+    if (x < std::min(in_min, in_max))
+        x = std::min(in_min, in_max);
+    else if (x > std::max(in_min, in_max))
+        x = std::max(in_min, in_max);
+
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+float getGas()
+{
+    analogRead(gasPin);
+    delay(2);
+    const auto raw_gas = analogRead(gasPin);
+
+    return scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
+}
+
+float getBrems()
+{
+    analogRead(bremsPin);
+    delay(2);
+    const auto raw_brems = analogRead(bremsPin);
+
+    return scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
+}
+
+class DrivingModes;
+class ModeBase {
+public:
+    virtual void update() = 0;
+};
 
 Command command;
 
-int lastSendCommand = millis();
-int lastAlive = millis();
+class DefaultMode : public ModeBase
+{
+public:
+    using ModeBase::ModeBase;
 
-Adafruit_SSD1306 display(128, 64, &Wire, 4);
+    void update() override;
 
-enum { ScreenA, ScreenB, ScreenC } screen { ScreenA };
-unsigned long lastScreenSwitch = 0;
+    bool waitForGasLoslass{false};
+    bool waitForBremsLoslass{false};
+};
+
+class ManualMode : public ModeBase
+{
+public:
+    using ModeBase::ModeBase;
+
+    void update() override;
+
+    bool enable = true;
+    int16_t pwm = 0;
+    ControlType ctrlTyp = ControlType::FieldOrientedControl;
+    ControlMode ctrlMod = ControlMode::Speed;
+};
+
+class DrivingModes
+{
+public:
+    DefaultMode defaultMode;
+    ManualMode manualMode;
+
+    std::reference_wrapper<ModeBase> currentMode{defaultMode};
+};
 
 struct Controller {
     Controller(HardwareSerial &serial) : serial{serial} {}
@@ -33,15 +93,82 @@ struct Controller {
     HardwareSerial &serial;
     Feedback feedback, newFeedback;
 
+    unsigned long lastFeedback = 0;
+
     uint8_t idx = 0;                        // Index for new data pointer
     uint16_t bufStartFrame;                 // Buffer Start Frame
-    byte *p;                                // Pointer declaration for the new received data
-    byte incomingByte;
-    byte incomingBytePrev;
+    uint8_t *p;                             // Pointer declaration for the new received data
+    uint8_t incomingByte;
+    uint8_t incomingBytePrev;
 };
+
+class HtmlTag {
+public:
+    HtmlTag(AsyncResponseStream &stream, const char *tag) :
+        stream{stream},
+        tag{tag}
+    {
+        stream.print("<");
+        stream.print(tag);
+        stream.print(">");
+    }
+
+    template<typename T>
+    HtmlTag(AsyncResponseStream &stream, const char *tag, const T &x) :
+        stream{stream},
+        tag{tag}
+    {
+        stream.print("<");
+        stream.print(tag);
+        stream.print(x);
+        stream.print(">");
+    }
+
+    ~HtmlTag()
+    {
+        stream.print("</");
+        stream.print(tag);
+        stream.print(">");
+    }
+
+private:
+    AsyncResponseStream &stream;
+    const char * const tag;
+};
+
+class WebHandler : public AsyncWebHandler
+{
+public:
+    using AsyncWebHandler::AsyncWebHandler;
+
+    bool canHandle(AsyncWebServerRequest *request) override;
+
+    void handleRequest(AsyncWebServerRequest *request) override;
+
+private:
+    void handleIndex(AsyncWebServerRequest *request);
+    void handleSetCommonParams(AsyncWebServerRequest *request);
+    void handleSetManualModeSetParams(AsyncWebServerRequest *request);
+};
+
+bool power_toggle{false};
+bool led_toggle{false};
+
+int lastSendCommand = millis();
+int lastStatus = millis();
+
+enum { ScreenA, ScreenB, ScreenC } screen { ScreenA };
+unsigned long lastScreenSwitch = 0;
+
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
 Controller &first{controllers[0]},
            &second{controllers[1]};
+
+DrivingModes modes;
+
+DNSServer dnsServer;
+AsyncWebServer server(80);
+WebHandler handler;
 
 void sendCommand()
 {
@@ -79,14 +206,13 @@ void receiveFeedback()
                 uint16_t checksum = calculateChecksum(controller.newFeedback);
 
                 // Check validity of the new data
-                if (controller.newFeedback.start == Feedback::VALID_HEADER && checksum == controller.newFeedback.checksum) {
-                    // Copy the new data
-                    memcpy(&controller.feedback, &controller.newFeedback, sizeof(controller.feedback));
-
-                    Serial.println("parsed");
-                } else {
-                    Serial.println("Non-valid data skipped");
-
+                if (controller.newFeedback.start == Feedback::VALID_HEADER && checksum == controller.newFeedback.checksum)
+                {
+                    controller.feedback = controller.newFeedback;
+                    controller.lastFeedback = millis();
+                }
+                else
+                {
                     if (controller.newFeedback.start == Feedback::VALID_HEADER)
                         Serial.println("header matched");
                     else
@@ -106,47 +232,612 @@ void receiveFeedback()
     }
 }
 
-template<typename T>
-T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-template<typename T>
-T scaleBetweenWithFixes(T x, T in_min, T in_max, T out_min, T out_max) {
-    if (x < in_min)
-        x = in_min;
-    else if (x > in_max)
-        x = in_max;
+void handleDebugSerial()
+{
+    while(Serial.available())
+    {
+        switch (Serial.read())
+        {
+        case 't':
+        case 'T':
+            power_toggle = !power_toggle;
+            Serial.printf("power: %d\n", power_toggle);
+            command.poweroff = power_toggle;
+            break;
+        case 'l':
+        case 'L':
+            led_toggle = !led_toggle;
+            Serial.printf("led: %d\n", led_toggle);
+            command.led = led_toggle;
+            break;
+        case '0': command.buzzer.freq = 0; break;
+        case '1': command.buzzer.freq = 1; break;
+        case '2': command.buzzer.freq = 2; break;
+        case '3': command.buzzer.freq = 3; break;
+        case '4': command.buzzer.freq = 4; break;
+        case '5': command.buzzer.freq = 5; break;
+        case '6': command.buzzer.freq = 6; break;
+        case '7': command.buzzer.freq = 7; break;
+        case '8': command.buzzer.freq = 8; break;
+        case '9': command.buzzer.freq = 9; break;
+        }
+    }
 
-    return scaleBetween(x, in_min, in_max, out_min, out_max);
+    const auto now = millis();
+    if (now - lastStatus > 500)
+    {
+        lastStatus = now;
+
+        Serial.print("Status: ");
+        Serial.println(WiFi.status());
+        Serial.print("IP: ");
+        Serial.println(WiFi.localIP());
+    }
+}
+
+void DefaultMode::update()
+{
+    auto gas_hebel = getGas();
+    if (waitForGasLoslass)
+    {
+        if (gas_hebel < 50)
+            waitForGasLoslass = false;
+        else
+            gas_hebel = 0;
+    }
+    gas_hebel = (gas_hebel * gas_hebel) / 1000;
+
+    auto brems_hebel = getBrems();
+    if (waitForBremsLoslass)
+    {
+        if (brems_hebel < 50)
+            waitForBremsLoslass = false;
+        else
+            brems_hebel = 0;
+    }
+    brems_hebel = (brems_hebel * brems_hebel) / 1000;
+
+    int16_t pwm;
+    if (gas_hebel >= 950.)
+        pwm = gas_hebel + (brems_hebel/2.);
+    else
+        pwm = gas_hebel - (brems_hebel*0.75);
+
+    command.left.enable = command.right.enable = true;
+    command.left.ctrlTyp = command.right.ctrlTyp = ControlType::FieldOrientedControl;
+    command.left.ctrlMod = command.right.ctrlMod = ControlMode::Torque;
+    command.left.pwm=pwm;
+    command.right.pwm=-pwm;
+}
+
+void ManualMode::update()
+{
+    auto gas_hebel = getGas();
+    auto brems_hebel = getBrems();
+
+    if (gas_hebel > 500 && brems_hebel > 500)
+    {
+        pwm = 0;
+        modes.defaultMode.waitForGasLoslass = true;
+        modes.defaultMode.waitForBremsLoslass = true;
+        modes.currentMode = modes.defaultMode;
+        modes.currentMode.get().update();
+        return;
+    }
+
+    pwm += (gas_hebel/1000) - (brems_hebel/1000);
+
+    command.left.enable = command.right.enable = true;
+    command.left.ctrlTyp = command.right.ctrlTyp = ControlType::FieldOrientedControl;
+    command.left.ctrlMod = command.right.ctrlMod = ControlMode::Speed;
+    command.left.pwm=pwm;
+    command.right.pwm=-pwm;
+}
+
+bool WebHandler::canHandle(AsyncWebServerRequest *request)
+{
+    if (request->url() == "/")
+        return true;
+    else if (request->url() == "/setCommonParams")
+        return true;
+    else if (request->url() == "/setManualModeParams")
+        return true;
+
+    return false;
+}
+
+void WebHandler::handleRequest(AsyncWebServerRequest *request)
+{
+    if (request->url() == "/")
+        handleIndex(request);
+    else if (request->url() == "/setCommonParams")
+        handleSetCommonParams(request);
+    else if (request->url() == "/setManualModeParams")
+        handleSetManualModeSetParams(request);
+}
+
+void WebHandler::handleIndex(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag fieldset(response, "fieldset");
+
+                {
+                    HtmlTag legend(response, "legend");
+                    response.print("Live data:");
+                }
+
+                {
+                    HtmlTag p(response, "p");
+                    response.print("<b>Voltages</b>: ");
+                    response.print(first.feedback.batVoltage/100.);
+                    response.print("V, ");
+                    response.print(second.feedback.batVoltage/100.);
+                    response.print("V");
+                }
+
+                {
+                    HtmlTag p(response, "p");
+                    response.print("<b>Temperatures</b>: ");
+                    response.print(first.feedback.boardTemp/100.);
+                    response.print("V, ");
+                    response.print(second.feedback.boardTemp/100.);
+                    response.print("V");
+                }
+            }
+
+            {
+                HtmlTag form(response, "form", " action=\"/setCommonParams\"");
+
+                HtmlTag fieldset(response, "fieldset");
+
+                {
+                    HtmlTag legend(response, "legend");
+                    response.print("Common params:");
+                }
+
+                {
+                    HtmlTag label(response, "label", " for=\"mode\"");
+                    response.print("Mode:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag select(response, "select", " id=\"mode\" name=\"mode\"");
+                    {
+                        String str{" value=\"defaultMode\""};
+                        if (&modes.currentMode.get()==&modes.defaultMode)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Default");
+                    }
+                    {
+                        String str{" value=\"manualMode\""};
+                        if (&modes.currentMode.get()==&modes.manualMode)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Manual mode");
+                    }
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"iMotMax\"");
+                    response.print("Maximum current:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"iMotMax\" name=\"iMotMax\" value=\"");
+                    response.print(command.left.iMotMax);
+                    response.print("\" />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"iDcMax\"");
+                    response.print("Maximum link current:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"iDcMax\" name=\"iDcMax\" value=\"");
+                    response.print(command.left.iDcMax);
+                    response.print("\" />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"nMotMax\"");
+                    response.print("Maximum speed:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"nMotMax\" name=\"nMotMax\" value=\"");
+                    response.print(command.left.nMotMax);
+                    response.print("\" />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"fieldWeakMax\"");
+                    response.print("Maximum field weakening current:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"fieldWeakMax\" name=\"fieldWeakMax\" value=\"");
+                    response.print(command.left.fieldWeakMax);
+                    response.print("\" />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"phaseAdvMax\"");
+                    response.print("Maximum phase adv angle:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"phaseAdvMax\" name=\"phaseAdvMax\" value=\"");
+                    response.print(command.left.phaseAdvMax);
+                    response.print("\" />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag button(response, "button", " type=\"submit\"");
+                    response.print("Submit");
+                }
+            }
+
+            {
+
+                HtmlTag fieldset(response, "fieldset");
+
+                {
+                    HtmlTag legend(response, "legend");
+                    response.print("Default Mode:");
+                }
+            }
+
+            {
+                HtmlTag form(response, "form", " action=\"/setManualModeParams\"");
+
+                HtmlTag fieldset(response, "fieldset");
+
+                {
+                    HtmlTag legend(response, "legend");
+                    response.print("Manual Mode:");
+                }
+
+                {
+                    HtmlTag label(response, "label", " for=\"enabled\"");
+                    response.print("Enabled:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"checkbox\" id=\"enabled\" name=\"enabled\"");
+                    if (modes.manualMode.enable)
+                        response.print(" checked");
+                    response.print(" />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"pwm\"");
+                    response.print("Pwm:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"pwm\" name=\"pwm\" value=\"");
+                    response.print(modes.manualMode.pwm);
+                    response.print("\" />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"ctrlTyp\"");
+                    response.print("Control Type:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\"");
+
+                    {
+                        String str{" value=\"Commutation\""};
+                        if (modes.manualMode.ctrlTyp == ControlType::Commutation)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Commutation");
+                    }
+
+                    {
+                        String str{" value=\"Sinusoidal\""};
+                        if (modes.manualMode.ctrlTyp == ControlType::Sinusoidal)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Sinusoidal");
+                    }
+
+                    {
+                        String str{" value=\"FieldOrientedControl\""};
+                        if (modes.manualMode.ctrlTyp == ControlType::FieldOrientedControl)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Field Oriented Control");
+                    }
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"ctrlMod\"");
+                    response.print("Control Mode:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\"");
+
+                    {
+                        String str{" value=\"OpenMode\""};
+                        if (modes.manualMode.ctrlMod == ControlMode::OpenMode)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Open Mode");
+                    }
+
+                    {
+                        String str{" value=\"Voltage\""};
+                        if (modes.manualMode.ctrlMod == ControlMode::Voltage)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Voltage");
+                    }
+
+                    {
+                        String str{" value=\"Speed\""};
+                        if (modes.manualMode.ctrlMod == ControlMode::Speed)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Speed");
+                    }
+
+                    {
+                        String str{" value=\"Torque\""};
+                        if (modes.manualMode.ctrlMod == ControlMode::Torque)
+                            str += " selected";
+                        HtmlTag option(response, "option", str);
+                        response.print("Torque");
+                    }
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag button(response, "button", " type=\"submit\"");
+                    response.print("Set Speed");
+                }
+            }
+        }
+    }
+
+    request->send(&response);
+}
+
+void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("mode"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no mode specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("iMotMax"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no iMotMax specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("iDcMax"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no iDcMax specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("nMotMax"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no nMotMax specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("fieldWeakMax"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no fieldWeakMax specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("phaseAdvMax"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no phaseAdvMax specified");
+        request->send(&response);
+        return;
+    }
+
+
+
+    {
+        AsyncWebParameter* p = request->getParam("mode");
+
+        if (p->value() == "defaultMode")
+        {
+            request->redirect("/");
+            modes.currentMode = modes.defaultMode;
+        }
+        else if (p->value() == "manualMode")
+        {
+            request->redirect("/");
+            modes.currentMode = modes.manualMode;
+        }
+        else
+        {
+            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+            response.setCode(400);
+            response.print("invalid mode");
+            request->send(&response);
+        }
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("iMotMax");
+
+        command.left.iMotMax = command.right.iMotMax = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("iDcMax");
+
+        command.left.iDcMax = command.right.iDcMax = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("nMotMax");
+
+        command.left.nMotMax = command.right.nMotMax = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("fieldWeakMax");
+
+        command.left.fieldWeakMax = command.right.fieldWeakMax = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("phaseAdvMax");
+
+        command.left.phaseAdvMax = command.right.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
+    }
+}
+
+void WebHandler::handleSetManualModeSetParams(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("pwm"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no mode specified");
+        request->send(&response);
+        return;
+    }
+
+
+
+    {
+        AsyncWebParameter* p = request->getParam("pwm");
+
+        modes.manualMode.pwm = strtol(p->value().c_str(), nullptr, 10);
+
+        request->redirect("/");
+    }
 }
 }
 
 void setup()
 {
-    command.left.enable = command.right.enable = true;
-    command.left.ctrlMod = command.right.ctrlMod = ControlMode::Torque;
-
     Serial.begin(115200);
+    Serial.setDebugOutput(true);
     Serial.println("setup()");
+
+    uint8_t mac[] { 0xFE, 0xED, 0xC0, 0xDE, 0xB0, 0x0B };
+    WiFi.macAddress(&mac[0]);
+
+    MDNS.begin("feedc0debbcar");
+    MDNS.addService("http", "tcp", 80);
+
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP("bobbycar", "Passwort_123");
+    WiFi.begin("realraum", "r3alraum");
+
+    dnsServer.start(53, "*", WiFi.softAPIP());
+
+    command.buzzer = {};
 
     Serial1.begin(38400, SERIAL_8N1, 25, 27);
 
     Serial2.begin(38400, SERIAL_8N1, 13, 15);
 
-    if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
-    {
-      Serial.println(F("SSD1306 allocation failed"));
-      for(;;); // Don't proceed, loop forever
-    }
-
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.cp437(true);
+    server.addHandler(&handler);
+    server.begin();
 }
 
 void loop()
 {
-
     /*
 
 #define BAT_CELLS               12        // battery number of cells. Normal Hoverboard battery: 10s
@@ -191,100 +882,9 @@ void loop()
 
     */
 
-    display.clearDisplay();
-    display.setCursor(0, 0);
+    modes.currentMode.get().update();
 
-    analogRead(gasPin);
-    delay(2);
-    const auto raw_gas = analogRead(gasPin);
-
-    analogRead(bremsPin);
-    delay(2);
-    const auto raw_brems = analogRead(bremsPin);
-
-
-    auto gas_hebel = scaleBetweenWithFixes<float>(raw_gas, gasMin, gasMax, 0., 1000.);
-    gas_hebel = (gas_hebel * gas_hebel) / 1000;
-
-    auto brems_hebel = scaleBetweenWithFixes<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
-    brems_hebel = (brems_hebel * brems_hebel) / 1000;
-
-    int16_t pwm;
-    if (gas_hebel >= 950.)
-        pwm = gas_hebel + (brems_hebel/2.);
-    else
-        pwm = gas_hebel - brems_hebel;
-
-    command.left = {};
-    command.left.enable=true,
-    command.left.pwm=pwm,
-    command.left.ctrlTyp=ControlType::FieldOrientedControl,
-    command.left.ctrlMod=ControlMode::Torque,
-    command.left.iMotMax=20,
-    command.left.iDcMax=23,
-    command.left.nMotMax=5000,
-    command.left.fieldWeakMax=13;
-
-    command.right = command.left;
-
-    command.buzzer = {};
-
-    switch (screen)
-    {
-    case ScreenA:
-        display.printf("potis: %i - %i\n", raw_gas, raw_brems);
-        display.printf("filtered: %.1f - %.1f\n", gas_hebel, brems_hebel);
-        display.printf("pwm: %i\n\n", pwm);
-        display.printf("voltage: %.1fV - %.1fV\n", first.feedback.batVoltage/100., second.feedback.batVoltage/100.);
-        display.printf("tempera: %.1fC - %.1fC\n", first.feedback.boardTemp/100., second.feedback.boardTemp/100.);
-        break;
-    case ScreenB:
-        display.printf("speed: %i - %i\n", first.feedback.left.speed, first.feedback.right.speed);
-        display.printf("       %i - %i\n", second.feedback.left.speed, second.feedback.right.speed);
-        display.printf("current: %i - %i\n", first.feedback.left.current, first.feedback.right.current);
-        display.printf("         %i - %i\n", second.feedback.left.current, second.feedback.right.current);
-        display.printf("error: %i - %i\n", first.feedback.left.error, first.feedback.right.error);
-        display.printf("       %i - %i\n", second.feedback.left.error, second.feedback.right.error);
-        break;
-    case ScreenC:
-        display.printf("angle: %i - %i\n", first.feedback.left.angle, first.feedback.right.angle);
-        display.printf("       %i - %i\n", second.feedback.left.angle, second.feedback.right.angle);
-        display.printf("halls: %d %d %d\n", first.feedback.left.hallA, first.feedback.left.hallB, first.feedback.left.hallC);
-        display.printf("       %d %d %d\n", first.feedback.right.hallA, first.feedback.right.hallB, first.feedback.left.hallC);
-        display.printf("       %d %d %d\n", second.feedback.left.hallA, second.feedback.left.hallB, second.feedback.left.hallC);
-        display.printf("       %d %d %d\n", second.feedback.right.hallA, second.feedback.right.hallB, second.feedback.left.hallC);
-    }
-
-    display.display();
-
-    while(Serial.available())
-    {
-        switch (Serial.read())
-        {
-        case 't':
-        case 'T':
-            power_toggle = !power_toggle;
-            Serial.printf("power: %d\n", power_toggle);
-            command.poweroff = power_toggle;
-            break;
-        case 'l':
-        case 'L':
-            led_toggle = !led_toggle;
-            Serial.printf("led: %d\n", led_toggle);
-            command.led = led_toggle;
-            break;
-        case '0': command.buzzer.freq = 0; break;
-        case '1': command.buzzer.freq = 1; break;
-        case '2': command.buzzer.freq = 2; break;
-        case '3': command.buzzer.freq = 3; break;
-        case '4': command.buzzer.freq = 4; break;
-        case '5': command.buzzer.freq = 5; break;
-        case '6': command.buzzer.freq = 6; break;
-        case '7': command.buzzer.freq = 7; break;
-        case '8': command.buzzer.freq = 8; break;
-        case '9': command.buzzer.freq = 9; break;
-        }
-    }
+    handleDebugSerial();
 
     const auto now = millis();
     if (now - lastSendCommand > 50)
@@ -293,13 +893,7 @@ void loop()
         sendCommand();
     }
 
-    if (now - lastAlive > 100)
-    {
-        lastAlive = now;
-        Serial.println("alive");
-    }
-
-    if (false && now - lastScreenSwitch > 5000)
+    if (now - lastScreenSwitch > (screen==ScreenA?10000:5000))
     {
         lastScreenSwitch = now;
         switch(screen)
@@ -311,4 +905,6 @@ void loop()
     }
 
     receiveFeedback();
+
+    dnsServer.processNextRequest();
 }
