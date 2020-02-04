@@ -203,7 +203,7 @@ int main()
     for (int i = 8; i >= 0; i--)
     {
         buzzer.state.freq = (uint8_t)i;
-        HAL_Delay(100);
+        HAL_Delay(50);
     }
     buzzer.state.freq = 0;
 
@@ -214,7 +214,7 @@ int main()
 
     HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, sizeof(command));
 
-    while(1) {
+    forever {
         HAL_Delay(DELAY_IN_MAIN_LOOP); //delay in ms
 
         parseCommand();
@@ -972,7 +972,7 @@ void poweroff() {
         left.state.enable = right.state.enable = 0;
         for (int i = 0; i < 8; i++) {
             buzzer.state.freq = (uint8_t)i;
-            HAL_Delay(100);
+            HAL_Delay(50);
         }
         HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, GPIO_PIN_RESET);
         for (int i = 0; i < 5; i++)
