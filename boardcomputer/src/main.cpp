@@ -147,6 +147,7 @@ public:
 
 private:
     void handleIndex(AsyncWebServerRequest *request);
+    void handleLive(AsyncWebServerRequest *request);
     void handleSetCommonParams(AsyncWebServerRequest *request);
     void handleSetManualModeSetParams(AsyncWebServerRequest *request);
 };
@@ -338,6 +339,8 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
 {
     if (request->url() == "/")
         return true;
+    else if (request->url() == "/live")
+        return true;
     else if (request->url() == "/setCommonParams")
         return true;
     else if (request->url() == "/setManualModeParams")
@@ -350,10 +353,165 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
 {
     if (request->url() == "/")
         handleIndex(request);
+    else if (request->url() == "/live")
+        handleLive(request);
     else if (request->url() == "/setCommonParams")
         handleSetCommonParams(request);
     else if (request->url() == "/setManualModeParams")
         handleSetManualModeSetParams(request);
+}
+
+void renderLiveData(AsyncResponseStream &response)
+{
+    HtmlTag fieldset(response, "fieldset");
+
+    {
+        HtmlTag legend(response, "legend");
+        response.print("Live data:");
+    }
+
+    for (const Controller &controller : controllers)
+    {
+        HtmlTag fieldset(response, "fieldset");
+
+        {
+            HtmlTag legend(response, "legend");
+            response.print("Board:");
+        }
+
+        if (millis() - controller.lastFeedback > 1000)
+        {
+            HtmlTag span(response, "span", " style=\"color: red;\"");
+            response.print("Dead!");
+            continue;
+        }
+
+        {
+            HtmlTag p(response, "p");
+            response.print(controller.feedback.batVoltage/100.);
+            response.print("V, ");
+            response.print(controller.feedback.boardTemp/100.);
+            response.print("°C");
+        }
+
+        for (const MotorFeedback &motor : {controller.feedback.left, controller.feedback.right})
+        {
+            HtmlTag fieldset(response, "fieldset");
+
+            {
+                HtmlTag legend(response, "legend");
+                response.print("Motor:");
+            }
+
+            {
+                String color, text;
+                switch (motor.error)
+                {
+                case 0: color="green"; text="Ok"; break;
+                case 1: color="red"; text="hall sensor not connected"; break;
+                case 2: color="red"; text="hall sensor short curcuit"; break;
+                case 4: color="red"; text="motors not able to spin"; break;
+                default: color="red"; text="Unknown "; text += motor.error; break;
+                }
+
+                {
+                    HtmlTag span(response, "span", " style=\"color: " + color + ";\"");
+                    response.print(text);
+                }
+
+                if (motor.chops)
+                {
+                    response.print(", chopping (");
+                    response.print(motor.chops);
+                    response.print(")");
+                }
+            }
+
+            {
+                HtmlTag p(response, "p");
+                response.print(motor.speed);
+                response.print("Rpm, ");
+                response.print(motor.current);
+                response.print("A");
+            }
+
+            {
+                HtmlTag table(response, "table", " border=\"1\"");
+                HtmlTag tr(response, "tr");
+
+                {
+                    HtmlTag td(response, "td", " style=\"width: 50px;\"");
+                    response.print(motor.angle);
+                }
+
+                {
+                    String str;
+                    if (motor.hallA)
+                        str = " style=\"background-color: grey;\"";
+                    HtmlTag td(response, "td", str);
+                    response.print("A");
+                }
+
+                {
+                    String str;
+                    if (motor.hallB)
+                        str = " style=\"background-color: grey;\"";
+                    HtmlTag td(response, "td", str);
+                    response.print("B");
+                }
+
+                {
+                    String str;
+                    if (motor.hallC)
+                        str = " style=\"background-color: grey;\"";
+                    HtmlTag td(response, "td", str);
+                    response.print("C");
+                }
+            }
+        }
+    }
+}
+
+void WebHandler::handleLive(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+            response.print("<meta http-equiv=\"refresh\" content=\"1\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
+            }
+
+            renderLiveData(response);
+        }
+    }
+
+    request->send(&response);
 }
 
 void WebHandler::handleIndex(AsyncWebServerRequest *request)
@@ -386,31 +544,11 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
             }
 
             {
-                HtmlTag fieldset(response, "fieldset");
-
-                {
-                    HtmlTag legend(response, "legend");
-                    response.print("Live data:");
-                }
-
-                {
-                    HtmlTag p(response, "p");
-                    response.print("<b>Voltages</b>: ");
-                    response.print(first.feedback.batVoltage/100.);
-                    response.print("V, ");
-                    response.print(second.feedback.batVoltage/100.);
-                    response.print("V");
-                }
-
-                {
-                    HtmlTag p(response, "p");
-                    response.print("<b>Temperatures</b>: ");
-                    response.print(first.feedback.boardTemp/100.);
-                    response.print("V, ");
-                    response.print(second.feedback.boardTemp/100.);
-                    response.print("V");
-                }
+                HtmlTag a(response, "a", " href=\"/live\"");
+                response.print("Live");
             }
+
+            renderLiveData(response);
 
             {
                 HtmlTag form(response, "form", " action=\"/setCommonParams\"");
@@ -443,7 +581,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                         if (&modes.currentMode.get()==&modes.manualMode)
                             str += " selected";
                         HtmlTag option(response, "option", str);
-                        response.print("Manual mode");
+                        response.print("Manual");
                     }
                 }
 
@@ -665,7 +803,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag button(response, "button", " type=\"submit\"");
-                    response.print("Set Speed");
+                    response.print("Submit");
                 }
             }
         }
