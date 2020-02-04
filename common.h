@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#define forever for (;;)
+
 namespace {
 
 enum class ControlType : uint8_t {
