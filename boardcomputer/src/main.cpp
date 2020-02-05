@@ -1,10 +1,8 @@
 #include <Arduino.h>
-#include <DNSServer.h>
 #include <HardwareSerial.h>
 #include <ESPAsyncWebServer.h>
 
 #include <WiFi.h>
-#include <ESPmDNS.h>
 
 #include <array>
 #include <algorithm>
@@ -72,6 +70,7 @@ public:
 
     void update() override;
 
+    bool manual = true;
     bool enable = true;
     int16_t pwm = 0;
     ControlType ctrlTyp = ControlType::FieldOrientedControl;
@@ -167,7 +166,6 @@ Controller &first{controllers[0]},
 
 DrivingModes modes;
 
-DNSServer dnsServer;
 AsyncWebServer server(80);
 WebHandler handler;
 
@@ -313,24 +311,27 @@ void DefaultMode::update()
 
 void ManualMode::update()
 {
-    auto gas_hebel = getGas();
-    auto brems_hebel = getBrems();
-
-    if (gas_hebel > 500 && brems_hebel > 500)
+    if (manual)
     {
-        pwm = 0;
-        modes.defaultMode.waitForGasLoslass = true;
-        modes.defaultMode.waitForBremsLoslass = true;
-        modes.currentMode = modes.defaultMode;
-        modes.currentMode.get().update();
-        return;
+        auto gas_hebel = getGas();
+        auto brems_hebel = getBrems();
+
+        if (gas_hebel > 500 && brems_hebel > 500)
+        {
+            pwm = 0;
+            modes.defaultMode.waitForGasLoslass = true;
+            modes.defaultMode.waitForBremsLoslass = true;
+            modes.currentMode = modes.defaultMode;
+            modes.currentMode.get().update();
+            return;
+        }
+
+        pwm += (gas_hebel/1000) - (brems_hebel/1000);
     }
 
-    pwm += (gas_hebel/1000) - (brems_hebel/1000);
-
-    command.left.enable = command.right.enable = true;
-    command.left.ctrlTyp = command.right.ctrlTyp = ControlType::FieldOrientedControl;
-    command.left.ctrlMod = command.right.ctrlMod = ControlMode::Speed;
+    command.left.enable = command.right.enable = enable;
+    command.left.ctrlTyp = command.right.ctrlTyp = ctrlTyp;
+    command.left.ctrlMod = command.right.ctrlMod = ctrlMod;
     command.left.pwm=pwm;
     command.right.pwm=-pwm;
 }
@@ -689,14 +690,30 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 }
 
                 {
-                    HtmlTag label(response, "label", " for=\"enabled\"");
-                    response.print("Enabled:");
+                    HtmlTag label(response, "label", " for=\"manual\"");
+                    response.print("Manual Control:");
                 }
 
                 response.print("<br/>");
 
                 {
-                    response.print("<input type=\"checkbox\" id=\"enabled\" name=\"enabled\"");
+                    response.print("<input type=\"checkbox\" id=\"manual\" name=\"manual\" value=\"on\"");
+                    if (modes.manualMode.manual)
+                        response.print(" checked");
+                    response.print(" />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"enable\"");
+                    response.print("enable:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"checkbox\" id=\"enable\" name=\"enable\" value=\"on\"");
                     if (modes.manualMode.enable)
                         response.print(" checked");
                     response.print(" />");
@@ -875,12 +892,10 @@ void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
 
         if (p->value() == "defaultMode")
         {
-            request->redirect("/");
             modes.currentMode = modes.defaultMode;
         }
         else if (p->value() == "manualMode")
         {
-            request->redirect("/");
             modes.currentMode = modes.manualMode;
         }
         else
@@ -889,6 +904,7 @@ void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
             response.setCode(400);
             response.print("invalid mode");
             request->send(&response);
+            return;
         }
     }
 
@@ -921,6 +937,8 @@ void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
 
         command.left.phaseAdvMax = command.right.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
     }
+
+    request->redirect("/");
 }
 
 void WebHandler::handleSetManualModeSetParams(AsyncWebServerRequest *request)
@@ -934,15 +952,67 @@ void WebHandler::handleSetManualModeSetParams(AsyncWebServerRequest *request)
         return;
     }
 
+    if (!request->hasParam("ctrlTyp"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no ctrlTyp specified");
+        request->send(&response);
+        return;
+    }
 
+
+
+    modes.manualMode.manual = request->hasParam("manual") && request->getParam("manual")->value() == "on";
+    modes.manualMode.enable = request->hasParam("enable") && request->getParam("enable")->value() == "on";
 
     {
         AsyncWebParameter* p = request->getParam("pwm");
 
         modes.manualMode.pwm = strtol(p->value().c_str(), nullptr, 10);
-
-        request->redirect("/");
     }
+
+    {
+        AsyncWebParameter* p = request->getParam("ctrlTyp");
+
+        if (p->value() == "Commutation")
+            modes.manualMode.ctrlTyp = ControlType::Commutation;
+        else if (p->value() == "Sinusoidal")
+            modes.manualMode.ctrlTyp = ControlType::Sinusoidal;
+        else if (p->value() == "FieldOrientedControl")
+            modes.manualMode.ctrlTyp = ControlType::FieldOrientedControl;
+        else
+        {
+            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+            response.setCode(400);
+            response.print("invalid ctrlTyp");
+            request->send(&response);
+            return;
+        }
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("ctrlMod");
+
+        if (p->value() == "OpenMode")
+            modes.manualMode.ctrlMod = ControlMode::OpenMode;
+        else if (p->value() == "Voltage")
+            modes.manualMode.ctrlMod = ControlMode::Voltage;
+        else if (p->value() == "Speed")
+            modes.manualMode.ctrlMod = ControlMode::Speed;
+        else if (p->value() == "Torque")
+            modes.manualMode.ctrlMod = ControlMode::Torque;
+        else
+        {
+            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+            response.setCode(400);
+            response.print("invalid ctrlMod");
+            request->send(&response);
+            return;
+        }
+    }
+
+    request->redirect("/");
 }
 }
 
@@ -952,17 +1022,9 @@ void setup()
     Serial.setDebugOutput(true);
     Serial.println("setup()");
 
-    uint8_t mac[] { 0xFE, 0xED, 0xC0, 0xDE, 0xB0, 0x0B };
-    WiFi.macAddress(&mac[0]);
-
-    MDNS.begin("feedc0debbcar");
-    MDNS.addService("http", "tcp", 80);
-
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("bobbycar", "Passwort_123");
     WiFi.begin("realraum", "r3alraum");
-
-    dnsServer.start(53, "*", WiFi.softAPIP());
 
     command.buzzer = {};
 
@@ -1043,6 +1105,4 @@ void loop()
     }
 
     receiveFeedback();
-
-    dnsServer.processNextRequest();
 }
