@@ -12,9 +12,11 @@
 #include "../../common.h"
 
 namespace {
-constexpr auto gasMin = 800., gasMax = 3700.,
-               bremsMin = 1300., bremsMax = 4000.;
+constexpr auto defaultGasMin = 800, defaultGasMax = 3700,
+               defaultBremsMin = 1300, defaultBremsMax = 4000;
 constexpr auto gasPin = 33, bremsPin = 35;
+constexpr auto rxPin1 = 25, txPin1 = 27,
+               rxPin2 = 13, txPin2 = 15;
 
 template<typename T>
 T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
@@ -24,27 +26,8 @@ T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
         x = std::max(in_min, in_max);
 
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
+};
 
-float getGas()
-{
-    analogRead(gasPin);
-    delay(2);
-    const auto raw_gas = analogRead(gasPin);
-
-    return scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
-}
-
-float getBrems()
-{
-    analogRead(bremsPin);
-    delay(2);
-    const auto raw_brems = analogRead(bremsPin);
-
-    return scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
-}
-
-class DrivingModes;
 class ModeBase {
 public:
     virtual void update() = 0;
@@ -151,6 +134,10 @@ private:
     void handleSetManualModeSetParams(AsyncWebServerRequest *request);
 };
 
+uint16_t raw_gas = 0, raw_brems = 0;
+float gas = 0., brems = 0.;
+uint16_t gasMin, gasMax, bremsMin, bremsMax;
+
 bool power_toggle{false};
 bool led_toggle{false};
 
@@ -161,8 +148,6 @@ enum { ScreenA, ScreenB, ScreenC } screen { ScreenA };
 unsigned long lastScreenSwitch = 0;
 
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
-Controller &first{controllers[0]},
-           &second{controllers[1]};
 
 DrivingModes modes;
 
@@ -173,8 +158,8 @@ void sendCommand()
 {
     command.start = Command::VALID_HEADER;
     command.checksum = calculateChecksum(command);
-    Serial1.write((uint8_t *) &command, sizeof(command));
-    Serial2.write((uint8_t *) &command, sizeof(command));
+    for (auto &controller : controllers)
+        controller.serial.write((uint8_t *) &command, sizeof(command));
 }
 
 void receiveFeedback()
@@ -276,31 +261,29 @@ void handleDebugSerial()
 
 void DefaultMode::update()
 {
-    auto gas_hebel = getGas();
     if (waitForGasLoslass)
     {
-        if (gas_hebel < 50)
+        if (gas < 50)
             waitForGasLoslass = false;
         else
-            gas_hebel = 0;
+            gas = 0;
     }
-    gas_hebel = (gas_hebel * gas_hebel) / 1000;
+    const auto gas_cubed = (gas * gas) / 1000;
 
-    auto brems_hebel = getBrems();
     if (waitForBremsLoslass)
     {
-        if (brems_hebel < 50)
+        if (brems < 50)
             waitForBremsLoslass = false;
         else
-            brems_hebel = 0;
+            brems = 0;
     }
-    brems_hebel = (brems_hebel * brems_hebel) / 1000;
+    const auto brems_cubed = (brems * brems) / 1000;
 
     int16_t pwm;
-    if (gas_hebel >= 950.)
-        pwm = gas_hebel + (brems_hebel/2.);
+    if (gas_cubed >= 950.)
+        pwm = gas_cubed + (brems_cubed/2.);
     else
-        pwm = gas_hebel - (brems_hebel*0.75);
+        pwm = gas_cubed - (brems_cubed*0.75);
 
     command.left.enable = command.right.enable = true;
     command.left.ctrlTyp = command.right.ctrlTyp = ControlType::FieldOrientedControl;
@@ -313,10 +296,7 @@ void ManualMode::update()
 {
     if (manual)
     {
-        auto gas_hebel = getGas();
-        auto brems_hebel = getBrems();
-
-        if (gas_hebel > 500 && brems_hebel > 500)
+        if (gas > 500. && brems > 500.)
         {
             pwm = 0;
             modes.defaultMode.waitForGasLoslass = true;
@@ -326,7 +306,7 @@ void ManualMode::update()
             return;
         }
 
-        pwm += (gas_hebel/1000) - (brems_hebel/1000);
+        pwm += (gas/1000.) - (brems/1000.);
     }
 
     command.left.enable = command.right.enable = enable;
@@ -369,6 +349,18 @@ void renderLiveData(AsyncResponseStream &response)
     {
         HtmlTag legend(response, "legend");
         response.print("Live data:");
+    }
+
+    {
+        HtmlTag p(response, "p");
+        response.print("raw_gas=");
+        response.print(raw_gas);
+        response.print(" raw_brems=");
+        response.print(raw_brems);
+        response.print(" gas=");
+        response.print(gas);
+        response.print(" brems=");
+        response.print(brems);
     }
 
     for (const Controller &controller : controllers)
@@ -549,7 +541,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 response.print("Live");
             }
 
-            renderLiveData(response);
+            //renderLiveData(response);
 
             {
                 HtmlTag form(response, "form", " action=\"/setCommonParams\"");
@@ -569,7 +561,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 response.print("<br/>");
 
                 {
-                    HtmlTag select(response, "select", " id=\"mode\" name=\"mode\"");
+                    HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
                     {
                         String str{" value=\"defaultMode\""};
                         if (&modes.currentMode.get()==&modes.defaultMode)
@@ -598,7 +590,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 {
                     response.print("<input type=\"number\" id=\"iMotMax\" name=\"iMotMax\" value=\"");
                     response.print(command.left.iMotMax);
-                    response.print("\" />");
+                    response.print("\" required />");
                 }
 
                 response.print("<br/>");
@@ -613,7 +605,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 {
                     response.print("<input type=\"number\" id=\"iDcMax\" name=\"iDcMax\" value=\"");
                     response.print(command.left.iDcMax);
-                    response.print("\" />");
+                    response.print("\" required />");
                 }
 
                 response.print("<br/>");
@@ -628,7 +620,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 {
                     response.print("<input type=\"number\" id=\"nMotMax\" name=\"nMotMax\" value=\"");
                     response.print(command.left.nMotMax);
-                    response.print("\" />");
+                    response.print("\" required />");
                 }
 
                 response.print("<br/>");
@@ -643,7 +635,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 {
                     response.print("<input type=\"number\" id=\"fieldWeakMax\" name=\"fieldWeakMax\" value=\"");
                     response.print(command.left.fieldWeakMax);
-                    response.print("\" />");
+                    response.print("\" required />");
                 }
 
                 response.print("<br/>");
@@ -658,7 +650,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 {
                     response.print("<input type=\"number\" id=\"phaseAdvMax\" name=\"phaseAdvMax\" value=\"");
                     response.print(command.left.phaseAdvMax);
-                    response.print("\" />");
+                    response.print("\" required />");
                 }
 
                 response.print("<br/>");
@@ -731,7 +723,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 {
                     response.print("<input type=\"number\" id=\"pwm\" name=\"pwm\" value=\"");
                     response.print(modes.manualMode.pwm);
-                    response.print("\" />");
+                    response.print("\" required />");
                 }
 
                 response.print("<br/>");
@@ -744,7 +736,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 response.print("<br/>");
 
                 {
-                    HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\"");
+                    HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\" required");
 
                     {
                         String str{" value=\"Commutation\""};
@@ -781,7 +773,7 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 response.print("<br/>");
 
                 {
-                    HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\"");
+                    HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\" required");
 
                     {
                         String str{" value=\"OpenMode\""};
@@ -814,6 +806,82 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                         HtmlTag option(response, "option", str);
                         response.print("Torque");
                     }
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag button(response, "button", " type=\"submit\"");
+                    response.print("Submit");
+                }
+            }
+
+            {
+                HtmlTag form(response, "form", " action=\"/setPotiParams\"");
+
+                HtmlTag fieldset(response, "fieldset");
+
+                {
+                    HtmlTag legend(response, "legend");
+                    response.print("Poti calibration:");
+                }
+
+                {
+                    HtmlTag label(response, "label", " for=\"gasMin\"");
+                    response.print("gasMin:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"gasMin\" name=\"gasMin\" value=\"");
+                    response.print(gasMin);
+                    response.print("\" required />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"gasMax\"");
+                    response.print("gasMax:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"gasMax\" name=\"gasMax\" value=\"");
+                    response.print(gasMax);
+                    response.print("\" required />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"bremsMin\"");
+                    response.print("bremsMin:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"bremsMin\" name=\"bremsMin\" value=\"");
+                    response.print(bremsMin);
+                    response.print("\" required />");
+                }
+
+                response.print("<br/>");
+
+                {
+                    HtmlTag label(response, "label", " for=\"bremsMax\"");
+                    response.print("bremsMax:");
+                }
+
+                response.print("<br/>");
+
+                {
+                    response.print("<input type=\"number\" id=\"bremsMax\" name=\"bremsMax\" value=\"");
+                    response.print(bremsMax);
+                    response.print("\" required />");
                 }
 
                 response.print("<br/>");
@@ -1026,11 +1094,15 @@ void setup()
     WiFi.softAP("bobbycar", "Passwort_123");
     WiFi.begin("realraum", "r3alraum");
 
+    gasMin = defaultGasMin;
+    gasMax = defaultGasMax;
+    bremsMin = defaultBremsMin;
+    bremsMax = defaultBremsMax;
+
     command.buzzer = {};
 
-    Serial1.begin(38400, SERIAL_8N1, 25, 27);
-
-    Serial2.begin(38400, SERIAL_8N1, 13, 15);
+    controllers[0].serial.begin(38400, SERIAL_8N1, rxPin1, txPin1);
+    controllers[1].serial.begin(38400, SERIAL_8N1, rxPin2, txPin2);
 
     server.addHandler(&handler);
     server.begin();
@@ -1081,6 +1153,16 @@ void loop()
     }
 
     */
+
+    analogRead(gasPin);
+    delay(2);
+    raw_gas = analogRead(gasPin);
+    gas = scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
+
+    analogRead(bremsPin);
+    delay(2);
+    raw_brems = analogRead(bremsPin);
+    brems = scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
 
     modes.currentMode.get().update();
 
