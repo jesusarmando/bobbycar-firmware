@@ -14,6 +14,7 @@
 namespace {
 constexpr auto defaultGasMin = 800, defaultGasMax = 3700,
                defaultBremsMin = 1300, defaultBremsMax = 4000;
+constexpr auto defaultInvertLeft = false, defaultInvertRight = true;
 constexpr auto gasPin = 33, bremsPin = 35;
 constexpr auto rxPin1 = 25, txPin1 = 27,
                rxPin2 = 13, txPin2 = 15;
@@ -33,8 +34,6 @@ public:
     virtual void update() = 0;
 };
 
-Command command;
-
 class DefaultMode : public ModeBase
 {
 public:
@@ -42,6 +41,7 @@ public:
 
     void update() override;
 
+    int16_t frontPercentage{100}, backPercentage{100};
     bool waitForGasLoslass{false};
     bool waitForBremsLoslass{false};
 };
@@ -73,6 +73,8 @@ struct Controller {
     Controller(HardwareSerial &serial) : serial{serial} {}
 
     HardwareSerial &serial;
+
+    Command command;
     Feedback feedback, newFeedback;
 
     unsigned long lastFeedback = 0;
@@ -126,17 +128,12 @@ public:
     bool canHandle(AsyncWebServerRequest *request) override;
 
     void handleRequest(AsyncWebServerRequest *request) override;
-
-private:
-    void handleIndex(AsyncWebServerRequest *request);
-    void handleLive(AsyncWebServerRequest *request);
-    void handleSetCommonParams(AsyncWebServerRequest *request);
-    void handleSetManualModeSetParams(AsyncWebServerRequest *request);
 };
 
-uint16_t raw_gas = 0, raw_brems = 0;
-float gas = 0., brems = 0.;
+uint16_t raw_gas, raw_brems;
+float gas, brems;
 uint16_t gasMin, gasMax, bremsMin, bremsMax;
+bool invertLeft, invertRight;
 
 bool power_toggle{false};
 bool led_toggle{false};
@@ -154,12 +151,14 @@ DrivingModes modes;
 AsyncWebServer server(80);
 WebHandler handler;
 
-void sendCommand()
+void sendCommands()
 {
-    command.start = Command::VALID_HEADER;
-    command.checksum = calculateChecksum(command);
     for (auto &controller : controllers)
-        controller.serial.write((uint8_t *) &command, sizeof(command));
+    {
+        controller.command.start = Command::VALID_HEADER;
+        controller.command.checksum = calculateChecksum(controller.command);
+        controller.serial.write((uint8_t *) &controller.command, sizeof(controller.command));
+    }
 }
 
 void receiveFeedback()
@@ -220,30 +219,36 @@ void handleDebugSerial()
 {
     while(Serial.available())
     {
-        switch (Serial.read())
+        const auto c = Serial.read();
+        switch (c)
         {
         case 't':
         case 'T':
             power_toggle = !power_toggle;
             Serial.printf("power: %d\n", power_toggle);
-            command.poweroff = power_toggle;
+            for (auto &controller : controllers)
+                controller.command.poweroff = power_toggle;
             break;
         case 'l':
         case 'L':
             led_toggle = !led_toggle;
             Serial.printf("led: %d\n", led_toggle);
-            command.led = led_toggle;
+            for (auto &controller : controllers)
+                controller.command.led = led_toggle;
             break;
-        case '0': command.buzzer.freq = 0; break;
-        case '1': command.buzzer.freq = 1; break;
-        case '2': command.buzzer.freq = 2; break;
-        case '3': command.buzzer.freq = 3; break;
-        case '4': command.buzzer.freq = 4; break;
-        case '5': command.buzzer.freq = 5; break;
-        case '6': command.buzzer.freq = 6; break;
-        case '7': command.buzzer.freq = 7; break;
-        case '8': command.buzzer.freq = 8; break;
-        case '9': command.buzzer.freq = 9; break;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            for (auto &controller : controllers)
+                controller.command.buzzer.freq = c-'0';
+            break;
         }
     }
 
@@ -259,87 +264,61 @@ void handleDebugSerial()
     }
 }
 
-void DefaultMode::update()
+void fixDirections(Command &command)
 {
-    if (waitForGasLoslass)
-    {
-        if (gas < 50)
-            waitForGasLoslass = false;
-        else
-            gas = 0;
-    }
-    const auto gas_cubed = (gas * gas) / 1000;
-
-    if (waitForBremsLoslass)
-    {
-        if (brems < 50)
-            waitForBremsLoslass = false;
-        else
-            brems = 0;
-    }
-    const auto brems_cubed = (brems * brems) / 1000;
-
-    int16_t pwm;
-    if (gas_cubed >= 950.)
-        pwm = gas_cubed + (brems_cubed/2.);
-    else
-        pwm = gas_cubed - (brems_cubed*0.75);
-
-    command.left.enable = command.right.enable = true;
-    command.left.ctrlTyp = command.right.ctrlTyp = ControlType::FieldOrientedControl;
-    command.left.ctrlMod = command.right.ctrlMod = ControlMode::Torque;
-    command.left.pwm=pwm;
-    command.right.pwm=-pwm;
+    if (invertLeft)
+        command.left.pwm = -command.left.pwm;
+    if (invertRight)
+        command.right.pwm = -command.right.pwm;
 }
 
-void ManualMode::update()
+void breakLine(AsyncResponseStream &stream)
 {
-    if (manual)
-    {
-        if (gas > 500. && brems > 500.)
-        {
-            pwm = 0;
-            modes.defaultMode.waitForGasLoslass = true;
-            modes.defaultMode.waitForBremsLoslass = true;
-            modes.currentMode = modes.defaultMode;
-            modes.currentMode.get().update();
-            return;
-        }
-
-        pwm += (gas/1000.) - (brems/1000.);
-    }
-
-    command.left.enable = command.right.enable = enable;
-    command.left.ctrlTyp = command.right.ctrlTyp = ctrlTyp;
-    command.left.ctrlMod = command.right.ctrlMod = ctrlMod;
-    command.left.pwm=pwm;
-    command.right.pwm=-pwm;
+    stream.print("<br/>");
 }
 
-bool WebHandler::canHandle(AsyncWebServerRequest *request)
+void label(AsyncResponseStream &stream, const char *name, const char *text)
 {
-    if (request->url() == "/")
-        return true;
-    else if (request->url() == "/live")
-        return true;
-    else if (request->url() == "/setCommonParams")
-        return true;
-    else if (request->url() == "/setManualModeParams")
-        return true;
-
-    return false;
+    HtmlTag label(stream, "label", String(" for=\"") + name + "\"");
+    stream.print(text);
 }
 
-void WebHandler::handleRequest(AsyncWebServerRequest *request)
+template<typename T>
+void numberInput(AsyncResponseStream &stream, T value, const char *name, const char *text)
 {
-    if (request->url() == "/")
-        handleIndex(request);
-    else if (request->url() == "/live")
-        handleLive(request);
-    else if (request->url() == "/setCommonParams")
-        handleSetCommonParams(request);
-    else if (request->url() == "/setManualModeParams")
-        handleSetManualModeSetParams(request);
+    label(stream, name, text);
+
+    breakLine(stream);
+
+    stream.print("<input type=\"number\" id=\"");
+    stream.print(name);
+    stream.print("\" name=\"");
+    stream.print(name);
+    stream.print("\" value=\"");
+    stream.print(value);
+    stream.print("\" required />");
+}
+
+void submitButton(AsyncResponseStream &stream)
+{
+    HtmlTag button(stream, "button", " type=\"submit\"");
+    stream.print("Submit");
+}
+
+void checkboxInput(AsyncResponseStream &stream, bool value, const char *name, const char *text)
+{
+    label(stream, name, text);
+
+    breakLine(stream);
+
+    stream.print("<input type=\"checkbox\" id=\"");
+    stream.print(name);
+    stream.print("\" name=\"");
+    stream.print(name);
+    stream.print("\" value=\"on\"");
+    if (value)
+        stream.print(" checked");
+    stream.print(" />");
 }
 
 void renderLiveData(AsyncResponseStream &response)
@@ -370,6 +349,20 @@ void renderLiveData(AsyncResponseStream &response)
         {
             HtmlTag legend(response, "legend");
             response.print("Board:");
+        }
+
+        {
+            HtmlTag p(response, "p");
+            response.print("left: ");
+            response.print(controller.command.left.pwm);
+            response.print(", right: ");
+            response.print(controller.command.right.pwm);
+            response.print(", beeper: (");
+            response.print(controller.command.buzzer.freq);
+            response.print(", ");
+            response.print(controller.command.buzzer.pattern);
+            response.print("), led: ");
+            response.print(controller.command.led ? "true" : "false");
         }
 
         if (millis() - controller.lastFeedback > 1000)
@@ -465,49 +458,7 @@ void renderLiveData(AsyncResponseStream &response)
     }
 }
 
-void WebHandler::handleLive(AsyncWebServerRequest *request)
-{
-    AsyncResponseStream &response = *request->beginResponseStream("text/html");
-
-    response.print("<!doctype html>");
-
-    {
-        HtmlTag html(response, "html");
-
-        {
-            HtmlTag head(response, "head");
-
-            response.print("<meta charset=\"utf-8\" />");
-            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
-            response.print("<meta http-equiv=\"refresh\" content=\"1\" />");
-
-            {
-                HtmlTag title(response, "title");
-                response.print("Bobbycar remote");
-            }
-        }
-
-        {
-            HtmlTag body(response, "body");
-
-            {
-                HtmlTag h1(response, "h1");
-                response.print("Bobbycar remote");
-            }
-
-            {
-                HtmlTag a(response, "a", " href=\"/\"");
-                response.print("Back");
-            }
-
-            renderLiveData(response);
-        }
-    }
-
-    request->send(&response);
-}
-
-void WebHandler::handleIndex(AsyncWebServerRequest *request)
+void handleIndex(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -553,12 +504,9 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                     response.print("Common params:");
                 }
 
-                {
-                    HtmlTag label(response, "label", " for=\"mode\"");
-                    response.print("Mode:");
-                }
+                label(response, "mode", "Mode:");
 
-                response.print("<br/>");
+                breakLine(response);
 
                 {
                     HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
@@ -578,90 +526,41 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                     }
                 }
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag label(response, "label", " for=\"iMotMax\"");
-                    response.print("Maximum current:");
-                }
+                numberInput(response, controllers[0].command.left.iMotMax, "iMotMax", "Maximum current:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    response.print("<input type=\"number\" id=\"iMotMax\" name=\"iMotMax\" value=\"");
-                    response.print(command.left.iMotMax);
-                    response.print("\" required />");
-                }
+                numberInput(response, controllers[0].command.left.iDcMax, "iDcMax", "Maximum link current:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag label(response, "label", " for=\"iDcMax\"");
-                    response.print("Maximum link current:");
-                }
+                numberInput(response, controllers[0].command.left.nMotMax, "nMotMax", "Maximum speed:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    response.print("<input type=\"number\" id=\"iDcMax\" name=\"iDcMax\" value=\"");
-                    response.print(command.left.iDcMax);
-                    response.print("\" required />");
-                }
+                numberInput(response, controllers[0].command.left.fieldWeakMax, "fieldWeakMax", "Maximum field weakening current:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag label(response, "label", " for=\"nMotMax\"");
-                    response.print("Maximum speed:");
-                }
+                numberInput(response, controllers[0].command.left.phaseAdvMax, "phaseAdvMax", "Maximum phase adv angle:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    response.print("<input type=\"number\" id=\"nMotMax\" name=\"nMotMax\" value=\"");
-                    response.print(command.left.nMotMax);
-                    response.print("\" required />");
-                }
+                checkboxInput(response, invertLeft, "invertLeft", "Invert left:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag label(response, "label", " for=\"fieldWeakMax\"");
-                    response.print("Maximum field weakening current:");
-                }
+                checkboxInput(response, invertRight, "invertRight", "Invert right:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    response.print("<input type=\"number\" id=\"fieldWeakMax\" name=\"fieldWeakMax\" value=\"");
-                    response.print(command.left.fieldWeakMax);
-                    response.print("\" required />");
-                }
-
-                response.print("<br/>");
-
-                {
-                    HtmlTag label(response, "label", " for=\"phaseAdvMax\"");
-                    response.print("Maximum phase adv angle:");
-                }
-
-                response.print("<br/>");
-
-                {
-                    response.print("<input type=\"number\" id=\"phaseAdvMax\" name=\"phaseAdvMax\" value=\"");
-                    response.print(command.left.phaseAdvMax);
-                    response.print("\" required />");
-                }
-
-                response.print("<br/>");
-
-                {
-                    HtmlTag button(response, "button", " type=\"submit\"");
-                    response.print("Submit");
-                }
+                submitButton(response);
             }
 
             {
+                HtmlTag form(response, "form", " action=\"/setDefaultModeParams\"");
 
                 HtmlTag fieldset(response, "fieldset");
 
@@ -669,6 +568,16 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                     HtmlTag legend(response, "legend");
                     response.print("Default Mode:");
                 }
+
+                numberInput(response, modes.defaultMode.frontPercentage, "frontPercentage", "Front percentage:");
+
+                breakLine(response);
+
+                numberInput(response, modes.defaultMode.backPercentage, "backPercentage", "Back percentage:");
+
+                breakLine(response);
+
+                submitButton(response);
             }
 
             {
@@ -676,64 +585,27 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
 
                 HtmlTag fieldset(response, "fieldset");
 
+
                 {
                     HtmlTag legend(response, "legend");
                     response.print("Manual Mode:");
                 }
 
-                {
-                    HtmlTag label(response, "label", " for=\"manual\"");
-                    response.print("Manual Control:");
-                }
+                checkboxInput(response, modes.manualMode.manual, "manual", "Manual Control:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    response.print("<input type=\"checkbox\" id=\"manual\" name=\"manual\" value=\"on\"");
-                    if (modes.manualMode.manual)
-                        response.print(" checked");
-                    response.print(" />");
-                }
+                checkboxInput(response, modes.manualMode.enable, "enable", "Enable:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag label(response, "label", " for=\"enable\"");
-                    response.print("enable:");
-                }
+                numberInput(response, modes.manualMode.pwm, "pwm", "Pwm:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    response.print("<input type=\"checkbox\" id=\"enable\" name=\"enable\" value=\"on\"");
-                    if (modes.manualMode.enable)
-                        response.print(" checked");
-                    response.print(" />");
-                }
+                label(response, "ctrlTyp", "Control Type:");
 
-                response.print("<br/>");
-
-                {
-                    HtmlTag label(response, "label", " for=\"pwm\"");
-                    response.print("Pwm:");
-                }
-
-                response.print("<br/>");
-
-                {
-                    response.print("<input type=\"number\" id=\"pwm\" name=\"pwm\" value=\"");
-                    response.print(modes.manualMode.pwm);
-                    response.print("\" required />");
-                }
-
-                response.print("<br/>");
-
-                {
-                    HtmlTag label(response, "label", " for=\"ctrlTyp\"");
-                    response.print("Control Type:");
-                }
-
-                response.print("<br/>");
+                breakLine(response);
 
                 {
                     HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\" required");
@@ -763,14 +635,11 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                     }
                 }
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag label(response, "label", " for=\"ctrlMod\"");
-                    response.print("Control Mode:");
-                }
+                label(response, "ctrlMod", "Control Mode:");
 
-                response.print("<br/>");
+                breakLine(response);
 
                 {
                     HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\" required");
@@ -808,12 +677,9 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                     }
                 }
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag button(response, "button", " type=\"submit\"");
-                    response.print("Submit");
-                }
+                submitButton(response);
             }
 
             {
@@ -826,70 +692,23 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                     response.print("Poti calibration:");
                 }
 
-                {
-                    HtmlTag label(response, "label", " for=\"gasMin\"");
-                    response.print("gasMin:");
-                }
+                numberInput(response, gasMin, "gasMin", "gasMin:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    response.print("<input type=\"number\" id=\"gasMin\" name=\"gasMin\" value=\"");
-                    response.print(gasMin);
-                    response.print("\" required />");
-                }
+                numberInput(response, gasMax, "gasMax", "gasMax:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag label(response, "label", " for=\"gasMax\"");
-                    response.print("gasMax:");
-                }
+                numberInput(response, bremsMin, "bremsMin", "bremsMin:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    response.print("<input type=\"number\" id=\"gasMax\" name=\"gasMax\" value=\"");
-                    response.print(gasMax);
-                    response.print("\" required />");
-                }
+                numberInput(response, bremsMax, "bremsMax", "bremsMax:");
 
-                response.print("<br/>");
+                breakLine(response);
 
-                {
-                    HtmlTag label(response, "label", " for=\"bremsMin\"");
-                    response.print("bremsMin:");
-                }
-
-                response.print("<br/>");
-
-                {
-                    response.print("<input type=\"number\" id=\"bremsMin\" name=\"bremsMin\" value=\"");
-                    response.print(bremsMin);
-                    response.print("\" required />");
-                }
-
-                response.print("<br/>");
-
-                {
-                    HtmlTag label(response, "label", " for=\"bremsMax\"");
-                    response.print("bremsMax:");
-                }
-
-                response.print("<br/>");
-
-                {
-                    response.print("<input type=\"number\" id=\"bremsMax\" name=\"bremsMax\" value=\"");
-                    response.print(bremsMax);
-                    response.print("\" required />");
-                }
-
-                response.print("<br/>");
-
-                {
-                    HtmlTag button(response, "button", " type=\"submit\"");
-                    response.print("Submit");
-                }
+                submitButton(response);
             }
         }
     }
@@ -897,7 +716,49 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
+void handleLive(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+            response.print("<meta http-equiv=\"refresh\" content=\"1\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
+            }
+
+            renderLiveData(response);
+        }
+    }
+
+    request->send(&response);
+}
+
+void handleSetCommonParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("mode"))
     {
@@ -979,37 +840,82 @@ void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
     {
         AsyncWebParameter* p = request->getParam("iMotMax");
 
-        command.left.iMotMax = command.right.iMotMax = strtol(p->value().c_str(), nullptr, 10);
+        for (auto &controller : controllers)
+            controller.command.left.iMotMax = controller.command.right.iMotMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("iDcMax");
 
-        command.left.iDcMax = command.right.iDcMax = strtol(p->value().c_str(), nullptr, 10);
+        for (auto &controller : controllers)
+            controller.command.left.iDcMax = controller.command.right.iDcMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("nMotMax");
 
-        command.left.nMotMax = command.right.nMotMax = strtol(p->value().c_str(), nullptr, 10);
+        for (auto &controller : controllers)
+            controller.command.left.nMotMax = controller.command.right.nMotMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("fieldWeakMax");
 
-        command.left.fieldWeakMax = command.right.fieldWeakMax = strtol(p->value().c_str(), nullptr, 10);
+        for (auto &controller : controllers)
+            controller.command.left.fieldWeakMax = controller.command.right.fieldWeakMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("phaseAdvMax");
 
-        command.left.phaseAdvMax = command.right.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
+        for (auto &controller : controllers)
+            controller.command.left.phaseAdvMax = controller.command.right.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    invertLeft = request->hasParam("invertLeft") && request->getParam("invertLeft")->value() == "on";
+    invertRight = request->hasParam("invertRight") && request->getParam("invertRight")->value() == "on";
+
+    request->redirect("/");
+}
+
+void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("frontPercentage"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no frontPercentage specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("backPercentage"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no backPercentage specified");
+        request->send(&response);
+        return;
+    }
+
+
+
+    {
+        AsyncWebParameter* p = request->getParam("frontPercentage");
+
+        modes.defaultMode.frontPercentage = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("backPercentage");
+
+        modes.defaultMode.backPercentage = strtol(p->value().c_str(), nullptr, 10);
     }
 
     request->redirect("/");
 }
 
-void WebHandler::handleSetManualModeSetParams(AsyncWebServerRequest *request)
+void handleSetManualModeSetParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("pwm"))
     {
@@ -1082,6 +988,110 @@ void WebHandler::handleSetManualModeSetParams(AsyncWebServerRequest *request)
 
     request->redirect("/");
 }
+
+void handleSetPotiParams(AsyncWebServerRequest *request)
+{
+
+}
+
+void DefaultMode::update()
+{
+    if (waitForGasLoslass)
+    {
+        if (gas < 50)
+            waitForGasLoslass = false;
+        else
+            gas = 0;
+    }
+    const auto gas_cubed = (gas * gas) / 1000;
+
+    if (waitForBremsLoslass)
+    {
+        if (brems < 50)
+            waitForBremsLoslass = false;
+        else
+            brems = 0;
+    }
+    const auto brems_cubed = (brems * brems) / 1000;
+
+    float pwm;
+    if (gas_cubed >= 950.)
+        pwm = gas_cubed + (brems_cubed/2.);
+    else
+        pwm = gas_cubed - (brems_cubed*0.75);
+
+    for (auto &controller : controllers)
+    {
+        auto &command = controller.command;
+        command.left.enable = command.right.enable = true;
+        command.left.ctrlTyp = command.right.ctrlTyp = ControlType::FieldOrientedControl;
+        command.left.ctrlMod = command.right.ctrlMod = ControlMode::Torque;
+        command.left.pwm = command.right.pwm = pwm / 100. * (&controller == &controllers[0] ? frontPercentage : backPercentage);
+        fixDirections(command);
+    }
+}
+
+void ManualMode::update()
+{
+    if (manual)
+    {
+        if (gas > 500. && brems > 500.)
+        {
+            pwm = 0;
+            modes.defaultMode.waitForGasLoslass = true;
+            modes.defaultMode.waitForBremsLoslass = true;
+            modes.currentMode = modes.defaultMode;
+            modes.currentMode.get().update();
+            return;
+        }
+
+        pwm += (gas/1000.) - (brems/1000.);
+    }
+
+    for (auto &controller : controllers)
+    {
+        auto &command = controller.command;
+        command.left.enable = command.right.enable = enable;
+        command.left.ctrlTyp = command.right.ctrlTyp = ctrlTyp;
+        command.left.ctrlMod = command.right.ctrlMod = ctrlMod;
+        command.left.pwm = command.right.pwm = pwm;
+        fixDirections(command);
+    }
+}
+
+bool WebHandler::canHandle(AsyncWebServerRequest *request)
+{
+    if (request->url() == "/")
+        return true;
+    else if (request->url() == "/live")
+        return true;
+    else if (request->url() == "/setCommonParams")
+        return true;
+    else if (request->url() == "/setDefaultModeParams")
+        return true;
+    else if (request->url() == "/setManualModeParams")
+        return true;
+    else if (request->url() == "/setPotiParams")
+        return true;
+
+    return false;
+}
+
+void WebHandler::handleRequest(AsyncWebServerRequest *request)
+{
+    if (request->url() == "/")
+        handleIndex(request);
+    else if (request->url() == "/live")
+        handleLive(request);
+    else if (request->url() == "/setCommonParams")
+        handleSetCommonParams(request);
+    else if (request->url() == "/setDefaultModeParams")
+        handleSetDefaultModeSetParams(request);
+    else if (request->url() == "/setManualModeParams")
+        handleSetManualModeSetParams(request);
+    else if (request->url() == "/setPotiParams")
+        handleSetPotiParams(request);
+}
 }
 
 void setup()
@@ -1099,7 +1109,11 @@ void setup()
     bremsMin = defaultBremsMin;
     bremsMax = defaultBremsMax;
 
-    command.buzzer = {};
+    invertLeft = defaultInvertLeft;
+    invertRight = defaultInvertRight;
+
+    for (auto &controller : controllers)
+        controller.command.buzzer = {};
 
     controllers[0].serial.begin(38400, SERIAL_8N1, rxPin1, txPin1);
     controllers[1].serial.begin(38400, SERIAL_8N1, rxPin2, txPin2);
@@ -1172,7 +1186,7 @@ void loop()
     if (now - lastSendCommand > 50)
     {
         lastSendCommand = now;
-        sendCommand();
+        sendCommands();
     }
 
     if (now - lastScreenSwitch > (screen==ScreenA?10000:5000))
