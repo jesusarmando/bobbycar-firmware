@@ -1,8 +1,13 @@
 #include <Arduino.h>
-#include <HardwareSerial.h>
+#include <ArduinoJson.h>
+#include <BluetoothSerial.h>
 #include <ESPAsyncWebServer.h>
-
+#include <HardwareSerial.h>
 #include <WiFi.h>
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
 
 #include <array>
 #include <algorithm>
@@ -31,7 +36,9 @@ T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
 
 class ModeBase {
 public:
+    virtual void start() = 0;
     virtual void update() = 0;
+    virtual void stop() = 0;
 };
 
 class DefaultMode : public ModeBase
@@ -39,7 +46,9 @@ class DefaultMode : public ModeBase
 public:
     using ModeBase::ModeBase;
 
+    void start() override {};
     void update() override;
+    void stop() override {};
 
     int16_t frontPercentage{100}, backPercentage{100};
     bool waitForGasLoslass{false};
@@ -51,7 +60,9 @@ class ManualMode : public ModeBase
 public:
     using ModeBase::ModeBase;
 
+    void start() override {};
     void update() override;
+    void stop() override {};
 
     bool manual = true;
     bool enable = true;
@@ -60,13 +71,14 @@ public:
     ControlMode ctrlMod = ControlMode::Speed;
 };
 
-class DrivingModes
+class BluetoothMode : public ModeBase
 {
 public:
-    DefaultMode defaultMode;
-    ManualMode manualMode;
+    using ModeBase::ModeBase;
 
-    std::reference_wrapper<ModeBase> currentMode{defaultMode};
+    void start() override;
+    void update() override;
+    void stop() override {};
 };
 
 struct Controller {
@@ -141,18 +153,39 @@ bool led_toggle{false};
 int lastSendCommand = millis();
 int lastStatus = millis();
 
-enum { ScreenA, ScreenB, ScreenC } screen { ScreenA };
-unsigned long lastScreenSwitch = 0;
+wl_status_t last_wl_status;
+IPAddress last_ip_address;
 
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
 
-DrivingModes modes;
+struct DrivingModes
+{
+    DefaultMode defaultMode;
+    ManualMode manualMode;
+    BluetoothMode bluetoothMode;
 
-AsyncWebServer server(80);
-WebHandler handler;
+    std::reference_wrapper<ModeBase> currentMode{defaultMode};
+} modes;
+
+struct {
+    BluetoothSerial serial;
+    std::array<uint8_t, 256> buffer;
+    std::array<uint8_t, 256>::iterator pos{buffer.begin()};
+} bluetooth;
+
+struct {
+    AsyncWebServer server{80};
+    WebHandler handler;
+} web;
 
 void sendCommands()
 {
+    const auto now = millis();
+    if (now - lastSendCommand < 50)
+        return;
+
+    lastSendCommand = now;
+
     for (auto &controller : controllers)
     {
         controller.command.start = Command::VALID_HEADER;
@@ -257,10 +290,21 @@ void handleDebugSerial()
     {
         lastStatus = now;
 
-        Serial.print("Status: ");
-        Serial.println(WiFi.status());
-        Serial.print("IP: ");
-        Serial.println(WiFi.localIP());
+        const auto wl_status = WiFi.status();
+        if (wl_status != last_wl_status)
+        {
+            Serial.print("Status changed to: ");
+            Serial.println(wl_status);
+            last_wl_status = wl_status;
+        }
+
+        const auto ip_address = WiFi.localIP();
+        if (ip_address != last_ip_address)
+        {
+            Serial.print("IP changed to : ");
+            Serial.println(ip_address);
+            last_ip_address = ip_address;
+        }
     }
 }
 
@@ -321,6 +365,19 @@ void checkboxInput(AsyncResponseStream &stream, bool value, const char *name, co
     stream.print(" />");
 }
 
+void selectOption(AsyncResponseStream &stream, const char *value, const char *text, bool selected)
+{
+    String str{" value=\""};
+    str += value;
+    str += "\"";
+
+    if (selected)
+        str += " selected";
+
+    HtmlTag option(stream, "option", str);
+    stream.print(text);
+}
+
 void renderLiveData(AsyncResponseStream &response)
 {
     HtmlTag fieldset(response, "fieldset");
@@ -362,7 +419,7 @@ void renderLiveData(AsyncResponseStream &response)
             response.print(", ");
             response.print(controller.command.buzzer.pattern);
             response.print("), led: ");
-            response.print(controller.command.led ? "true" : "false");
+            response.print(controller.command.led ? "true" : "false ");
         }
 
         if (millis() - controller.lastFeedback > 1000)
@@ -430,29 +487,17 @@ void renderLiveData(AsyncResponseStream &response)
                     response.print(motor.angle);
                 }
 
-                {
+                const auto printCell = [&response](bool active, const char *text){
                     String str;
-                    if (motor.hallA)
+                    if (active)
                         str = " style=\"background-color: grey;\"";
                     HtmlTag td(response, "td", str);
-                    response.print("A");
-                }
+                    response.print(text);
+                };
 
-                {
-                    String str;
-                    if (motor.hallB)
-                        str = " style=\"background-color: grey;\"";
-                    HtmlTag td(response, "td", str);
-                    response.print("B");
-                }
-
-                {
-                    String str;
-                    if (motor.hallC)
-                        str = " style=\"background-color: grey;\"";
-                    HtmlTag td(response, "td", str);
-                    response.print("C");
-                }
+                printCell(motor.hallA, "A");
+                printCell(motor.hallB, "B");
+                printCell(motor.hallC, "C");
             }
         }
     }
@@ -510,20 +555,9 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
-                    {
-                        String str{" value=\"defaultMode\""};
-                        if (&modes.currentMode.get()==&modes.defaultMode)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Default");
-                    }
-                    {
-                        String str{" value=\"manualMode\""};
-                        if (&modes.currentMode.get()==&modes.manualMode)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Manual");
-                    }
+                    selectOption(response, "defaultMode", "Default", &modes.currentMode.get()==&modes.defaultMode);
+                    selectOption(response, "manualMode", "Manual", &modes.currentMode.get()==&modes.manualMode);
+                    selectOption(response, "bluetoothMode", "Bluetooth", &modes.currentMode.get()==&modes.bluetoothMode);
                 }
 
                 breakLine(response);
@@ -609,30 +643,9 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\" required");
-
-                    {
-                        String str{" value=\"Commutation\""};
-                        if (modes.manualMode.ctrlTyp == ControlType::Commutation)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Commutation");
-                    }
-
-                    {
-                        String str{" value=\"Sinusoidal\""};
-                        if (modes.manualMode.ctrlTyp == ControlType::Sinusoidal)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Sinusoidal");
-                    }
-
-                    {
-                        String str{" value=\"FieldOrientedControl\""};
-                        if (modes.manualMode.ctrlTyp == ControlType::FieldOrientedControl)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Field Oriented Control");
-                    }
+                    selectOption(response, "Commutation", "Commutation", modes.manualMode.ctrlTyp == ControlType::Commutation);
+                    selectOption(response, "Sinusoidal", "Sinusoidal", modes.manualMode.ctrlTyp == ControlType::Sinusoidal);
+                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes.manualMode.ctrlTyp == ControlType::FieldOrientedControl);
                 }
 
                 breakLine(response);
@@ -644,37 +657,10 @@ void handleIndex(AsyncWebServerRequest *request)
                 {
                     HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\" required");
 
-                    {
-                        String str{" value=\"OpenMode\""};
-                        if (modes.manualMode.ctrlMod == ControlMode::OpenMode)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Open Mode");
-                    }
-
-                    {
-                        String str{" value=\"Voltage\""};
-                        if (modes.manualMode.ctrlMod == ControlMode::Voltage)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Voltage");
-                    }
-
-                    {
-                        String str{" value=\"Speed\""};
-                        if (modes.manualMode.ctrlMod == ControlMode::Speed)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Speed");
-                    }
-
-                    {
-                        String str{" value=\"Torque\""};
-                        if (modes.manualMode.ctrlMod == ControlMode::Torque)
-                            str += " selected";
-                        HtmlTag option(response, "option", str);
-                        response.print("Torque");
-                    }
+                    selectOption(response, "OpenMode", "Open Mode", modes.manualMode.ctrlMod == ControlMode::OpenMode);
+                    selectOption(response, "Voltage", "Voltage", modes.manualMode.ctrlMod == ControlMode::Voltage);
+                    selectOption(response, "Speed", "Speed", modes.manualMode.ctrlMod == ControlMode::Speed);
+                    selectOption(response, "Torque", "Torque", modes.manualMode.ctrlMod == ControlMode::Torque);
                 }
 
                 breakLine(response);
@@ -821,11 +807,21 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
 
         if (p->value() == "defaultMode")
         {
+            modes.currentMode.get().start();
             modes.currentMode = modes.defaultMode;
+            modes.currentMode.get().stop();
         }
         else if (p->value() == "manualMode")
         {
+            modes.currentMode.get().start();
             modes.currentMode = modes.manualMode;
+            modes.currentMode.get().stop();
+        }
+        else if (p->value() == "bluetoothMode")
+        {
+            modes.currentMode.get().start();
+            modes.currentMode = modes.bluetoothMode;
+            modes.currentMode.get().stop();
         }
         else
         {
@@ -991,7 +987,7 @@ void handleSetManualModeSetParams(AsyncWebServerRequest *request)
 
 void handleSetPotiParams(AsyncWebServerRequest *request)
 {
-
+    // TODO
 }
 
 void DefaultMode::update()
@@ -1020,15 +1016,20 @@ void DefaultMode::update()
     else
         pwm = gas_cubed - (brems_cubed*0.75);
 
-    for (auto &controller : controllers)
+    for (Controller &controller : controllers)
     {
-        auto &command = controller.command;
-        command.left.enable = command.right.enable = true;
-        command.left.ctrlTyp = command.right.ctrlTyp = ControlType::FieldOrientedControl;
-        command.left.ctrlMod = command.right.ctrlMod = ControlMode::Torque;
-        command.left.pwm = command.right.pwm = pwm / 100. * (&controller == &controllers[0] ? frontPercentage : backPercentage);
+        Command &command = controller.command;
+        for (MotorState *motor : {&command.left, &command.right})
+        {
+            motor->enable = true;
+            motor->ctrlTyp = ControlType::FieldOrientedControl;
+            motor->ctrlMod = ControlMode::Torque;
+            motor->pwm = pwm / 100. * (&controller == &controllers[0] ? frontPercentage : backPercentage);
+        }
         fixDirections(command);
     }
+
+    sendCommands();
 }
 
 void ManualMode::update()
@@ -1051,12 +1052,92 @@ void ManualMode::update()
     for (auto &controller : controllers)
     {
         auto &command = controller.command;
-        command.left.enable = command.right.enable = enable;
-        command.left.ctrlTyp = command.right.ctrlTyp = ctrlTyp;
-        command.left.ctrlMod = command.right.ctrlMod = ctrlMod;
-        command.left.pwm = command.right.pwm = pwm;
+        for (MotorState *motor : {&command.left, &command.right})
+        {
+            motor->enable = enable;
+            motor->ctrlTyp = ctrlTyp;
+            motor->ctrlMod = ctrlMod;
+            motor->pwm = pwm;
+        }
         fixDirections(command);
     }
+
+    sendCommands();
+}
+
+void BluetoothMode::start()
+{
+    // clear buffer
+    while (bluetooth.serial.available())
+        bluetooth.serial.read();
+}
+
+void BluetoothMode::update()
+{
+    bool newLine{false};
+    while (bluetooth.serial.available())
+    {
+        *bluetooth.pos = bluetooth.serial.read();
+        if (*bluetooth.pos == '\n')
+            newLine = true;
+        bluetooth.pos++;
+        if (newLine)
+            break;
+    }
+
+    if (!newLine)
+        return;
+
+    StaticJsonDocument<256> doc;
+    const auto error = deserializeJson(doc, &(*bluetooth.buffer.begin()), std::distance(bluetooth.buffer.begin(), bluetooth.pos));
+
+    if (error)
+    {
+        bluetooth.serial.println(error.c_str());
+        return;
+    }
+
+    bluetooth.pos = bluetooth.buffer.begin();
+
+    if (!doc.containsKey("frontLeft"))
+    {
+        bluetooth.serial.print("no frontLeft");
+        return;
+    }
+    if (!doc.containsKey("frontRight"))
+    {
+        bluetooth.serial.print("no frontRight");
+        return;
+    }
+    if (!doc.containsKey("backLeft"))
+    {
+        bluetooth.serial.print("no backLeft");
+        return;
+    }
+    if (!doc.containsKey("backRight"))
+    {
+        bluetooth.serial.print("no backRight");
+        return;
+    }
+
+    controllers[0].command.left.pwm = doc["frontLeft"].as<int16_t>();
+    controllers[0].command.right.pwm = doc["frontRight"].as<int16_t>();
+    controllers[1].command.left.pwm = doc["backLeft"].as<int16_t>();
+    controllers[1].command.right.pwm = doc["backRight"].as<int16_t>();
+
+    for (Controller &controller : controllers)
+    {
+        Command &command = controller.command;
+        for (MotorState *motor : {&command.left, &command.right})
+        {
+            motor->enable = true;
+            motor->ctrlTyp = ControlType::FieldOrientedControl;
+            motor->ctrlMod = ControlMode::Torque;
+        }
+        fixDirections(command);
+    }
+
+    sendCommands();
 }
 
 bool WebHandler::canHandle(AsyncWebServerRequest *request)
@@ -1100,6 +1181,8 @@ void setup()
     Serial.setDebugOutput(true);
     Serial.println("setup()");
 
+    bluetooth.serial.begin("bobbycar");
+
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("bobbycar", "Passwort_123");
     WiFi.begin("realraum", "r3alraum");
@@ -1118,8 +1201,10 @@ void setup()
     controllers[0].serial.begin(38400, SERIAL_8N1, rxPin1, txPin1);
     controllers[1].serial.begin(38400, SERIAL_8N1, rxPin2, txPin2);
 
-    server.addHandler(&handler);
-    server.begin();
+    modes.currentMode.get().start();
+
+    web.server.addHandler(&web.handler);
+    web.server.begin();
 }
 
 void loop()
@@ -1180,25 +1265,7 @@ void loop()
 
     modes.currentMode.get().update();
 
-    handleDebugSerial();
-
-    const auto now = millis();
-    if (now - lastSendCommand > 50)
-    {
-        lastSendCommand = now;
-        sendCommands();
-    }
-
-    if (now - lastScreenSwitch > (screen==ScreenA?10000:5000))
-    {
-        lastScreenSwitch = now;
-        switch(screen)
-        {
-        case ScreenA: screen = ScreenB; break;
-        case ScreenB: screen = ScreenC; break;
-        case ScreenC: screen = ScreenA; break;
-        }
-    }
-
     receiveFeedback();
+
+    handleDebugSerial();
 }
