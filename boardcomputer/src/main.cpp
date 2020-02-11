@@ -20,9 +20,9 @@ namespace {
 constexpr auto defaultGasMin = 800, defaultGasMax = 3700,
                defaultBremsMin = 1300, defaultBremsMax = 4000;
 constexpr auto defaultInvertLeft = false, defaultInvertRight = true;
-constexpr auto gasPin = 33, bremsPin = 35;
-constexpr auto rxPin1 = 25, txPin1 = 27,
-               rxPin2 = 13, txPin2 = 15;
+constexpr auto gasPin = 35, bremsPin = 33;
+constexpr auto rxPin1 = 4, txPin1 = 5,
+               rxPin2 = 25, txPin2 = 26;
 
 template<typename T>
 T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
@@ -305,6 +305,11 @@ void handleDebugSerial()
             Serial.println(ip_address);
             last_ip_address = ip_address;
         }
+
+        Serial.print("raw_gas=");
+        Serial.print(raw_gas);
+        Serial.print(" raw_brems=");
+        Serial.println(raw_brems);
     }
 }
 
@@ -393,6 +398,10 @@ void renderLiveData(AsyncResponseStream &response)
         response.print(raw_gas);
         response.print(" raw_brems=");
         response.print(raw_brems);
+        response.print(" gasPin=");
+        response.print(gasPin);
+        response.print(" bremsPin=");
+        response.print(bremsPin);
         response.print(" gas=");
         response.print(gas);
         response.print(" brems=");
