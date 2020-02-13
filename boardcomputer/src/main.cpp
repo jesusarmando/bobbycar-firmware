@@ -16,132 +16,18 @@
 
 #include "../../common.h"
 
+#include "settings.h"
+#include "utils.h"
+#include "modebase.h"
+#include "defaultmode.h"
+#include "manualmode.h"
+#include "bluetoothmode.h"
+#include "controller.h"
+#include "htmltag.h"
+#include "webhandler.h"
+#include "htmlutils.h"
+
 namespace {
-constexpr auto defaultGasMin = 800, defaultGasMax = 3700,
-               defaultBremsMin = 1300, defaultBremsMax = 4000;
-constexpr auto defaultInvertLeft = false, defaultInvertRight = true;
-constexpr auto gasPin = 35, bremsPin = 33;
-constexpr auto rxPin1 = 4, txPin1 = 5,
-               rxPin2 = 25, txPin2 = 26;
-
-template<typename T>
-T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
-    if (x < std::min(in_min, in_max))
-        x = std::min(in_min, in_max);
-    else if (x > std::max(in_min, in_max))
-        x = std::max(in_min, in_max);
-
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-};
-
-class ModeBase {
-public:
-    virtual void start() = 0;
-    virtual void update() = 0;
-    virtual void stop() = 0;
-};
-
-class DefaultMode : public ModeBase
-{
-public:
-    using ModeBase::ModeBase;
-
-    void start() override {};
-    void update() override;
-    void stop() override {};
-
-    int16_t frontPercentage{100}, backPercentage{100};
-    bool waitForGasLoslass{false};
-    bool waitForBremsLoslass{false};
-};
-
-class ManualMode : public ModeBase
-{
-public:
-    using ModeBase::ModeBase;
-
-    void start() override {};
-    void update() override;
-    void stop() override {};
-
-    bool manual = true;
-    bool enable = true;
-    int16_t pwm = 0;
-    ControlType ctrlTyp = ControlType::FieldOrientedControl;
-    ControlMode ctrlMod = ControlMode::Speed;
-};
-
-class BluetoothMode : public ModeBase
-{
-public:
-    using ModeBase::ModeBase;
-
-    void start() override;
-    void update() override;
-    void stop() override {};
-};
-
-struct Controller {
-    Controller(HardwareSerial &serial) : serial{serial} {}
-
-    HardwareSerial &serial;
-
-    Command command;
-    Feedback feedback, newFeedback;
-
-    unsigned long lastFeedback = 0;
-
-    uint8_t idx = 0;                        // Index for new data pointer
-    uint16_t bufStartFrame;                 // Buffer Start Frame
-    uint8_t *p;                             // Pointer declaration for the new received data
-    uint8_t incomingByte;
-    uint8_t incomingBytePrev;
-};
-
-class HtmlTag {
-public:
-    HtmlTag(AsyncResponseStream &stream, const char *tag) :
-        stream{stream},
-        tag{tag}
-    {
-        stream.print("<");
-        stream.print(tag);
-        stream.print(">");
-    }
-
-    template<typename T>
-    HtmlTag(AsyncResponseStream &stream, const char *tag, const T &x) :
-        stream{stream},
-        tag{tag}
-    {
-        stream.print("<");
-        stream.print(tag);
-        stream.print(x);
-        stream.print(">");
-    }
-
-    ~HtmlTag()
-    {
-        stream.print("</");
-        stream.print(tag);
-        stream.print(">");
-    }
-
-private:
-    AsyncResponseStream &stream;
-    const char * const tag;
-};
-
-class WebHandler : public AsyncWebHandler
-{
-public:
-    using AsyncWebHandler::AsyncWebHandler;
-
-    bool canHandle(AsyncWebServerRequest *request) override;
-
-    void handleRequest(AsyncWebServerRequest *request) override;
-};
-
 uint16_t raw_gas, raw_brems;
 float gas, brems;
 uint16_t gasMin, gasMax, bremsMin, bremsMax;
@@ -321,66 +207,154 @@ void fixDirections(Command &command)
         command.right.pwm = -command.right.pwm;
 }
 
-void breakLine(AsyncResponseStream &stream)
+void DefaultMode::update()
 {
-    stream.print("<br/>");
+    if (waitForGasLoslass)
+    {
+        if (gas < 50)
+            waitForGasLoslass = false;
+        else
+            gas = 0;
+    }
+    const auto gas_cubed = (gas * gas) / 1000;
+
+    if (waitForBremsLoslass)
+    {
+        if (brems < 50)
+            waitForBremsLoslass = false;
+        else
+            brems = 0;
+    }
+    const auto brems_cubed = (brems * brems) / 1000;
+
+    float pwm;
+    if (gas_cubed >= 950.)
+        pwm = gas_cubed + (brems_cubed/2.);
+    else
+        pwm = gas_cubed - (brems_cubed*0.75);
+
+    for (Controller &controller : controllers)
+    {
+        Command &command = controller.command;
+        for (MotorState *motor : {&command.left, &command.right})
+        {
+            motor->enable = true;
+            motor->ctrlTyp = ControlType::FieldOrientedControl;
+            motor->ctrlMod = ControlMode::Torque;
+            motor->pwm = pwm / 100. * (&controller == &controllers[0] ? frontPercentage : backPercentage);
+        }
+        fixDirections(command);
+    }
+
+    sendCommands();
 }
 
-void label(AsyncResponseStream &stream, const char *name, const char *text)
+void ManualMode::update()
 {
-    HtmlTag label(stream, "label", String(" for=\"") + name + "\"");
-    stream.print(text);
+    if (manual)
+    {
+        if (gas > 500. && brems > 500.)
+        {
+            pwm = 0;
+            modes.defaultMode.waitForGasLoslass = true;
+            modes.defaultMode.waitForBremsLoslass = true;
+            modes.currentMode = modes.defaultMode;
+            modes.currentMode.get().update();
+            return;
+        }
+
+        pwm += (gas/1000.) - (brems/1000.);
+    }
+
+    for (auto &controller : controllers)
+    {
+        auto &command = controller.command;
+        for (MotorState *motor : {&command.left, &command.right})
+        {
+            motor->enable = enable;
+            motor->ctrlTyp = ctrlTyp;
+            motor->ctrlMod = ctrlMod;
+            motor->pwm = pwm;
+        }
+        fixDirections(command);
+    }
+
+    sendCommands();
 }
 
-template<typename T>
-void numberInput(AsyncResponseStream &stream, T value, const char *name, const char *text)
+void BluetoothMode::start()
 {
-    label(stream, name, text);
-
-    breakLine(stream);
-
-    stream.print("<input type=\"number\" id=\"");
-    stream.print(name);
-    stream.print("\" name=\"");
-    stream.print(name);
-    stream.print("\" value=\"");
-    stream.print(value);
-    stream.print("\" required />");
+    // clear buffer
+    while (bluetooth.serial.available())
+        bluetooth.serial.read();
 }
 
-void submitButton(AsyncResponseStream &stream)
+void BluetoothMode::update()
 {
-    HtmlTag button(stream, "button", " type=\"submit\"");
-    stream.print("Submit");
-}
+    bool newLine{false};
+    while (bluetooth.serial.available())
+    {
+        *bluetooth.pos = bluetooth.serial.read();
+        if (*bluetooth.pos == '\n')
+            newLine = true;
+        bluetooth.pos++;
+        if (newLine)
+            break;
+    }
 
-void checkboxInput(AsyncResponseStream &stream, bool value, const char *name, const char *text)
-{
-    label(stream, name, text);
+    if (!newLine)
+        return;
 
-    breakLine(stream);
+    StaticJsonDocument<256> doc;
+    const auto error = deserializeJson(doc, &(*bluetooth.buffer.begin()), std::distance(bluetooth.buffer.begin(), bluetooth.pos));
 
-    stream.print("<input type=\"checkbox\" id=\"");
-    stream.print(name);
-    stream.print("\" name=\"");
-    stream.print(name);
-    stream.print("\" value=\"on\"");
-    if (value)
-        stream.print(" checked");
-    stream.print(" />");
-}
+    if (error)
+    {
+        bluetooth.serial.println(error.c_str());
+        return;
+    }
 
-void selectOption(AsyncResponseStream &stream, const char *value, const char *text, bool selected)
-{
-    String str{" value=\""};
-    str += value;
-    str += "\"";
+    bluetooth.pos = bluetooth.buffer.begin();
 
-    if (selected)
-        str += " selected";
+    if (!doc.containsKey("frontLeft"))
+    {
+        bluetooth.serial.print("no frontLeft");
+        return;
+    }
+    if (!doc.containsKey("frontRight"))
+    {
+        bluetooth.serial.print("no frontRight");
+        return;
+    }
+    if (!doc.containsKey("backLeft"))
+    {
+        bluetooth.serial.print("no backLeft");
+        return;
+    }
+    if (!doc.containsKey("backRight"))
+    {
+        bluetooth.serial.print("no backRight");
+        return;
+    }
 
-    HtmlTag option(stream, "option", str);
-    stream.print(text);
+    controllers[0].command.left.pwm = doc["frontLeft"].as<int16_t>();
+    controllers[0].command.right.pwm = doc["frontRight"].as<int16_t>();
+    controllers[1].command.left.pwm = doc["backLeft"].as<int16_t>();
+    controllers[1].command.right.pwm = doc["backRight"].as<int16_t>();
+
+    for (Controller &controller : controllers)
+    {
+        Command &command = controller.command;
+        for (MotorState *motor : {&command.left, &command.right})
+        {
+            motor->enable = true;
+            motor->ctrlTyp = ControlType::FieldOrientedControl;
+            motor->ctrlMod = ControlMode::Torque;
+        }
+        fixDirections(command);
+    }
+
+    sendCommands();
 }
 
 void renderLiveData(AsyncResponseStream &response)
@@ -997,156 +971,6 @@ void handleSetManualModeSetParams(AsyncWebServerRequest *request)
 void handleSetPotiParams(AsyncWebServerRequest *request)
 {
     // TODO
-}
-
-void DefaultMode::update()
-{
-    if (waitForGasLoslass)
-    {
-        if (gas < 50)
-            waitForGasLoslass = false;
-        else
-            gas = 0;
-    }
-    const auto gas_cubed = (gas * gas) / 1000;
-
-    if (waitForBremsLoslass)
-    {
-        if (brems < 50)
-            waitForBremsLoslass = false;
-        else
-            brems = 0;
-    }
-    const auto brems_cubed = (brems * brems) / 1000;
-
-    float pwm;
-    if (gas_cubed >= 950.)
-        pwm = gas_cubed + (brems_cubed/2.);
-    else
-        pwm = gas_cubed - (brems_cubed*0.75);
-
-    for (Controller &controller : controllers)
-    {
-        Command &command = controller.command;
-        for (MotorState *motor : {&command.left, &command.right})
-        {
-            motor->enable = true;
-            motor->ctrlTyp = ControlType::FieldOrientedControl;
-            motor->ctrlMod = ControlMode::Torque;
-            motor->pwm = pwm / 100. * (&controller == &controllers[0] ? frontPercentage : backPercentage);
-        }
-        fixDirections(command);
-    }
-
-    sendCommands();
-}
-
-void ManualMode::update()
-{
-    if (manual)
-    {
-        if (gas > 500. && brems > 500.)
-        {
-            pwm = 0;
-            modes.defaultMode.waitForGasLoslass = true;
-            modes.defaultMode.waitForBremsLoslass = true;
-            modes.currentMode = modes.defaultMode;
-            modes.currentMode.get().update();
-            return;
-        }
-
-        pwm += (gas/1000.) - (brems/1000.);
-    }
-
-    for (auto &controller : controllers)
-    {
-        auto &command = controller.command;
-        for (MotorState *motor : {&command.left, &command.right})
-        {
-            motor->enable = enable;
-            motor->ctrlTyp = ctrlTyp;
-            motor->ctrlMod = ctrlMod;
-            motor->pwm = pwm;
-        }
-        fixDirections(command);
-    }
-
-    sendCommands();
-}
-
-void BluetoothMode::start()
-{
-    // clear buffer
-    while (bluetooth.serial.available())
-        bluetooth.serial.read();
-}
-
-void BluetoothMode::update()
-{
-    bool newLine{false};
-    while (bluetooth.serial.available())
-    {
-        *bluetooth.pos = bluetooth.serial.read();
-        if (*bluetooth.pos == '\n')
-            newLine = true;
-        bluetooth.pos++;
-        if (newLine)
-            break;
-    }
-
-    if (!newLine)
-        return;
-
-    StaticJsonDocument<256> doc;
-    const auto error = deserializeJson(doc, &(*bluetooth.buffer.begin()), std::distance(bluetooth.buffer.begin(), bluetooth.pos));
-
-    if (error)
-    {
-        bluetooth.serial.println(error.c_str());
-        return;
-    }
-
-    bluetooth.pos = bluetooth.buffer.begin();
-
-    if (!doc.containsKey("frontLeft"))
-    {
-        bluetooth.serial.print("no frontLeft");
-        return;
-    }
-    if (!doc.containsKey("frontRight"))
-    {
-        bluetooth.serial.print("no frontRight");
-        return;
-    }
-    if (!doc.containsKey("backLeft"))
-    {
-        bluetooth.serial.print("no backLeft");
-        return;
-    }
-    if (!doc.containsKey("backRight"))
-    {
-        bluetooth.serial.print("no backRight");
-        return;
-    }
-
-    controllers[0].command.left.pwm = doc["frontLeft"].as<int16_t>();
-    controllers[0].command.right.pwm = doc["frontRight"].as<int16_t>();
-    controllers[1].command.left.pwm = doc["backLeft"].as<int16_t>();
-    controllers[1].command.right.pwm = doc["backRight"].as<int16_t>();
-
-    for (Controller &controller : controllers)
-    {
-        Command &command = controller.command;
-        for (MotorState *motor : {&command.left, &command.right})
-        {
-            motor->enable = true;
-            motor->ctrlTyp = ControlType::FieldOrientedControl;
-            motor->ctrlMod = ControlMode::Torque;
-        }
-        fixDirections(command);
-    }
-
-    sendCommands();
 }
 
 bool WebHandler::canHandle(AsyncWebServerRequest *request)
