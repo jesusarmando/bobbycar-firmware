@@ -3,6 +3,7 @@
 #include <BluetoothSerial.h>
 #include <ESPAsyncWebServer.h>
 #include <HardwareSerial.h>
+#include <pidcontroller.h>
 #include <WiFi.h>
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -36,16 +37,21 @@ bool invertLeft, invertRight;
 bool power_toggle{false};
 bool led_toggle{false};
 
-int lastSendCommand = millis();
-int lastStatus = millis();
+unsigned long lastSendCommand = millis();
+unsigned long lastStatus = millis();
+unsigned long lastUpdate = millis();
+struct {
+    unsigned long lastTime = millis();
+    int current{0};
+    int last{0};
+} performance;
 
 wl_status_t last_wl_status;
 IPAddress last_ip_address;
 
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
 
-struct DrivingModes
-{
+struct {
     DefaultMode defaultMode;
     ManualMode manualMode;
     BluetoothMode bluetoothMode;
@@ -216,7 +222,7 @@ void DefaultMode::update()
         else
             gas = 0;
     }
-    const auto gas_cubed = (gas * gas) / 1000;
+    const auto gas_squared = (gas * gas) / 1000;
 
     if (waitForBremsLoslass)
     {
@@ -225,13 +231,20 @@ void DefaultMode::update()
         else
             brems = 0;
     }
-    const auto brems_cubed = (brems * brems) / 1000;
+    const auto brems_squared = (brems * brems) / 1000;
 
     float pwm;
-    if (gas_cubed >= 950.)
-        pwm = gas_cubed + (brems_cubed/2.);
+    if (gas_squared >= 950.)
+    {
+        pwm = gas_squared + (brems_squared/2.);
+
+        if (enableWeakeningSmoothening && pwm > 1000. && lastPwm > pwm)
+            pwm = std::max(lastPwm-weakeningSmoothening, pwm);
+    }
     else
-        pwm = gas_cubed - (brems_cubed*0.75);
+        pwm = gas_squared - (brems_squared*0.75);
+
+    lastPwm = pwm;
 
     for (Controller &controller : controllers)
     {
@@ -380,6 +393,8 @@ void renderLiveData(AsyncResponseStream &response)
         response.print(gas);
         response.print(" brems=");
         response.print(brems);
+        response.print(" mainLoop=");
+        response.print(performance.last);
     }
 
     for (const Controller &controller : controllers)
@@ -585,6 +600,14 @@ void handleIndex(AsyncWebServerRequest *request)
                     HtmlTag legend(response, "legend");
                     response.print("Default Mode:");
                 }
+
+                checkboxInput(response, modes.defaultMode.enableWeakeningSmoothening, "enableWeakeningSmoothening", "Enable Weakening Smoothening:");
+
+                breakLine(response);
+
+                numberInput(response, modes.defaultMode.weakeningSmoothening, "weakeningSmoothening", "Weakening Smoothening:");
+
+                breakLine(response);
 
                 numberInput(response, modes.defaultMode.frontPercentage, "frontPercentage", "Front percentage:");
 
@@ -859,6 +882,15 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
 
 void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
 {
+    if (!request->hasParam("weakeningSmoothening"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no weakeningSmoothening specified");
+        request->send(&response);
+        return;
+    }
+
     if (!request->hasParam("frontPercentage"))
     {
         AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -878,6 +910,14 @@ void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
     }
 
 
+
+    modes.defaultMode.enableWeakeningSmoothening = request->hasParam("enableWeakeningSmoothening") && request->getParam("enableWeakeningSmoothening")->value() == "on";
+
+    {
+        AsyncWebParameter* p = request->getParam("weakeningSmoothening");
+
+        modes.defaultMode.weakeningSmoothening = strtol(p->value().c_str(), nullptr, 10);
+    }
 
     {
         AsyncWebParameter* p = request->getParam("frontPercentage");
@@ -916,6 +956,7 @@ void handleSetManualModeSetParams(AsyncWebServerRequest *request)
 
 
 
+    modes.manualMode.manual = request->hasParam("manual") && request->getParam("manual")->value() == "on";
     modes.manualMode.manual = request->hasParam("manual") && request->getParam("manual")->value() == "on";
     modes.manualMode.enable = request->hasParam("enable") && request->getParam("enable")->value() == "on";
 
@@ -1086,17 +1127,32 @@ void loop()
 
     */
 
-    analogRead(gasPin);
-    delay(2);
-    raw_gas = analogRead(gasPin);
-    gas = scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
+    const auto now = millis();
+    if (now - lastUpdate >= 1000/50)
+    {
+        analogRead(gasPin);
+        delay(2);
+        raw_gas = analogRead(gasPin);
+        gas = scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
 
-    analogRead(bremsPin);
-    delay(2);
-    raw_brems = analogRead(bremsPin);
-    brems = scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
+        analogRead(bremsPin);
+        delay(2);
+        raw_brems = analogRead(bremsPin);
+        brems = scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
 
-    modes.currentMode.get().update();
+        modes.currentMode.get().update();
+
+        lastUpdate = now;
+
+        performance.current++;
+    }
+
+    if (now - performance.lastTime >= 1000)
+    {
+        performance.last = performance.current;
+        performance.current = 0;
+        performance.lastTime = now;
+    }
 
     receiveFeedback();
 
