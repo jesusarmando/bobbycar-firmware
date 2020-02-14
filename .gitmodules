@@ -1,0 +1,3 @@
+[submodule "boardcomputer/lib/TFT_eSPI_bobbycar"]
+	path = boardcomputer/lib/TFT_eSPI_bobbycar
+	url = git@github.com:0xFEEDC0DE64/TFT_eSPI_bobbycar.git
