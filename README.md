@@ -19,8 +19,12 @@ This repository implements Field Oriented Control (FOC) for stock hoverboards. C
   - **VOLTAGE MODE**: in this mode the controller applies a constant Voltage to the motors
   - **SPEED MODE**: in this mode a closed-loop controller realizes the input target speed by rejecting any of the disturbance (resistive load) applied to the motor
   - **TORQUE MODE**: in this mode the target torque set by the user is realized. This mode enables motor "freewheeling" when the torque target is "0".
+  - **OPEN MODE**: Just reduces the input to 0. Since it is in software it will be exact 0. It will charge the battery, it  is basically a fast recharge phase.
 
   **NOTE**: In all the modes, the controller features maximum motor speed and maximum motor current protection. This brings great advantages to fulfil the needs of many robotic applications while maintaining safe operation.
+
+- for critical error (blocked motor, Hall sensor not connected), enable = 0. So, the MOSFETs get interrupted immediately, to avoid HW damage.
+- for soft error (Serial timeout, ADC out of range), I request OPEN mode. The rate of opening is controlled by dV_openRate see here. Decrease this parameter if you want slower opening.
 
 ## Firmware architecture
 
@@ -89,19 +93,7 @@ http://vocke.tv/lib/exe/fetch.php?media=20150722_hoverboard_sch.pdf
 
 ---
 
-
-Demo videos:
-
-[►Video: Commutation vs Advanced control (constant speed)](https://drive.google.com/open?id=1vC_kEkp2LE2lAaMCJcmK4z2m3jrPUoBD)
-
-[►Video: Commutation vs Advanced control (variable speed)](https://drive.google.com/open?id=1rrQ4k5VLhhAWXQzDSCar_SmEdsbM-hq2)
-
-[►Video: Reliable Serial Communication demo](https://drive.google.com/open?id=1mUM-p7SE6gmyTH7zhDHy5DUyczXvmy5d)
-
-[►Video: HOVERCAR demo](https://drive.google.com/open?id=18IvRJVdQSsjTg1I0Wedlg19e0FuDjfdS)
-
-![Hoverboard wheel](/docs/pictures/hoverboard_wheel.JPG)
-
+TODO: photos
 
 ---
 
@@ -141,6 +133,7 @@ Last but not least, I would like to acknowledge and thank the following people:
 - Original firmware: [@NiklasFauth](https://github.com/NiklasFauth)
 - Github: [@TomTinkering](https://github.com/TomTinkering), [@ced2c](https://github.com/ced2c), [@btsimonh](https://github.com/btsimonh), [@lalalandrus](https://github.com/lalalandrus), [@p-h-a-i-l](https://github.com/p-h-a-i-l) , [@AntumArk](https://github.com/AntumArk), [@juodumas](https://github.com/juodumas)
 - ST Employee: [cedric H](https://community.st.com/s/question/0D50X0000B28qTDSQY/custom-foc-control-current-measurement-dma-timer-interrupt-needs-review)
+- Emanuel Feru: [@EmanuelFeru](https://github.com/EmanuelFeru)
 
 for the very useful discussions, code snippets, and good suggestions to make this work possbile.
 
