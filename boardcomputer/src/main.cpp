@@ -29,6 +29,7 @@
 #include "htmltag.h"
 #include "webhandler.h"
 #include "htmlutils.h"
+#include "statusdisplay.h"
 #include "starfielddisplay.h"
 #include "pingpongdisplay.h"
 
@@ -75,10 +76,11 @@ struct {
 struct {
     TFT_eSPI tft = TFT_eSPI();
 
+    StatusDisplay status;
     StarfieldDisplay starfield;
     PingPongDisplay pingPong;
 
-    std::reference_wrapper<Display> currentDisplay{starfield};
+    std::reference_wrapper<Display> currentDisplay{status};
 } display;
 
 void receiveFeedback()
@@ -1026,6 +1028,86 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
         handleSetPotiParams(request);
 }
 
+void StatusDisplay::start()
+{
+    display.tft.setRotation(0);
+    display.tft.fillScreen(TFT_BLACK);
+    display.tft.setTextColor(TFT_WHITE, TFT_BLACK);
+}
+
+String toString(wl_status_t status)
+{
+    switch (status)
+    {
+    case WL_NO_SHIELD: return "WL_NO_SHIELD";
+    case WL_IDLE_STATUS: return "WL_IDLE_STATUS";
+    case WL_NO_SSID_AVAIL: return "WL_NO_SSID_AVAIL";
+    case WL_SCAN_COMPLETED: return "WL_SCAN_COMPLETED";
+    case WL_CONNECTED: return "WL_CONNECTED";
+    case WL_CONNECT_FAILED: return "WL_CONNECT_FAILED";
+    case WL_CONNECTION_LOST: return "WL_CONNECTION_LOST";
+    case WL_DISCONNECTED: return "WL_DISCONNECTED";
+    }
+
+    return String("Unknown: ") + int(status);
+}
+
+void StatusDisplay::update()
+{
+    int y = 0;
+
+    display.tft.drawString(String("raw_gas=") + raw_gas + " -> " + gas + "                                                ",0,y,2); y+=15;
+    display.tft.drawString(String("raw_brems=") + raw_brems + " -> " + brems + "                                                ",0,y,2); y+=15;
+
+    y+=12;
+
+    const auto print_controller = [&](const Controller &controller)
+    {
+        display.tft.drawString(String("pwm: ") + controller.command.left.pwm + ", " + controller.command.right.pwm + "                                                ", 0,y,4); y+=25;
+        if (millis() - controller.lastFeedback > 1000)
+        {
+            display.tft.setTextColor(TFT_RED, TFT_BLACK);
+            display.tft.drawString("Dead!                                                ",0,y,4); y+=25;
+            display.tft.drawString("                                                     ",0,y,4); y+=25;
+            display.tft.drawString("                                                     ",0,y,4); y+=25;
+            display.tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        }
+        else
+        {
+            display.tft.drawString(String("U=") + (controller.feedback.batVoltage/100.) + "V, T=" + (controller.feedback.boardTemp/10.) + "C                                                 ",0,y,4); y+=25;
+            const auto print_motor = [&](const char *pre, const MotorFeedback &motor)
+            {
+                display.tft.drawString(pre, 0, y, 4);
+                if (motor.error)
+                    display.tft.setTextColor(TFT_RED, TFT_BLACK);
+                else
+                    display.tft.setTextColor(TFT_GREEN, TFT_BLACK);
+                display.tft.drawString(String() + motor.error + "   ", 15, y, 4);
+                display.tft.setTextColor(TFT_WHITE, TFT_BLACK);
+                display.tft.drawString(String("") + std::abs(motor.current/50.) + "A"
+                                       "     " +
+                                       (motor.speed/15) +
+                                       "     " +
+                                       (motor.hallA ? '|' : '.') + (motor.hallB ? '|' : '.') + (motor.hallC ? '|' : '.') + "                                                ",45,y,4); y+=25;
+
+            };
+
+            print_motor("l: ", controller.feedback.left);
+            print_motor("r: ", controller.feedback.right);
+        }
+    };
+
+    for (const auto &controller : controllers)
+    {
+        print_controller(controller);
+        y+=12;
+    }
+
+    display.tft.drawString("WiFi: " + toString(WiFi.status()) + "                                                ",0,y,2); y+=15;
+    display.tft.drawString("IP: " + WiFi.localIP().toString() + "                                                ",0,y,2); y+=15;
+    display.tft.drawString(String("Performance: ") + performance.last + "                                                ",0,y,2); y+=15;
+}
+
 StarfieldDisplay::StarfieldDisplay()
 {
     za = random(256);
@@ -1237,6 +1319,20 @@ void PingPongDisplay::ball()
     oldball_x = ball_x;
     oldball_y = ball_y;
 }
+
+void nextDisplay()
+{
+    display.currentDisplay.get().stop();
+
+    if (&display.currentDisplay.get() == &display.status)
+        display.currentDisplay = display.starfield;
+    else if (&display.currentDisplay.get() == &display.starfield)
+        display.currentDisplay = display.pingPong;
+    else if (&display.currentDisplay.get() == &display.pingPong)
+        display.currentDisplay = display.status;
+
+    display.currentDisplay.get().start();
+}
 }
 
 void setup()
@@ -1341,21 +1437,17 @@ void loop()
         performance.current++;
     }
 
-    if (now - lastRedraw >= 1000/30)
+    if (now - lastRedraw >= 1000/2)
     {
         display.currentDisplay.get().update();
 
         lastRedraw = now;
     }
 
+    if (false)
     if (now - lastScreenSwitch >= 1000*5)
     {
-        display.currentDisplay.get().stop();
-        if (&display.currentDisplay.get() == &display.starfield)
-            display.currentDisplay = display.pingPong;
-        else if (&display.currentDisplay.get() == &display.pingPong)
-            display.currentDisplay = display.starfield;
-        display.currentDisplay.get().start();
+        nextDisplay();
 
         lastScreenSwitch = now;
     }
