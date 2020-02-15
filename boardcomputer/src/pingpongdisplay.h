@@ -13,6 +13,7 @@ public:
     void start() override;
     void update() override;
     void stop() override {};
+    int framerate() const override { return 60; }
 
     void midline();
     void lpaddle();

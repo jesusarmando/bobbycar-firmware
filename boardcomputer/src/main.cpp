@@ -175,6 +175,20 @@ void handleDebugSerial()
     }
 }
 
+void nextDisplay()
+{
+    display.currentDisplay.get().stop();
+
+    if (&display.currentDisplay.get() == &display.status)
+        display.currentDisplay = display.starfield;
+    else if (&display.currentDisplay.get() == &display.starfield)
+        display.currentDisplay = display.pingPong;
+    else if (&display.currentDisplay.get() == &display.pingPong)
+        display.currentDisplay = display.status;
+
+    display.currentDisplay.get().start();
+}
+
 void fixDirections(Command &command)
 {
     if (invertLeft)
@@ -515,6 +529,13 @@ void handleIndex(AsyncWebServerRequest *request)
                 response.print("Live");
             }
 
+            response.print(" - ");
+
+            {
+                HtmlTag a(response, "a", " href=\"/next\"");
+                response.print("Next screen");
+            }
+
             //renderLiveData(response);
 
             {
@@ -728,6 +749,13 @@ void handleLive(AsyncWebServerRequest *request)
     }
 
     request->send(&response);
+}
+
+void handleNext(AsyncWebServerRequest *request)
+{
+    nextDisplay();
+
+    request->redirect("/");
 }
 
 void handleSetCommonParams(AsyncWebServerRequest *request)
@@ -1000,6 +1028,8 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
         return true;
     else if (request->url() == "/live")
         return true;
+    else if (request->url() == "/next")
+        return true;
     else if (request->url() == "/setCommonParams")
         return true;
     else if (request->url() == "/setDefaultModeParams")
@@ -1018,6 +1048,8 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
         handleIndex(request);
     else if (request->url() == "/live")
         handleLive(request);
+    else if (request->url() == "/next")
+        handleNext(request);
     else if (request->url() == "/setCommonParams")
         handleSetCommonParams(request);
     else if (request->url() == "/setDefaultModeParams")
@@ -1319,20 +1351,6 @@ void PingPongDisplay::ball()
     oldball_x = ball_x;
     oldball_y = ball_y;
 }
-
-void nextDisplay()
-{
-    display.currentDisplay.get().stop();
-
-    if (&display.currentDisplay.get() == &display.status)
-        display.currentDisplay = display.starfield;
-    else if (&display.currentDisplay.get() == &display.starfield)
-        display.currentDisplay = display.pingPong;
-    else if (&display.currentDisplay.get() == &display.pingPong)
-        display.currentDisplay = display.status;
-
-    display.currentDisplay.get().start();
-}
 }
 
 void setup()
@@ -1437,7 +1455,7 @@ void loop()
         performance.current++;
     }
 
-    if (now - lastRedraw >= 1000/2)
+    if (now - lastRedraw >= 1000/display.currentDisplay.get().framerate())
     {
         display.currentDisplay.get().update();
 
