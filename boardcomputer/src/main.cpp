@@ -24,7 +24,7 @@
 #include "modebase.h"
 #include "defaultmode.h"
 #include "manualmode.h"
-#include "bluetoothmode.h"
+#include "nonemode.h"
 #include "controller.h"
 #include "webhandler.h"
 #include "statusdisplay.h"
@@ -55,7 +55,7 @@ std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
 struct {
     DefaultMode defaultMode;
     ManualMode manualMode;
-    BluetoothMode bluetoothMode;
+    NoneMode noneMode;
 
     std::reference_wrapper<ModeBase> currentMode{defaultMode};
 } modes;
@@ -287,15 +287,9 @@ void ManualMode::update()
     sendCommands();
 }
 
-void BluetoothMode::start()
+void handleBluetoothCmds()
 {
-    // clear buffer
-    while (bluetooth.serial.available())
-        bluetooth.serial.read();
-}
 
-void BluetoothMode::update()
-{
     bool newLine{false};
     while (bluetooth.serial.available())
     {
@@ -313,13 +307,13 @@ void BluetoothMode::update()
     StaticJsonDocument<256> doc;
     const auto error = deserializeJson(doc, &(*bluetooth.buffer.begin()), std::distance(bluetooth.buffer.begin(), bluetooth.pos));
 
+    bluetooth.pos = bluetooth.buffer.begin();
+
     if (error)
     {
         bluetooth.serial.println(error.c_str());
         return;
     }
-
-    bluetooth.pos = bluetooth.buffer.begin();
 
     if (!doc.containsKey("frontLeft"))
     {
@@ -463,10 +457,10 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
             modes.currentMode = modes.manualMode;
             modes.currentMode.get().stop();
         }
-        else if (p->value() == "bluetoothMode")
+        else if (p->value() == "noneMode")
         {
             modes.currentMode.get().start();
-            modes.currentMode = modes.bluetoothMode;
+            modes.currentMode = modes.noneMode;
             modes.currentMode.get().stop();
         }
         else
@@ -1153,6 +1147,8 @@ void loop()
         performance.current = 0;
         performance.lastTime = now;
     }
+
+    handleBluetoothCmds();
 
     receiveFeedback();
 
