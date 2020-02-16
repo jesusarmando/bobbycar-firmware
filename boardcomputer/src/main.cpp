@@ -3,10 +3,10 @@
 #include <BluetoothSerial.h>
 #include <ESPAsyncWebServer.h>
 #include <HardwareSerial.h>
-#include <pidcontroller.h>
-#include <WiFi.h>
-#include <TFT_eSPI.h>
 #include <SPI.h>
+#include <SPIFFS.h>
+#include <TFT_eSPI.h>
+#include <WiFi.h>
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
@@ -15,7 +15,7 @@
 #include <array>
 #include <algorithm>
 #include <functional>
-#include <stdint.h>
+#include <cstdint>
 
 #include "../../common.h"
 
@@ -26,9 +26,7 @@
 #include "manualmode.h"
 #include "bluetoothmode.h"
 #include "controller.h"
-#include "htmltag.h"
 #include "webhandler.h"
-#include "htmlutils.h"
 #include "statusdisplay.h"
 #include "starfielddisplay.h"
 #include "pingpongdisplay.h"
@@ -364,398 +362,32 @@ void BluetoothMode::update()
     sendCommands();
 }
 
-void renderLiveData(AsyncResponseStream &response)
-{
-    HtmlTag fieldset(response, "fieldset");
-
-    {
-        HtmlTag legend(response, "legend");
-        response.print("Live data:");
-    }
-
-    {
-        HtmlTag p(response, "p");
-        response.print("raw_gas=");
-        response.print(raw_gas);
-        response.print(" raw_brems=");
-        response.print(raw_brems);
-        response.print(" gasPin=");
-        response.print(gasPin);
-        response.print(" bremsPin=");
-        response.print(bremsPin);
-        response.print(" gas=");
-        response.print(gas);
-        response.print(" brems=");
-        response.print(brems);
-        response.print(" mainLoop=");
-        response.print(performance.last);
-    }
-
-    for (const Controller &controller : controllers)
-    {
-        HtmlTag fieldset(response, "fieldset");
-
-        {
-            HtmlTag legend(response, "legend");
-            response.print("Board:");
-        }
-
-        {
-            HtmlTag p(response, "p");
-            response.print("left: ");
-            response.print(controller.command.left.pwm);
-            response.print(", right: ");
-            response.print(controller.command.right.pwm);
-            response.print(", beeper: (");
-            response.print(controller.command.buzzer.freq);
-            response.print(", ");
-            response.print(controller.command.buzzer.pattern);
-            response.print("), led: ");
-            response.print(controller.command.led ? "true" : "false ");
-        }
-
-        if (millis() - controller.lastFeedback > 1000)
-        {
-            HtmlTag span(response, "span", " style=\"color: red;\"");
-            response.print("Dead!");
-            continue;
-        }
-
-        {
-            HtmlTag p(response, "p");
-            response.print(controller.feedback.batVoltage/100.);
-            response.print("V, ");
-            response.print(controller.feedback.boardTemp/100.);
-            response.print("°C");
-        }
-
-        for (const MotorFeedback &motor : {controller.feedback.left, controller.feedback.right})
-        {
-            HtmlTag fieldset(response, "fieldset");
-
-            {
-                HtmlTag legend(response, "legend");
-                response.print("Motor:");
-            }
-
-            {
-                String color, text;
-                switch (motor.error)
-                {
-                case 0: color="green"; text="Ok"; break;
-                case 1: color="red"; text="hall sensor not connected"; break;
-                case 2: color="red"; text="hall sensor short curcuit"; break;
-                case 4: color="red"; text="motors not able to spin"; break;
-                default: color="red"; text="Unknown "; text += motor.error; break;
-                }
-
-                {
-                    HtmlTag span(response, "span", " style=\"color: " + color + ";\"");
-                    response.print(text);
-                }
-
-                if (motor.chops)
-                {
-                    response.print(", chopping (");
-                    response.print(motor.chops);
-                    response.print(")");
-                }
-            }
-
-            {
-                HtmlTag p(response, "p");
-                response.print(motor.speed);
-                response.print("Rpm, ");
-                response.print(motor.current);
-                response.print("A");
-            }
-
-            {
-                HtmlTag table(response, "table", " border=\"1\"");
-                HtmlTag tr(response, "tr");
-
-                {
-                    HtmlTag td(response, "td", " style=\"width: 50px;\"");
-                    response.print(motor.angle);
-                }
-
-                const auto printCell = [&response](bool active, const char *text){
-                    String str;
-                    if (active)
-                        str = " style=\"background-color: grey;\"";
-                    HtmlTag td(response, "td", str);
-                    response.print(text);
-                };
-
-                printCell(motor.hallA, "A");
-                printCell(motor.hallB, "B");
-                printCell(motor.hallC, "C");
-            }
-        }
-    }
-}
-
-void handleIndex(AsyncWebServerRequest *request)
-{
-    AsyncResponseStream &response = *request->beginResponseStream("text/html");
-
-    response.print("<!doctype html>");
-
-    {
-        HtmlTag html(response, "html");
-
-        {
-            HtmlTag head(response, "head");
-
-            response.print("<meta charset=\"utf-8\" />");
-            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
-
-            {
-                HtmlTag title(response, "title");
-                response.print("Bobbycar remote");
-            }
-        }
-
-        {
-            HtmlTag body(response, "body");
-
-            {
-                HtmlTag h1(response, "h1");
-                response.print("Bobbycar remote");
-            }
-
-            {
-                HtmlTag a(response, "a", " href=\"/live\"");
-                response.print("Live");
-            }
-
-            response.print(" - ");
-
-            {
-                HtmlTag a(response, "a", " href=\"/next\"");
-                response.print("Next screen");
-            }
-
-            //renderLiveData(response);
-
-            {
-                HtmlTag form(response, "form", " action=\"/setCommonParams\"");
-
-                HtmlTag fieldset(response, "fieldset");
-
-                {
-                    HtmlTag legend(response, "legend");
-                    response.print("Common params:");
-                }
-
-                label(response, "mode", "Mode:");
-
-                breakLine(response);
-
-                {
-                    HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
-                    selectOption(response, "defaultMode", "Default", &modes.currentMode.get()==&modes.defaultMode);
-                    selectOption(response, "manualMode", "Manual", &modes.currentMode.get()==&modes.manualMode);
-                    selectOption(response, "bluetoothMode", "Bluetooth", &modes.currentMode.get()==&modes.bluetoothMode);
-                }
-
-                breakLine(response);
-
-                numberInput(response, controllers[0].command.left.iMotMax, "iMotMax", "Maximum current:");
-
-                breakLine(response);
-
-                numberInput(response, controllers[0].command.left.iDcMax, "iDcMax", "Maximum link current:");
-
-                breakLine(response);
-
-                numberInput(response, controllers[0].command.left.nMotMax, "nMotMax", "Maximum speed:");
-
-                breakLine(response);
-
-                numberInput(response, controllers[0].command.left.fieldWeakMax, "fieldWeakMax", "Maximum field weakening current:");
-
-                breakLine(response);
-
-                numberInput(response, controllers[0].command.left.phaseAdvMax, "phaseAdvMax", "Maximum phase adv angle:");
-
-                breakLine(response);
-
-                checkboxInput(response, invertLeft, "invertLeft", "Invert left:");
-
-                breakLine(response);
-
-                checkboxInput(response, invertRight, "invertRight", "Invert right:");
-
-                breakLine(response);
-
-                submitButton(response);
-            }
-
-            {
-                HtmlTag form(response, "form", " action=\"/setDefaultModeParams\"");
-
-                HtmlTag fieldset(response, "fieldset");
-
-                {
-                    HtmlTag legend(response, "legend");
-                    response.print("Default Mode:");
-                }
-
-                checkboxInput(response, modes.defaultMode.enableWeakeningSmoothening, "enableWeakeningSmoothening", "Enable Weakening Smoothening:");
-
-                breakLine(response);
-
-                numberInput(response, modes.defaultMode.weakeningSmoothening, "weakeningSmoothening", "Weakening Smoothening:");
-
-                breakLine(response);
-
-                numberInput(response, modes.defaultMode.frontPercentage, "frontPercentage", "Front percentage:");
-
-                breakLine(response);
-
-                numberInput(response, modes.defaultMode.backPercentage, "backPercentage", "Back percentage:");
-
-                breakLine(response);
-
-                submitButton(response);
-            }
-
-            {
-                HtmlTag form(response, "form", " action=\"/setManualModeParams\"");
-
-                HtmlTag fieldset(response, "fieldset");
-
-
-                {
-                    HtmlTag legend(response, "legend");
-                    response.print("Manual Mode:");
-                }
-
-                checkboxInput(response, modes.manualMode.manual, "manual", "Manual Control:");
-
-                breakLine(response);
-
-                checkboxInput(response, modes.manualMode.enable, "enable", "Enable:");
-
-                breakLine(response);
-
-                numberInput(response, modes.manualMode.pwm, "pwm", "Pwm:");
-
-                breakLine(response);
-
-                label(response, "ctrlTyp", "Control Type:");
-
-                breakLine(response);
-
-                {
-                    HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\" required");
-                    selectOption(response, "Commutation", "Commutation", modes.manualMode.ctrlTyp == ControlType::Commutation);
-                    selectOption(response, "Sinusoidal", "Sinusoidal", modes.manualMode.ctrlTyp == ControlType::Sinusoidal);
-                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes.manualMode.ctrlTyp == ControlType::FieldOrientedControl);
-                }
-
-                breakLine(response);
-
-                label(response, "ctrlMod", "Control Mode:");
-
-                breakLine(response);
-
-                {
-                    HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\" required");
-
-                    selectOption(response, "OpenMode", "Open Mode", modes.manualMode.ctrlMod == ControlMode::OpenMode);
-                    selectOption(response, "Voltage", "Voltage", modes.manualMode.ctrlMod == ControlMode::Voltage);
-                    selectOption(response, "Speed", "Speed", modes.manualMode.ctrlMod == ControlMode::Speed);
-                    selectOption(response, "Torque", "Torque", modes.manualMode.ctrlMod == ControlMode::Torque);
-                }
-
-                breakLine(response);
-
-                submitButton(response);
-            }
-
-            {
-                HtmlTag form(response, "form", " action=\"/setPotiParams\"");
-
-                HtmlTag fieldset(response, "fieldset");
-
-                {
-                    HtmlTag legend(response, "legend");
-                    response.print("Poti calibration:");
-                }
-
-                numberInput(response, gasMin, "gasMin", "gasMin:");
-
-                breakLine(response);
-
-                numberInput(response, gasMax, "gasMax", "gasMax:");
-
-                breakLine(response);
-
-                numberInput(response, bremsMin, "bremsMin", "bremsMin:");
-
-                breakLine(response);
-
-                numberInput(response, bremsMax, "bremsMax", "bremsMax:");
-
-                breakLine(response);
-
-                submitButton(response);
-            }
-        }
-    }
-
-    request->send(&response);
-}
-
-void handleLive(AsyncWebServerRequest *request)
-{
-    AsyncResponseStream &response = *request->beginResponseStream("text/html");
-
-    response.print("<!doctype html>");
-
-    {
-        HtmlTag html(response, "html");
-
-        {
-            HtmlTag head(response, "head");
-
-            response.print("<meta charset=\"utf-8\" />");
-            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
-            response.print("<meta http-equiv=\"refresh\" content=\"1\" />");
-
-            {
-                HtmlTag title(response, "title");
-                response.print("Bobbycar remote");
-            }
-        }
-
-        {
-            HtmlTag body(response, "body");
-
-            {
-                HtmlTag h1(response, "h1");
-                response.print("Bobbycar remote");
-            }
-
-            {
-                HtmlTag a(response, "a", " href=\"/\"");
-                response.print("Back");
-            }
-
-            renderLiveData(response);
-        }
-    }
-
-    request->send(&response);
-}
-
 void handleNext(AsyncWebServerRequest *request)
 {
     nextDisplay();
 
-    request->redirect("/");
+    AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+    response.print("ok");
+    request->send(&response);
+}
+
+void handlePoweroff(AsyncWebServerRequest *request)
+{
+    // TODO
+}
+
+void handleReboot(AsyncWebServerRequest *request)
+{
+    ESP.restart();
+
+    AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+    response.print("ok");
+    request->send(&response);
+}
+
+void handleGetCommonParams(AsyncWebServerRequest *request)
+{
+    //TODO
 }
 
 void handleSetCommonParams(AsyncWebServerRequest *request)
@@ -885,7 +517,14 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
     invertLeft = request->hasParam("invertLeft") && request->getParam("invertLeft")->value() == "on";
     invertRight = request->hasParam("invertRight") && request->getParam("invertRight")->value() == "on";
 
-    request->redirect("/");
+    AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+    response.print("ok");
+    request->send(&response);
+}
+
+void handleGetDefaultModeSetParams(AsyncWebServerRequest *request)
+{
+    // TODO
 }
 
 void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
@@ -939,7 +578,14 @@ void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
         modes.defaultMode.backPercentage = strtol(p->value().c_str(), nullptr, 10);
     }
 
-    request->redirect("/");
+    AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+    response.print("ok");
+    request->send(&response);
+}
+
+void handleGetManualModeSetParams(AsyncWebServerRequest *request)
+{
+    //TODO
 }
 
 void handleSetManualModeSetParams(AsyncWebServerRequest *request)
@@ -1014,7 +660,14 @@ void handleSetManualModeSetParams(AsyncWebServerRequest *request)
         }
     }
 
-    request->redirect("/");
+    AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+    response.print("ok");
+    request->send(&response);
+}
+
+void handleGetPotiParams(AsyncWebServerRequest *request)
+{
+    // TODO
 }
 
 void handleSetPotiParams(AsyncWebServerRequest *request)
@@ -1024,17 +677,25 @@ void handleSetPotiParams(AsyncWebServerRequest *request)
 
 bool WebHandler::canHandle(AsyncWebServerRequest *request)
 {
-    if (request->url() == "/")
+    if (request->url() == "/next")
         return true;
-    else if (request->url() == "/live")
+    else if (request->url() == "/poweroff")
         return true;
-    else if (request->url() == "/next")
+    else if (request->url() == "/reboot")
+        return true;
+    else if (request->url() == "/getCommonParams")
         return true;
     else if (request->url() == "/setCommonParams")
         return true;
+    else if (request->url() == "/getDefaultModeParams")
+        return true;
     else if (request->url() == "/setDefaultModeParams")
         return true;
+    else if (request->url() == "/getManualModeParams")
+        return true;
     else if (request->url() == "/setManualModeParams")
+        return true;
+    else if (request->url() == "/getPotiParams")
         return true;
     else if (request->url() == "/setPotiParams")
         return true;
@@ -1044,18 +705,26 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
 
 void WebHandler::handleRequest(AsyncWebServerRequest *request)
 {
-    if (request->url() == "/")
-        handleIndex(request);
-    else if (request->url() == "/live")
-        handleLive(request);
-    else if (request->url() == "/next")
+    if (request->url() == "/next")
         handleNext(request);
+    else if (request->url() == "/poweroff")
+        handlePoweroff(request);
+    else if (request->url() == "/reboot")
+        handleReboot(request);
+    else if (request->url() == "/getCommonParams")
+        handleGetCommonParams(request);
     else if (request->url() == "/setCommonParams")
         handleSetCommonParams(request);
+    else if (request->url() == "/getDefaultModeParams")
+        handleGetDefaultModeSetParams(request);
     else if (request->url() == "/setDefaultModeParams")
         handleSetDefaultModeSetParams(request);
+    else if (request->url() == "/getManualModeParams")
+        handleGetManualModeSetParams(request);
     else if (request->url() == "/setManualModeParams")
         handleSetManualModeSetParams(request);
+    else if (request->url() == "/getPotiParams")
+        handleGetPotiParams(request);
     else if (request->url() == "/setPotiParams")
         handleSetPotiParams(request);
 }
@@ -1111,16 +780,21 @@ void StatusDisplay::update()
             {
                 display.tft.drawString(pre, 0, y, 4);
                 if (motor.error)
+                {
                     display.tft.setTextColor(TFT_RED, TFT_BLACK);
+                    display.tft.drawString(String() + motor.error + "   ", 15, y, 4);
+                }
                 else
+                {
                     display.tft.setTextColor(TFT_GREEN, TFT_BLACK);
-                display.tft.drawString(String() + motor.error + "   ", 15, y, 4);
+                    display.tft.drawString("OK   ", 15, y, 4);
+                }
                 display.tft.setTextColor(TFT_WHITE, TFT_BLACK);
                 display.tft.drawString(String("") + std::abs(motor.current/50.) + "A"
                                        "     " +
-                                       (motor.speed/15) +
+                                       motor.speed +
                                        "     " +
-                                       (motor.hallA ? '|' : '.') + (motor.hallB ? '|' : '.') + (motor.hallC ? '|' : '.') + "                                                ",45,y,4); y+=25;
+                                       (motor.hallA ? '1' : '0') + (motor.hallB ? '1' : '0') + (motor.hallC ? '1' : '0') + "                                                ",45,y,4); y+=25;
 
             };
 
@@ -1359,6 +1033,8 @@ void setup()
     Serial.setDebugOutput(true);
     Serial.println("setup()");
 
+    SPIFFS.begin();
+
     bluetooth.serial.begin("bobbycar");
 
     WiFi.mode(WIFI_AP_STA);
@@ -1382,6 +1058,7 @@ void setup()
     modes.currentMode.get().start();
 
     web.server.addHandler(&web.handler);
+    web.server.serveStatic("/", SPIFFS, "/");
     web.server.begin();
 
     display.tft.init();

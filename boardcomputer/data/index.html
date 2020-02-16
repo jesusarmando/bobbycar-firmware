@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+
+        <link rel="stylesheet" href="style.css" />
+
+        <title>Hello, world!</title>
+    </head>
+    <body>
+        <div class="container" id="mainContainer">
+            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <a href="next" class="btn btn-secondary">next screen</a>
+                </div>
+                <div class="btn-group mr-2" role="group" aria-label="Second group">
+                    <a href="poweroff" class="btn btn-secondary">poweroff</a>
+                </div>
+                <div class="btn-group" role="group" aria-label="Third group">
+                    <a href="reboot" class="btn btn-secondary">reboot</a>
+                </div>
+            </div>
+
+            <fieldset class="border p-2">
+                <legend>Common params</legend>
+
+                <form method="GET" action="setCommonParams">
+                    <div class="form-group row">
+                        <label for="mode" class="col-6 col-form-label">Mode:</label>
+                        <div class="col-6">
+                            <select class="form-control" id="mode" name="mode">
+                                <option value="defaultMode">Default</option>
+                                <option value="manualMode">Manual</option>
+                                <option value="bluetoothMode">Bluetooth</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="iMotMax" class="col-6 col-form-label">Maximum current:</label>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="iMotMax" name="iMotMax" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic- name="basic"addon2">A</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="iDcMax" class="col-6 col-form-label">Maximum link current:</label>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="iDcMax" name="iDcMax" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic- name="basic"addon2">A</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="nMotMax" class="col-6 col-form-label">Maximum speed:</label>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="nMotMax" name="nMotMax" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic- name="basic"addon2">RPM/15</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="fieldWeakMax" class="col-6 col-form-label">Maximum phase advance angle:</label>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="fieldWeakMax" name="fieldWeakMax" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic- name="basic"addon2">&deg;</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="invertLeft" class="col-6 col-form-label">Invert left:</label>
+                        <div class="col-6">
+                            <input type="checkbox" class="form-control" id="invertLeft" name="invertLeft" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="invertRight" class="col-6 col-form-label">Invert right:</label>
+                        <div class="col-6">
+                            <input type="checkbox" class="form-control" id="invertRight" name="invertRight" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary float-right">Set common params</button>
+                </form>
+            </fieldset>
+
+            <fieldset class="border p-2">
+                <legend>Default mode:</legend>
+
+                <form method="GET" action="setDefaultModeParams">
+                    <div class="form-group row">
+                        <label for="enableWeakeningSmoothening" class="col-6 col-form-label">Enable weakening smoothening:</label>
+                        <div class="col-6">
+                            <input type="checkbox" class="form-control" id="enableWeakeningSmoothening" name="enableWeakeningSmoothening" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="weakeningSmoothening" class="col-6 col-form-label">Weakening smoothening:</label>
+                        <div class="col-6">
+                            <input type="number" class="form-control" id="weakeningSmoothening" name="weakeningSmoothening" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="frontPercentage" class="col-6 col-form-label">Front percentage:</label>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="frontPercentage" name="frontPercentage" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic- name="basic"addon2">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="backPercentage" class="col-6 col-form-label">Back percentage:</label>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="backPercentage" name="backPercentage" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic- name="basic"addon2">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary float-right">Set default mode params</button>
+                </form>
+            </fieldset>
+
+            <fieldset class="border p-2">
+                <legend>Manual mode:</legend>
+
+                <form method="GET" action="setManualModeParams">
+                    <div class="form-group row">
+                        <label for="manualControl" class="col-6 col-form-label">Manual control:</label>
+                        <div class="col-6">
+                            <input type="checkbox" class="form-control" id="manualControl" name="manualControl" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="enable" class="col-6 col-form-label">Enable:</label>
+                        <div class="col-6">
+                            <input type="checkbox" class="form-control" id="enable" name="enable" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="pwm" class="col-6 col-form-label">Pwm:</label>
+                        <div class="col-6">
+                            <input type="number" class="form-control" id="pwm" name="pwm" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="ctrlTyp" class="col-6 col-form-label">Control type:</label>
+                        <div class="col-6">
+                            <select class="form-control" id="ctrlTyp" name="ctrlTyp">
+                                <option value="Commutation">Commutation</option>
+                                <option value="Sinusoidal">Sinusoidal</option>
+                                <option value="FieldOrientedControl" selected="">Field Oriented Control</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="ctrlMod" class="col-6 col-form-label">Control mode:</label>
+                        <div class="col-6">
+                            <select class="form-control" id="ctrlMod" name="ctrlMod">
+                                <option value="OpenMode">Open Mode</option>
+                                <option value="Voltage">Voltage</option>
+                                <option value="Speed" selected="">Speed</option>
+                                <option value="Torque">Torque</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary float-right">Set manual mode params</button>
+                </form>
+            </fieldset>
+
+            <fieldset class="border p-2">
+                <legend>Poti calibration:</legend>
+
+                <form method="GET" action="setPotiParams">
+                    <div class="form-group row">
+                        <label for="gasMin" class="col-6 col-form-label">gasMin:</label>
+                        <div class="col-6">
+                            <input type="number" class="form-control" id="gasMin" name="gasMin" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="gasMax" class="col-6 col-form-label">gasMax:</label>
+                        <div class="col-6">
+                            <input type="number" class="form-control" id="gasMax" name="gasMax" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="bremsMin" class="col-6 col-form-label">bremsMin:</label>
+                        <div class="col-6">
+                            <input type="number" class="form-control" id="bremsMin" name="bremsMin" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="bremsMax" class="col-6 col-form-label">bremsMax:</label>
+                        <div class="col-6">
+                            <input type="number" class="form-control" id="bremsMax" name="bremsMax" />
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary float-right">Set poti calibration</button>
+                </form>
+            </fieldset>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="modalBody"></div>
+                    <div class="modal-footer" id="modalFooter">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>
+        <script src="bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
