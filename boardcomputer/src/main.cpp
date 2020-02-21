@@ -26,7 +26,6 @@
 #include "manualmode.h"
 #include "nonemode.h"
 #include "controller.h"
-#include "webhandler.h"
 #include "statusdisplay.h"
 #include "starfielddisplay.h"
 #include "pingpongdisplay.h"
@@ -43,6 +42,9 @@ bool led_toggle{false};
 unsigned long lastUpdate = millis();
 unsigned long lastRedraw = millis();
 unsigned long lastScreenSwitch = millis();
+
+wl_status_t last_status;
+IPAddress last_ip;
 
 struct {
     unsigned long lastTime = millis();
@@ -68,7 +70,6 @@ struct {
 
 struct {
     AsyncWebServer server{80};
-    WebHandler handler;
 } web;
 
 struct {
@@ -80,6 +81,23 @@ struct {
 
     std::reference_wrapper<Display> currentDisplay{status};
 } display;
+
+String toString(wl_status_t status)
+{
+    switch (status)
+    {
+    case WL_NO_SHIELD: return "WL_NO_SHIELD";
+    case WL_IDLE_STATUS: return "WL_IDLE_STATUS";
+    case WL_NO_SSID_AVAIL: return "WL_NO_SSID_AVAIL";
+    case WL_SCAN_COMPLETED: return "WL_SCAN_COMPLETED";
+    case WL_CONNECTED: return "WL_CONNECTED";
+    case WL_CONNECT_FAILED: return "WL_CONNECT_FAILED";
+    case WL_CONNECTION_LOST: return "WL_CONNECTION_LOST";
+    case WL_DISCONNECTED: return "WL_DISCONNECTED";
+    }
+
+    return String("Unknown: ") + int(status);
+}
 
 void receiveFeedback()
 {
@@ -137,6 +155,22 @@ void receiveFeedback()
 
 void handleDebugSerial()
 {
+    const auto status = WiFi.status();
+    if (last_status != status)
+    {
+        Serial.print("Status changed to: ");
+        Serial.println(toString(status));
+        last_status = status;
+    }
+
+    const auto ip = WiFi.localIP();
+    if (last_ip != ip)
+    {
+        Serial.print("IP changed to: ");
+        Serial.println(ip.toString());
+        last_ip = ip;
+    }
+
     while(Serial.available())
     {
         const auto c = Serial.read();
@@ -669,82 +703,11 @@ void handleSetPotiParams(AsyncWebServerRequest *request)
     // TODO
 }
 
-bool WebHandler::canHandle(AsyncWebServerRequest *request)
-{
-    if (request->url() == "/next")
-        return true;
-    else if (request->url() == "/poweroff")
-        return true;
-    else if (request->url() == "/reboot")
-        return true;
-    else if (request->url() == "/getCommonParams")
-        return true;
-    else if (request->url() == "/setCommonParams")
-        return true;
-    else if (request->url() == "/getDefaultModeParams")
-        return true;
-    else if (request->url() == "/setDefaultModeParams")
-        return true;
-    else if (request->url() == "/getManualModeParams")
-        return true;
-    else if (request->url() == "/setManualModeParams")
-        return true;
-    else if (request->url() == "/getPotiParams")
-        return true;
-    else if (request->url() == "/setPotiParams")
-        return true;
-
-    return false;
-}
-
-void WebHandler::handleRequest(AsyncWebServerRequest *request)
-{
-    if (request->url() == "/next")
-        handleNext(request);
-    else if (request->url() == "/poweroff")
-        handlePoweroff(request);
-    else if (request->url() == "/reboot")
-        handleReboot(request);
-    else if (request->url() == "/getCommonParams")
-        handleGetCommonParams(request);
-    else if (request->url() == "/setCommonParams")
-        handleSetCommonParams(request);
-    else if (request->url() == "/getDefaultModeParams")
-        handleGetDefaultModeSetParams(request);
-    else if (request->url() == "/setDefaultModeParams")
-        handleSetDefaultModeSetParams(request);
-    else if (request->url() == "/getManualModeParams")
-        handleGetManualModeSetParams(request);
-    else if (request->url() == "/setManualModeParams")
-        handleSetManualModeSetParams(request);
-    else if (request->url() == "/getPotiParams")
-        handleGetPotiParams(request);
-    else if (request->url() == "/setPotiParams")
-        handleSetPotiParams(request);
-}
-
 void StatusDisplay::start()
 {
     display.tft.setRotation(0);
     display.tft.fillScreen(TFT_BLACK);
     display.tft.setTextColor(TFT_WHITE, TFT_BLACK);
-}
-
-String toString(wl_status_t status)
-{
-    switch (status)
-    {
-    case WL_NO_SHIELD: return "WL_NO_SHIELD";
-    case WL_IDLE_STATUS: return "WL_IDLE_STATUS";
-    case WL_NO_SSID_AVAIL: return "WL_NO_SSID_AVAIL";
-    case WL_SCAN_COMPLETED: return "WL_SCAN_COMPLETED";
-    case WL_CONNECTED: return "WL_CONNECTED";
-    case WL_CONNECT_FAILED: return "WL_CONNECT_FAILED";
-    case WL_CONNECTION_LOST: return "WL_CONNECTION_LOST";
-    case WL_DISCONNECTED: return "WL_DISCONNECTED";
-    }
-
-    return String("Unknown: ") + int(status);
 }
 
 void StatusDisplay::update()
@@ -1030,6 +993,7 @@ void setup()
     SPIFFS.begin();
 
     bluetooth.serial.begin("bobbycar");
+    bluetooth.serial.setPin("1234");
 
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("bobbycar", "Passwort_123");
@@ -1051,7 +1015,18 @@ void setup()
 
     modes.currentMode.get().start();
 
-    web.server.addHandler(&web.handler);
+    web.server.on("/next", HTTP_GET, handleNext);
+    web.server.on("/poweroff", HTTP_GET, handlePoweroff);
+    web.server.on("/reboot", HTTP_GET, handleReboot);
+    web.server.on("/commonParams", HTTP_GET, handleGetCommonParams);
+    web.server.on("/commonParams", HTTP_POST, handleSetCommonParams);
+    web.server.on("/defaultModeParams", HTTP_GET, handleGetDefaultModeSetParams);
+    web.server.on("/defaultModeParams", HTTP_POST, handleSetDefaultModeSetParams);
+    web.server.on("/manualModeParams", HTTP_GET, handleGetManualModeSetParams);
+    web.server.on("/manualModeParams", HTTP_POST, handleSetManualModeSetParams);
+    web.server.on("/potiParams", HTTP_GET, handleGetPotiParams);
+    web.server.on("/potiParams", HTTP_POST, handleSetPotiParams);
+
     web.server.serveStatic("/", SPIFFS, "/");
     web.server.begin();
 
