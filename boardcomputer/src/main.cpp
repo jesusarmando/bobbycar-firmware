@@ -46,6 +46,9 @@ unsigned long lastUpdate = millis();
 unsigned long lastRedraw = millis();
 unsigned long lastScreenSwitch = millis();
 
+wl_status_t last_status;
+IPAddress last_ip;
+
 struct {
     unsigned long lastTime = millis();
     int current{0};
@@ -82,6 +85,23 @@ struct {
 
     std::reference_wrapper<Display> currentDisplay{status};
 } display;
+
+String toString(wl_status_t status)
+{
+    switch (status)
+    {
+    case WL_NO_SHIELD: return "WL_NO_SHIELD";
+    case WL_IDLE_STATUS: return "WL_IDLE_STATUS";
+    case WL_NO_SSID_AVAIL: return "WL_NO_SSID_AVAIL";
+    case WL_SCAN_COMPLETED: return "WL_SCAN_COMPLETED";
+    case WL_CONNECTED: return "WL_CONNECTED";
+    case WL_CONNECT_FAILED: return "WL_CONNECT_FAILED";
+    case WL_CONNECTION_LOST: return "WL_CONNECTION_LOST";
+    case WL_DISCONNECTED: return "WL_DISCONNECTED";
+    }
+
+    return String("Unknown: ") + int(status);
+}
 
 void receiveFeedback()
 {
@@ -139,6 +159,22 @@ void receiveFeedback()
 
 void handleDebugSerial()
 {
+    const auto status = WiFi.status();
+    if (last_status != status)
+    {
+        Serial.print("Status changed to: ");
+        Serial.println(toString(status));
+        last_status = status;
+    }
+
+    const auto ip = WiFi.localIP();
+    if (last_ip != ip)
+    {
+        Serial.print("IP changed to: ");
+        Serial.println(ip.toString());
+        last_ip = ip;
+    }
+
     while(Serial.available())
     {
         const auto c = Serial.read();
@@ -1065,23 +1101,6 @@ void StatusDisplay::start()
     display.tft.setRotation(0);
     display.tft.fillScreen(TFT_BLACK);
     display.tft.setTextColor(TFT_WHITE, TFT_BLACK);
-}
-
-String toString(wl_status_t status)
-{
-    switch (status)
-    {
-    case WL_NO_SHIELD: return "WL_NO_SHIELD";
-    case WL_IDLE_STATUS: return "WL_IDLE_STATUS";
-    case WL_NO_SSID_AVAIL: return "WL_NO_SSID_AVAIL";
-    case WL_SCAN_COMPLETED: return "WL_SCAN_COMPLETED";
-    case WL_CONNECTED: return "WL_CONNECTED";
-    case WL_CONNECT_FAILED: return "WL_CONNECT_FAILED";
-    case WL_CONNECTION_LOST: return "WL_CONNECTION_LOST";
-    case WL_DISCONNECTED: return "WL_DISCONNECTED";
-    }
-
-    return String("Unknown: ") + int(status);
 }
 
 void StatusDisplay::update()
