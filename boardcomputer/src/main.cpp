@@ -283,23 +283,26 @@ void DefaultMode::update()
     }
     const auto brems_squared = (brems * brems) / 1000;
 
+    const auto now = millis();
+
     float pwm;
-    if (gas_squared >= 950.)
+    if (gas_squared >= add_schwelle)
     {
-        pwm = gas_squared + (brems_squared/2.);
+        pwm = (gas_squared/1000.*gas1_wert) + (brems_squared/1000.*brems1_wert);
 
         if (enableWeakeningSmoothening && (pwm > 1000. || lastPwm > 1000.))
         {
             if (lastPwm < pwm)
-                pwm = std::min(pwm, lastPwm+weakeningSmoothening);
+                pwm = std::min(pwm, lastPwm+(weakeningSmoothening*(now-lastTime)/100.f));
             else if (lastPwm > pwm)
-                pwm = std::max(pwm, lastPwm-weakeningSmoothening);
+                pwm = std::max(pwm, lastPwm-(weakeningSmoothening*(now-lastTime)/100.f));
         }
     }
     else
-        pwm = gas_squared - (brems_squared*0.75);
+        pwm = (gas_squared/1000.*gas2_wert) - (brems_squared/1000.*brems2_wert);
 
     lastPwm = pwm;
+    lastTime = now;
 
     for (Controller &controller : controllers)
     {
@@ -649,11 +652,11 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                checkboxInput(response, enableBackLeft, "enableLeft", "Enable back left:");
+                checkboxInput(response, enableBackLeft, "enableBackLeft", "Enable back left:");
 
                 breakLine(response);
 
-                checkboxInput(response, enableBackRight, "enableRight", "Enable back right:");
+                checkboxInput(response, enableBackRight, "enableBackRight", "Enable back right:");
 
                 breakLine(response);
 
@@ -665,11 +668,15 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                checkboxInput(response, invertBackLeft, "invertLeft", "Invert back left:");
+                checkboxInput(response, invertBackLeft, "invertBackLeft", "Invert back left:");
 
                 breakLine(response);
 
-                checkboxInput(response, invertBackRight, "invertRight", "Invert back right:");
+                checkboxInput(response, invertBackRight, "invertBackRight", "Invert back right:");
+
+                breakLine(response);
+
+                numberInput(response, display.status.framerate(), "framerate", "Status framerate:");
 
                 breakLine(response);
 
@@ -727,6 +734,26 @@ void handleIndex(AsyncWebServerRequest *request)
                 breakLine(response);
 
                 numberInput(response, modes.defaultMode.backPercentage, "backPercentage", "Back percentage:");
+
+                breakLine(response);
+
+                numberInput(response, modes.defaultMode.add_schwelle, "add_schwelle", "add_schwelle:");
+
+                breakLine(response);
+
+                numberInput(response, modes.defaultMode.gas1_wert, "gas1_wert", "gas1_wert:");
+
+                breakLine(response);
+
+                numberInput(response, modes.defaultMode.gas2_wert, "gas2_wert", "gas2_wert:");
+
+                breakLine(response);
+
+                numberInput(response, modes.defaultMode.brems1_wert, "brems1_wert", "brems1_wert:");
+
+                breakLine(response);
+
+                numberInput(response, modes.defaultMode.brems2_wert, "brems2_wert", "brems2_wert:");
 
                 breakLine(response);
 
@@ -922,6 +949,15 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
         return;
     }
 
+    if (!request->hasParam("framerate"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no framerate specified");
+        request->send(&response);
+        return;
+    }
+
 
 
     {
@@ -1000,6 +1036,12 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
     invertBackLeft = request->hasParam("invertBackLeft") && request->getParam("invertBackLeft")->value() == "on";
     invertBackRight = request->hasParam("invertBackRight") && request->getParam("invertBackRight")->value() == "on";
 
+    {
+        AsyncWebParameter* p = request->getParam("framerate");
+
+        display.status.setFramerate(strtol(p->value().c_str(), nullptr, 10));
+    }
+
     request->redirect("/");
 }
 
@@ -1046,6 +1088,51 @@ void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
         AsyncResponseStream &response = *request->beginResponseStream("text/plain");
         response.setCode(400);
         response.print("no backPercentage specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("add_schwelle"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no add_schwelle specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("gas1_wert"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no gas1_wert specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("gas2_wert"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no gas2_wert specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("brems1_wert"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no brems1_wert specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("brems2_wert"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no brems2_wert specified");
         request->send(&response);
         return;
     }
@@ -1110,6 +1197,36 @@ void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("backPercentage");
 
         modes.defaultMode.backPercentage = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("add_schwelle");
+
+        modes.defaultMode.add_schwelle = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("gas1_wert");
+
+        modes.defaultMode.gas1_wert = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("gas2_wert");
+
+        modes.defaultMode.gas2_wert = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("brems1_wert");
+
+        modes.defaultMode.brems1_wert = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("brems2_wert");
+
+        modes.defaultMode.brems2_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     request->redirect("/");
@@ -1604,7 +1721,10 @@ void setup()
     invertBackRight = defaultInvertBackRight;
 
     for (auto &controller : controllers)
+    {
         controller.command.buzzer = {};
+        controller.command.left.phaseAdvMax = controller.command.right.phaseAdvMax = 25;
+    }
 
     controllers[0].serial.begin(38400, SERIAL_8N1, rxPin1, txPin1);
     controllers[1].serial.begin(38400, SERIAL_8N1, rxPin2, txPin2);
