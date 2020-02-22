@@ -3,7 +3,6 @@
 #include <BluetoothSerial.h>
 #include <ESPAsyncWebServer.h>
 #include <HardwareSerial.h>
-#include <pidcontroller.h>
 #include <WiFi.h>
 #include <TFT_eSPI.h>
 #include <SPI.h>
@@ -15,7 +14,7 @@
 #include <array>
 #include <algorithm>
 #include <functional>
-#include <stdint.h>
+#include <cstdint>
 
 #include "../../common.h"
 
@@ -181,7 +180,8 @@ void handleDebugSerial()
     const auto now = millis();
     if (now - lastDebug >= 50)
     {
-        Serial.printf("pwm: %i", front.command.left.pwm);
+        Serial.print("pwm: ");
+        Serial.println(front.command.left.pwm);
 
         lastDebug = now;
     }
@@ -288,8 +288,13 @@ void DefaultMode::update()
     {
         pwm = gas_squared + (brems_squared/2.);
 
-        if (enableWeakeningSmoothening && pwm > 1000. && lastPwm > pwm)
-            pwm = std::max(lastPwm-weakeningSmoothening, pwm);
+        if (enableWeakeningSmoothening && (pwm > 1000. || lastPwm > 1000.))
+        {
+            if (lastPwm < pwm)
+                pwm = std::min(pwm, lastPwm+weakeningSmoothening);
+            else if (lastPwm > pwm)
+                pwm = std::max(pwm, lastPwm-weakeningSmoothening);
+        }
     }
     else
         pwm = gas_squared - (brems_squared*0.75);
@@ -1000,6 +1005,24 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
 
 void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
 {
+    if (!request->hasParam("ctrlTyp"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no ctrlTyp specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("ctrlMod"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no ctrlMod specified");
+        request->send(&response);
+        return;
+    }
+
     if (!request->hasParam("weakeningSmoothening"))
     {
         AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -1028,6 +1051,46 @@ void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
     }
 
 
+
+    {
+        AsyncWebParameter* p = request->getParam("ctrlTyp");
+
+        if (p->value() == "Commutation")
+            modes.defaultMode.ctrlTyp = ControlType::Commutation;
+        else if (p->value() == "Sinusoidal")
+            modes.defaultMode.ctrlTyp = ControlType::Sinusoidal;
+        else if (p->value() == "FieldOrientedControl")
+            modes.defaultMode.ctrlTyp = ControlType::FieldOrientedControl;
+        else
+        {
+            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+            response.setCode(400);
+            response.print("invalid ctrlTyp");
+            request->send(&response);
+            return;
+        }
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("ctrlMod");
+
+        if (p->value() == "OpenMode")
+            modes.defaultMode.ctrlMod = ControlMode::OpenMode;
+        else if (p->value() == "Voltage")
+            modes.defaultMode.ctrlMod = ControlMode::Voltage;
+        else if (p->value() == "Speed")
+            modes.defaultMode.ctrlMod = ControlMode::Speed;
+        else if (p->value() == "Torque")
+            modes.defaultMode.ctrlMod = ControlMode::Torque;
+        else
+        {
+            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+            response.setCode(400);
+            response.print("invalid ctrlMod");
+            request->send(&response);
+            return;
+        }
+    }
 
     modes.defaultMode.enableWeakeningSmoothening = request->hasParam("enableWeakeningSmoothening") && request->getParam("enableWeakeningSmoothening")->value() == "on";
 
@@ -1068,6 +1131,15 @@ void handleSetManualModeSetParams(AsyncWebServerRequest *request)
         AsyncResponseStream &response = *request->beginResponseStream("text/plain");
         response.setCode(400);
         response.print("no ctrlTyp specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("ctrlMod"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no ctrlMod specified");
         request->send(&response);
         return;
     }
@@ -1127,7 +1199,67 @@ void handleSetManualModeSetParams(AsyncWebServerRequest *request)
 
 void handleSetPotiParams(AsyncWebServerRequest *request)
 {
-    // TODO
+    if (!request->hasParam("gasMin"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no gasMin specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("gasMax"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no gasMax specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("bremsMin"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no bremsMin specified");
+        request->send(&response);
+        return;
+    }
+
+    if (!request->hasParam("bremsMax"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no bremsMax specified");
+        request->send(&response);
+        return;
+    }
+
+
+
+    {
+        AsyncWebParameter* p = request->getParam("gasMin");
+
+        gasMin = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("gasMax");
+
+        gasMax = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("bremsMin");
+
+        bremsMin = strtol(p->value().c_str(), nullptr, 10);
+    }
+
+    {
+        AsyncWebParameter* p = request->getParam("bremsMax");
+
+        bremsMax = strtol(p->value().c_str(), nullptr, 10);
+    }
 }
 
 bool WebHandler::canHandle(AsyncWebServerRequest *request)
@@ -1179,8 +1311,8 @@ void StatusDisplay::update()
 {
     int y = 0;
 
-    display.tft.drawString(String("raw_gas=") + raw_gas + " -> " + gas + "                                                ",0,y,2); y+=15;
-    display.tft.drawString(String("raw_brems=") + raw_brems + " -> " + brems + "                                                ",0,y,2); y+=15;
+    display.tft.drawString(String("gas=") + raw_gas + " -> " + gas + "                                                ",0,y,2); y+=15;
+    display.tft.drawString(String("brems=") + raw_brems + " -> " + brems + "                                                ",0,y,2); y+=15;
 
     y+=12;
 
