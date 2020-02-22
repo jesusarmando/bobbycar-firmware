@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cstdint>
+
 #include "modebase.h"
+#include "../../common.h"
 
 namespace {
 class ManualMode : public ModeBase
@@ -12,8 +15,7 @@ public:
     void update() override;
     void stop() override {};
 
-    bool manual = true;
-    bool enable = true;
+    bool potiControl = true;
     int16_t pwm = 0;
     ControlType ctrlTyp = ControlType::FieldOrientedControl;
     ControlMode ctrlMod = ControlMode::Speed;

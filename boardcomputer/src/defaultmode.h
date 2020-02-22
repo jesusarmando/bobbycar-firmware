@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "modebase.h"
+#include "../../common.h"
 
 namespace {
 class DefaultMode : public ModeBase
@@ -14,6 +15,8 @@ public:
     void update() override;
     void stop() override {};
 
+    ControlType ctrlTyp = ControlType::FieldOrientedControl;
+    ControlMode ctrlMod = ControlMode::Torque;
     bool enableWeakeningSmoothening{true};
     int16_t weakeningSmoothening{1};
     float lastPwm{0};

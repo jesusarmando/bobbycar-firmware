@@ -37,7 +37,8 @@ namespace {
 uint16_t raw_gas, raw_brems;
 float gas, brems;
 uint16_t gasMin, gasMax, bremsMin, bremsMax;
-bool invertLeft, invertRight;
+bool invertFrontLeft, invertFrontRight, invertBackLeft, invertBackRight;
+bool enableFrontLeft, enableFrontRight, enableBackLeft, enableBackRight;
 
 bool power_toggle{false};
 bool led_toggle{false};
@@ -45,6 +46,7 @@ bool led_toggle{false};
 unsigned long lastUpdate = millis();
 unsigned long lastRedraw = millis();
 unsigned long lastScreenSwitch = millis();
+unsigned long lastDebug = millis();
 
 wl_status_t last_status;
 IPAddress last_ip;
@@ -56,6 +58,7 @@ struct {
 } performance;
 
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
+Controller &front = controllers[0], &back = controllers[1];
 
 struct {
     DefaultMode defaultMode;
@@ -175,6 +178,14 @@ void handleDebugSerial()
         last_ip = ip;
     }
 
+    const auto now = millis();
+    if (now - lastDebug >= 50)
+    {
+        Serial.printf("pwm: %i", front.command.left.pwm);
+
+        lastDebug = now;
+    }
+
     while(Serial.available())
     {
         const auto c = Serial.read();
@@ -225,12 +236,21 @@ void nextDisplay()
     display.currentDisplay.get().start();
 }
 
-void fixDirections(Command &command)
+void fixCommonParams()
 {
-    if (invertLeft)
-        command.left.pwm = -command.left.pwm;
-    if (invertRight)
-        command.right.pwm = -command.right.pwm;
+    front.command.left.enable = enableFrontLeft;
+    front.command.right.enable = enableFrontRight;
+    back.command.left.enable = enableBackLeft;
+    back.command.right.enable = enableBackRight;
+
+    if (invertFrontLeft)
+        front.command.left.pwm = -front.command.left.pwm;
+    if (invertFrontRight)
+        front.command.right.pwm = -front.command.right.pwm;
+    if (invertBackLeft)
+        back.command.left.pwm = -back.command.left.pwm;
+    if (invertBackRight)
+        back.command.right.pwm = -back.command.right.pwm;
 }
 
 void sendCommands()
@@ -281,20 +301,20 @@ void DefaultMode::update()
         Command &command = controller.command;
         for (MotorState *motor : {&command.left, &command.right})
         {
-            motor->enable = true;
-            motor->ctrlTyp = ControlType::FieldOrientedControl;
-            motor->ctrlMod = ControlMode::Torque;
+            motor->ctrlTyp = ctrlTyp;
+            motor->ctrlMod = ctrlMod;
             motor->pwm = pwm / 100. * (&controller == &controllers[0] ? frontPercentage : backPercentage);
         }
-        fixDirections(command);
     }
+
+    fixCommonParams();
 
     sendCommands();
 }
 
 void ManualMode::update()
 {
-    if (manual)
+    if (potiControl)
     {
         if (gas > 500. && brems > 500.)
         {
@@ -314,13 +334,12 @@ void ManualMode::update()
         auto &command = controller.command;
         for (MotorState *motor : {&command.left, &command.right})
         {
-            motor->enable = enable;
             motor->ctrlTyp = ctrlTyp;
             motor->ctrlMod = ctrlMod;
             motor->pwm = pwm;
         }
-        fixDirections(command);
     }
+    fixCommonParams();
 
     sendCommands();
 }
@@ -351,13 +370,13 @@ void BluetoothMode::update()
     StaticJsonDocument<256> doc;
     const auto error = deserializeJson(doc, &(*bluetooth.buffer.begin()), std::distance(bluetooth.buffer.begin(), bluetooth.pos));
 
+    bluetooth.pos = bluetooth.buffer.begin();
+
     if (error)
     {
         bluetooth.serial.println(error.c_str());
         return;
     }
-
-    bluetooth.pos = bluetooth.buffer.begin();
 
     if (!doc.containsKey("frontLeft"))
     {
@@ -394,8 +413,8 @@ void BluetoothMode::update()
             motor->ctrlTyp = ControlType::FieldOrientedControl;
             motor->ctrlMod = ControlMode::Torque;
         }
-        fixDirections(command);
     }
+    fixCommonParams();
 
     sendCommands();
 }
@@ -617,11 +636,35 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                checkboxInput(response, invertLeft, "invertLeft", "Invert left:");
+                checkboxInput(response, enableFrontLeft, "enableFrontLeft", "Enable front left:");
 
                 breakLine(response);
 
-                checkboxInput(response, invertRight, "invertRight", "Invert right:");
+                checkboxInput(response, enableFrontRight, "enableFrontRight", "Enable front right:");
+
+                breakLine(response);
+
+                checkboxInput(response, enableBackLeft, "enableLeft", "Enable back left:");
+
+                breakLine(response);
+
+                checkboxInput(response, enableBackRight, "enableRight", "Enable back right:");
+
+                breakLine(response);
+
+                checkboxInput(response, invertFrontLeft, "invertFrontLeft", "Invert front left:");
+
+                breakLine(response);
+
+                checkboxInput(response, invertFrontRight, "invertFrontRight", "Invert front right:");
+
+                breakLine(response);
+
+                checkboxInput(response, invertBackLeft, "invertLeft", "Invert back left:");
+
+                breakLine(response);
+
+                checkboxInput(response, invertBackRight, "invertRight", "Invert back right:");
 
                 breakLine(response);
 
@@ -637,6 +680,34 @@ void handleIndex(AsyncWebServerRequest *request)
                     HtmlTag legend(response, "legend");
                     response.print("Default Mode:");
                 }
+
+                label(response, "ctrlTyp1", "Control Type:");
+
+                breakLine(response);
+
+                {
+                    HtmlTag select(response, "select", " id=\"ctrlTyp1\" name=\"ctrlTyp\" required");
+                    selectOption(response, "Commutation", "Commutation", modes.defaultMode.ctrlTyp == ControlType::Commutation);
+                    selectOption(response, "Sinusoidal", "Sinusoidal", modes.defaultMode.ctrlTyp == ControlType::Sinusoidal);
+                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes.defaultMode.ctrlTyp == ControlType::FieldOrientedControl);
+                }
+
+                breakLine(response);
+
+                label(response, "ctrlMod1", "Control Mode:");
+
+                breakLine(response);
+
+                {
+                    HtmlTag select(response, "select", " id=\"ctrlMod1\" name=\"ctrlMod\" required");
+
+                    selectOption(response, "OpenMode", "Open Mode", modes.defaultMode.ctrlMod == ControlMode::OpenMode);
+                    selectOption(response, "Voltage", "Voltage", modes.defaultMode.ctrlMod == ControlMode::Voltage);
+                    selectOption(response, "Speed", "Speed", modes.defaultMode.ctrlMod == ControlMode::Speed);
+                    selectOption(response, "Torque", "Torque", modes.defaultMode.ctrlMod == ControlMode::Torque);
+                }
+
+                breakLine(response);
 
                 checkboxInput(response, modes.defaultMode.enableWeakeningSmoothening, "enableWeakeningSmoothening", "Enable Weakening Smoothening:");
 
@@ -668,11 +739,7 @@ void handleIndex(AsyncWebServerRequest *request)
                     response.print("Manual Mode:");
                 }
 
-                checkboxInput(response, modes.manualMode.manual, "manual", "Manual Control:");
-
-                breakLine(response);
-
-                checkboxInput(response, modes.manualMode.enable, "enable", "Enable:");
+                checkboxInput(response, modes.manualMode.potiControl, "potiControl", "Poti control:");
 
                 breakLine(response);
 
@@ -680,12 +747,12 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                label(response, "ctrlTyp", "Control Type:");
+                label(response, "ctrlTyp2", "Control Type:");
 
                 breakLine(response);
 
                 {
-                    HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\" required");
+                    HtmlTag select(response, "select", " id=\"ctrlTyp2\" name=\"ctrlTyp\" required");
                     selectOption(response, "Commutation", "Commutation", modes.manualMode.ctrlTyp == ControlType::Commutation);
                     selectOption(response, "Sinusoidal", "Sinusoidal", modes.manualMode.ctrlTyp == ControlType::Sinusoidal);
                     selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes.manualMode.ctrlTyp == ControlType::FieldOrientedControl);
@@ -693,12 +760,12 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                label(response, "ctrlMod", "Control Mode:");
+                label(response, "ctrlMod2", "Control Mode:");
 
                 breakLine(response);
 
                 {
-                    HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\" required");
+                    HtmlTag select(response, "select", " id=\"ctrlMod2\" name=\"ctrlMod\" required");
 
                     selectOption(response, "OpenMode", "Open Mode", modes.manualMode.ctrlMod == ControlMode::OpenMode);
                     selectOption(response, "Voltage", "Voltage", modes.manualMode.ctrlMod == ControlMode::Voltage);
@@ -918,8 +985,15 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
             controller.command.left.phaseAdvMax = controller.command.right.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
-    invertLeft = request->hasParam("invertLeft") && request->getParam("invertLeft")->value() == "on";
-    invertRight = request->hasParam("invertRight") && request->getParam("invertRight")->value() == "on";
+    enableFrontLeft = request->hasParam("enableFrontLeft") && request->getParam("enableFrontLeft")->value() == "on";
+    enableFrontRight = request->hasParam("enableFrontRight") && request->getParam("enableFrontRight")->value() == "on";
+    enableBackLeft = request->hasParam("enableBackLeft") && request->getParam("enableBackLeft")->value() == "on";
+    enableBackRight = request->hasParam("enableBackRight") && request->getParam("enableBackRight")->value() == "on";
+
+    invertFrontLeft = request->hasParam("invertFrontLeft") && request->getParam("invertFrontLeft")->value() == "on";
+    invertFrontRight = request->hasParam("invertFrontRight") && request->getParam("invertFrontRight")->value() == "on";
+    invertBackLeft = request->hasParam("invertBackLeft") && request->getParam("invertBackLeft")->value() == "on";
+    invertBackRight = request->hasParam("invertBackRight") && request->getParam("invertBackRight")->value() == "on";
 
     request->redirect("/");
 }
@@ -1000,9 +1074,7 @@ void handleSetManualModeSetParams(AsyncWebServerRequest *request)
 
 
 
-    modes.manualMode.manual = request->hasParam("manual") && request->getParam("manual")->value() == "on";
-    modes.manualMode.manual = request->hasParam("manual") && request->getParam("manual")->value() == "on";
-    modes.manualMode.enable = request->hasParam("enable") && request->getParam("enable")->value() == "on";
+    modes.manualMode.potiControl = request->hasParam("potiControl") && request->getParam("potiControl")->value() == "on";
 
     {
         AsyncWebParameter* p = request->getParam("pwm");
@@ -1389,8 +1461,15 @@ void setup()
     bremsMin = defaultBremsMin;
     bremsMax = defaultBremsMax;
 
-    invertLeft = defaultInvertLeft;
-    invertRight = defaultInvertRight;
+    enableFrontLeft = defaultEnableFrontLeft;
+    enableFrontRight = defaultEnableFrontRight;
+    enableBackLeft = defaultEnableBackLeft;
+    enableBackRight = defaultEnableBackRight;
+
+    invertFrontLeft = defaultInvertFrontLeft;
+    invertFrontRight = defaultInvertFrontRight;
+    invertBackLeft = defaultInvertBackLeft;
+    invertBackRight = defaultInvertBackRight;
 
     for (auto &controller : controllers)
         controller.command.buzzer = {};

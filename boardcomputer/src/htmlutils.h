@@ -15,19 +15,25 @@ void label(AsyncResponseStream &stream, const char *name, const char *text)
 }
 
 template<typename T>
-void numberInput(AsyncResponseStream &stream, T value, const char *name, const char *text)
+void numberInput(AsyncResponseStream &stream, T value, const char *id, const char *name, const char *text)
 {
-    label(stream, name, text);
+    label(stream, id, text);
 
     breakLine(stream);
 
     stream.print("<input type=\"number\" id=\"");
-    stream.print(name);
+    stream.print(id);
     stream.print("\" name=\"");
     stream.print(name);
     stream.print("\" value=\"");
     stream.print(value);
     stream.print("\" required />");
+}
+
+template<typename T>
+void numberInput(AsyncResponseStream &stream, T value, const char *name, const char *text)
+{
+    numberInput(stream, value, name, name, text);
 }
 
 void submitButton(AsyncResponseStream &stream)
@@ -36,20 +42,25 @@ void submitButton(AsyncResponseStream &stream)
     stream.print("Submit");
 }
 
-void checkboxInput(AsyncResponseStream &stream, bool value, const char *name, const char *text)
+void checkboxInput(AsyncResponseStream &stream, bool value, const char *id, const char *name, const char *text)
 {
-    label(stream, name, text);
+    label(stream, id, text);
 
     breakLine(stream);
 
     stream.print("<input type=\"checkbox\" id=\"");
-    stream.print(name);
+    stream.print(id);
     stream.print("\" name=\"");
     stream.print(name);
     stream.print("\" value=\"on\"");
     if (value)
         stream.print(" checked");
     stream.print(" />");
+}
+
+void checkboxInput(AsyncResponseStream &stream, bool value, const char *name, const char *text)
+{
+    checkboxInput(stream, value, name, name, text);
 }
 
 void selectOption(AsyncResponseStream &stream, const char *value, const char *text, bool selected)
