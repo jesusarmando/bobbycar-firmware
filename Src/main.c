@@ -26,11 +26,6 @@
 #include "setup.h"
 #include "config.h"
 #include "comms.h"
-#include "eeprom.h"
-
-#if defined(DEBUG_I2C_LCD) || defined(SUPPORT_LCD)
-  #include "hd44780.h"
-#endif
 
 
 // Matlab includes and defines - from auto-code generation
@@ -65,9 +60,6 @@ extern TIM_HandleTypeDef htim_right;
 extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern volatile adc_buf_t adc_buffer;
-#if defined(DEBUG_I2C_LCD) || defined(SUPPORT_LCD)
-  LCD_PCF8574_HandleTypeDef lcd;
-#endif
 extern I2C_HandleTypeDef hi2c2;
 #if defined(CONTROL_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART2) || defined(DEBUG_SERIAL_USART2) \
  || defined(CONTROL_SERIAL_USART3) || defined(FEEDBACK_SERIAL_USART3) || defined(DEBUG_SERIAL_USART3) 
@@ -76,91 +68,15 @@ extern I2C_HandleTypeDef hi2c2;
   static UART_HandleTypeDef huart;
 #endif
 
-#if defined(DEBUG_I2C_LCD) || defined(SUPPORT_LCD)
-  extern uint8_t LCDerrorFlag;
-#endif
-
-#ifdef VARIANT_TRANSPOTTER
-  uint8_t nunchuk_connected = 0;
-  float steering;
-  int feedforward;
-
-  void saveConfig(void);
-
-  /* Virtual address defined by the user: 0xFFFF value is prohibited */
-  uint16_t VirtAddVarTab[NB_OF_VAR] = {0x1337};
-  uint16_t VarDataTab[NB_OF_VAR] = {0};
-  uint16_t VarValue = 0;
-  uint16_t saveValue = 0;
-
-  uint16_t counter = 0;
-#else
-  uint8_t nunchuk_connected = 1;
-	uint16_t VirtAddVarTab[NB_OF_VAR] = {0x1300}; 	// Dummy address to avoid warnings
-#endif
-
 #if defined(CONTROL_ADC) && defined(ADC_PROTECT_ENA)
 static int16_t timeoutCntADC   = 0;  // Timeout counter for ADC Protection
 #endif
 static uint8_t timeoutFlagADC  = 0;  // Timeout Flag for for ADC Protection: 0 = OK, 1 = Problem detected (line disconnected or wrong ADC data)
 
-#if defined(CONTROL_SERIAL_USART2) || defined(CONTROL_SERIAL_USART3)
-  #ifdef CONTROL_IBUS
-    static uint16_t ibus_chksum;
-    static uint16_t ibus_captured_value[IBUS_NUM_CHANNELS];
-    
-    typedef struct{
-      uint8_t  start;
-      uint8_t  type; 
-      uint8_t  channels[IBUS_NUM_CHANNELS*2];
-      uint8_t  checksuml;
-      uint8_t  checksumh;    
-    } Serialcommand;
-  #else
-    typedef struct{
-      uint16_t  start; 
-      int16_t   steer;
-      int16_t   speed;
-      uint16_t  checksum;    
-    } Serialcommand;
-  #endif
-static volatile Serialcommand command;
-static int16_t timeoutCntSerial   = 0;  // Timeout counter for Rx Serial command
-#endif
 static uint8_t timeoutFlagSerial  = 0;  // Timeout Flag for Rx Serial command: 0 = OK, 1 = Problem detected (line disconnected or wrong Rx data)
-
-#if defined(FEEDBACK_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART3)
-typedef struct{
-  uint16_t  start;
-  int16_t   cmd1;
-  int16_t   cmd2;
-  int16_t   speedR;
-  int16_t   speedL;
-  int16_t   speedR_meas;
-  int16_t   speedL_meas;
-  int16_t   batVoltage;
-  int16_t   boardTemp;
-  uint16_t  checksum;
-} SerialFeedback;
-static SerialFeedback Feedback;
-#endif
-
-#ifdef SUPPORT_BUTTONS
-static uint8_t button1, button2;
-#endif
 
 uint8_t ctrlModReqRaw = CTRL_MOD_REQ;
 uint8_t ctrlModReq    = CTRL_MOD_REQ;   // Final control mode request
-static int16_t    speed;                // local variable for speed. -1000 to 1000
-#ifndef VARIANT_TRANSPOTTER
-	static int        cmd1;               // normalized input value. -1000 to 1000
-	static int        cmd2;               // normalized input value. -1000 to 1000
-  static int16_t  steer;                // local variable for steering. -1000 to 1000
-  static int16_t  steerRateFixdt;       // local fixed-point variable for steering rate limiter
-  static int16_t  speedRateFixdt;       // local fixed-point variable for speed rate limiter
-  static int32_t  steerFixdt;           // local fixed-point variable for steering low-pass filter
-  static int32_t  speedFixdt;           // local fixed-point variable for speed low-pass filter
-#endif
 static MultipleTap MultipleTapBreak;  // define multiple tap functionality for the Break pedal
 
 static int16_t    speedAvg;             // average measured speed
@@ -181,9 +97,6 @@ static uint32_t inactivity_timeout_counter;
 static uint32_t main_loop_counter;
 
 extern uint8_t nunchuk_data[6];
-#ifdef CONTROL_PPM
-extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
-#endif
 
 
 void poweroff(void) {
@@ -279,93 +192,15 @@ int main(void) {
 
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);
 
-  #ifdef VARIANT_TRANSPOTTER
-    int  lastDistance = 0;
-    enable = 1;
-    uint8_t checkRemote = 0;
-
-    HAL_FLASH_Unlock();
-
-    /* EEPROM Init */
-    EE_Init();
-
-    EE_ReadVariable(VirtAddVarTab[0], &saveValue);
-
-    HAL_FLASH_Lock();
-    float setDistance = saveValue / 1000.0;
-    if (setDistance < 0.2) {
-      setDistance = 1.0;
-    }
-  #endif
-
-  #ifdef CONTROL_PPM
-    PPM_Init();
-  #endif
-
-  #ifdef CONTROL_NUNCHUK
-    I2C_Init();
-    Nunchuk_Init();
-  #endif
-
-  #if defined(CONTROL_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART2) || defined(DEBUG_SERIAL_USART2)
-    UART2_Init();
-    huart = huart2;
-  #endif
   #if defined(CONTROL_SERIAL_USART3) || defined(FEEDBACK_SERIAL_USART3) || defined(DEBUG_SERIAL_USART3)
     UART3_Init();
     huart = huart3;
   #endif
-  #if defined(CONTROL_SERIAL_USART2) || defined(CONTROL_SERIAL_USART3)
-    HAL_UART_Receive_DMA(&huart, (uint8_t *)&command, sizeof(command));
-  #endif
 
-  #if defined(DEBUG_I2C_LCD) || defined(SUPPORT_LCD)
-    I2C_Init();
-    HAL_Delay(50);
-    lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
-      lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
-      lcd.pcf8574.i2c = hi2c2;
-      lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_2;
-      lcd.type = TYPE0;
-
-      if(LCD_Init(&lcd)!=LCD_OK){
-          // error occured
-          //TODO while(1);
-      }
-
-    LCD_ClearDisplay(&lcd);
-    HAL_Delay(5);
-    LCD_SetLocation(&lcd, 0, 0);
-    #ifdef VARIANT_TRANSPOTTER
-      LCD_WriteString(&lcd, "TranspOtter V2.1");
-    #else
-      LCD_WriteString(&lcd, "Hover V2.0");
-    #endif
-    LCD_SetLocation(&lcd, 0, 1);
-    LCD_WriteString(&lcd, "Initializing...");
-  #endif
-
-  #if defined(VARIANT_TRANSPOTTER) && defined(SUPPORT_LCD)
-    LCD_ClearDisplay(&lcd);
-    HAL_Delay(5);
-    LCD_SetLocation(&lcd, 0, 1);
-    LCD_WriteString(&lcd, "Bat:");
-    LCD_SetLocation(&lcd, 8, 1);
-    LCD_WriteString(&lcd, "V");
-
-    LCD_SetLocation(&lcd, 15, 1);
-    LCD_WriteString(&lcd, "A");
-
-    LCD_SetLocation(&lcd, 0, 0);
-    LCD_WriteString(&lcd, "Len:");
-    LCD_SetLocation(&lcd, 8, 0);
-    LCD_WriteString(&lcd, "m(");
-    LCD_SetLocation(&lcd, 14, 0);
-    LCD_WriteString(&lcd, "m)");
-  #endif
 
   int16_t lastSpeedL = 0, lastSpeedR = 0;
   int16_t speedL = 0, speedR = 0;
+  int speed = 0;
 
   int32_t board_temp_adcFixdt = adc_buffer.temp << 20;  // Fixed-point filter output initialized with current ADC converted to fixed-point
   int16_t board_temp_adcFilt  = adc_buffer.temp;
@@ -375,120 +210,10 @@ int main(void) {
   while(1) {
     HAL_Delay(DELAY_IN_MAIN_LOOP); //delay in ms
 
-    #ifdef VARIANT_TRANSPOTTER
-      if(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
-        enable = 0;
-        while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
-          HAL_Delay(10);
-        }
-        shortBeep(5);
-        HAL_Delay(300);
-        if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
-          while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
-            HAL_Delay(10);
-          }
-          longBeep(5);
-          HAL_Delay(350);
-          poweroff();
-        } else {
-          setDistance += 0.25;
-          if (setDistance > 2.6) {
-            setDistance = 0.5;
-          }
-          shortBeep(setDistance / 0.25);
-          saveValue = setDistance * 1000;
-          saveConfig();
-        }
-      }
-
-      #ifdef GAMETRAK_CONNECTION_NORMAL
-        uint16_t distance = CLAMP((adc_buffer.l_rx2) - 180, 0, 4095);
-        steering = (adc_buffer.l_tx2 - 2048) / 2048.0;
-      #endif
-      #ifdef GAMETRAK_CONNECTION_ALTERNATE
-        uint16_t distance = CLAMP((adc_buffer.l_tx2) - 180, 0, 4095);
-        steering = (adc_buffer.l_rx2 - 2048) / 2048.0;
-      #endif
-
-      feedforward = ((distance - (int)(setDistance * 1345)));
-
-      if (nunchuk_connected == 0) {
-        speedL = speedL * 0.8f + (CLAMP(feedforward +  ((steering)*((float)MAX(ABS(feedforward), 50)) * ROT_P), -850, 850) * -0.2f);
-        speedR = speedR * 0.8f + (CLAMP(feedforward -  ((steering)*((float)MAX(ABS(feedforward), 50)) * ROT_P), -850, 850) * -0.2f);
-        if ((speedL < lastSpeedL + 50 && speedL > lastSpeedL - 50) && (speedR < lastSpeedR + 50 && speedR > lastSpeedR - 50)) {
-          if (distance - (int)(setDistance * 1345) > 0) {
-            enable = 1;
-          }
-          if (distance - (int)(setDistance * 1345) > -300) {
-            #ifdef INVERT_R_DIRECTION
-              pwmr = speedR;
-            #endif
-            #ifndef INVERT_R_DIRECTION
-              pwmr = -speedR;
-            #endif
-            #ifdef INVERT_L_DIRECTION
-              pwml = -speedL;
-            #endif
-            #ifndef INVERT_L_DIRECTION
-              pwml = speedL;
-            #endif
-
-            if (checkRemote) {
-              if (!HAL_GPIO_ReadPin(LED_PORT, LED_PIN)) {
-                //enable = 1;
-              } else {
-                enable = 0;
-              }
-            }
-          } else {
-            enable = 0;
-          }
-        }
-        lastSpeedL = speedL;
-        lastSpeedR = speedR;
-
-        timeout = 0;
-      }
-    #endif
-
-    #if defined(CONTROL_NUNCHUK) || defined(SUPPORT_NUNCHUK)
-      if (nunchuk_connected != 0) {
-        Nunchuk_Read();
-        cmd1 = CLAMP((nunchuk_data[0] - 127) * 8, INPUT_MIN, INPUT_MAX); // x - axis. Nunchuk joystick readings range 30 - 230
-        cmd2 = CLAMP((nunchuk_data[1] - 128) * 8, INPUT_MIN, INPUT_MAX); // y - axis
-				
-				#ifdef SUPPORT_BUTTONS
-					button1 = (uint8_t)nunchuk_data[5] & 1;
-					button2 = (uint8_t)(nunchuk_data[5] >> 1) & 1;
-				#endif
-      }
-    #endif
-
-    #ifdef CONTROL_PPM
-      cmd1 = CLAMP((ppm_captured_value[0] - INPUT_MID) * 2, INPUT_MIN, INPUT_MAX);
-      cmd2 = CLAMP((ppm_captured_value[1] - INPUT_MID) * 2, INPUT_MIN, INPUT_MAX);
-			#ifdef SUPPORT_BUTTONS
-				button1 = ppm_captured_value[5] > INPUT_MID;
-				button2 = 0;
-			#endif
-      // float scale = ppm_captured_value[2] / 1000.0f;     // not used for now, uncomment if needed
-    #endif
-
     #ifdef CONTROL_ADC
       // ADC values range: 0-4095, see ADC-calibration in config.h
-      #ifdef ADC1_MID_POT
-        cmd1 = CLAMP((adc_buffer.l_tx2 - ADC1_MID) * INPUT_MAX / (ADC1_MAX - ADC1_MID), 0, INPUT_MAX) 
-              -CLAMP((ADC1_MID - adc_buffer.l_tx2) * INPUT_MAX / (ADC1_MID - ADC1_MIN), 0, INPUT_MAX);    // ADC1        
-      #else
-        cmd1 = CLAMP((adc_buffer.l_tx2 - ADC1_MIN) * INPUT_MAX / (ADC1_MAX - ADC1_MIN), 0, INPUT_MAX);    // ADC1
-      #endif
-
-      #ifdef ADC2_MID_POT
-        cmd2 = CLAMP((adc_buffer.l_rx2 - ADC2_MID) * INPUT_MAX / (ADC2_MAX - ADC2_MID), 0, INPUT_MAX)  
-              -CLAMP((ADC2_MID - adc_buffer.l_rx2) * INPUT_MAX / (ADC2_MID - ADC2_MIN), 0, INPUT_MAX);    // ADC2        
-      #else
-        cmd2 = CLAMP((adc_buffer.l_rx2 - ADC2_MIN) * INPUT_MAX / (ADC2_MAX - ADC2_MIN), 0, INPUT_MAX);    // ADC2
-      #endif
+    int cmd1 = CLAMP((adc_buffer.l_rx2 - ADC2_MIN) * 1000 / (ADC2_MAX - ADC2_MIN), 0, 1000);    // ADC1
+    int cmd2 = CLAMP((adc_buffer.l_tx2 - ADC1_MIN) * 1000 / (ADC1_MAX - ADC1_MIN), 0, 1000);    // ADC2
 
       #ifdef ADC_PROTECT_ENA
         if (adc_buffer.l_tx2 >= (ADC1_MIN - ADC_PROTECT_THRESH) && adc_buffer.l_tx2 <= (ADC1_MAX + ADC_PROTECT_THRESH) && 
@@ -515,83 +240,9 @@ int main(void) {
         }
       #endif
 
-      // use ADCs as button inputs:
-			#ifdef SUPPORT_BUTTONS
-				button1 = (uint8_t)(adc_buffer.l_tx2 > 2000);  // ADC1
-				button2 = (uint8_t)(adc_buffer.l_rx2 > 2000);  // ADC2
-			#endif
-
       timeout = 0;
     #endif
 
-    #if defined CONTROL_SERIAL_USART2 || defined CONTROL_SERIAL_USART3
-
-      // Handle received data validity, timeout and fix out-of-sync if necessary
-      #ifdef CONTROL_IBUS
-        ibus_chksum = 0xFFFF - IBUS_LENGTH - IBUS_COMMAND;
-        for (uint8_t i = 0; i < (IBUS_NUM_CHANNELS * 2); i++) {
-          ibus_chksum -= command.channels[i];
-        }
-        if (command.start == IBUS_LENGTH && command.type == IBUS_COMMAND && ibus_chksum == (uint16_t)((command.checksumh << 8) + command.checksuml)) {
-          if (timeoutFlagSerial) {                      // Check for previous timeout flag  
-            if (timeoutCntSerial-- <= 0)                // Timeout de-qualification
-              timeoutFlagSerial = 0;                    // Timeout flag cleared           
-          } else {         
-            for (uint8_t i = 0; i < (IBUS_NUM_CHANNELS * 2); i+=2) {
-              ibus_captured_value[(i/2)] = CLAMP(command.channels[i] + (command.channels[i+1] << 8) - 1000, 0, INPUT_MAX); // 1000-2000 -> 0-1000
-            }
-            cmd1              = CLAMP((ibus_captured_value[0] - INPUT_MID) * 2, INPUT_MIN, INPUT_MAX);
-            cmd2              = CLAMP((ibus_captured_value[1] - INPUT_MID) * 2, INPUT_MIN, INPUT_MAX);
-            command.start     = 0xFF;                   // Change the Start Frame for timeout detection in the next cycle
-            timeoutCntSerial  = 0;                      // Reset the timeout counter
-          }
-        } else {
-          if (timeoutCntSerial++ >= SERIAL_TIMEOUT) {   // Timeout qualification
-            timeoutFlagSerial = 1;                      // Timeout detected
-            timeoutCntSerial  = SERIAL_TIMEOUT;         // Limit timout counter value
-          }
-          // Check periodically the received Start Frame. If it is NOT OK, most probably we are out-of-sync. Try to re-sync by reseting the DMA
-          if (main_loop_counter % 25 == 0 && command.start != IBUS_LENGTH && command.start != 0xFF) {
-            HAL_UART_DMAStop(&huart);                
-            HAL_UART_Receive_DMA(&huart, (uint8_t *)&command, sizeof(command));
-            command.start = 0xFF;                       // Change the Start Frame to avoid entering again here if no data is received
-          }
-        }  
-      #else
-        if (command.start == START_FRAME && command.checksum == (uint16_t)(command.start ^ command.steer ^ command.speed)) {
-          if (timeoutFlagSerial) {                      // Check for previous timeout flag  
-            if (timeoutCntSerial-- <= 0)                // Timeout de-qualification
-              timeoutFlagSerial = 0;                    // Timeout flag cleared           
-          } else {
-            cmd1              = CLAMP((int16_t)command.steer, INPUT_MIN, INPUT_MAX);
-            cmd2              = CLAMP((int16_t)command.speed, INPUT_MIN, INPUT_MAX);
-            command.start     = 0xFFFF;                 // Change the Start Frame for timeout detection in the next cycle
-            timeoutCntSerial  = 0;                      // Reset the timeout counter         
-          }
-        } else {
-          if (timeoutCntSerial++ >= SERIAL_TIMEOUT) {   // Timeout qualification
-            timeoutFlagSerial = 1;                      // Timeout detected
-            timeoutCntSerial  = SERIAL_TIMEOUT;         // Limit timout counter value
-          }
-          // Check periodically the received Start Frame. If it is NOT OK, most probably we are out-of-sync. Try to re-sync by reseting the DMA
-          if (main_loop_counter % 25 == 0 && command.start != START_FRAME && command.start != 0xFFFF) {
-            HAL_UART_DMAStop(&huart);                
-            HAL_UART_Receive_DMA(&huart, (uint8_t *)&command, sizeof(command));
-            command.start = 0xFFFF;                     // Change the Start Frame to avoid entering again here if no data is received
-          }
-        }
-      #endif     
-
-      if (timeoutFlagSerial) {                          // In case of timeout bring the system to a Safe State
-        ctrlModReq  = 0;                                // OPEN_MODE request. This will bring the motor power to 0 in a controlled way
-        cmd1        = 0;
-        cmd2        = 0;
-      } else {
-        ctrlModReq  = ctrlModReqRaw;                    // Follow the Mode request
-      }
-      timeout = 0;
-
-    #endif
 
     // Calculate measured average speed. The minus sign (-) is beacause motors spin in opposite directions
     #if   !defined(INVERT_L_DIRECTION) && !defined(INVERT_R_DIRECTION)
@@ -618,55 +269,15 @@ int main(void) {
         enable = 1;                       // enable motors
       }
 
-      // ####### VARIANT_HOVERCAR #######
-      #ifdef VARIANT_HOVERCAR
-        // Calculate speed Blend, a number between [0, 1] in fixdt(0,16,15)
-        uint16_t speedBlend;       
-        speedBlend = (uint16_t)(((CLAMP(speedAvgAbs,30,90) - 30) << 15) / 60);     // speedBlend [0,1] is within [30 rpm, 90rpm]
 
-        // Check if Hovercar is physically close to standstill to enable Double tap detection on Brake pedal for Reverse functionality
-        if (speedAvgAbs < 20) {
-          multipleTapDet(cmd1, HAL_GetTick(), &MultipleTapBreak);   // Break pedal in this case is "cmd1" variable
-        }
 
-        // If Brake pedal (cmd1) is pressed, bring to 0 also the Throttle pedal (cmd2) to avoid "Double pedal" driving          
-        if (cmd1 > 20) {
-          cmd2 = (int16_t)((cmd2 * speedBlend) >> 15);
-        }
 
-        // Make sure the Brake pedal is opposite to the direction of motion AND it goes to 0 as we reach standstill (to avoid Reverse driving by Brake pedal) 
-        if (speedAvg > 0) {
-          cmd1 = (int16_t)((-cmd1 * speedBlend) >> 15);
-        } else {
-          cmd1 = (int16_t)(( cmd1 * speedBlend) >> 15);          
-        }
-      #endif
+      if (cmd1 >= 950)
+          speed = cmd1 + (cmd2 / 2);
+      else
+          speed = cmd1 - cmd2;
 
-      // ####### LOW-PASS FILTER #######
-      rateLimiter16(cmd1, RATE, &steerRateFixdt);
-      rateLimiter16(cmd2, RATE, &speedRateFixdt);
-      filtLowPass32(steerRateFixdt >> 4, FILTER, &steerFixdt);
-      filtLowPass32(speedRateFixdt >> 4, FILTER, &speedFixdt);
-      steer = (int16_t)(steerFixdt >> 20);  // convert fixed-point to integer
-      speed = (int16_t)(speedFixdt >> 20);  // convert fixed-point to integer    
-
-      // ####### VARIANT_HOVERCAR #######
-      #ifdef VARIANT_HOVERCAR        
-        if (!MultipleTapBreak.b_multipleTap) {  // Check driving direction
-          speed = steer + speed;                // Forward driving          
-        } else {
-          speed = steer - speed;                // Reverse driving
-        }
-      #endif
-
-      // ####### MIXER #######
-      // speedR = CLAMP((int)(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT), -1000, 1000);
-      // speedL = CLAMP((int)(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT), -1000, 1000);
-      mixerFcn(speed << 4, steer << 4, &speedR, &speedL);   // This function implements the equations above
-
-      #ifdef ADDITIONAL_CODE
-        ADDITIONAL_CODE;
-      #endif
+      speedL = speedR = speed;
 
 
       // ####### SET OUTPUTS (if the target change is less than +/- 50) #######
@@ -687,79 +298,6 @@ int main(void) {
     lastSpeedL = speedL;
     lastSpeedR = speedR;
 
-    #ifdef VARIANT_TRANSPOTTER
-      if (timeout > TIMEOUT) {
-        pwml = 0;
-        pwmr = 0;
-        enable = 0;
-        #ifdef SUPPORT_LCD
-          LCD_SetLocation(&lcd, 0, 0);
-          LCD_WriteString(&lcd, "Len:");
-          LCD_SetLocation(&lcd, 8, 0);
-          LCD_WriteString(&lcd, "m(");
-          LCD_SetLocation(&lcd, 14, 0);
-          LCD_WriteString(&lcd, "m)");
-        #endif
-
-        HAL_Delay(1000);
-
-        nunchuk_connected = 0;
-      }
-
-      if ((distance / 1345.0) - setDistance > 0.5 && (lastDistance / 1345.0) - setDistance > 0.5) { // Error, robot too far away!
-        enable = 0;
-        longBeep(5);
-        #ifdef SUPPORT_LCD
-          LCD_ClearDisplay(&lcd);
-          HAL_Delay(5);
-          LCD_SetLocation(&lcd, 0, 0);
-          LCD_WriteString(&lcd, "Emergency Off!");
-          LCD_SetLocation(&lcd, 0, 1);
-          LCD_WriteString(&lcd, "Keeper too fast.");
-        #endif
-        poweroff();
-      }
-
-      #ifdef SUPPORT_NUNCHUK
-        if (counter % 500 == 0) {
-          if (nunchuk_connected == 0 && enable == 0) {
-            if (Nunchuk_Ping()) {
-              HAL_Delay(500);
-              Nunchuk_Init();
-              #ifdef SUPPORT_LCD
-                LCD_SetLocation(&lcd, 0, 0);
-                LCD_WriteString(&lcd, "Nunchuk Control");
-              #endif
-              timeout = 0;
-              HAL_Delay(1000);
-              nunchuk_connected = 1;
-            }
-          }
-        }   
-      #endif
-
-      #ifdef SUPPORT_LCD
-        if (counter % 100 == 0) {
-          if (LCDerrorFlag == 1 && enable == 0) {
-
-          } else {
-            if (nunchuk_connected == 0) {
-              LCD_SetLocation(&lcd, 4, 0);
-              LCD_WriteFloat(&lcd,distance/1345.0,2);
-              LCD_SetLocation(&lcd, 10, 0);
-              LCD_WriteFloat(&lcd,setDistance,2);
-            }
-            LCD_SetLocation(&lcd, 4, 1);
-            LCD_WriteFloat(&lcd,batVoltage, 1);
-            LCD_SetLocation(&lcd, 11, 1);
-            //LCD_WriteFloat(&lcd,MAX(ABS(currentR), ABS(currentL)),2);
-          }
-        }
-      #endif
-
-      counter++;
-    #endif
-
 
     // ####### CALC BOARD TEMPERATURE #######
     filtLowPass32(adc_buffer.temp, TEMP_FILT_COEF, &board_temp_adcFixdt);
@@ -769,40 +307,16 @@ int main(void) {
     if (main_loop_counter % 25 == 0) {    // Send data periodically
 
       // ####### DEBUG SERIAL OUT #######
-      #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
-        #ifdef CONTROL_ADC
-          setScopeChannel(0, (int16_t)adc_buffer.l_tx2);        // 1: ADC1
-          setScopeChannel(1, (int16_t)adc_buffer.l_rx2);        // 2: ADC2
-        #endif
-        setScopeChannel(2, (int16_t)speedR);                    // 3: output command: [-1000, 1000]
-        setScopeChannel(3, (int16_t)speedL);                    // 4: output command: [-1000, 1000]
-        setScopeChannel(4, (int16_t)adc_buffer.batt1);          // 5: for battery voltage calibration
-        setScopeChannel(5, (int16_t)(batVoltage * BAT_CALIB_REAL_VOLTAGE / BAT_CALIB_ADC)); // 6: for verifying battery voltage calibration
-        setScopeChannel(6, (int16_t)board_temp_adcFilt);        // 7: for board temperature calibration
-        setScopeChannel(7, (int16_t)board_temp_deg_c);          // 8: for verifying board temperature calibration
-        consoleScope();
-
-      // ####### FEEDBACK SERIAL OUT #######
-      #elif defined(FEEDBACK_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART3)
-        if(UART_DMA_CHANNEL->CNDTR == 0) {
-          Feedback.start	        = (uint16_t)START_FRAME;
-          Feedback.cmd1           = (int16_t)cmd1;
-          Feedback.cmd2           = (int16_t)cmd2;
-          Feedback.speedR	        = (int16_t)speedR;
-          Feedback.speedL	        = (int16_t)speedL;
-          Feedback.speedR_meas	  = (int16_t)rtY_Left.n_mot;
-          Feedback.speedL_meas	  = (int16_t)rtY_Right.n_mot;
-          Feedback.batVoltage	    = (int16_t)(batVoltage * BAT_CALIB_REAL_VOLTAGE / BAT_CALIB_ADC);
-          Feedback.boardTemp	    = (int16_t)board_temp_deg_c;
-          Feedback.checksum       = (uint16_t)(Feedback.start ^ Feedback.cmd1 ^ Feedback.cmd2 ^ Feedback.speedR ^ Feedback.speedL
-                                    ^ Feedback.speedR_meas ^ Feedback.speedL_meas ^ Feedback.batVoltage ^ Feedback.boardTemp); 
-
-          UART_DMA_CHANNEL->CCR  &= ~DMA_CCR_EN;
-          UART_DMA_CHANNEL->CNDTR = sizeof(Feedback);
-          UART_DMA_CHANNEL->CMAR  = (uint32_t)&Feedback;
-          UART_DMA_CHANNEL->CCR  |= DMA_CCR_EN;          
-        }
-      #endif      
+        setScopeChannel(0, (int16_t)adc_buffer.l_tx2);        // 1: ADC1
+        setScopeChannel(1, (int16_t)adc_buffer.l_rx2);        // 2: ADC2
+        setScopeChannel(2, (int16_t)cmd1);                    // 3: output command: [-1000, 1000]
+        setScopeChannel(3, (int16_t)cmd2);                    // 4: output command: [-1000, 1000]
+        setScopeChannel(4, (int16_t)speed);
+        setScopeChannel(5, (int16_t)adc_buffer.batt1);          // 5: for battery voltage calibration
+        setScopeChannel(6, (int16_t)(batVoltage * BAT_CALIB_REAL_VOLTAGE / BAT_CALIB_ADC)); // 6: for verifying battery voltage calibration
+        setScopeChannel(7, (int16_t)board_temp_adcFilt);        // 7: for board temperature calibration
+        setScopeChannel(8, (int16_t)board_temp_deg_c);          // 8: for verifying board temperature calibration
+        consoleScope();    
     }    
 
     HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
@@ -860,14 +374,6 @@ int main(void) {
     timeout++;
   }
 }
-
-#ifdef VARIANT_TRANSPOTTER
-  void saveConfig() {
-    HAL_FLASH_Unlock();
-    EE_WriteVariable(VirtAddVarTab[0], saveValue);
-    HAL_FLASH_Lock();
-  }
-#endif
 
 void longBeep(uint8_t freq){
     buzzerFreq = freq;

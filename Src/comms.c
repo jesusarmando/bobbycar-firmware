@@ -10,7 +10,7 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 
 static volatile uint8_t uart_buf[100];
-static volatile int16_t ch_buf[8];
+static volatile int16_t ch_buf[9];
 //volatile char char_buf[300];
 
 void setScopeChannel(uint8_t ch, int16_t val) {
@@ -42,8 +42,8 @@ void consoleScope(void) {
     // memset((void *)(uintptr_t)uart_buf, 0, sizeof(uart_buf));
     int strLength;
     strLength = sprintf((char *)(uintptr_t)uart_buf,
-                "1:%i 2:%i 3:%i 4:%i 5:%i 6:%i 7:%i 8:%i\r\n",
-                ch_buf[0], ch_buf[1], ch_buf[2], ch_buf[3], ch_buf[4], ch_buf[5], ch_buf[6], ch_buf[7]);
+                "1:%i 2:%i 3:%i 4:%i 5:%i 6:%i 7:%i 8:%i 9:%i\r\n",
+                ch_buf[0], ch_buf[1], ch_buf[2], ch_buf[3], ch_buf[4], ch_buf[5], ch_buf[6], ch_buf[7], ch_buf[8]);
 
     if(UART_DMA_CHANNEL->CNDTR == 0) {
       UART_DMA_CHANNEL->CCR    &= ~DMA_CCR_EN;
