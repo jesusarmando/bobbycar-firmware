@@ -212,8 +212,30 @@ int main(void) {
 
     #ifdef CONTROL_ADC
       // ADC values range: 0-4095, see ADC-calibration in config.h
-    int cmd1 = CLAMP((adc_buffer.l_rx2 - ADC2_MIN) * 1000 / (ADC2_MAX - ADC2_MIN), 0, 1000);    // ADC1
-    int cmd2 = CLAMP((adc_buffer.l_tx2 - ADC1_MIN) * 1000 / (ADC1_MAX - ADC1_MIN), 0, 1000);    // ADC2
+    double cmd1 = CLAMP((adc_buffer.l_tx2 - ADC1_MIN) * 1000. / (ADC1_MAX - ADC1_MIN), 0., 1000.);    // ADC2
+    double cmd2 = CLAMP((adc_buffer.l_rx2 - ADC2_MIN) * 1000. / (ADC2_MAX - ADC2_MIN), 0., 1000.);    // ADC1
+
+    double a = 0.;
+    double b = 1000.;
+
+    double t1 = MIN(
+                     MAX(
+                         (cmd1-a)/(b-a),
+                         0
+                     ),
+                     1
+                );
+    cmd1 = t1*t1*t1*1000.;
+
+    double t2 = MIN(
+                     MAX(
+                         (cmd2-a)/(b-a),
+                         0
+                     ),
+                     1
+                );
+    cmd2 = t2*t2*t2*1000.;
+
 
       #ifdef ADC_PROTECT_ENA
         if (adc_buffer.l_tx2 >= (ADC1_MIN - ADC_PROTECT_THRESH) && adc_buffer.l_tx2 <= (ADC1_MAX + ADC_PROTECT_THRESH) && 
@@ -272,10 +294,10 @@ int main(void) {
 
 
 
-      if (cmd1 >= 950)
-          speed = cmd1 + (cmd2 / 2);
+      if (cmd1 >= 950.)
+          speed = cmd1 + (cmd2 / 2.);
       else
-          speed = cmd1 - cmd2;
+          speed = cmd1 - (cmd2 * 0.75);
 
       speedL = speedR = speed;
 
@@ -337,17 +359,6 @@ int main(void) {
       enable        = 0;
       buzzerFreq    = 8;
       buzzerPattern = 1;
-    } else if ((TEMP_POWEROFF_ENABLE && board_temp_deg_c >= TEMP_POWEROFF && speedAvgAbs < 20) || (batVoltage < BAT_LOW_DEAD && speedAvgAbs < 20)) {  // poweroff before mainboard burns OR low bat 3
-      poweroff();
-    } else if (TEMP_WARNING_ENABLE && board_temp_deg_c >= TEMP_WARNING) {  // beep if mainboard gets hot
-      buzzerFreq    = 4;
-      buzzerPattern = 1;
-    } else if (batVoltage < BAT_LOW_LVL1 && batVoltage >= BAT_LOW_LVL2 && BAT_LOW_LVL1_ENABLE) {  // low bat 1: slow beep
-      buzzerFreq    = 5;
-      buzzerPattern = 42;
-    } else if (batVoltage < BAT_LOW_LVL2 && batVoltage >= BAT_LOW_DEAD && BAT_LOW_LVL2_ENABLE) {  // low bat 2: fast beep
-      buzzerFreq    = 5;
-      buzzerPattern = 6;
     } else if (timeoutFlagADC || timeoutFlagSerial) {  // beep in case of ADC or Serial timeout - fast beep      
       buzzerFreq    = 24;
       buzzerPattern = 1;

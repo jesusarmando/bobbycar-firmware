@@ -125,13 +125,13 @@
 #define DIAG_ENA        1               // [-] Motor Diagnostics enable flag: 0 = Disabled, 1 = Enabled (default)
 
 // Limitation settings
-#define I_MOT_MAX       2              // [A] Maximum motor current limit
-#define I_DC_MAX        4              // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+#define I_MOT_MAX       25              // [A] Maximum motor current limit
+#define I_DC_MAX        27              // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
 #define N_MOT_MAX       1000            // [rpm] Maximum motor speed limit
 
 // Field Weakening / Phase Advance
 #define FIELD_WEAK_ENA  1               // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
-#define FIELD_WEAK_MAX  5               // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
+#define FIELD_WEAK_MAX  10               // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
 #define PHASE_ADV_MAX   25              // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
 #define FIELD_WEAK_HI   1500            // [-] Input target High threshold for reaching maximum Field Weakening / Phase Advance. Do NOT set this higher than 1500.
 #define FIELD_WEAK_LO   1000            // [-] Input target Low threshold for starting Field Weakening / Phase Advance. Do NOT set this higher than 1000.
@@ -303,14 +303,39 @@
   //#define ADC_PROTECT_ENA               // ADC Protection Enable flag. Use this flag to make sure the ADC is protected when GND or Vcc wire is disconnected
   //#define ADC_PROTECT_TIMEOUT 30        // ADC Protection: number of wrong / missing input commands before safety state is taken
   //#define ADC_PROTECT_THRESH  400       // ADC Protection threshold below/above the MIN/MAX ADC values
+//#define MAX
+//#define BSOD_VORNE
+#define BSOD_HINTEN
+
+#ifdef MAX
   #define ADC1_MIN            200      // min ADC1-value while poti at minimum-position (0 - 4095)
   #define ADC1_MAX            2500      // max ADC1-value while poti at maximum-position (0 - 4095)
   #define ADC2_MIN            200       // min ADC2-value while poti at minimum-position (0 - 4095)
   #define ADC2_MAX            2500      // max ADC2-value while poti at maximum-position (0 - 4095)
+//#define INVERT_R_DIRECTION            // Invert rotation of right motor
+//#define INVERT_L_DIRECTION            // Invert rotation of left motor
+#endif
+
+#ifdef BSOD_VORNE
+#define ADC1_MIN            300      // min ADC1-value while poti at minimum-position (0 - 4095)
+#define ADC1_MAX            1200      // max ADC1-value while poti at maximum-position (0 - 4095)
+#define ADC2_MIN            300       // min ADC2-value while poti at minimum-position (0 - 4095)
+#define ADC2_MAX            1000      // max ADC2-value while poti at maximum-position (0 - 4095)
+#define INVERT_R_DIRECTION            // Invert rotation of right motor
+#define INVERT_L_DIRECTION            // Invert rotation of left motor
+#endif
+
+#ifdef BSOD_HINTEN
+#define ADC1_MIN            300      // min ADC1-value while poti at minimum-position (0 - 4095)
+#define ADC1_MAX            1200      // max ADC1-value while poti at maximum-position (0 - 4095)
+#define ADC2_MIN            300       // min ADC2-value while poti at minimum-position (0 - 4095)
+#define ADC2_MAX            1000      // max ADC2-value while poti at maximum-position (0 - 4095)
+//#define INVERT_R_DIRECTION            // Invert rotation of right motor
+//#define INVERT_L_DIRECTION            // Invert rotation of left motor
+#endif
+
   #define SPEED_COEFFICIENT   16384     //  1.0f
   #define STEER_COEFFICIENT   0         //  0.0f
-  //#define INVERT_R_DIRECTION            // Invert rotation of right motor
-  //#define INVERT_L_DIRECTION            // Invert rotation of left motor
 #endif
 
 // Multiple tap detection: default DOUBLE Tap on Brake pedal (4 pulses)
