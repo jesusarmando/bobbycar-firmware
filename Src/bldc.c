@@ -100,11 +100,6 @@ void DMA1_Channel1_IRQHandler(void) {
     return;
   }
 
-  if (buzzerTimer % 1000 == 0) {  // because you get float rounding errors if it would run every time -> not any more, everything converted to fixed-point
-    filtLowPass32(adc_buffer.batt1, BAT_FILT_COEF, &batVoltageFixdt);
-    batVoltage = (int16_t)(batVoltageFixdt >> 20);  // convert fixed-point to integer
-  }
-
   // Get Left motor currents
   curL_phaA = (int16_t)(offsetrl1 - adc_buffer.rl1);
   curL_phaB = (int16_t)(offsetrl2 - adc_buffer.rl2);
@@ -151,8 +146,29 @@ void DMA1_Channel1_IRQHandler(void) {
   }
   OverrunFlag = true;
 
+  if (errCode_Left && errCode_Right)
+  {
+      buzzerFreq    = 24;
+      buzzerPattern = 1;
+  }
+  else if (errCode_Left)
+  {
+      buzzerFreq    = 18;
+      buzzerPattern = 2;
+  }
+  else if (errCode_Right)
+  {
+      buzzerFreq    = 12;
+      buzzerPattern = 3;
+  }
+  else
+  {
+      buzzerFreq    = 0;
+      buzzerPattern = 0;
+  }
+
   /* Make sure to stop BOTH motors in case of an error */
-  enableFin = enable && !errCode_Left && !errCode_Right;
+  enableFin = enable && !errCode_Left;
  
   // ========================= LEFT MOTOR ============================ 
     // Get hall sensors values
@@ -187,7 +203,8 @@ void DMA1_Channel1_IRQHandler(void) {
     LEFT_TIM->LEFT_TIM_V    = (uint16_t)CLAMP(vl + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
     LEFT_TIM->LEFT_TIM_W    = (uint16_t)CLAMP(wl + pwm_res / 2, pwm_margin, pwm_res-pwm_margin);
   // =================================================================
-  
+
+    enableFin = enable && !errCode_Right;
 
   // ========================= RIGHT MOTOR ===========================  
     // Get hall sensors values

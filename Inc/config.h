@@ -4,24 +4,6 @@
 
 #include "stm32f1xx_hal.h"
 
-// ############################### VARIANT SELECTION ###############################
-// PlatformIO: uncomment desired variant in platformio.ini
-// Keil uVision: select desired variant from the Target drop down menu (to the right of the Load button)
-// Ubuntu: define the desired build variant here if you want to use make in console
-// or use VARIANT environment variable for example like "make -e VARIANT=VARIANT_NUNCHUK". Select only one at a time.
-#if !defined(PLATFORMIO)
-  //#define VARIANT_ADC         // Variant for control via ADC input
-  //#define VARIANT_USART       // Variant for Serial control via USART3 input
-  //#define VARIANT_NUNCHUK     // Variant for Nunchuk controlled vehicle build
-  //#define VARIANT_PPM         // Variant for RC-Remote with PPM-Sum Signal
-  //#define VARIANT_IBUS        // Variant for RC-Remotes with FLYSKY IBUS
-  #define VARIANT_HOVERCAR    // Variant for HOVERCAR build
-	//#define VARIANT_HOVERBOARD  // Variant for HOVERBOARD build
-  //#define VARIANT_TRANSPOTTER // Variant for TRANSPOTTER build https://github.com/NiklasFauth/hoverboard-firmware-hack/wiki/Build-Instruction:-TranspOtter https://hackaday.io/project/161891-transpotter-ng
-#endif
-// ########################### END OF VARIANT SELECTION ############################
-
-
 // ############################### DO-NOT-TOUCH SETTINGS ###############################
 #define PWM_FREQ            16000     // PWM frequency in Hz / is also used for buzzer
 #define DEAD_TIME              48     // PWM deadtime
@@ -125,12 +107,12 @@
 #define DIAG_ENA        1               // [-] Motor Diagnostics enable flag: 0 = Disabled, 1 = Enabled (default)
 
 // Limitation settings
-#define I_MOT_MAX       25              // [A] Maximum motor current limit
-#define I_DC_MAX        27              // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
-#define N_MOT_MAX       1000            // [rpm] Maximum motor speed limit
+#define I_MOT_MAX       5              // [A] Maximum motor current limit
+#define I_DC_MAX        7              // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+#define N_MOT_MAX       2000            // [rpm] Maximum motor speed limit
 
 // Field Weakening / Phase Advance
-#define FIELD_WEAK_ENA  1               // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
+#define FIELD_WEAK_ENA  0               // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
 #define FIELD_WEAK_MAX  10               // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
 #define PHASE_ADV_MAX   25              // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
 #define FIELD_WEAK_HI   1500            // [-] Input target High threshold for reaching maximum Field Weakening / Phase Advance. Do NOT set this higher than 1500.
@@ -141,30 +123,7 @@
   #undef  FIELD_WEAK_HI
   #define FIELD_WEAK_HI 1000            // [-] This prevents the input target going beyond 1000 when Field Weakening is not enabled
 #endif
-#define INPUT_MAX MAX( 1000, FIELD_WEAK_HI)   // [-] Defines the Input target maximum limitation
-#define INPUT_MIN MIN(-1000,-FIELD_WEAK_HI)   // [-] Defines the Input target minimum limitation
-#define INPUT_MID INPUT_MAX / 2
 // ########################### END OF MOTOR CONTROL ########################
-
-
-
-// ############################## DEFAULT SETTINGS ############################
-// Default settings will be applied at the end of this config file if not set before
-#define INACTIVITY_TIMEOUT      	8     // Minutes of not driving until poweroff. it is not very precise.
-#define BEEPS_BACKWARD          	1     // 0 or 1
-// #define SUPPORT_BUTTONS							// Define for buttons support on ADC, Nunchuck
-
-/* FILTER is in fixdt(0,16,16): VAL_fixedPoint = VAL_floatingPoint * 2^16. In this case 6553 = 0.1 * 2^16
- * Value of COEFFICIENT is in fixdt(1,16,14)
- * If VAL_floatingPoint >= 0, VAL_fixedPoint = VAL_floatingPoint * 2^14
- * If VAL_floatingPoint < 0,  VAL_fixedPoint = 2^16 + floor(VAL_floatingPoint * 2^14).
-*/
-// Value of RATE is in fixdt(1,16,4): VAL_fixedPoint = VAL_floatingPoint * 2^4. In this case 480 = 30 * 2^4
-#define DEFAULT_RATE                480   // 30.0f [-] lower value == slower rate [0, 32767] = [0.0, 2047.9375]. Do NOT make rate negative (>32767)
-#define DEFAULT_FILTER              6553  // Default for FILTER 0.1f [-] lower value == softer filter [0, 65535] = [0.0 - 1.0].
-#define DEFAULT_SPEED_COEFFICIENT   16384 // Default for SPEED_COEFFICIENT 1.0f [-] higher value == stronger. [0, 65535] = [-2.0 - 2.0]. In this case 16384 = 1.0 * 2^14
-#define DEFAULT_STEER_COEFFICIENT   8192  // Defualt for STEER_COEFFICIENT 0.5f [-] higher value == stronger. [0, 65535] = [-2.0 - 2.0]. In this case  8192 = 0.5 * 2^14. If you do not want any steering, set it to 0.
-// ######################### END OF DEFAULT SETTINGS ##########################
 
 
 
@@ -404,30 +363,6 @@
 #endif
 // ########################### UART SETIINGS ############################
 
-
-
-// ############################### APPLY DEFAULT SETTINGS ###############################
-#ifndef RATE
-  #define RATE DEFAULT_RATE
-#endif
-#ifndef FILTER
-  #define FILTER DEFAULT_FILTER
-#endif
-#ifndef SPEED_COEFFICIENT
-  #define SPEED_COEFFICIENT DEFAULT_SPEED_COEFFICIENT
-#endif
-#ifndef STEER_COEFFICIENT
-  #define STEER_COEFFICIENT DEFAULT_STEER_COEFFICIENT
-#endif
-// ########################### END OF APPLY DEFAULT SETTING ############################
-
-
-
-// ############################### VALIDATE SETTINGS ###############################
-#if !defined(VARIANT_ADC) && !defined(VARIANT_USART) && !defined(VARIANT_NUNCHUK) && !defined(VARIANT_PPM) && !defined(VARIANT_IBUS) && \
-    !defined(VARIANT_HOVERCAR) && !defined(VARIANT_HOVERBOARD) && !defined(VARIANT_TRANSPOTTER)
-  #error Variant not defined! Please check platformio.ini or Inc/config.h for available variants.
-#endif
 
 #if defined(CONTROL_SERIAL_USART2) && defined(CONTROL_SERIAL_USART3)
   #error CONTROL_SERIAL_USART2 and CONTROL_SERIAL_USART3 not allowed, choose one.

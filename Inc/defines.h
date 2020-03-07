@@ -171,19 +171,7 @@ typedef struct {
 void longBeep(uint8_t freq);
 void shortBeep(uint8_t freq);
 
-// Define additional functions. Implementation is in main.c
-void filtLowPass32(int16_t u, uint16_t coef, int32_t *y);
-void mixerFcn(int16_t rtu_speed, int16_t rtu_steer, int16_t *rty_speedR, int16_t *rty_speedL);
-void rateLimiter16(int16_t u, int16_t rate, int16_t *y);
-void multipleTapDet(int16_t u, uint32_t timeNow, MultipleTap *x);
-
 // Define I2C, Nunchuk, PPM functions
-void I2C_Init(void);
-void Nunchuk_Init(void);
-void Nunchuk_Read(void);
-uint8_t Nunchuk_Ping(void);
-void PPM_Init(void);
-void PPM_ISR_Callback(void);
 
 #endif
 
