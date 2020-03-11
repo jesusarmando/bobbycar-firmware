@@ -12,7 +12,7 @@ public:
 
     void start() override;
     void update() override;
-    void stop() override {}
+    void stop() override;
     int framerate() const override { return 30; }
 
     // Fast 0-255 random number generator from http://eternityforest.com/Projects/rng.php:

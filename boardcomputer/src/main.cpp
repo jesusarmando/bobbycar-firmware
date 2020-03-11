@@ -31,13 +31,12 @@
 #include "statusdisplay.h"
 #include "starfielddisplay.h"
 #include "pingpongdisplay.h"
+#include "spirodisplay.h"
 
 namespace {
 uint16_t raw_gas, raw_brems;
 float gas, brems;
 uint16_t gasMin, gasMax, bremsMin, bremsMax;
-bool invertFrontLeft, invertFrontRight, invertBackLeft, invertBackRight;
-bool enableFrontLeft, enableFrontRight, enableBackLeft, enableBackRight;
 
 bool power_toggle{false};
 bool led_toggle{false};
@@ -57,7 +56,14 @@ struct {
 } performance;
 
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
-Controller &front = controllers[0], &back = controllers[1];
+struct {
+    Controller &controller;
+
+    struct {
+        bool invert, enable;
+    } left, right;
+} front{controllers[0]}, back{controllers[1]};
+bool enableFrontLeft, enableFrontRight, enableBackLeft, enableBackRight;
 
 struct {
     DefaultMode defaultMode;
@@ -84,26 +90,10 @@ struct {
     StatusDisplay status;
     StarfieldDisplay starfield;
     PingPongDisplay pingPong;
+    SpiroDisplay spiro;
 
     std::reference_wrapper<Display> currentDisplay{status};
 } display;
-
-String toString(wl_status_t status)
-{
-    switch (status)
-    {
-    case WL_NO_SHIELD: return "WL_NO_SHIELD";
-    case WL_IDLE_STATUS: return "WL_IDLE_STATUS";
-    case WL_NO_SSID_AVAIL: return "WL_NO_SSID_AVAIL";
-    case WL_SCAN_COMPLETED: return "WL_SCAN_COMPLETED";
-    case WL_CONNECTED: return "WL_CONNECTED";
-    case WL_CONNECT_FAILED: return "WL_CONNECT_FAILED";
-    case WL_CONNECTION_LOST: return "WL_CONNECTION_LOST";
-    case WL_DISCONNECTED: return "WL_DISCONNECTED";
-    }
-
-    return String("Unknown: ") + int(status);
-}
 
 void receiveFeedback()
 {
@@ -138,18 +128,18 @@ void receiveFeedback()
                     controller.feedback = controller.newFeedback;
                     controller.lastFeedback = millis();
                 }
-                else
-                {
-                    if (controller.newFeedback.start == Feedback::VALID_HEADER)
-                        Serial.println("header matched");
-                    else
-                        Serial.println("header did not match");
+//                else
+//                {
+//                    if (controller.newFeedback.start == Feedback::VALID_HEADER)
+//                        Serial.println("header matched");
+//                    else
+//                        Serial.println("header did not match");
 
-                    if (checksum == controller.newFeedback.checksum)
-                        Serial.println("checksum matched");
-                    else
-                        Serial.println("checksum did not match");
-                }
+//                    if (checksum == controller.newFeedback.checksum)
+//                        Serial.println("checksum matched");
+//                    else
+//                        Serial.println("checksum did not match");
+//                }
                 controller.idx = 0; // Reset the index (it prevents to enter in this if condition in the next cycle)
             }
 
@@ -178,10 +168,11 @@ void handleDebugSerial()
     }
 
     const auto now = millis();
+    if (false)
     if (now - lastDebug >= 50)
     {
         Serial.print("pwm: ");
-        Serial.println(front.command.left.pwm);
+        Serial.println(front.controller.command.left.pwm);
 
         lastDebug = now;
     }
@@ -231,6 +222,8 @@ void nextDisplay()
     else if (&display.currentDisplay.get() == &display.starfield)
         display.currentDisplay = display.pingPong;
     else if (&display.currentDisplay.get() == &display.pingPong)
+        display.currentDisplay = display.spiro;
+    else if (&display.currentDisplay.get() == &display.spiro)
         display.currentDisplay = display.status;
 
     display.currentDisplay.get().start();
@@ -238,19 +231,19 @@ void nextDisplay()
 
 void fixCommonParams()
 {
-    front.command.left.enable = enableFrontLeft;
-    front.command.right.enable = enableFrontRight;
-    back.command.left.enable = enableBackLeft;
-    back.command.right.enable = enableBackRight;
+    front.controller.command.left.enable = enableFrontLeft;
+    front.controller.command.right.enable = enableFrontRight;
+    back.controller.command.left.enable = enableBackLeft;
+    back.controller.command.right.enable = enableBackRight;
 
-    if (invertFrontLeft)
-        front.command.left.pwm = -front.command.left.pwm;
-    if (invertFrontRight)
-        front.command.right.pwm = -front.command.right.pwm;
-    if (invertBackLeft)
-        back.command.left.pwm = -back.command.left.pwm;
-    if (invertBackRight)
-        back.command.right.pwm = -back.command.right.pwm;
+    if (front.left.invert)
+        front.controller.command.left.pwm = -front.controller.command.left.pwm;
+    if (front.right.invert)
+        front.controller.command.right.pwm = -front.controller.command.right.pwm;
+    if (back.left.invert)
+        back.controller.command.left.pwm = -back.controller.command.left.pwm;
+    if (back.right.invert)
+        back.controller.command.right.pwm = -back.controller.command.right.pwm;
 }
 
 void sendCommands()
@@ -293,9 +286,15 @@ void DefaultMode::update()
         if (enableWeakeningSmoothening && (pwm > 1000. || lastPwm > 1000.))
         {
             if (lastPwm < pwm)
+            {
                 pwm = std::min(pwm, lastPwm+(weakeningSmoothening*(now-lastTime)/100.f));
+                if (pwm < 1000.)
+                    pwm = 1000.;
+            }
             else if (lastPwm > pwm)
+            {
                 pwm = std::max(pwm, lastPwm-(weakeningSmoothening*(now-lastTime)/100.f));
+            }
         }
     }
     else
@@ -587,19 +586,216 @@ void handleIndex(AsyncWebServerRequest *request)
                 response.print("Bobbycar remote");
             }
 
+            HtmlTag ul(response, "ul");
+
             {
-                HtmlTag a(response, "a", " href=\"/live\"");
+                HtmlTag li(response, "li");
+                HtmlTag a(response, "a", " href=\"live\"");
                 response.print("Live");
+            }
+
+            {
+                HtmlTag li(response, "li");
+                HtmlTag a(response, "a", " href=\"screenParams\"");
+                response.print("Screen params");
+            }
+
+            {
+                HtmlTag li(response, "li");
+                HtmlTag a(response, "a", " href=\"commonParams\"");
+                response.print("Common params");
+            }
+
+            {
+                HtmlTag li(response, "li");
+                HtmlTag a(response, "a", " href=\"defaultModeParams\"");
+                response.print("Default mode params");
+            }
+
+            {
+                HtmlTag li(response, "li");
+                HtmlTag a(response, "a", " href=\"manualModeParams\"");
+                response.print("Manual mode params");
+            }
+
+            {
+                HtmlTag li(response, "li");
+                HtmlTag a(response, "a", " href=\"potiParams\"");
+                response.print("Poti params");
+            }
+        }
+    }
+
+    request->send(&response);
+}
+
+void handleLive(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+            response.print("<meta http-equiv=\"refresh\" content=\"1\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
+            }
+
+            renderLiveData(response);
+        }
+    }
+
+    request->send(&response);
+}
+
+void handleScreenParams(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
             }
 
             response.print(" - ");
 
             {
-                HtmlTag a(response, "a", " href=\"/next\"");
+                HtmlTag a(response, "a", " href=\"nextScreen\"");
                 response.print("Next screen");
             }
 
-            //renderLiveData(response);
+            {
+                HtmlTag form(response, "form", " action=\"/setScreenParams\"");
+
+                HtmlTag fieldset(response, "fieldset");
+
+                {
+                    HtmlTag legend(response, "legend");
+                    response.print("Screen params:");
+                }
+
+                numberInput(response, display.status.framerate(), "framerate", "Status framerate:");
+
+                breakLine(response);
+
+                submitButton(response);
+            }
+        }
+    }
+
+    request->send(&response);
+}
+
+void handleSetScreenParams(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("framerate"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no framerate specified");
+        request->send(&response);
+        return;
+    }
+
+
+
+    {
+        AsyncWebParameter* p = request->getParam("framerate");
+
+        display.status.setFramerate(strtol(p->value().c_str(), nullptr, 10));
+    }
+
+    request->redirect("/screenParams");
+}
+
+void handleNextScreen(AsyncWebServerRequest *request)
+{
+    nextDisplay();
+
+    request->redirect("/screenParams");
+}
+
+void handleCommonParams(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
+            }
 
             {
                 HtmlTag form(response, "form", " action=\"/setCommonParams\"");
@@ -660,27 +856,62 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                checkboxInput(response, invertFrontLeft, "invertFrontLeft", "Invert front left:");
+                checkboxInput(response, front.left.invert, "invertFrontLeft", "Invert front left:");
 
                 breakLine(response);
 
-                checkboxInput(response, invertFrontRight, "invertFrontRight", "Invert front right:");
+                checkboxInput(response, front.right.invert, "invertFrontRight", "Invert front right:");
 
                 breakLine(response);
 
-                checkboxInput(response, invertBackLeft, "invertBackLeft", "Invert back left:");
+                checkboxInput(response, back.left.invert, "invertBackLeft", "Invert back left:");
 
                 breakLine(response);
 
-                checkboxInput(response, invertBackRight, "invertBackRight", "Invert back right:");
-
-                breakLine(response);
-
-                numberInput(response, display.status.framerate(), "framerate", "Status framerate:");
+                checkboxInput(response, back.right.invert, "invertBackRight", "Invert back right:");
 
                 breakLine(response);
 
                 submitButton(response);
+            }
+        }
+    }
+
+    request->send(&response);
+}
+
+void handleDefaultModeParams(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
             }
 
             {
@@ -759,6 +990,45 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 submitButton(response);
             }
+        }
+    }
+
+    request->send(&response);
+}
+
+void handleManualModeParams(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
+            }
 
             {
                 HtmlTag form(response, "form", " action=\"/setManualModeParams\"");
@@ -809,6 +1079,45 @@ void handleIndex(AsyncWebServerRequest *request)
 
                 submitButton(response);
             }
+        }
+    }
+
+    request->send(&response);
+}
+
+void handlePotiParams(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
+            }
 
             {
                 HtmlTag form(response, "form", " action=\"/setPotiParams\"");
@@ -842,55 +1151,6 @@ void handleIndex(AsyncWebServerRequest *request)
     }
 
     request->send(&response);
-}
-
-void handleLive(AsyncWebServerRequest *request)
-{
-    AsyncResponseStream &response = *request->beginResponseStream("text/html");
-
-    response.print("<!doctype html>");
-
-    {
-        HtmlTag html(response, "html");
-
-        {
-            HtmlTag head(response, "head");
-
-            response.print("<meta charset=\"utf-8\" />");
-            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
-            response.print("<meta http-equiv=\"refresh\" content=\"1\" />");
-
-            {
-                HtmlTag title(response, "title");
-                response.print("Bobbycar remote");
-            }
-        }
-
-        {
-            HtmlTag body(response, "body");
-
-            {
-                HtmlTag h1(response, "h1");
-                response.print("Bobbycar remote");
-            }
-
-            {
-                HtmlTag a(response, "a", " href=\"/\"");
-                response.print("Back");
-            }
-
-            renderLiveData(response);
-        }
-    }
-
-    request->send(&response);
-}
-
-void handleNext(AsyncWebServerRequest *request)
-{
-    nextDisplay();
-
-    request->redirect("/");
 }
 
 void handleSetCommonParams(AsyncWebServerRequest *request)
@@ -945,15 +1205,6 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
         AsyncResponseStream &response = *request->beginResponseStream("text/plain");
         response.setCode(400);
         response.print("no phaseAdvMax specified");
-        request->send(&response);
-        return;
-    }
-
-    if (!request->hasParam("framerate"))
-    {
-        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
-        response.setCode(400);
-        response.print("no framerate specified");
         request->send(&response);
         return;
     }
@@ -1031,21 +1282,15 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
     enableBackLeft = request->hasParam("enableBackLeft") && request->getParam("enableBackLeft")->value() == "on";
     enableBackRight = request->hasParam("enableBackRight") && request->getParam("enableBackRight")->value() == "on";
 
-    invertFrontLeft = request->hasParam("invertFrontLeft") && request->getParam("invertFrontLeft")->value() == "on";
-    invertFrontRight = request->hasParam("invertFrontRight") && request->getParam("invertFrontRight")->value() == "on";
-    invertBackLeft = request->hasParam("invertBackLeft") && request->getParam("invertBackLeft")->value() == "on";
-    invertBackRight = request->hasParam("invertBackRight") && request->getParam("invertBackRight")->value() == "on";
+    front.left.invert = request->hasParam("invertFrontLeft") && request->getParam("invertFrontLeft")->value() == "on";
+    front.right.invert = request->hasParam("invertFrontRight") && request->getParam("invertFrontRight")->value() == "on";
+    back.left.invert = request->hasParam("invertBackLeft") && request->getParam("invertBackLeft")->value() == "on";
+    back.right.invert = request->hasParam("invertBackRight") && request->getParam("invertBackRight")->value() == "on";
 
-    {
-        AsyncWebParameter* p = request->getParam("framerate");
-
-        display.status.setFramerate(strtol(p->value().c_str(), nullptr, 10));
-    }
-
-    request->redirect("/");
+    request->redirect("/commonParams");
 }
 
-void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
+void handleSetDefaultModeParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("ctrlTyp"))
     {
@@ -1229,10 +1474,10 @@ void handleSetDefaultModeSetParams(AsyncWebServerRequest *request)
         modes.defaultMode.brems2_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
-    request->redirect("/");
+    request->redirect("/defaultModeParams");
 }
 
-void handleSetManualModeSetParams(AsyncWebServerRequest *request)
+void handleSetManualModeParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("pwm"))
     {
@@ -1311,7 +1556,7 @@ void handleSetManualModeSetParams(AsyncWebServerRequest *request)
         }
     }
 
-    request->redirect("/");
+    request->redirect("/manualModeParams");
 }
 
 void handleSetPotiParams(AsyncWebServerRequest *request)
@@ -1385,13 +1630,25 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
         return true;
     else if (request->url() == "/live")
         return true;
-    else if (request->url() == "/next")
+    else if (request->url() == "/screenParams")
+        return true;
+    else if (request->url() == "/setScreenParams")
+        return true;
+    else if (request->url() == "/nextScreen")
+        return true;
+    else if (request->url() == "/commonParams")
         return true;
     else if (request->url() == "/setCommonParams")
         return true;
+    else if (request->url() == "/defaultModeParams")
+        return true;
     else if (request->url() == "/setDefaultModeParams")
         return true;
+    else if (request->url() == "/manualModeParams")
+        return true;
     else if (request->url() == "/setManualModeParams")
+        return true;
+    else if (request->url() == "/potiParams")
         return true;
     else if (request->url() == "/setPotiParams")
         return true;
@@ -1405,20 +1662,33 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
         handleIndex(request);
     else if (request->url() == "/live")
         handleLive(request);
-    else if (request->url() == "/next")
-        handleNext(request);
+    else if (request->url() == "/screenParams")
+        handleScreenParams(request);
+    else if (request->url() == "/setScreenParams")
+        handleSetScreenParams(request);
+    else if (request->url() == "/nextScreen")
+        handleNextScreen(request);
+    else if (request->url() == "/commonParams")
+        handleCommonParams(request);
     else if (request->url() == "/setCommonParams")
         handleSetCommonParams(request);
+    else if (request->url() == "/defaultModeParams")
+        handleDefaultModeParams(request);
     else if (request->url() == "/setDefaultModeParams")
-        handleSetDefaultModeSetParams(request);
+        handleSetDefaultModeParams(request);
+    else if (request->url() == "/manualModeParams")
+        handleManualModeParams(request);
     else if (request->url() == "/setManualModeParams")
-        handleSetManualModeSetParams(request);
+        handleSetManualModeParams(request);
+    else if (request->url() == "/potiParams")
+        handlePotiParams(request);
     else if (request->url() == "/setPotiParams")
         handleSetPotiParams(request);
 }
 
 void StatusDisplay::start()
 {
+    Serial.println("StatusDisplay::start()");
     display.tft.setRotation(0);
     display.tft.fillScreen(TFT_BLACK);
     display.tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -1457,11 +1727,14 @@ void StatusDisplay::update()
                 display.tft.drawString(String() + motor.error + "   ", 15, y, 4);
                 display.tft.setTextColor(TFT_WHITE, TFT_BLACK);
                 display.tft.drawString(String("") + std::abs(motor.current/50.) + "A"
-                                       "     " +
-                                       (motor.speed/15) +
-                                       "     " +
-                                       (motor.hallA ? '|' : '.') + (motor.hallB ? '|' : '.') + (motor.hallC ? '|' : '.') + "                                                ",45,y,4); y+=25;
+                                       "    " +
+                                       (motor.speed/32.133) +
+                                       "                                                ",45,y,4);
 
+                display.tft.drawString(String("") +
+                                       (motor.hallA ? '1' : '0') + (motor.hallB ? '1' : '0') + (motor.hallC ? '1' : '0')
+                                       , 215, y, 2);
+                y+=25;
             };
 
             print_motor("l: ", controller.feedback.left);
@@ -1475,9 +1748,23 @@ void StatusDisplay::update()
         y+=12;
     }
 
-    display.tft.drawString("WiFi: " + toString(WiFi.status()) + "                                                ",0,y,2); y+=15;
-    display.tft.drawString("IP: " + WiFi.localIP().toString() + "                                                ",0,y,2); y+=15;
-    display.tft.drawString(String("Performance: ") + performance.last + "                                                ",0,y,2); y+=15;
+    String modeStr;
+    if (&modes.currentMode.get() == &modes.defaultMode) modeStr = "Default";
+    else if (&modes.currentMode.get() == &modes.manualMode) modeStr = "Manual";
+    else if (&modes.currentMode.get() == &modes.bluetoothMode) modeStr = "Bluetooth";
+    else modeStr = "Unknown";
+
+    display.tft.drawString("WiFi: " + toString(WiFi.status()) + "                                                ",0,y,2);
+    display.tft.drawString(String("Limit0: ") + front.controller.command.left.iMotMax + "A", 160, y, 2); y+=15;
+    display.tft.drawString("IP: " + WiFi.localIP().toString() + "                                                ",0,y,2);
+    display.tft.drawString(String("Limit1: ") + front.controller.command.left.iDcMax + "A", 160, y, 2); y+=15;
+    display.tft.drawString(String("Performance: ") + performance.last + "                                                ",0,y,2);
+    display.tft.drawString("Mode: " + modeStr, 125, y, 2); y+=15;
+}
+
+void StatusDisplay::stop()
+{
+    Serial.println("StatusDisplay::stop()");
 }
 
 StarfieldDisplay::StarfieldDisplay()
@@ -1490,6 +1777,7 @@ StarfieldDisplay::StarfieldDisplay()
 
 void StarfieldDisplay::start()
 {
+    Serial.println("StarfieldDisplay::start()");
     display.tft.setRotation(1);
     display.tft.fillScreen(TFT_BLACK);
 
@@ -1538,6 +1826,11 @@ void StarfieldDisplay::update()
     }
 }
 
+void StarfieldDisplay::stop()
+{
+    Serial.println("StarfieldDisplay::stop()");
+}
+
 PingPongDisplay::PingPongDisplay()
 {
     lpaddle_y = random(0, h - paddle_h);
@@ -1551,6 +1844,8 @@ PingPongDisplay::PingPongDisplay()
 
 void PingPongDisplay::start()
 {
+    Serial.println("PingPongDisplay::start()");
+
     display.tft.setRotation(1);
 
     display.tft.fillScreen(BLACK);
@@ -1566,6 +1861,86 @@ void PingPongDisplay::update()
     midline();
 
     ball();
+}
+
+void PingPongDisplay::stop()
+{
+    Serial.println("PingPongDisplay::stop()");
+}
+
+SpiroDisplay::SpiroDisplay()
+{
+}
+
+void SpiroDisplay::start()
+{
+    Serial.println("SpiroDisplay::start()");
+    display.tft.setRotation(3);
+}
+
+void SpiroDisplay::update()
+{
+    for (int i = 0; i < std::max(1, n); i++)
+        render();
+}
+
+void SpiroDisplay::stop()
+{
+    Serial.println("SpiroDisplay::stop()");
+}
+
+void SpiroDisplay::render()
+{
+    auto &tft = display.tft;
+
+    if (i == 0)
+    {
+        tft.fillScreen(TFT_BLACK);
+        n = random(2, 23);
+        r = random(20, 100);
+        colour = 0; //rainbow();
+    }
+
+    if (i < (360 * n))
+    {
+        sx = cos((i / n - 90) * DEG2RAD);
+        sy = sin((i / n - 90) * DEG2RAD);
+        x0 = sx * (120 - r) + 159;
+        yy0 = sy * (120 - r) + 119;
+
+
+        sy = cos(((i % 360) - 90) * DEG2RAD);
+        sx = sin(((i % 360) - 90) * DEG2RAD);
+        x1 = sx * r + x0;
+        yy1 = sy * r + yy0;
+        tft.drawPixel(x1, yy1, rainbow(map(i%360,0,360,0,127))); //colour);
+    }
+
+    if (i == (360 * n))
+    {
+        r = random(20, 100);//r = r / random(2,4);
+    }
+
+    if (i >= (360 * n))
+    {
+        auto new_i = i - (360 * n);
+
+        sx = cos((new_i / n - 90) * DEG2RAD);
+        sy = sin((new_i / n - 90) * DEG2RAD);
+        x0 = sx * (120 - r) + 159;
+        yy0 = sy * (120 - r) + 119;
+
+
+        sy = cos(((new_i % 360) - 90) * DEG2RAD);
+        sx = sin(((new_i % 360) - 90) * DEG2RAD);
+        x1 = sx * r + x0;
+        yy1 = sy * r + yy0;
+        tft.drawPixel(x1, yy1, rainbow(map(new_i%360,0,360,0,127))); //colour);
+    }
+
+    i++;
+    if (i == 2* (360 * n))
+        i = 0;
 }
 
 void PingPongDisplay::midline()
@@ -1715,10 +2090,10 @@ void setup()
     enableBackLeft = defaultEnableBackLeft;
     enableBackRight = defaultEnableBackRight;
 
-    invertFrontLeft = defaultInvertFrontLeft;
-    invertFrontRight = defaultInvertFrontRight;
-    invertBackLeft = defaultInvertBackLeft;
-    invertBackRight = defaultInvertBackRight;
+    front.left.invert = defaultInvertFrontLeft;
+    front.right.invert = defaultInvertFrontRight;
+    back.left.invert = defaultInvertBackLeft;
+    back.right.invert = defaultInvertBackRight;
 
     for (auto &controller : controllers)
     {
@@ -1728,6 +2103,18 @@ void setup()
 
     controllers[0].serial.begin(38400, SERIAL_8N1, rxPin1, txPin1);
     controllers[1].serial.begin(38400, SERIAL_8N1, rxPin2, txPin2);
+
+    for (auto &controller : controllers)
+    {
+        controller.command.left.iMotMax = controller.command.right.iMotMax = defaultIMotMax;
+        controller.command.left.iDcMax = controller.command.right.iDcMax = defaultIDcMax;
+        controller.command.left.fieldWeakMax = controller.command.right.fieldWeakMax = defaultFieldWeakMax;
+    }
+
+    modes.defaultMode.gas1_wert = defaultDefaultModeGas1Wert;
+    modes.defaultMode.gas2_wert = defaultDefaultModeGas2Wert;
+    modes.defaultMode.brems1_wert = defaultDefaultModeBrems1Wert;
+    modes.defaultMode.brems2_wert = defaultDefaultModeBrems2Wert;
 
     modes.currentMode.get().start();
 
@@ -1788,14 +2175,19 @@ void loop()
     const auto now = millis();
     if (now - lastUpdate >= 1000/50)
     {
-        analogRead(gasPin);
-        delay(2);
-        raw_gas = analogRead(gasPin);
+        constexpr auto times = 100;
+        const auto read_n_times = [](int pin){
+            analogRead(pin);
+            double sum{};
+            for (int i = 0; i < times; i++)
+                sum += analogRead(pin);
+            return sum/times;
+        };
+
+        raw_gas = read_n_times(gasPin);
         gas = scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
 
-        analogRead(bremsPin);
-        delay(2);
-        raw_brems = analogRead(bremsPin);
+        raw_brems = read_n_times(bremsPin);
         brems = scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
 
         modes.currentMode.get().update();
