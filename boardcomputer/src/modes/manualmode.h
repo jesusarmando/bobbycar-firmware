@@ -1,0 +1,60 @@
+#pragma once
+
+#include <cstdint>
+
+#include "../../common.h"
+
+#include "modebase.h"
+//#include "globals_modes.h"
+#include "utils.h"
+
+namespace {
+class ManualMode : public ModeBase
+{
+public:
+    using ModeBase::ModeBase;
+
+    void start() override {};
+    void update() override;
+    void stop() override {};
+
+    String displayName() const override { return "Manual"; }
+
+    bool potiControl = true;
+    int16_t pwm = 0;
+    ControlType ctrlTyp = ControlType::FieldOrientedControl;
+    ControlMode ctrlMod = ControlMode::Speed;
+};
+
+void ManualMode::update()
+{
+    if (potiControl)
+    {
+        if (gas > 500. && brems > 500.)
+        {
+            pwm = 0;
+//            modes.defaultMode.waitForGasLoslass = true;
+//            modes.defaultMode.waitForBremsLoslass = true;
+//            currentMode = &modes.defaultMode;
+//            currentMode->update();
+            return;
+        }
+
+        pwm += (gas/1000.) - (brems/1000.);
+    }
+
+    for (auto &controller : controllers)
+    {
+        auto &command = controller.command;
+        for (MotorState *motor : {&command.left, &command.right})
+        {
+            motor->ctrlTyp = ctrlTyp;
+            motor->ctrlMod = ctrlMod;
+            motor->pwm = pwm;
+        }
+    }
+    fixCommonParams();
+
+    sendCommands();
+}
+}

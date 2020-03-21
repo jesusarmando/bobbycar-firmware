@@ -5,6 +5,10 @@
 #include <WString.h>
 #include <WiFi.h>
 
+#include "display.h"
+#include "globals.h"
+//#include "globals_displays.h"
+
 namespace {
 template<typename T>
 T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
@@ -31,5 +35,48 @@ String toString(wl_status_t status)
     }
 
     return String("Unknown: ") + int(status);
+}
+
+void fixCommonParams()
+{
+    front.controller.command.left.enable = front.left.enable;
+    front.controller.command.right.enable = front.right.enable;
+    back.controller.command.left.enable = back.left.enable;
+    back.controller.command.right.enable = back.right.enable;
+
+    if (front.left.invert)
+        front.controller.command.left.pwm = -front.controller.command.left.pwm;
+    if (front.right.invert)
+        front.controller.command.right.pwm = -front.controller.command.right.pwm;
+    if (back.left.invert)
+        back.controller.command.left.pwm = -back.controller.command.left.pwm;
+    if (back.right.invert)
+        back.controller.command.right.pwm = -back.controller.command.right.pwm;
+}
+
+void sendCommands()
+{
+    for (auto &controller : controllers)
+    {
+        controller.command.start = Command::VALID_HEADER;
+        controller.command.checksum = calculateChecksum(controller.command);
+        controller.serial.write((uint8_t *) &controller.command, sizeof(controller.command));
+    }
+}
+
+void nextDisplay()
+{
+    currentDisplay->stop();
+
+//    if (currentDisplay == &display.status)
+//        currentDisplay = &display.starfield;
+//    else if (currentDisplay == &display.starfield)
+//        currentDisplay = &display.pingPong;
+//    else if (currentDisplay == &display.pingPong)
+//        currentDisplay = &display.spiro;
+//    else if (currentDisplay == &display.spiro)
+//        currentDisplay = &display.status;
+
+    currentDisplay->start();
 }
 }
