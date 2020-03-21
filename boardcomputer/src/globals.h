@@ -28,7 +28,6 @@ bool led_toggle{false};
 
 unsigned long lastUpdate = millis();
 unsigned long lastRedraw = millis();
-unsigned long lastScreenSwitch = millis();
 unsigned long lastDebug = millis();
 
 wl_status_t last_status;

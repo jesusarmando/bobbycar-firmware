@@ -9,13 +9,15 @@
 #include "globals.h"
 
 namespace {
-class SpiroDisplay : public Display
+class SpiroDisplay final : public Display
 {
 public:
     void start() override;
     void update() override;
     void stop() override;
     int framerate() const override { return 100; }
+
+    String displayName() const override { return "Spiro"; }
 
 private:
     void render();

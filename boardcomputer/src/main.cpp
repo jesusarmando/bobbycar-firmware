@@ -283,14 +283,6 @@ void loop()
         lastRedraw = now;
     }
 
-    if (false)
-    if (now - lastScreenSwitch >= 1000*5)
-    {
-        nextDisplay();
-
-        lastScreenSwitch = now;
-    }
-
     if (now - performance.lastTime >= 1000)
     {
         performance.last = performance.current;

@@ -10,7 +10,7 @@
 #include "utils.h"
 
 namespace {
-class DefaultMode : public ModeBase
+class DefaultMode final : public ModeBase
 {
 public:
     using ModeBase::ModeBase;

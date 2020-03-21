@@ -6,7 +6,7 @@
 #include "globals.h"
 
 namespace {
-class BluetoothMode : public ModeBase
+class BluetoothMode final : public ModeBase
 {
 public:
     using ModeBase::ModeBase;

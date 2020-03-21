@@ -8,11 +8,6 @@
 #include "display.h"
 #include "globals.h"
 
-#include "displays/statusdisplay.h"
-#include "displays/starfielddisplay.h"
-#include "displays/pingpongdisplay.h"
-#include "displays/spirodisplay.h"
-
 namespace {
 template<typename T>
 T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
@@ -66,21 +61,5 @@ void sendCommands()
         controller.command.checksum = calculateChecksum(controller.command);
         controller.serial.write((uint8_t *) &controller.command, sizeof(controller.command));
     }
-}
-
-void nextDisplay()
-{
-    currentDisplay->stop();
-
-    if (currentDisplay == &displays::status)
-        currentDisplay = &displays::starfield;
-    else if (currentDisplay == &displays::starfield)
-        currentDisplay = &displays::pingPong;
-    else if (currentDisplay == &displays::pingPong)
-        currentDisplay = &displays::spiro;
-    else if (currentDisplay == &displays::spiro)
-        currentDisplay = &displays::status;
-
-    currentDisplay->start();
 }
 }

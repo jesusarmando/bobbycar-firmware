@@ -9,7 +9,7 @@
 //#include "utils.h"
 
 namespace {
-class StatusDisplay : public Display
+class StatusDisplay final : public Display
 {
 public:
     void start() override;
@@ -18,6 +18,8 @@ public:
 
     int framerate() const override { return m_framerate; }
     void setFramerate(int framerate) { m_framerate = framerate; }
+
+    String displayName() const override { return "Status"; }
 
 private:
     int m_framerate{2};

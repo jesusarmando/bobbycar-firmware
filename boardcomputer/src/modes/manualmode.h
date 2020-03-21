@@ -9,7 +9,7 @@
 #include "defaultmode.h"
 
 namespace {
-class ManualMode : public ModeBase
+class ManualMode final : public ModeBase
 {
 public:
     using ModeBase::ModeBase;

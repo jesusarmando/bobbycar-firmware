@@ -6,7 +6,7 @@
 #include "globals.h"
 
 namespace {
-class StarfieldDisplay : public Display
+class StarfieldDisplay final : public Display
 {
 public:
     StarfieldDisplay();
@@ -15,6 +15,8 @@ public:
     void update() override;
     void stop() override;
     int framerate() const override { return 30; }
+
+    String displayName() const override { return "Starfield"; }
 
     // Fast 0-255 random number generator from http://eternityforest.com/Projects/rng.php:
     uint8_t rng()

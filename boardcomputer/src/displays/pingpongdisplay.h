@@ -9,7 +9,7 @@
 #include "globals.h"
 
 namespace {
-class PingPongDisplay : public Display
+class PingPongDisplay final : public Display
 {
 public:
     PingPongDisplay();
@@ -18,6 +18,8 @@ public:
     void update() override;
     void stop() override;
     int framerate() const override { return 60; }
+
+    String displayName() const override { return "PingPong"; }
 
     void midline();
     void lpaddle();

@@ -7,6 +7,9 @@
 #include "settings.h"
 
 #include "displays/statusdisplay.h"
+#include "displays/starfielddisplay.h"
+#include "displays/pingpongdisplay.h"
+#include "displays/spirodisplay.h"
 
 #include "modes/defaultmode.h"
 #include "modes/manualmode.h"
@@ -302,17 +305,25 @@ void handleScreenParams(AsyncWebServerRequest *request)
                 response.print("Back");
             }
 
-            response.print(" - ");
-
-            {
-                HtmlTag a(response, "a", " href=\"nextScreen\"");
-                response.print("Next screen");
-            }
-
             {
                 HtmlTag form(response, "form", " action=\"/setScreenParams\"");
 
                 HtmlTag fieldset(response, "fieldset");
+
+                {
+                    HtmlTag legend(response, "display");
+                    response.print("Current display:");
+                }
+
+                {
+                    HtmlTag select(response, "select", " id=\"display\" name=\"display\" required");
+                    selectOption(response, "status", displays::status.displayName().c_str(), currentDisplay==&displays::status);
+                    selectOption(response, "starfield", displays::starfield.displayName().c_str(), currentDisplay==&displays::starfield);
+                    selectOption(response, "pingPong", displays::pingPong.displayName().c_str(), currentDisplay==&displays::pingPong);
+                    selectOption(response, "spiro", displays::spiro.displayName().c_str(), currentDisplay==&displays::spiro);
+                }
+
+                breakLine(response);
 
                 {
                     HtmlTag legend(response, "legend");
@@ -342,6 +353,15 @@ void handleSetScreenParams(AsyncWebServerRequest *request)
         return;
     }
 
+    if (!request->hasParam("display"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no display specified");
+        request->send(&response);
+        return;
+    }
+
 
 
     {
@@ -350,12 +370,42 @@ void handleSetScreenParams(AsyncWebServerRequest *request)
         displays::status.setFramerate(strtol(p->value().c_str(), nullptr, 10));
     }
 
-    request->redirect("/screenParams");
-}
+    {
+        AsyncWebParameter* p = request->getParam("display");
 
-void handleNextScreen(AsyncWebServerRequest *request)
-{
-    nextDisplay();
+        if (p->value() == "status")
+        {
+            currentDisplay->stop();
+            currentDisplay = &displays::status;
+            currentDisplay->start();
+        }
+        else if (p->value() == "starfield")
+        {
+            currentDisplay->stop();
+            currentDisplay = &displays::starfield;
+            currentDisplay->start();
+        }
+        else if (p->value() == "pingPong")
+        {
+            currentDisplay->stop();
+            currentDisplay = &displays::pingPong;
+            currentDisplay->start();
+        }
+        else if (p->value() == "spiro")
+        {
+            currentDisplay->stop();
+            currentDisplay = &displays::spiro;
+            currentDisplay->start();
+        }
+        else
+        {
+            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+            response.setCode(400);
+            response.print("invalid display");
+            request->send(&response);
+            return;
+        }
+    }
 
     request->redirect("/screenParams");
 }
@@ -410,9 +460,9 @@ void handleCommonParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
-                    selectOption(response, "defaultMode", "Default", currentMode==&modes::defaultMode);
-                    selectOption(response, "manualMode", "Manual", currentMode==&modes::manualMode);
-                    selectOption(response, "bluetoothMode", "Bluetooth", currentMode==&modes::bluetoothMode);
+                    selectOption(response, "defaultMode", modes::defaultMode.displayName().c_str(), currentMode==&modes::defaultMode);
+                    selectOption(response, "manualMode", modes::manualMode.displayName().c_str(), currentMode==&modes::manualMode);
+                    selectOption(response, "bluetoothMode", modes::bluetoothMode.displayName().c_str(), currentMode==&modes::bluetoothMode);
                 }
 
                 breakLine(response);
@@ -813,21 +863,21 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
 
         if (p->value() == "defaultMode")
         {
-            currentMode->start();
-            currentMode = &modes::defaultMode;
             currentMode->stop();
+            currentMode = &modes::defaultMode;
+            currentMode->start();
         }
         else if (p->value() == "manualMode")
         {
-            currentMode->start();
-            currentMode = &modes::manualMode;
             currentMode->stop();
+            currentMode = &modes::manualMode;
+            currentMode->start();
         }
         else if (p->value() == "bluetoothMode")
         {
-            currentMode->start();
-            currentMode = &modes::bluetoothMode;
             currentMode->stop();
+            currentMode = &modes::bluetoothMode;
+            currentMode->start();
         }
         else
         {
@@ -1231,8 +1281,6 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
         return true;
     else if (request->url() == "/setScreenParams")
         return true;
-    else if (request->url() == "/nextScreen")
-        return true;
     else if (request->url() == "/commonParams")
         return true;
     else if (request->url() == "/setCommonParams")
@@ -1263,8 +1311,6 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
         handleScreenParams(request);
     else if (request->url() == "/setScreenParams")
         handleSetScreenParams(request);
-    else if (request->url() == "/nextScreen")
-        handleNextScreen(request);
     else if (request->url() == "/commonParams")
         handleCommonParams(request);
     else if (request->url() == "/setCommonParams")
