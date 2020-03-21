@@ -317,10 +317,10 @@ void handleScreenParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"display\" name=\"display\" required");
-                    selectOption(response, "status", displays::status.displayName().c_str(), currentDisplay==&displays::status);
-                    selectOption(response, "starfield", displays::starfield.displayName().c_str(), currentDisplay==&displays::starfield);
-                    selectOption(response, "pingPong", displays::pingPong.displayName().c_str(), currentDisplay==&displays::pingPong);
-                    selectOption(response, "spiro", displays::spiro.displayName().c_str(), currentDisplay==&displays::spiro);
+                    selectOption(response, "status", displays::status.displayName(), currentDisplay==&displays::status);
+                    selectOption(response, "starfield", displays::starfield.displayName(), currentDisplay==&displays::starfield);
+                    selectOption(response, "pingPong", displays::pingPong.displayName(), currentDisplay==&displays::pingPong);
+                    selectOption(response, "spiro", displays::spiro.displayName(), currentDisplay==&displays::spiro);
                 }
 
                 breakLine(response);
@@ -460,9 +460,9 @@ void handleCommonParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
-                    selectOption(response, "defaultMode", modes::defaultMode.displayName().c_str(), currentMode==&modes::defaultMode);
-                    selectOption(response, "manualMode", modes::manualMode.displayName().c_str(), currentMode==&modes::manualMode);
-                    selectOption(response, "bluetoothMode", modes::bluetoothMode.displayName().c_str(), currentMode==&modes::bluetoothMode);
+                    selectOption(response, "defaultMode", modes::defaultMode.displayName(), currentMode==&modes::defaultMode);
+                    selectOption(response, "manualMode", modes::manualMode.displayName(), currentMode==&modes::manualMode);
+                    selectOption(response, "bluetoothMode", modes::bluetoothMode.displayName(), currentMode==&modes::bluetoothMode);
                 }
 
                 breakLine(response);

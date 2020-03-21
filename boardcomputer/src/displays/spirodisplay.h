@@ -17,7 +17,7 @@ public:
     void stop() override;
     int framerate() const override { return 100; }
 
-    String displayName() const override { return "Spiro"; }
+    const char *displayName() const override { return "Spiro"; }
 
 private:
     void render();

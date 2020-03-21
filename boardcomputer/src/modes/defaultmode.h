@@ -19,7 +19,7 @@ public:
     void update() override;
     void stop() override {};
 
-    String displayName() const override { return "Default"; }
+    const char *displayName() const override { return "Default"; }
 
     ControlType ctrlTyp = ControlType::FieldOrientedControl;
     ControlMode ctrlMod = ControlMode::Torque;

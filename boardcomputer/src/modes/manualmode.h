@@ -18,7 +18,7 @@ public:
     void update() override;
     void stop() override {};
 
-    String displayName() const override { return "Manual"; }
+    const char *displayName() const override { return "Manual"; }
 
     bool potiControl = true;
     int16_t pwm = 0;

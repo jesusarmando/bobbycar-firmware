@@ -10,6 +10,6 @@ public:
     virtual void stop() = 0;
     virtual int framerate() const = 0;
 
-    virtual String displayName() const = 0;
+    virtual const char *displayName() const = 0;
 };
 }

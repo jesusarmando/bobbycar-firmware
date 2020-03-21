@@ -19,7 +19,7 @@ public:
     void stop() override;
     int framerate() const override { return 60; }
 
-    String displayName() const override { return "PingPong"; }
+    const char *displayName() const override { return "PingPong"; }
 
     void midline();
     void lpaddle();

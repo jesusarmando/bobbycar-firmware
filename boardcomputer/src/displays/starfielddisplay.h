@@ -16,17 +16,10 @@ public:
     void stop() override;
     int framerate() const override { return 30; }
 
-    String displayName() const override { return "Starfield"; }
+    const char *displayName() const override { return "Starfield"; }
 
     // Fast 0-255 random number generator from http://eternityforest.com/Projects/rng.php:
-    uint8_t rng()
-    {
-        zx++;
-        za = (za^zc^zx);
-        zb = (zb+za);
-        zc = (zc+(zb>>1)^za);
-        return zc;
-    }
+    uint8_t rng();
 
     static constexpr auto NSTARS = 1024;
 
@@ -103,5 +96,14 @@ void StarfieldDisplay::update()
 void StarfieldDisplay::stop()
 {
     Serial.println("StarfieldDisplay::stop()");
+}
+
+uint8_t StarfieldDisplay::rng()
+{
+    zx++;
+    za = (za^zc^zx);
+    zb = (zb+za);
+    zc = (zc+(zb>>1)^za);
+    return zc;
 }
 }

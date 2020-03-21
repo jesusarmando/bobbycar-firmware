@@ -15,7 +15,7 @@ public:
     void update() override;
     void stop() override {};
 
-    String displayName() const override { return "Bluetooth"; }
+    const char *displayName() const override { return "Bluetooth"; }
 };
 
 namespace modes {
