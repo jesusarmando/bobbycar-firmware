@@ -146,6 +146,12 @@ void setup()
     Serial.setDebugOutput(true);
     Serial.println("setup()");
 
+    tft.init();
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setRotation(0);
+    tft.drawString("Booting...", 32, 64, 4);
+
     gasMin = defaultGasMin;
     gasMax = defaultGasMax;
     bremsMin = defaultBremsMin;
@@ -183,10 +189,7 @@ void setup()
     modes::defaultMode.brems2_wert = defaultDefaultModeBrems2Wert;
 
     currentMode = &modes::defaultMode;
-    currentMode->start();
-
     currentDisplay = &displays::status;
-    currentDisplay->start();
 
     bluetooth.serial.begin("bobbycar");
 
@@ -198,7 +201,8 @@ void setup()
     web.server.addHandler(&web.handler);
     web.server.begin();
 
-    tft.init();
+    currentMode->start();
+    currentDisplay->start();
 }
 
 void loop()
