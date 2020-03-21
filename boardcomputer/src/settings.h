@@ -8,6 +8,7 @@ constexpr auto defaultEnableFrontLeft = true, defaultEnableFrontRight = true, de
 constexpr auto defaultIMotMax = 25, defaultIDcMax = 27, defaultFieldWeakMax = 5;
 constexpr auto defaultDefaultModeGas1Wert = 1250, defaultDefaultModeGas2Wert = 1250, defaultDefaultModeBrems1Wert = 250, defaultDefaultModeBrems2Wert = 750;
 constexpr auto gasPin = 35, bremsPin = 33;
-constexpr auto rxPin1 = 4, txPin1 = 5,
-               rxPin2 = 25, txPin2 = 26;
+constexpr int rxPin1 = PINS_RX1, txPin1 = PINS_TX1,
+              rxPin2 = PINS_RX2, txPin2 = PINS_TX2;
+constexpr auto rotaryClkPin = 4, rotaryDtPin = 16, rotarySwPin = 17;
 }

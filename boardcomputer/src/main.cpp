@@ -11,6 +11,7 @@
 #include "../../common.h"
 
 #include "globals.h"
+#include "rotary.h"
 #include "webhandler.h"
 #include "displays/statusdisplay.h"
 #include "modes/defaultmode.h"
@@ -138,6 +139,17 @@ void handleDebugSerial()
         }
     }
 }
+
+class InputDispatcher {
+public:
+    void rotate(int offset) { Serial.print("rotate: "); Serial.println(offset); }
+    void button(bool pressed) { Serial.print("button: "); Serial.println(pressed); }
+};
+
+Rotary<InputDispatcher, rotaryClkPin, rotaryDtPin, rotarySwPin> rotary;
+
+void updateRotate() { rotary.updateRotate(); }
+void updateSwitch() { rotary.updateSwitch(); }
 }
 
 void setup()
@@ -201,6 +213,9 @@ void setup()
     web.server.addHandler(&web.handler);
     web.server.begin();
 
+    attachInterrupt(decltype(rotary)::ClkPin, updateRotate, CHANGE);
+    attachInterrupt(decltype(rotary)::SwPin, updateSwitch, CHANGE);
+
     currentMode->start();
     currentDisplay->start();
 }
@@ -252,7 +267,7 @@ void loop()
     */
 
     const auto now = millis();
-    if (now - lastUpdate >= 1000/50)
+    if (currentMode && now - lastUpdate >= 1000/50)
     {
         constexpr auto times = 100;
         const auto read_n_times = [](int pin){
@@ -276,10 +291,9 @@ void loop()
         performance.current++;
     }
 
-    if (now - lastRedraw >= 1000/currentDisplay->framerate())
+    if (currentDisplay && now - lastRedraw >= 1000/currentDisplay->framerate())
     {
         currentDisplay->update();
-
         lastRedraw = now;
     }
 
