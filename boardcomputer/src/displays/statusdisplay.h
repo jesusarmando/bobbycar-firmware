@@ -6,7 +6,7 @@
 #include "display.h"
 #include "modebase.h"
 #include "globals.h"
-#include "utils.h"
+//#include "utils.h"
 
 namespace {
 class StatusDisplay : public Display
@@ -23,17 +23,20 @@ private:
     int m_framerate{2};
 };
 
+namespace displays {
+StatusDisplay status;
+}
+
 void StatusDisplay::start()
 {
     Serial.println("StatusDisplay::start()");
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setRotation(0);
 }
 
 void StatusDisplay::update()
 {
-    Serial.println("StatusDisplay::update()");
     int y = 0;
 
     tft.drawString(String("gas=") + raw_gas + " -> " + gas + "                                                ",0,y,2); y+=15;
@@ -86,7 +89,7 @@ void StatusDisplay::update()
         y+=12;
     }
 
-    tft.drawString("WiFi: " + toString(WiFi.status()) + "                                                ",0,y,2);
+    //tft.drawString("WiFi: " + toString(WiFi.status()) + "                                                ",0,y,2);
     tft.drawString(String("Limit0: ") + front.controller.command.left.iMotMax + "A", 160, y, 2); y+=15;
     tft.drawString("IP: " + WiFi.localIP().toString() + "                                                ",0,y,2);
     tft.drawString(String("Limit1: ") + front.controller.command.left.iDcMax + "A", 160, y, 2); y+=15;

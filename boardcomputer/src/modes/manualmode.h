@@ -5,8 +5,8 @@
 #include "../../common.h"
 
 #include "modebase.h"
-//#include "globals_modes.h"
 #include "utils.h"
+#include "defaultmode.h"
 
 namespace {
 class ManualMode : public ModeBase
@@ -26,6 +26,10 @@ public:
     ControlMode ctrlMod = ControlMode::Speed;
 };
 
+namespace modes {
+ManualMode manualMode;
+}
+
 void ManualMode::update()
 {
     if (potiControl)
@@ -33,10 +37,10 @@ void ManualMode::update()
         if (gas > 500. && brems > 500.)
         {
             pwm = 0;
-//            modes.defaultMode.waitForGasLoslass = true;
-//            modes.defaultMode.waitForBremsLoslass = true;
-//            currentMode = &modes.defaultMode;
-//            currentMode->update();
+            modes::defaultMode.waitForGasLoslass = true;
+            modes::defaultMode.waitForBremsLoslass = true;
+            currentMode = &modes::defaultMode;
+            currentMode->update();
             return;
         }
 

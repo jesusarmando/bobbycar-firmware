@@ -11,9 +11,9 @@
 #include "../../common.h"
 
 #include "globals.h"
-#include "globals_displays.h"
-#include "globals_modes.h"
 #include "webhandler.h"
+#include "displays/statusdisplay.h"
+#include "modes/defaultmode.h"
 
 namespace {
 struct {
@@ -146,12 +146,6 @@ void setup()
     Serial.setDebugOutput(true);
     Serial.println("setup()");
 
-    bluetooth.serial.begin("bobbycar");
-
-    WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP("bobbycar", "Passwort_123");
-    WiFi.begin("realraum", "r3alraum");
-
     gasMin = defaultGasMin;
     gasMax = defaultGasMax;
     bremsMin = defaultBremsMin;
@@ -183,16 +177,23 @@ void setup()
         controller.command.left.fieldWeakMax = controller.command.right.fieldWeakMax = defaultFieldWeakMax;
     }
 
-    modes.defaultMode.gas1_wert = defaultDefaultModeGas1Wert;
-    modes.defaultMode.gas2_wert = defaultDefaultModeGas2Wert;
-    modes.defaultMode.brems1_wert = defaultDefaultModeBrems1Wert;
-    modes.defaultMode.brems2_wert = defaultDefaultModeBrems2Wert;
+    modes::defaultMode.gas1_wert = defaultDefaultModeGas1Wert;
+    modes::defaultMode.gas2_wert = defaultDefaultModeGas2Wert;
+    modes::defaultMode.brems1_wert = defaultDefaultModeBrems1Wert;
+    modes::defaultMode.brems2_wert = defaultDefaultModeBrems2Wert;
 
-    currentMode = &modes.defaultMode;
+    currentMode = &modes::defaultMode;
     currentMode->start();
 
-    currentDisplay = &display.status;
+    currentDisplay = &displays::status;
     currentDisplay->start();
+
+    bluetooth.serial.begin("bobbycar");
+
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP("bobbycar", "Passwort_123");
+    //WiFi.begin("realraum", "r3alraum");
+    WiFi.begin("McDonalds Free WiFi 2.4GHz", "Passwort_123");
 
     web.server.addHandler(&web.handler);
     web.server.begin();

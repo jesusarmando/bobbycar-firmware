@@ -18,6 +18,10 @@ public:
     String displayName() const override { return "Bluetooth"; }
 };
 
+namespace modes {
+BluetoothMode bluetoothMode;
+}
+
 void BluetoothMode::start()
 {
     // clear buffer

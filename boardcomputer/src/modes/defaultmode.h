@@ -38,6 +38,10 @@ public:
     int16_t brems2_wert = 750;
 };
 
+namespace modes {
+DefaultMode defaultMode;
+}
+
 void DefaultMode::update()
 {
     if (waitForGasLoslass)

@@ -35,19 +35,23 @@ public:
     uint8_t za, zb, zc, zx;
 };
 
-StarfieldDisplay::StarfieldDisplay()
+namespace displays {
+StarfieldDisplay starfield;
+}
+
+StarfieldDisplay::StarfieldDisplay() :
+    za(random(256)),
+    zb(random(256)),
+    zc(random(256)),
+    zx(random(256))
 {
-    za = random(256);
-    zb = random(256);
-    zc = random(256);
-    zx = random(256);
 }
 
 void StarfieldDisplay::start()
 {
     Serial.println("StarfieldDisplay::start()");
-    tft.setRotation(1);
     tft.fillScreen(TFT_BLACK);
+    tft.setRotation(1);
 
     // fastSetup() must be used immediately before fastPixel() to prepare screen
     // It must be called after any other graphics drawing function call if fastPixel()

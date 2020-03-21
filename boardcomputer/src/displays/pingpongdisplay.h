@@ -2,7 +2,11 @@
 
 #include <cstdint>
 
+#include <Arduino.h>
+#include <HardwareSerial.h>
+
 #include "display.h"
+#include "globals.h"
 
 namespace {
 class PingPongDisplay : public Display
@@ -68,6 +72,10 @@ public:
     static const constexpr auto GREY = 0x5AEB;
 };
 
+namespace displays {
+PingPongDisplay pingPong;
+}
+
 PingPongDisplay::PingPongDisplay()
 {
     lpaddle_y = random(0, h - paddle_h);
@@ -83,9 +91,8 @@ void PingPongDisplay::start()
 {
     Serial.println("PingPongDisplay::start()");
 
+    tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
-
-    tft.fillScreen(BLACK);
 
     midline();
 }

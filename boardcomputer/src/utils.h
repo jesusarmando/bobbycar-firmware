@@ -7,7 +7,11 @@
 
 #include "display.h"
 #include "globals.h"
-//#include "globals_displays.h"
+
+#include "displays/statusdisplay.h"
+#include "displays/starfielddisplay.h"
+#include "displays/pingpongdisplay.h"
+#include "displays/spirodisplay.h"
 
 namespace {
 template<typename T>
@@ -68,14 +72,14 @@ void nextDisplay()
 {
     currentDisplay->stop();
 
-//    if (currentDisplay == &display.status)
-//        currentDisplay = &display.starfield;
-//    else if (currentDisplay == &display.starfield)
-//        currentDisplay = &display.pingPong;
-//    else if (currentDisplay == &display.pingPong)
-//        currentDisplay = &display.spiro;
-//    else if (currentDisplay == &display.spiro)
-//        currentDisplay = &display.status;
+    if (currentDisplay == &displays::status)
+        currentDisplay = &displays::starfield;
+    else if (currentDisplay == &displays::starfield)
+        currentDisplay = &displays::pingPong;
+    else if (currentDisplay == &displays::pingPong)
+        currentDisplay = &displays::spiro;
+    else if (currentDisplay == &displays::spiro)
+        currentDisplay = &displays::status;
 
     currentDisplay->start();
 }

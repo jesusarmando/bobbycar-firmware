@@ -4,9 +4,13 @@
 
 #include "htmlutils.h"
 #include "globals.h"
-#include "globals_displays.h"
-#include "globals_modes.h"
 #include "settings.h"
+
+#include "displays/statusdisplay.h"
+
+#include "modes/defaultmode.h"
+#include "modes/manualmode.h"
+#include "modes/bluetoothmode.h"
 
 namespace {
 class WebHandler : public AsyncWebHandler
@@ -315,7 +319,7 @@ void handleScreenParams(AsyncWebServerRequest *request)
                     response.print("Screen params:");
                 }
 
-                numberInput(response, display.status.framerate(), "framerate", "Status framerate:");
+                numberInput(response, displays::status.framerate(), "framerate", "Status framerate:");
 
                 breakLine(response);
 
@@ -343,7 +347,7 @@ void handleSetScreenParams(AsyncWebServerRequest *request)
     {
         AsyncWebParameter* p = request->getParam("framerate");
 
-        display.status.setFramerate(strtol(p->value().c_str(), nullptr, 10));
+        displays::status.setFramerate(strtol(p->value().c_str(), nullptr, 10));
     }
 
     request->redirect("/screenParams");
@@ -406,9 +410,9 @@ void handleCommonParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
-                    selectOption(response, "defaultMode", "Default", currentMode==&modes.defaultMode);
-                    selectOption(response, "manualMode", "Manual", currentMode==&modes.manualMode);
-                    selectOption(response, "bluetoothMode", "Bluetooth", currentMode==&modes.bluetoothMode);
+                    selectOption(response, "defaultMode", "Default", currentMode==&modes::defaultMode);
+                    selectOption(response, "manualMode", "Manual", currentMode==&modes::manualMode);
+                    selectOption(response, "bluetoothMode", "Bluetooth", currentMode==&modes::bluetoothMode);
                 }
 
                 breakLine(response);
@@ -523,9 +527,9 @@ void handleDefaultModeParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"ctrlTyp1\" name=\"ctrlTyp\" required");
-                    selectOption(response, "Commutation", "Commutation", modes.defaultMode.ctrlTyp == ControlType::Commutation);
-                    selectOption(response, "Sinusoidal", "Sinusoidal", modes.defaultMode.ctrlTyp == ControlType::Sinusoidal);
-                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes.defaultMode.ctrlTyp == ControlType::FieldOrientedControl);
+                    selectOption(response, "Commutation", "Commutation", modes::defaultMode.ctrlTyp == ControlType::Commutation);
+                    selectOption(response, "Sinusoidal", "Sinusoidal", modes::defaultMode.ctrlTyp == ControlType::Sinusoidal);
+                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes::defaultMode.ctrlTyp == ControlType::FieldOrientedControl);
                 }
 
                 breakLine(response);
@@ -537,47 +541,47 @@ void handleDefaultModeParams(AsyncWebServerRequest *request)
                 {
                     HtmlTag select(response, "select", " id=\"ctrlMod1\" name=\"ctrlMod\" required");
 
-                    selectOption(response, "OpenMode", "Open Mode", modes.defaultMode.ctrlMod == ControlMode::OpenMode);
-                    selectOption(response, "Voltage", "Voltage", modes.defaultMode.ctrlMod == ControlMode::Voltage);
-                    selectOption(response, "Speed", "Speed", modes.defaultMode.ctrlMod == ControlMode::Speed);
-                    selectOption(response, "Torque", "Torque", modes.defaultMode.ctrlMod == ControlMode::Torque);
+                    selectOption(response, "OpenMode", "Open Mode", modes::defaultMode.ctrlMod == ControlMode::OpenMode);
+                    selectOption(response, "Voltage", "Voltage", modes::defaultMode.ctrlMod == ControlMode::Voltage);
+                    selectOption(response, "Speed", "Speed", modes::defaultMode.ctrlMod == ControlMode::Speed);
+                    selectOption(response, "Torque", "Torque", modes::defaultMode.ctrlMod == ControlMode::Torque);
                 }
 
                 breakLine(response);
 
-                checkboxInput(response, modes.defaultMode.enableWeakeningSmoothening, "enableWeakeningSmoothening", "Enable Weakening Smoothening:");
+                checkboxInput(response, modes::defaultMode.enableWeakeningSmoothening, "enableWeakeningSmoothening", "Enable Weakening Smoothening:");
 
                 breakLine(response);
 
-                numberInput(response, modes.defaultMode.weakeningSmoothening, "weakeningSmoothening", "Weakening Smoothening:");
+                numberInput(response, modes::defaultMode.weakeningSmoothening, "weakeningSmoothening", "Weakening Smoothening:");
 
                 breakLine(response);
 
-                numberInput(response, modes.defaultMode.frontPercentage, "frontPercentage", "Front percentage:");
+                numberInput(response, modes::defaultMode.frontPercentage, "frontPercentage", "Front percentage:");
 
                 breakLine(response);
 
-                numberInput(response, modes.defaultMode.backPercentage, "backPercentage", "Back percentage:");
+                numberInput(response, modes::defaultMode.backPercentage, "backPercentage", "Back percentage:");
 
                 breakLine(response);
 
-                numberInput(response, modes.defaultMode.add_schwelle, "add_schwelle", "add_schwelle:");
+                numberInput(response, modes::defaultMode.add_schwelle, "add_schwelle", "add_schwelle:");
 
                 breakLine(response);
 
-                numberInput(response, modes.defaultMode.gas1_wert, "gas1_wert", "gas1_wert:");
+                numberInput(response, modes::defaultMode.gas1_wert, "gas1_wert", "gas1_wert:");
 
                 breakLine(response);
 
-                numberInput(response, modes.defaultMode.gas2_wert, "gas2_wert", "gas2_wert:");
+                numberInput(response, modes::defaultMode.gas2_wert, "gas2_wert", "gas2_wert:");
 
                 breakLine(response);
 
-                numberInput(response, modes.defaultMode.brems1_wert, "brems1_wert", "brems1_wert:");
+                numberInput(response, modes::defaultMode.brems1_wert, "brems1_wert", "brems1_wert:");
 
                 breakLine(response);
 
-                numberInput(response, modes.defaultMode.brems2_wert, "brems2_wert", "brems2_wert:");
+                numberInput(response, modes::defaultMode.brems2_wert, "brems2_wert", "brems2_wert:");
 
                 breakLine(response);
 
@@ -634,11 +638,11 @@ void handleManualModeParams(AsyncWebServerRequest *request)
                     response.print("Manual Mode:");
                 }
 
-                checkboxInput(response, modes.manualMode.potiControl, "potiControl", "Poti control:");
+                checkboxInput(response, modes::manualMode.potiControl, "potiControl", "Poti control:");
 
                 breakLine(response);
 
-                numberInput(response, modes.manualMode.pwm, "pwm", "Pwm:");
+                numberInput(response, modes::manualMode.pwm, "pwm", "Pwm:");
 
                 breakLine(response);
 
@@ -648,9 +652,9 @@ void handleManualModeParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"ctrlTyp2\" name=\"ctrlTyp\" required");
-                    selectOption(response, "Commutation", "Commutation", modes.manualMode.ctrlTyp == ControlType::Commutation);
-                    selectOption(response, "Sinusoidal", "Sinusoidal", modes.manualMode.ctrlTyp == ControlType::Sinusoidal);
-                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes.manualMode.ctrlTyp == ControlType::FieldOrientedControl);
+                    selectOption(response, "Commutation", "Commutation", modes::manualMode.ctrlTyp == ControlType::Commutation);
+                    selectOption(response, "Sinusoidal", "Sinusoidal", modes::manualMode.ctrlTyp == ControlType::Sinusoidal);
+                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes::manualMode.ctrlTyp == ControlType::FieldOrientedControl);
                 }
 
                 breakLine(response);
@@ -662,10 +666,10 @@ void handleManualModeParams(AsyncWebServerRequest *request)
                 {
                     HtmlTag select(response, "select", " id=\"ctrlMod2\" name=\"ctrlMod\" required");
 
-                    selectOption(response, "OpenMode", "Open Mode", modes.manualMode.ctrlMod == ControlMode::OpenMode);
-                    selectOption(response, "Voltage", "Voltage", modes.manualMode.ctrlMod == ControlMode::Voltage);
-                    selectOption(response, "Speed", "Speed", modes.manualMode.ctrlMod == ControlMode::Speed);
-                    selectOption(response, "Torque", "Torque", modes.manualMode.ctrlMod == ControlMode::Torque);
+                    selectOption(response, "OpenMode", "Open Mode", modes::manualMode.ctrlMod == ControlMode::OpenMode);
+                    selectOption(response, "Voltage", "Voltage", modes::manualMode.ctrlMod == ControlMode::Voltage);
+                    selectOption(response, "Speed", "Speed", modes::manualMode.ctrlMod == ControlMode::Speed);
+                    selectOption(response, "Torque", "Torque", modes::manualMode.ctrlMod == ControlMode::Torque);
                 }
 
                 breakLine(response);
@@ -810,19 +814,19 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
         if (p->value() == "defaultMode")
         {
             currentMode->start();
-            currentMode = &modes.defaultMode;
+            currentMode = &modes::defaultMode;
             currentMode->stop();
         }
         else if (p->value() == "manualMode")
         {
             currentMode->start();
-            currentMode = &modes.manualMode;
+            currentMode = &modes::manualMode;
             currentMode->stop();
         }
         else if (p->value() == "bluetoothMode")
         {
             currentMode->start();
-            currentMode = &modes.bluetoothMode;
+            currentMode = &modes::bluetoothMode;
             currentMode->stop();
         }
         else
@@ -981,11 +985,11 @@ void handleSetDefaultModeParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("ctrlTyp");
 
         if (p->value() == "Commutation")
-            modes.defaultMode.ctrlTyp = ControlType::Commutation;
+            modes::defaultMode.ctrlTyp = ControlType::Commutation;
         else if (p->value() == "Sinusoidal")
-            modes.defaultMode.ctrlTyp = ControlType::Sinusoidal;
+            modes::defaultMode.ctrlTyp = ControlType::Sinusoidal;
         else if (p->value() == "FieldOrientedControl")
-            modes.defaultMode.ctrlTyp = ControlType::FieldOrientedControl;
+            modes::defaultMode.ctrlTyp = ControlType::FieldOrientedControl;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -1000,13 +1004,13 @@ void handleSetDefaultModeParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("ctrlMod");
 
         if (p->value() == "OpenMode")
-            modes.defaultMode.ctrlMod = ControlMode::OpenMode;
+            modes::defaultMode.ctrlMod = ControlMode::OpenMode;
         else if (p->value() == "Voltage")
-            modes.defaultMode.ctrlMod = ControlMode::Voltage;
+            modes::defaultMode.ctrlMod = ControlMode::Voltage;
         else if (p->value() == "Speed")
-            modes.defaultMode.ctrlMod = ControlMode::Speed;
+            modes::defaultMode.ctrlMod = ControlMode::Speed;
         else if (p->value() == "Torque")
-            modes.defaultMode.ctrlMod = ControlMode::Torque;
+            modes::defaultMode.ctrlMod = ControlMode::Torque;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -1017,54 +1021,54 @@ void handleSetDefaultModeParams(AsyncWebServerRequest *request)
         }
     }
 
-    modes.defaultMode.enableWeakeningSmoothening = request->hasParam("enableWeakeningSmoothening") && request->getParam("enableWeakeningSmoothening")->value() == "on";
+    modes::defaultMode.enableWeakeningSmoothening = request->hasParam("enableWeakeningSmoothening") && request->getParam("enableWeakeningSmoothening")->value() == "on";
 
     {
         AsyncWebParameter* p = request->getParam("weakeningSmoothening");
 
-        modes.defaultMode.weakeningSmoothening = strtol(p->value().c_str(), nullptr, 10);
+        modes::defaultMode.weakeningSmoothening = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("frontPercentage");
 
-        modes.defaultMode.frontPercentage = strtol(p->value().c_str(), nullptr, 10);
+        modes::defaultMode.frontPercentage = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("backPercentage");
 
-        modes.defaultMode.backPercentage = strtol(p->value().c_str(), nullptr, 10);
+        modes::defaultMode.backPercentage = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("add_schwelle");
 
-        modes.defaultMode.add_schwelle = strtol(p->value().c_str(), nullptr, 10);
+        modes::defaultMode.add_schwelle = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("gas1_wert");
 
-        modes.defaultMode.gas1_wert = strtol(p->value().c_str(), nullptr, 10);
+        modes::defaultMode.gas1_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("gas2_wert");
 
-        modes.defaultMode.gas2_wert = strtol(p->value().c_str(), nullptr, 10);
+        modes::defaultMode.gas2_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("brems1_wert");
 
-        modes.defaultMode.brems1_wert = strtol(p->value().c_str(), nullptr, 10);
+        modes::defaultMode.brems1_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("brems2_wert");
 
-        modes.defaultMode.brems2_wert = strtol(p->value().c_str(), nullptr, 10);
+        modes::defaultMode.brems2_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     request->redirect("/defaultModeParams");
@@ -1101,23 +1105,23 @@ void handleSetManualModeParams(AsyncWebServerRequest *request)
 
 
 
-    modes.manualMode.potiControl = request->hasParam("potiControl") && request->getParam("potiControl")->value() == "on";
+    modes::manualMode.potiControl = request->hasParam("potiControl") && request->getParam("potiControl")->value() == "on";
 
     {
         AsyncWebParameter* p = request->getParam("pwm");
 
-        modes.manualMode.pwm = strtol(p->value().c_str(), nullptr, 10);
+        modes::manualMode.pwm = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("ctrlTyp");
 
         if (p->value() == "Commutation")
-            modes.manualMode.ctrlTyp = ControlType::Commutation;
+            modes::manualMode.ctrlTyp = ControlType::Commutation;
         else if (p->value() == "Sinusoidal")
-            modes.manualMode.ctrlTyp = ControlType::Sinusoidal;
+            modes::manualMode.ctrlTyp = ControlType::Sinusoidal;
         else if (p->value() == "FieldOrientedControl")
-            modes.manualMode.ctrlTyp = ControlType::FieldOrientedControl;
+            modes::manualMode.ctrlTyp = ControlType::FieldOrientedControl;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -1132,13 +1136,13 @@ void handleSetManualModeParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("ctrlMod");
 
         if (p->value() == "OpenMode")
-            modes.manualMode.ctrlMod = ControlMode::OpenMode;
+            modes::manualMode.ctrlMod = ControlMode::OpenMode;
         else if (p->value() == "Voltage")
-            modes.manualMode.ctrlMod = ControlMode::Voltage;
+            modes::manualMode.ctrlMod = ControlMode::Voltage;
         else if (p->value() == "Speed")
-            modes.manualMode.ctrlMod = ControlMode::Speed;
+            modes::manualMode.ctrlMod = ControlMode::Speed;
         else if (p->value() == "Torque")
-            modes.manualMode.ctrlMod = ControlMode::Torque;
+            modes::manualMode.ctrlMod = ControlMode::Torque;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
