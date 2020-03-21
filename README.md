@@ -1,12 +1,21 @@
 # bobbycar-firmware
+How to build the motor controller firmware?
 ```
-git clone --recursive git@github.com:0xFEEDC0DE64/bobbycar-firmware.git
 mkdir -v build_bobbycar-firmware
 cd build_bobbycar-firmware
 cmake ../bobbycar-firmware
 make unlock0 # needed only once
 make flash
 ```
+
+How to build the steering wheel board computer firmware?
+```
+cd boardcomputer/
+platformio run --environment bobbycar --target upload
+```
+
+How to wire all the PCBs inside the bobbycar?
+![Wiring diagram](/wiring.png)
 
 ## with Field Oriented Control (FOC)
 
