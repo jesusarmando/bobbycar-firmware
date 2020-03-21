@@ -40,7 +40,6 @@ void ManualMode::update()
             modes::defaultMode.waitForGasLoslass = true;
             modes::defaultMode.waitForBremsLoslass = true;
             currentMode = &modes::defaultMode;
-            currentMode->update();
             return;
         }
 

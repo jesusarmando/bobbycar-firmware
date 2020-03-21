@@ -22,6 +22,9 @@ struct {
     WebHandler handler;
 } web;
 
+ModeBase *lastMode{};
+Display *lastDisplay{};
+
 void receiveFeedback()
 {
     for (Controller &controller : controllers)
@@ -203,7 +206,7 @@ void setup()
     currentMode = &modes::defaultMode;
     currentDisplay = &displays::status;
 
-    bluetooth.serial.begin("bobbycar");
+    bluetoothSerial.begin("bobbycar");
 
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("bobbycar", "Passwort_123");
@@ -215,9 +218,6 @@ void setup()
 
     attachInterrupt(decltype(rotary)::ClkPin, updateRotate, CHANGE);
     attachInterrupt(decltype(rotary)::SwPin, updateSwitch, CHANGE);
-
-    currentMode->start();
-    currentDisplay->start();
 }
 
 void loop()
@@ -267,7 +267,7 @@ void loop()
     */
 
     const auto now = millis();
-    if (currentMode && now - lastUpdate >= 1000/50)
+    if (now - lastUpdate >= 1000/50)
     {
         constexpr auto times = 100;
         const auto read_n_times = [](int pin){
@@ -284,16 +284,37 @@ void loop()
         raw_brems = read_n_times(bremsPin);
         brems = scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
 
-        currentMode->update();
+        if (lastMode != currentMode)
+        {
+            if (lastMode)
+                lastMode->stop();
+            lastMode = currentMode;
+            if (currentMode)
+                currentMode->start();
+        }
+
+        if (currentMode)
+            currentMode->update();
 
         lastUpdate = now;
 
         performance.current++;
     }
 
-    if (currentDisplay && now - lastRedraw >= 1000/currentDisplay->framerate())
+    if (now - lastRedraw >= 1000/currentDisplay->framerate())
     {
-        currentDisplay->update();
+        if (lastDisplay != currentDisplay)
+        {
+            if (lastDisplay)
+                lastDisplay->stop();
+            lastDisplay = currentDisplay;
+            if (currentDisplay)
+                currentDisplay->start();
+        }
+
+        if (currentDisplay)
+            currentDisplay->redraw();
+
         lastRedraw = now;
     }
 

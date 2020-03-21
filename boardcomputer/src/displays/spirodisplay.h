@@ -13,7 +13,7 @@ class SpiroDisplay final : public Display
 {
 public:
     void start() override;
-    void update() override;
+    void redraw() override;
     void stop() override;
     int framerate() const override { return 100; }
 
@@ -44,7 +44,7 @@ void SpiroDisplay::start()
     tft.setRotation(3);
 }
 
-void SpiroDisplay::update()
+void SpiroDisplay::redraw()
 {
     for (int i = 0; i < std::max(1, n); i++)
         render();

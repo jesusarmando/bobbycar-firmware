@@ -1,9 +1,13 @@
 #pragma once
 
+#include <array>
+#include <iterator>
+
 #include <ArduinoJson.h>
 
 #include "modebase.h"
 #include "globals.h"
+#include "utils.h"
 
 namespace {
 class BluetoothMode final : public ModeBase
@@ -16,6 +20,10 @@ public:
     void stop() override {};
 
     const char *displayName() const override { return "Bluetooth"; }
+
+private:
+    std::array<uint8_t, 256> buffer;
+    std::array<uint8_t, 256>::iterator pos{std::begin(buffer)};
 };
 
 namespace modes {
@@ -25,19 +33,19 @@ BluetoothMode bluetoothMode;
 void BluetoothMode::start()
 {
     // clear buffer
-    while (bluetooth.serial.available())
-        bluetooth.serial.read();
+    while (bluetoothSerial.available())
+        bluetoothSerial.read();
 }
 
 void BluetoothMode::update()
 {
     bool newLine{false};
-    while (bluetooth.serial.available())
+    while (bluetoothSerial.available())
     {
-        *bluetooth.pos = bluetooth.serial.read();
-        if (*bluetooth.pos == '\n')
+        *pos = bluetoothSerial.read();
+        if (*pos == '\n')
             newLine = true;
-        bluetooth.pos++;
+        ++pos;
         if (newLine)
             break;
     }
@@ -46,34 +54,34 @@ void BluetoothMode::update()
         return;
 
     StaticJsonDocument<256> doc;
-    const auto error = deserializeJson(doc, &(*bluetooth.buffer.begin()), std::distance(bluetooth.buffer.begin(), bluetooth.pos));
+    const auto error = deserializeJson(doc, &(*buffer.begin()), std::distance(buffer.begin(), pos));
 
-    bluetooth.pos = bluetooth.buffer.begin();
+    pos = buffer.begin();
 
     if (error)
     {
-        bluetooth.serial.println(error.c_str());
+        bluetoothSerial.println(error.c_str());
         return;
     }
 
     if (!doc.containsKey("frontLeft"))
     {
-        bluetooth.serial.print("no frontLeft");
+        bluetoothSerial.print("no frontLeft");
         return;
     }
     if (!doc.containsKey("frontRight"))
     {
-        bluetooth.serial.print("no frontRight");
+        bluetoothSerial.print("no frontRight");
         return;
     }
     if (!doc.containsKey("backLeft"))
     {
-        bluetooth.serial.print("no backLeft");
+        bluetoothSerial.print("no backLeft");
         return;
     }
     if (!doc.containsKey("backRight"))
     {
-        bluetooth.serial.print("no backRight");
+        bluetoothSerial.print("no backRight");
         return;
     }
 

@@ -12,7 +12,7 @@ public:
     StarfieldDisplay();
 
     void start() override;
-    void update() override;
+    void redraw() override;
     void stop() override;
     int framerate() const override { return 30; }
 
@@ -54,7 +54,7 @@ void StarfieldDisplay::start()
     //tft.fastSetup(); // Prepare plot window range for fast pixel plotting
 }
 
-void StarfieldDisplay::update()
+void StarfieldDisplay::redraw()
 {
     uint8_t spawnDepthVariation = 255;
 

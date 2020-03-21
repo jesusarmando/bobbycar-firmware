@@ -48,11 +48,7 @@ struct {
     int last{0};
 } performance;
 
-struct {
-    BluetoothSerial serial;
-    std::array<uint8_t, 256> buffer;
-    std::array<uint8_t, 256>::iterator pos{std::begin(buffer)};
-} bluetooth;
+BluetoothSerial bluetoothSerial;
 
 TFT_eSPI tft = TFT_eSPI();
 

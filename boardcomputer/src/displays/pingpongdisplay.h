@@ -15,7 +15,7 @@ public:
     PingPongDisplay();
 
     void start() override;
-    void update() override;
+    void redraw() override;
     void stop() override;
     int framerate() const override { return 60; }
 
@@ -99,7 +99,7 @@ void PingPongDisplay::start()
     midline();
 }
 
-void PingPongDisplay::update()
+void PingPongDisplay::redraw()
 {
     lpaddle();
     rpaddle();

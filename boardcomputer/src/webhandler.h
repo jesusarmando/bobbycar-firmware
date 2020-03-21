@@ -7,6 +7,7 @@
 #include "settings.h"
 
 #include "displays/statusdisplay.h"
+#include "displays/mainmenu.h"
 #include "displays/starfielddisplay.h"
 #include "displays/pingpongdisplay.h"
 #include "displays/spirodisplay.h"
@@ -318,6 +319,7 @@ void handleScreenParams(AsyncWebServerRequest *request)
                 {
                     HtmlTag select(response, "select", " id=\"display\" name=\"display\" required");
                     selectOption(response, "status", displays::status.displayName(), currentDisplay==&displays::status);
+                    selectOption(response, "mainMenu", displays::mainMenu.displayName(), currentDisplay==&displays::mainMenu);
                     selectOption(response, "starfield", displays::starfield.displayName(), currentDisplay==&displays::starfield);
                     selectOption(response, "pingPong", displays::pingPong.displayName(), currentDisplay==&displays::pingPong);
                     selectOption(response, "spiro", displays::spiro.displayName(), currentDisplay==&displays::spiro);
@@ -374,29 +376,15 @@ void handleSetScreenParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("display");
 
         if (p->value() == "status")
-        {
-            currentDisplay->stop();
             currentDisplay = &displays::status;
-            currentDisplay->start();
-        }
+        else if (p->value() == "mainMenu")
+            currentDisplay = &displays::mainMenu;
         else if (p->value() == "starfield")
-        {
-            currentDisplay->stop();
             currentDisplay = &displays::starfield;
-            currentDisplay->start();
-        }
         else if (p->value() == "pingPong")
-        {
-            currentDisplay->stop();
             currentDisplay = &displays::pingPong;
-            currentDisplay->start();
-        }
         else if (p->value() == "spiro")
-        {
-            currentDisplay->stop();
             currentDisplay = &displays::spiro;
-            currentDisplay->start();
-        }
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -862,23 +850,11 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("mode");
 
         if (p->value() == "defaultMode")
-        {
-            currentMode->stop();
             currentMode = &modes::defaultMode;
-            currentMode->start();
-        }
         else if (p->value() == "manualMode")
-        {
-            currentMode->stop();
             currentMode = &modes::manualMode;
-            currentMode->start();
-        }
         else if (p->value() == "bluetoothMode")
-        {
-            currentMode->stop();
             currentMode = &modes::bluetoothMode;
-            currentMode->start();
-        }
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");

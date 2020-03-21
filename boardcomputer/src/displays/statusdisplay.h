@@ -16,10 +16,8 @@ namespace {
 class StatusDisplay final : public Display
 {
 public:
-    StatusDisplay();
-
     void start() override;
-    void update() override;
+    void redraw() override;
     void stop() override;
 
     int framerate() const override { return m_framerate; }
@@ -35,17 +33,14 @@ namespace displays {
 StatusDisplay status;
 }
 
-StatusDisplay::StatusDisplay()
-{
-}
-
 void StatusDisplay::start()
 {
     Serial.println("StatusDisplay::start()");
+    tft.fillScreen(TFT_BLACK);
     tft.setRotation(0);
 }
 
-void StatusDisplay::update()
+void StatusDisplay::redraw()
 {
     int y = 0;
 
