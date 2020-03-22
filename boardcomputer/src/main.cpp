@@ -57,6 +57,12 @@ void GameOfLifeDisplay::button(bool pressed)
         currentDisplay = &displays::mainMenu;
 }
 
+void MetersDisplay::button(bool pressed)
+{
+    if (!pressed)
+        currentDisplay = &displays::mainMenu;
+}
+
 void receiveFeedback()
 {
     for (Controller &controller : controllers)

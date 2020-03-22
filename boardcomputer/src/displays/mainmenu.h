@@ -11,6 +11,7 @@
 #include "displays/pingpongdisplay.h"
 #include "displays/spirodisplay.h"
 #include "displays/gameoflifedisplay.h"
+#include "displays/metersdisplay.h"
 
 namespace {
 class MainMenu final : public MenuDisplay
@@ -33,15 +34,17 @@ private:
     SwitchScreenItem item2{displays::pingPong, displays::pingPong.displayName()};
     SwitchScreenItem item3{displays::spiro, displays::spiro.displayName()};
     SwitchScreenItem item4{displays::gameOfLife, displays::gameOfLife.displayName()};
-    RebootItem item5;
+    SwitchScreenItem item5{displays::meters, displays::meters.displayName()};
+    RebootItem item6;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 6> carr{{
+    const std::array<std::reference_wrapper<const MenuItem>, 7> carr{{
         std::cref<MenuItem>(item0),
         std::cref<MenuItem>(item1),
         std::cref<MenuItem>(item2),
         std::cref<MenuItem>(item3),
         std::cref<MenuItem>(item4),
-        std::cref<MenuItem>(item5)
+        std::cref<MenuItem>(item5),
+        std::cref<MenuItem>(item6)
     }};
 };
 
