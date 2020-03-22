@@ -7,7 +7,8 @@
 #include "settings.h"
 
 #include "displays/statusdisplay.h"
-#include "displays/mainmenu.h"
+#include "displays/menus/mainmenu.h"
+#include "displays/menus/demosmenu.h"
 #include "displays/starfielddisplay.h"
 #include "displays/pingpongdisplay.h"
 #include "displays/spirodisplay.h"
@@ -395,6 +396,7 @@ void WebHandler::handleScreenParams(AsyncWebServerRequest *request)
                     HtmlTag select(response, "select", " id=\"display\" name=\"display\" required");
                     selectOption(response, "status", displays::status.displayName(), currentDisplay==&displays::status);
                     selectOption(response, "mainMenu", displays::mainMenu.displayName(), currentDisplay==&displays::mainMenu);
+                    selectOption(response, "demosMenu", displays::demosMenu.displayName(), currentDisplay==&displays::demosMenu);
                     selectOption(response, "starfield", displays::starfield.displayName(), currentDisplay==&displays::starfield);
                     selectOption(response, "pingPong", displays::pingPong.displayName(), currentDisplay==&displays::pingPong);
                     selectOption(response, "spiro", displays::spiro.displayName(), currentDisplay==&displays::spiro);
@@ -456,6 +458,8 @@ void WebHandler::handleSetScreenParams(AsyncWebServerRequest *request)
             currentDisplay = &displays::status;
         else if (p->value() == "mainMenu")
             currentDisplay = &displays::mainMenu;
+        else if (p->value() == "demosMenu")
+            currentDisplay = &displays::demosMenu;
         else if (p->value() == "starfield")
             currentDisplay = &displays::starfield;
         else if (p->value() == "pingPong")

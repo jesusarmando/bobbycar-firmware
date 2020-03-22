@@ -63,6 +63,10 @@ void MetersDisplay::button(bool pressed)
         currentDisplay = &displays::mainMenu;
 }
 
+DemosMenu::DemosMenu() :
+    item5{displays::mainMenu, "Back"}
+{}
+
 void handleDebugSerial()
 {
     const auto status = WiFi.status();
