@@ -4,7 +4,7 @@
 
 #include "globals.h"
 #include "menudisplay.h"
-#include "menuitems/selectcontroltypeitem.h"
+#include "menuitems/setvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
 
 namespace {
@@ -24,9 +24,9 @@ public:
 private:
     ControlType &m_controlType;
 
-    SelectControlTypeItem item0;
-    SelectControlTypeItem item1;
-    SelectControlTypeItem item2;
+    SetValueMenuItem<ControlType> item0;
+    SetValueMenuItem<ControlType> item1;
+    SetValueMenuItem<ControlType> item2;
     SwitchScreenItem item3;
 
     const std::array<std::reference_wrapper<const MenuItem>, 4> carr{{

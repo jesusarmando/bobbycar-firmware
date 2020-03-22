@@ -4,7 +4,7 @@
 
 #include "globals.h"
 #include "menudisplay.h"
-#include "menuitems/selectmodeitem.h"
+#include "menuitems/setvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
 #include "modes/defaultmode.h"
 #include "modes/manualmode.h"
@@ -25,9 +25,9 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SelectModeItem item0;
-    SelectModeItem item1;
-    SelectModeItem item2;
+    SetValueMenuItem<ModeBase*> item0;
+    SetValueMenuItem<ModeBase*> item1;
+    SetValueMenuItem<ModeBase*> item2;
     SwitchScreenItem item3;
 
     const std::array<std::reference_wrapper<const MenuItem>, 4> carr{{
@@ -39,9 +39,9 @@ private:
 };
 
 SelectModeMenu::SelectModeMenu(Display &prevDisplay) :
-    item0{modes::defaultMode, prevDisplay, "Default"},
-    item1{modes::manualMode, prevDisplay, "Manual"},
-    item2{modes::bluetoothMode, prevDisplay, "Bluetooth"},
+    item0{&modes::defaultMode, currentMode, prevDisplay, "Default"},
+    item1{&modes::manualMode, currentMode, prevDisplay, "Manual"},
+    item2{&modes::bluetoothMode, currentMode, prevDisplay, "Bluetooth"},
     item3{prevDisplay, "Back"}
 {
 }

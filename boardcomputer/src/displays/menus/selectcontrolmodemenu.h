@@ -4,7 +4,7 @@
 
 #include "globals.h"
 #include "menudisplay.h"
-#include "menuitems/selectcontrolmodeitem.h"
+#include "menuitems/setvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
 
 namespace {
@@ -24,10 +24,10 @@ public:
 private:
     ControlMode &m_controlMode;
 
-    SelectControlModeItem item0;
-    SelectControlModeItem item1;
-    SelectControlModeItem item2;
-    SelectControlModeItem item3;
+    SetValueMenuItem<ControlMode> item0;
+    SetValueMenuItem<ControlMode> item1;
+    SetValueMenuItem<ControlMode> item2;
+    SetValueMenuItem<ControlMode> item3;
     SwitchScreenItem item4;
 
     const std::array<std::reference_wrapper<const MenuItem>, 5> carr{{
