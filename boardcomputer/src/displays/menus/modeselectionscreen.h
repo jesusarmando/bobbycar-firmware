@@ -2,15 +2,21 @@
 
 #include <array>
 
+#include "globals.h"
 #include "menudisplay.h"
 #include "menuitems/selectmodeitem.h"
 #include "menuitems/switchscreenmenuitem.h"
+#include "modes/defaultmode.h"
+#include "modes/manualmode.h"
+#include "modes/bluetoothmode.h"
 
 namespace {
 class ModeSelectionMenu final : public MenuDisplay
 {
 public:
     ModeSelectionMenu();
+
+    void start() override;
 
     const char *displayName() const override { return "ModeSelectionMenu"; }
     const char *menuTitle() const override { return "Mode selection"; }
@@ -34,5 +40,19 @@ private:
 
 namespace displays {
 ModeSelectionMenu modeSelectionMenu;
+}
+
+void ModeSelectionMenu::start()
+{
+    MenuDisplay::start();
+
+    if (currentMode == &modes::defaultMode)
+        m_current = begin() + 0;
+    else if (currentMode == &modes::manualMode)
+        m_current = begin() + 1;
+    else if (currentMode == &modes::bluetoothMode)
+        m_current = begin() + 2;
+    else
+        m_current = begin() + 3;
 }
 }

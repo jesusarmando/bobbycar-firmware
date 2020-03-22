@@ -26,7 +26,7 @@ public:
 
     void redrawMenu() const;
 
-private:
+protected:
     const std::reference_wrapper<const MenuItem> *m_current;
     bool m_needsRedraw;
 };
