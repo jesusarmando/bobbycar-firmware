@@ -8,6 +8,8 @@
 #include "globals.h"
 #include "utils.h"
 
+//#include "displays/mainmenu.h"
+
 namespace {
 #include "sprites/alert.h"
 }
@@ -24,6 +26,8 @@ public:
     void setFramerate(int framerate) { m_framerate = framerate; }
 
     const char *displayName() const override { return "Status"; }
+
+    void button(bool pressed) override;
 
 private:
     int m_framerate{2};
@@ -111,5 +115,11 @@ void StatusDisplay::redraw()
 void StatusDisplay::stop()
 {
     Serial.println("StatusDisplay::stop()");
+}
+
+void StatusDisplay::button(bool pressed)
+{
+//    if (!pressed)
+//        currentDisplay = &displays::mainMenu;
 }
 }

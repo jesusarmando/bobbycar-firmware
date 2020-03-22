@@ -11,5 +11,8 @@ public:
     virtual int framerate() const = 0;
 
     virtual const char *displayName() const = 0;
+
+    virtual void rotate(int offset) {}
+    virtual void button(bool pressed) {}
 };
 }

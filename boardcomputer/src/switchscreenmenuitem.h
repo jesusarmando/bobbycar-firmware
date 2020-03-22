@@ -4,14 +4,12 @@
 #include "menuitem.h"
 
 namespace {
-class Display;
-
 class SwitchScreenItem : public MenuItem
 {
 public:
     SwitchScreenItem(Display &display, const char *text);
 
-    void triggered() override;
+    void triggered() const override;
 
 private:
     Display &m_display;
@@ -23,7 +21,7 @@ SwitchScreenItem::SwitchScreenItem(Display &display, const char *text) :
 {
 }
 
-void SwitchScreenItem::triggered()
+void SwitchScreenItem::triggered() const
 {
     currentDisplay = &m_display;
 }

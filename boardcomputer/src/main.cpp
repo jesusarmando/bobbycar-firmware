@@ -145,8 +145,8 @@ void handleDebugSerial()
 
 class InputDispatcher {
 public:
-    void rotate(int offset) { Serial.print("rotate: "); Serial.println(offset); }
-    void button(bool pressed) { Serial.print("button: "); Serial.println(pressed); }
+    void rotate(int offset) { if (currentDisplay) currentDisplay->rotate(offset); }
+    void button(bool pressed) { if (currentDisplay) currentDisplay->button(pressed); }
 };
 
 Rotary<InputDispatcher, rotaryClkPin, rotaryDtPin, rotarySwPin> rotary;

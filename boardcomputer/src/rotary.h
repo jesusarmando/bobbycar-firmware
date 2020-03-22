@@ -22,7 +22,7 @@ private:
     int m_lastMillis{};
 
     bool m_lastClk;
-    bool m_lastSw;
+    bool m_lastSw{};
 };
 
 template<typename HANDLER, pin_t CLK, pin_t DT, pin_t SW>
