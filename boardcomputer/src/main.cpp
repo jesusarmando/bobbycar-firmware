@@ -25,6 +25,32 @@ struct {
 ModeBase *lastMode{};
 Display *lastDisplay{};
 
+// To solve circular dependencies between headers:
+
+void StatusDisplay::button(bool pressed)
+{
+    if (!pressed)
+        currentDisplay = &displays::mainMenu;
+}
+
+void StarfieldDisplay::button(bool pressed)
+{
+    if (!pressed)
+        currentDisplay = &displays::mainMenu;
+}
+
+void PingPongDisplay::button(bool pressed)
+{
+    if (!pressed)
+        currentDisplay = &displays::mainMenu;
+}
+
+void SpiroDisplay::button(bool pressed)
+{
+    if (!pressed)
+        currentDisplay = &displays::mainMenu;
+}
+
 void receiveFeedback()
 {
     for (Controller &controller : controllers)
@@ -301,20 +327,21 @@ void loop()
         performance.current++;
     }
 
-    if (now - lastRedraw >= 1000/currentDisplay->framerate())
+    if (lastDisplay != currentDisplay)
     {
-        if (lastDisplay != currentDisplay)
-        {
-            if (lastDisplay)
-                lastDisplay->stop();
-            lastDisplay = currentDisplay;
-            if (currentDisplay)
-                currentDisplay->start();
-        }
-
+        if (lastDisplay)
+            lastDisplay->stop();
+        lastDisplay = currentDisplay;
         if (currentDisplay)
+        {
+            currentDisplay->start();
             currentDisplay->redraw();
+        }
+    }
 
+    if (currentDisplay && now - lastRedraw >= 1000/currentDisplay->framerate())
+    {
+        currentDisplay->redraw();
         lastRedraw = now;
     }
 

@@ -19,6 +19,8 @@ public:
 
     const char *displayName() const override { return "Spiro"; }
 
+    void button(bool pressed) override;
+
 private:
     void render();
 

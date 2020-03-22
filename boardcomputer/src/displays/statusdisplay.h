@@ -8,8 +8,6 @@
 #include "globals.h"
 #include "utils.h"
 
-//#include "displays/mainmenu.h"
-
 namespace {
 #include "sprites/alert.h"
 }
@@ -115,11 +113,5 @@ void StatusDisplay::redraw()
 void StatusDisplay::stop()
 {
     Serial.println("StatusDisplay::stop()");
-}
-
-void StatusDisplay::button(bool pressed)
-{
-//    if (!pressed)
-//        currentDisplay = &displays::mainMenu;
 }
 }

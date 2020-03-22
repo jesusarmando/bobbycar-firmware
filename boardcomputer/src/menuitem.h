@@ -16,9 +16,13 @@ private:
 
 int MenuItem::draw(int y, bool selected) const
 {
-    if (selected)
-        tft.drawRect(5, y, tft.width() - 5, 25, TFT_WHITE);
+    tft.setTextColor(selected ? TFT_ORANGE : TFT_WHITE);
+
     tft.drawString(m_text, 10, y, 4);
+
+    if (selected)
+        tft.drawRect(5, y-2, tft.width() - 5, 25, TFT_WHITE);
+
     return 25;
 }
 }

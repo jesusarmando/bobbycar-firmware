@@ -4,7 +4,7 @@
 #include "menuitem.h"
 
 namespace {
-class SwitchScreenItem : public MenuItem
+class SwitchScreenItem final : public MenuItem
 {
 public:
     SwitchScreenItem(Display &display, const char *text);

@@ -12,7 +12,7 @@
 #include "displays/spirodisplay.h"
 
 namespace {
-class MainMenu : public MenuDisplay
+class MainMenu final : public MenuDisplay
 {
 public:
     const char *displayName() const override { return "MainMenu"; }

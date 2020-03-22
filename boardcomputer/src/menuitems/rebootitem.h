@@ -5,7 +5,7 @@
 #include "menuitem.h"
 
 namespace {
-class RebootItem : public MenuItem
+class RebootItem final : public MenuItem
 {
 public:
     RebootItem(const char *text = "Reboot");

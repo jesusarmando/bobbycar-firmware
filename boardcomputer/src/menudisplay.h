@@ -11,7 +11,7 @@ class MenuDisplay : public Display
 {
 public:
     void start() override;
-    void redraw() override;
+    void redraw() override final;
     void stop() override;
     int framerate() const override { return 60; }
 

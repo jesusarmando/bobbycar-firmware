@@ -21,6 +21,8 @@ public:
 
     const char *displayName() const override { return "PingPong"; }
 
+    void button(bool pressed) override;
+
     void midline();
     void lpaddle();
     void rpaddle();

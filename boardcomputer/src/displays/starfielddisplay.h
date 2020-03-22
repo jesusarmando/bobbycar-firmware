@@ -18,6 +18,8 @@ public:
 
     const char *displayName() const override { return "Starfield"; }
 
+    void button(bool pressed) override;
+
     // Fast 0-255 random number generator from http://eternityforest.com/Projects/rng.php:
     uint8_t rng();
 
