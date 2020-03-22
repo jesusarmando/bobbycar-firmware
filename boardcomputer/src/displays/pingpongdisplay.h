@@ -5,14 +5,13 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 
-#include "display.h"
-#include "globals.h"
+#include "demodisplay.h"
 
 namespace {
-class PingPongDisplay final : public Display
+class PingPongDisplay final : public DemoDisplay
 {
 public:
-    PingPongDisplay();
+    PingPongDisplay(Display &prevDisplay);
 
     void start() override;
     void redraw() override;
@@ -20,8 +19,6 @@ public:
     int framerate() const override { return 60; }
 
     const char *displayName() const override { return "PingPong"; }
-
-    void button(bool pressed) override;
 
     void midline();
     void lpaddle();
@@ -76,11 +73,8 @@ public:
     static const constexpr auto GREY = 0x5AEB;
 };
 
-namespace displays {
-PingPongDisplay pingPong;
-}
-
-PingPongDisplay::PingPongDisplay()
+PingPongDisplay::PingPongDisplay(Display &prevDisplay) :
+    DemoDisplay{prevDisplay}
 {
     lpaddle_y = random(0, h - paddle_h);
     rpaddle_y = random(0, h - paddle_h);

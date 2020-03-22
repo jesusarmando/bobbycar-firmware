@@ -5,21 +5,20 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 
-#include "display.h"
-#include "globals.h"
+#include "demodisplay.h"
 
 namespace {
-class SpiroDisplay final : public Display
+class SpiroDisplay final : public DemoDisplay
 {
 public:
+    using DemoDisplay::DemoDisplay;
+
     void start() override;
     void redraw() override;
     void stop() override;
     int framerate() const override { return 100; }
 
     const char *displayName() const override { return "Spiro"; }
-
-    void button(bool pressed) override;
 
 private:
     void render();
@@ -34,10 +33,6 @@ private:
     long i{0};
     int n{}, r{}, colour{};
 };
-
-namespace displays {
-SpiroDisplay spiro;
-}
 
 void SpiroDisplay::start()
 {

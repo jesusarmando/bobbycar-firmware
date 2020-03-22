@@ -4,13 +4,13 @@
 
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
-#include "displays/menus/modeselectionscreen.h"
+#include "displays/menus/selectmodemenu.h"
 
 namespace {
 class CommonSettingsMenu final : public MenuDisplay
 {
 public:
-    CommonSettingsMenu();
+    CommonSettingsMenu(Display &prevDisplay);
 
     const char *displayName() const override { return "CommonSettingsMenu"; }
     const char *menuTitle() const override { return "Common settings"; }
@@ -19,7 +19,9 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SwitchScreenItem item0{displays::modeSelectionMenu, displays::modeSelectionMenu.menuTitle()};
+    SelectModeMenu m_selectModeMenu{*this};
+
+    SwitchScreenItem item0{m_selectModeMenu, m_selectModeMenu.menuTitle()};
     SwitchScreenItem item1;
 
     const std::array<std::reference_wrapper<const MenuItem>, 2> carr{{
@@ -28,7 +30,8 @@ private:
     }};
 };
 
-namespace displays {
-CommonSettingsMenu commonSettingsMenu;
+CommonSettingsMenu::CommonSettingsMenu(Display &prevDisplay) :
+    item1{prevDisplay, "Back"}
+{
 }
 }

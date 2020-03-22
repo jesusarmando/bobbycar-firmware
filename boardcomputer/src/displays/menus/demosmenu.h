@@ -15,7 +15,7 @@ namespace {
 class DemosMenu final : public MenuDisplay
 {
 public:
-    DemosMenu();
+    DemosMenu(Display &prevDisplay);
 
     const char *displayName() const override { return "DemosMenu"; }
     const char *menuTitle() const override { return "Demos"; }
@@ -24,11 +24,17 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SwitchScreenItem item0{displays::starfield, displays::starfield.displayName()};
-    SwitchScreenItem item1{displays::pingPong, displays::pingPong.displayName()};
-    SwitchScreenItem item2{displays::spiro, displays::spiro.displayName()};
-    SwitchScreenItem item3{displays::gameOfLife, displays::gameOfLife.displayName()};
-    SwitchScreenItem item4{displays::meters, displays::meters.displayName()};
+    StarfieldDisplay m_starfield{*this};
+    PingPongDisplay m_pingPong{*this};
+    SpiroDisplay m_spiro{*this};
+    GameOfLifeDisplay m_gameOfLife{*this};
+    MetersDisplay m_meters{*this};
+
+    SwitchScreenItem item0{m_starfield, m_starfield.displayName()};
+    SwitchScreenItem item1{m_pingPong, m_pingPong.displayName()};
+    SwitchScreenItem item2{m_spiro, m_spiro.displayName()};
+    SwitchScreenItem item3{m_gameOfLife, m_gameOfLife.displayName()};
+    SwitchScreenItem item4{m_meters, m_meters.displayName()};
     SwitchScreenItem item5;
 
     const std::array<std::reference_wrapper<const MenuItem>, 6> carr{{
@@ -41,7 +47,8 @@ private:
     }};
 };
 
-namespace displays {
-DemosMenu demosMenu;
+DemosMenu::DemosMenu(Display &prevDisplay) :
+    item5{prevDisplay, "Back"}
+{
 }
 }

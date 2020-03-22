@@ -13,7 +13,7 @@
 #include "globals.h"
 #include "rotary.h"
 #include "webhandler.h"
-#include "displays/statusdisplay.h"
+#include "displays/menus/mainmenu.h"
 #include "modes/defaultmode.h"
 
 namespace {
@@ -22,81 +22,10 @@ struct {
     WebHandler handler;
 } web;
 
+MainMenu mainMenu;
+
 ModeBase *lastMode{};
 Display *lastDisplay{};
-
-// To solve circular dependencies between headers:
-
-void StatusDisplay::button(bool pressed)
-{
-    if (!pressed)
-        currentDisplay = &displays::mainMenu;
-}
-
-void StarfieldDisplay::button(bool pressed)
-{
-    if (!pressed)
-        currentDisplay = &displays::mainMenu;
-}
-
-void PingPongDisplay::button(bool pressed)
-{
-    if (!pressed)
-        currentDisplay = &displays::mainMenu;
-}
-
-void SpiroDisplay::button(bool pressed)
-{
-    if (!pressed)
-        currentDisplay = &displays::mainMenu;
-}
-
-void GameOfLifeDisplay::button(bool pressed)
-{
-    if (!pressed)
-        currentDisplay = &displays::mainMenu;
-}
-
-void MetersDisplay::button(bool pressed)
-{
-    if (!pressed)
-        currentDisplay = &displays::mainMenu;
-}
-
-SettingsMenu::SettingsMenu() :
-    item5{displays::mainMenu, "Back"}
-{}
-
-CommonSettingsMenu::CommonSettingsMenu() :
-    item1{displays::settingsMenu, "Back"}
-{}
-
-ModeSelectionMenu::ModeSelectionMenu() :
-    item0{modes::defaultMode, displays::commonSettingsMenu, "Default"},
-    item1{modes::manualMode, displays::commonSettingsMenu, "Manual"},
-    item2{modes::bluetoothMode, displays::commonSettingsMenu, "Bluetooth"},
-    item3{displays::commonSettingsMenu, "Back"}
-{}
-
-DefaultModeSettingsMenu::DefaultModeSettingsMenu() :
-    item0{displays::settingsMenu, "Back"}
-{}
-
-ManualModeSettingsMenu::ManualModeSettingsMenu() :
-    item0{displays::settingsMenu, "Back"}
-{}
-
-BluetoothModeSettingsMenu::BluetoothModeSettingsMenu() :
-    item0{displays::settingsMenu, "Back"}
-{}
-
-PotiSettingsMenu::PotiSettingsMenu() :
-    item0{displays::settingsMenu, "Back"}
-{}
-
-DemosMenu::DemosMenu() :
-    item5{displays::mainMenu, "Back"}
-{}
 
 void handleDebugSerial()
 {
@@ -226,7 +155,7 @@ void setup()
     modes::defaultMode.brems2_wert = defaultDefaultModeBrems2Wert;
 
     currentMode = &modes::defaultMode;
-    currentDisplay = &displays::status;
+    currentDisplay = &mainMenu.m_statusDisplay;
 
     web.server.addHandler(&web.handler);
     web.server.begin();

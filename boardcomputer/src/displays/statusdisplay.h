@@ -3,7 +3,7 @@
 #include <HardwareSerial.h>
 #include <WiFi.h>
 
-#include "display.h"
+#include "demodisplay.h"
 #include "modebase.h"
 #include "globals.h"
 #include "utils.h"
@@ -13,9 +13,11 @@ namespace {
 }
 
 namespace {
-class StatusDisplay final : public Display
+class StatusDisplay final : public DemoDisplay
 {
 public:
+    using DemoDisplay::DemoDisplay;
+
     void start() override;
     void redraw() override;
     void stop() override;
@@ -25,15 +27,9 @@ public:
 
     const char *displayName() const override { return "Status"; }
 
-    void button(bool pressed) override;
-
 private:
     int m_framerate{2};
 };
-
-namespace displays {
-StatusDisplay status;
-}
 
 void StatusDisplay::start()
 {

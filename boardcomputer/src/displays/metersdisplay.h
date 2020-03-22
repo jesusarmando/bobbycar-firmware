@@ -2,13 +2,14 @@
 
 #include <Arduino.h>
 
-#include "display.h"
-#include "globals.h"
+#include "demodisplay.h"
 
 namespace {
-class MetersDisplay final : public Display
+class MetersDisplay final : public DemoDisplay
 {
 public:
+    using DemoDisplay::DemoDisplay;
+
     void start() override;
     void redraw() override;
     void stop() override;
@@ -16,8 +17,6 @@ public:
     int framerate() const override { return 60; }
 
     const char *displayName() const override { return "Meters"; }
-
-    void button(bool pressed) override;
 
 private:
     //  Draw the analogue meter on the screen
@@ -49,10 +48,6 @@ private:
 
     int d = 0;
 };
-
-namespace displays {
-MetersDisplay meters;
-}
 
 void MetersDisplay::start()
 {

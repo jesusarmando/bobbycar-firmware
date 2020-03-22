@@ -8,20 +8,6 @@
 #include "settings.h"
 
 #include "displays/statusdisplay.h"
-#include "displays/menus/mainmenu.h"
-#include "displays/menus/settingsmenu.h"
-#include "displays/menus/commonsettingsmenu.h"
-#include "displays/menus/modeselectionscreen.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
-#include "displays/menus/manualmodesettingsmenu.h"
-#include "displays/menus/bluetoothmodesettingsmenu.h"
-#include "displays/menus/potisettingsmenu.h"
-#include "displays/menus/demosmenu.h"
-#include "displays/starfielddisplay.h"
-#include "displays/pingpongdisplay.h"
-#include "displays/spirodisplay.h"
-#include "displays/gameoflifedisplay.h"
-#include "displays/metersdisplay.h"
 
 #include "modes/defaultmode.h"
 #include "modes/manualmode.h"
@@ -407,39 +393,9 @@ void WebHandler::handleScreenParams(AsyncWebServerRequest *request)
                 HtmlTag fieldset(response, "fieldset");
 
                 {
-                    HtmlTag legend(response, "display");
-                    response.print("Current display:");
-                }
-
-                {
-                    HtmlTag select(response, "select", " id=\"display\" name=\"display\" required");
-                    selectOption(response, "status", displays::status.displayName(), currentDisplay==&displays::status);
-                    selectOption(response, "mainMenu", displays::mainMenu.displayName(), currentDisplay==&displays::mainMenu);
-                    selectOption(response, "settingsMenu", displays::settingsMenu.displayName(), currentDisplay==&displays::settingsMenu);
-                    selectOption(response, "commonSettingsMenu", displays::commonSettingsMenu.displayName(), currentDisplay==&displays::commonSettingsMenu);
-                    selectOption(response, "modeSelectionMenu", displays::modeSelectionMenu.displayName(), currentDisplay==&displays::modeSelectionMenu);
-                    selectOption(response, "defaultModeSettingsMenu", displays::defaultModeSettingsMenu.displayName(), currentDisplay==&displays::defaultModeSettingsMenu);
-                    selectOption(response, "manualModeSettingsMenu", displays::manualModeSettingsMenu.displayName(), currentDisplay==&displays::manualModeSettingsMenu);
-                    selectOption(response, "bluetoothModeSettingsMenu", displays::bluetoothModeSettingsMenu.displayName(), currentDisplay==&displays::bluetoothModeSettingsMenu);
-                    selectOption(response, "potiSettingsMenu", displays::potiSettingsMenu.displayName(), currentDisplay==&displays::potiSettingsMenu);
-                    selectOption(response, "demosMenu", displays::demosMenu.displayName(), currentDisplay==&displays::demosMenu);
-                    selectOption(response, "starfield", displays::starfield.displayName(), currentDisplay==&displays::starfield);
-                    selectOption(response, "pingPong", displays::pingPong.displayName(), currentDisplay==&displays::pingPong);
-                    selectOption(response, "spiro", displays::spiro.displayName(), currentDisplay==&displays::spiro);
-                    selectOption(response, "gameOfLife", displays::gameOfLife.displayName(), currentDisplay==&displays::gameOfLife);
-                    selectOption(response, "meters", displays::meters.displayName(), currentDisplay==&displays::meters);
-                }
-
-                breakLine(response);
-
-                {
                     HtmlTag legend(response, "legend");
                     response.print("Screen params:");
                 }
-
-                numberInput(response, displays::status.framerate(), "framerate", "Status framerate:");
-
-                breakLine(response);
 
                 submitButton(response);
             }
@@ -451,75 +407,6 @@ void WebHandler::handleScreenParams(AsyncWebServerRequest *request)
 
 void WebHandler::handleSetScreenParams(AsyncWebServerRequest *request)
 {
-    if (!request->hasParam("framerate"))
-    {
-        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
-        response.setCode(400);
-        response.print("no framerate specified");
-        request->send(&response);
-        return;
-    }
-
-    if (!request->hasParam("display"))
-    {
-        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
-        response.setCode(400);
-        response.print("no display specified");
-        request->send(&response);
-        return;
-    }
-
-
-
-    {
-        AsyncWebParameter* p = request->getParam("framerate");
-
-        displays::status.setFramerate(strtol(p->value().c_str(), nullptr, 10));
-    }
-
-    {
-        AsyncWebParameter* p = request->getParam("display");
-
-        if (p->value() == "status")
-            currentDisplay = &displays::status;
-        else if (p->value() == "mainMenu")
-            currentDisplay = &displays::mainMenu;
-        else if (p->value() == "settingsMenu")
-            currentDisplay = &displays::settingsMenu;
-        else if (p->value() == "commonSettingsMenu")
-            currentDisplay = &displays::commonSettingsMenu;
-        else if (p->value() == "modeSelectionMenu")
-            currentDisplay = &displays::modeSelectionMenu;
-        else if (p->value() == "defaultModeSettingsMenu")
-            currentDisplay = &displays::defaultModeSettingsMenu;
-        else if (p->value() == "manualModeSettingsMenu")
-            currentDisplay = &displays::manualModeSettingsMenu;
-        else if (p->value() == "bluetoothModeSettingsMenu")
-            currentDisplay = &displays::bluetoothModeSettingsMenu;
-        else if (p->value() == "potiSettingsMenu")
-            currentDisplay = &displays::potiSettingsMenu;
-        else if (p->value() == "demosMenu")
-            currentDisplay = &displays::demosMenu;
-        else if (p->value() == "starfield")
-            currentDisplay = &displays::starfield;
-        else if (p->value() == "pingPong")
-            currentDisplay = &displays::pingPong;
-        else if (p->value() == "spiro")
-            currentDisplay = &displays::spiro;
-        else if (p->value() == "gameOfLife")
-            currentDisplay = &displays::gameOfLife;
-        else if (p->value() == "meters")
-            currentDisplay = &displays::meters;
-        else
-        {
-            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
-            response.setCode(400);
-            response.print("invalid display");
-            request->send(&response);
-            return;
-        }
-    }
-
     request->redirect("/screenParams");
 }
 

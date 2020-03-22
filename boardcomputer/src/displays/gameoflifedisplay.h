@@ -2,13 +2,14 @@
 
 #include <Arduino.h>
 
-#include "display.h"
-#include "globals.h"
+#include "demodisplay.h"
 
 namespace {
-class GameOfLifeDisplay final : public Display
+class GameOfLifeDisplay final : public DemoDisplay
 {
 public:
+    using DemoDisplay::DemoDisplay;
+
     void start() override;
     void redraw() override;
     void stop() override;
@@ -16,8 +17,6 @@ public:
     int framerate() const override { return 60; }
 
     const char *displayName() const override { return "GameOfLife"; }
-
-    void button(bool pressed) override;
 
 private:
     //Draws the grid on the display
@@ -52,10 +51,6 @@ private:
     static const constexpr auto NUMGEN = 600;
     int gen = 0;
 };
-
-namespace displays {
-GameOfLifeDisplay gameOfLife;
-}
 
 void GameOfLifeDisplay::start()
 {

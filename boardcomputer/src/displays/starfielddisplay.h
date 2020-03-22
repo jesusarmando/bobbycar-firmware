@@ -2,14 +2,14 @@
 
 #include <cstdint>
 
-#include "display.h"
+#include "demodisplay.h"
 #include "globals.h"
 
 namespace {
-class StarfieldDisplay final : public Display
+class StarfieldDisplay final : public DemoDisplay
 {
 public:
-    StarfieldDisplay();
+    StarfieldDisplay(Display &prevDisplay);
 
     void start() override;
     void redraw() override;
@@ -17,8 +17,6 @@ public:
     int framerate() const override { return 30; }
 
     const char *displayName() const override { return "Starfield"; }
-
-    void button(bool pressed) override;
 
     // Fast 0-255 random number generator from http://eternityforest.com/Projects/rng.php:
     uint8_t rng();
@@ -32,11 +30,8 @@ public:
     uint8_t za, zb, zc, zx;
 };
 
-namespace displays {
-StarfieldDisplay starfield;
-}
-
-StarfieldDisplay::StarfieldDisplay() :
+StarfieldDisplay::StarfieldDisplay(Display &prevDisplay) :
+    DemoDisplay{prevDisplay},
     za(random(256)),
     zb(random(256)),
     zc(random(256)),

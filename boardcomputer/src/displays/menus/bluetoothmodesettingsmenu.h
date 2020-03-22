@@ -9,7 +9,7 @@ namespace {
 class BluetoothModeSettingsMenu final : public MenuDisplay
 {
 public:
-    BluetoothModeSettingsMenu();
+    BluetoothModeSettingsMenu(Display &prevDisplay);
 
     const char *displayName() const override { return "BluetoothModeSettingsMenu"; }
     const char *menuTitle() const override { return "Bluetooth mode settings"; }
@@ -25,7 +25,8 @@ private:
     }};
 };
 
-namespace displays {
-BluetoothModeSettingsMenu bluetoothModeSettingsMenu;
+BluetoothModeSettingsMenu::BluetoothModeSettingsMenu(Display &prevDisplay):
+   item0{prevDisplay, "Back"}
+{
 }
 }

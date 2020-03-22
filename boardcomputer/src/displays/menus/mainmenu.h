@@ -2,7 +2,11 @@
 
 #include <array>
 
+#include "displays/statusdisplay.h"
 #include "menudisplay.h"
+#include "settingsmenu.h"
+#include "demosmenu.h"
+
 #include "menuitems/switchscreenmenuitem.h"
 #include "menuitems/rebootitem.h"
 
@@ -20,10 +24,14 @@ public:
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
+    StatusDisplay m_statusDisplay{*this};
 private:
-    SwitchScreenItem item0{displays::status, displays::status.displayName()};
-    SwitchScreenItem item1{displays::settingsMenu, displays::settingsMenu.menuTitle()};
-    SwitchScreenItem item2{displays::demosMenu, displays::demosMenu.menuTitle()};
+    SettingsMenu m_settingsMenu{*this};
+    DemosMenu m_demoMenu{*this};
+
+    SwitchScreenItem item0{m_statusDisplay, m_statusDisplay.displayName()};
+    SwitchScreenItem item1{m_settingsMenu, m_settingsMenu.menuTitle()};
+    SwitchScreenItem item2{m_demoMenu, m_demoMenu.menuTitle()};
     RebootItem item3;
 
     const std::array<std::reference_wrapper<const MenuItem>, 4> carr{{
@@ -33,8 +41,4 @@ private:
         std::cref<MenuItem>(item3)
     }};
 };
-
-namespace displays {
-MainMenu mainMenu;
-}
 };

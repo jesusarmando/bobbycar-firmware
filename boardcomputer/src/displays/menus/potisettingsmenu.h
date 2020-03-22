@@ -9,7 +9,7 @@ namespace {
 class PotiSettingsMenu final : public MenuDisplay
 {
 public:
-    PotiSettingsMenu();
+    PotiSettingsMenu(Display &prevDisplay);
 
     const char *displayName() const override { return "PotiSettingsMenu"; }
     const char *menuTitle() const override { return "Poti settings"; }
@@ -25,7 +25,8 @@ private:
     }};
 };
 
-namespace displays {
-PotiSettingsMenu potiSettingsMenu;
+PotiSettingsMenu::PotiSettingsMenu(Display &prevDisplay):
+   item0{prevDisplay, "Back"}
+{
 }
 }

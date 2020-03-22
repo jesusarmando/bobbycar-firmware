@@ -4,12 +4,15 @@
 
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
+#include "displays/menus/selectcontroltypemenu.h"
+#include "displays/menus/selectcontrolmodemenu.h"
+#include "modes/defaultmode.h"
 
 namespace {
 class DefaultModeSettingsMenu final : public MenuDisplay
 {
 public:
-    DefaultModeSettingsMenu();
+    DefaultModeSettingsMenu(Display &prevDisplay);
 
     const char *displayName() const override { return "DefaultModeSettingsMenu"; }
     const char *menuTitle() const override { return "Default mode settings"; }
@@ -18,14 +21,22 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SwitchScreenItem item0;
+    SelectControlTypeMenu m_selectControlTypeMenu{modes::defaultMode.ctrlTyp, *this};
+    SelectControlModeMenu m_selectControlModeMenu{modes::defaultMode.ctrlMod, *this};
 
-    const std::array<std::reference_wrapper<const MenuItem>, 1> carr{{
-        std::cref<MenuItem>(item0)
+    SwitchScreenItem item0{m_selectControlTypeMenu, m_selectControlTypeMenu.menuTitle()};
+    SwitchScreenItem item1{m_selectControlModeMenu, m_selectControlModeMenu.menuTitle()};
+    SwitchScreenItem item2;
+
+    const std::array<std::reference_wrapper<const MenuItem>, 3> carr{{
+        std::cref<MenuItem>(item0),
+        std::cref<MenuItem>(item1),
+        std::cref<MenuItem>(item2)
     }};
 };
 
-namespace displays {
-DefaultModeSettingsMenu defaultModeSettingsMenu;
+DefaultModeSettingsMenu::DefaultModeSettingsMenu(Display &prevDisplay) :
+    item2{prevDisplay, "Back"}
+{
 }
 }

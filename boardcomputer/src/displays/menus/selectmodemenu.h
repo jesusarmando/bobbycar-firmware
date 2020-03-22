@@ -11,15 +11,15 @@
 #include "modes/bluetoothmode.h"
 
 namespace {
-class ModeSelectionMenu final : public MenuDisplay
+class SelectModeMenu final : public MenuDisplay
 {
 public:
-    ModeSelectionMenu();
+    SelectModeMenu(Display &prevDisplay);
 
     void start() override;
 
-    const char *displayName() const override { return "ModeSelectionMenu"; }
-    const char *menuTitle() const override { return "Mode selection"; }
+    const char *displayName() const override { return "SelectModeMenu"; }
+    const char *menuTitle() const override { return "Select mode"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
@@ -38,11 +38,15 @@ private:
     }};
 };
 
-namespace displays {
-ModeSelectionMenu modeSelectionMenu;
+SelectModeMenu::SelectModeMenu(Display &prevDisplay) :
+    item0{modes::defaultMode, prevDisplay, "Default"},
+    item1{modes::manualMode, prevDisplay, "Manual"},
+    item2{modes::bluetoothMode, prevDisplay, "Bluetooth"},
+    item3{prevDisplay, "Back"}
+{
 }
 
-void ModeSelectionMenu::start()
+void SelectModeMenu::start()
 {
     MenuDisplay::start();
 

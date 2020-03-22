@@ -15,7 +15,7 @@ namespace {
 class SettingsMenu final : public MenuDisplay
 {
 public:
-    SettingsMenu();
+    SettingsMenu(Display &prevDisplay);
 
     const char *displayName() const override { return "SettingsMenu"; }
     const char *menuTitle() const override { return "Settings"; }
@@ -24,11 +24,17 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SwitchScreenItem item0{displays::commonSettingsMenu, displays::commonSettingsMenu.menuTitle()};
-    SwitchScreenItem item1{displays::defaultModeSettingsMenu, displays::defaultModeSettingsMenu.menuTitle()};
-    SwitchScreenItem item2{displays::manualModeSettingsMenu, displays::manualModeSettingsMenu.menuTitle()};
-    SwitchScreenItem item3{displays::bluetoothModeSettingsMenu, displays::bluetoothModeSettingsMenu.menuTitle()};
-    SwitchScreenItem item4{displays::potiSettingsMenu, displays::potiSettingsMenu.menuTitle()};
+    CommonSettingsMenu m_commonSettingsMenu{*this};
+    DefaultModeSettingsMenu m_defaultModeSettingsMenu{*this};
+    ManualModeSettingsMenu m_manualModeSettingsMenu{*this};
+    BluetoothModeSettingsMenu m_bluetoothModeSettingsMenu{*this};
+    PotiSettingsMenu m_potiSettingsMenu{*this};
+
+    SwitchScreenItem item0{m_commonSettingsMenu, m_commonSettingsMenu.menuTitle()};
+    SwitchScreenItem item1{m_defaultModeSettingsMenu, m_defaultModeSettingsMenu.menuTitle()};
+    SwitchScreenItem item2{m_manualModeSettingsMenu, m_manualModeSettingsMenu.menuTitle()};
+    SwitchScreenItem item3{m_bluetoothModeSettingsMenu, m_bluetoothModeSettingsMenu.menuTitle()};
+    SwitchScreenItem item4{m_potiSettingsMenu, m_potiSettingsMenu.menuTitle()};
     SwitchScreenItem item5;
 
     const std::array<std::reference_wrapper<const MenuItem>, 6> carr{{
@@ -41,7 +47,8 @@ private:
     }};
 };
 
-namespace displays {
-SettingsMenu settingsMenu;
+SettingsMenu::SettingsMenu(Display &prevDisplay) :
+    item5{prevDisplay, "Back"}
+{
 }
 }
