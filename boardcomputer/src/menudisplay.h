@@ -18,6 +18,8 @@ public:
     void rotate(int offset) override;
     void button(bool pressed) override;
 
+    virtual const char *menuTitle() const = 0;
+
     virtual const std::reference_wrapper<const MenuItem> *begin() const = 0;
     virtual const std::reference_wrapper<const MenuItem> *end() const = 0;
 

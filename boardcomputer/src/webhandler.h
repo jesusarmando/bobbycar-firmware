@@ -9,6 +9,12 @@
 
 #include "displays/statusdisplay.h"
 #include "displays/menus/mainmenu.h"
+#include "displays/menus/settingsmenu.h"
+#include "displays/menus/commonsettingsmenu.h"
+#include "displays/menus/defaultmodesettingsmenu.h"
+#include "displays/menus/manualmodesettingsmenu.h"
+#include "displays/menus/bluetoothmodesettingsmenu.h"
+#include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/demosmenu.h"
 #include "displays/starfielddisplay.h"
 #include "displays/pingpongdisplay.h"
@@ -408,6 +414,12 @@ void WebHandler::handleScreenParams(AsyncWebServerRequest *request)
                     HtmlTag select(response, "select", " id=\"display\" name=\"display\" required");
                     selectOption(response, "status", displays::status.displayName(), currentDisplay==&displays::status);
                     selectOption(response, "mainMenu", displays::mainMenu.displayName(), currentDisplay==&displays::mainMenu);
+                    selectOption(response, "settingsMenu", displays::settingsMenu.displayName(), currentDisplay==&displays::settingsMenu);
+                    selectOption(response, "commonSettingsMenu", displays::commonSettingsMenu.displayName(), currentDisplay==&displays::commonSettingsMenu);
+                    selectOption(response, "defaultModeSettingsMenu", displays::defaultModeSettingsMenu.displayName(), currentDisplay==&displays::defaultModeSettingsMenu);
+                    selectOption(response, "manualModeSettingsMenu", displays::manualModeSettingsMenu.displayName(), currentDisplay==&displays::manualModeSettingsMenu);
+                    selectOption(response, "bluetoothModeSettingsMenu", displays::bluetoothModeSettingsMenu.displayName(), currentDisplay==&displays::bluetoothModeSettingsMenu);
+                    selectOption(response, "potiSettingsMenu", displays::potiSettingsMenu.displayName(), currentDisplay==&displays::potiSettingsMenu);
                     selectOption(response, "demosMenu", displays::demosMenu.displayName(), currentDisplay==&displays::demosMenu);
                     selectOption(response, "starfield", displays::starfield.displayName(), currentDisplay==&displays::starfield);
                     selectOption(response, "pingPong", displays::pingPong.displayName(), currentDisplay==&displays::pingPong);
@@ -470,6 +482,18 @@ void WebHandler::handleSetScreenParams(AsyncWebServerRequest *request)
             currentDisplay = &displays::status;
         else if (p->value() == "mainMenu")
             currentDisplay = &displays::mainMenu;
+        else if (p->value() == "settingsMenu")
+            currentDisplay = &displays::settingsMenu;
+        else if (p->value() == "commonSettingsMenu")
+            currentDisplay = &displays::commonSettingsMenu;
+        else if (p->value() == "defaultModeSettingsMenu")
+            currentDisplay = &displays::defaultModeSettingsMenu;
+        else if (p->value() == "manualModeSettingsMenu")
+            currentDisplay = &displays::manualModeSettingsMenu;
+        else if (p->value() == "bluetoothModeSettingsMenu")
+            currentDisplay = &displays::bluetoothModeSettingsMenu;
+        else if (p->value() == "potiSettingsMenu")
+            currentDisplay = &displays::potiSettingsMenu;
         else if (p->value() == "demosMenu")
             currentDisplay = &displays::demosMenu;
         else if (p->value() == "starfield")

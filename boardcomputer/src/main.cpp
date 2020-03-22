@@ -63,6 +63,30 @@ void MetersDisplay::button(bool pressed)
         currentDisplay = &displays::mainMenu;
 }
 
+SettingsMenu::SettingsMenu() :
+    item5{displays::mainMenu, "Back"}
+{}
+
+CommonSettingsMenu::CommonSettingsMenu() :
+    item0{displays::settingsMenu, "Back"}
+{}
+
+DefaultModeSettingsMenu::DefaultModeSettingsMenu() :
+    item0{displays::settingsMenu, "Back"}
+{}
+
+ManualModeSettingsMenu::ManualModeSettingsMenu() :
+    item0{displays::settingsMenu, "Back"}
+{}
+
+BluetoothModeSettingsMenu::BluetoothModeSettingsMenu() :
+    item0{displays::settingsMenu, "Back"}
+{}
+
+PotiSettingsMenu::PotiSettingsMenu() :
+    item0{displays::settingsMenu, "Back"}
+{}
+
 DemosMenu::DemosMenu() :
     item5{displays::mainMenu, "Back"}
 {}

@@ -18,6 +18,7 @@ public:
     DemosMenu();
 
     const char *displayName() const override { return "DemosMenu"; }
+    const char *menuTitle() const override { return "Demos"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override
     {
