@@ -3,7 +3,8 @@
 #include <array>
 
 #include "menudisplay.h"
-#include "switchscreenmenuitem.h"
+#include "menuitems/switchscreenmenuitem.h"
+#include "menuitems/rebootitem.h"
 
 #include "displays/statusdisplay.h"
 #include "displays/starfielddisplay.h"
@@ -30,12 +31,14 @@ private:
     SwitchScreenItem item1{displays::starfield, displays::starfield.displayName()};
     SwitchScreenItem item2{displays::pingPong, displays::pingPong.displayName()};
     SwitchScreenItem item3{displays::spiro, displays::spiro.displayName()};
+    RebootItem item4;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 4> carr{{
+    const std::array<std::reference_wrapper<const MenuItem>, 5> carr{{
         std::cref<MenuItem>(item0),
         std::cref<MenuItem>(item1),
         std::cref<MenuItem>(item2),
-        std::cref<MenuItem>(item3)
+        std::cref<MenuItem>(item3),
+        std::cref<MenuItem>(item4)
     }};
 };
 
