@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Esp.h>
 #include <ESPAsyncWebServer.h>
 
 #include "htmlutils.h"
@@ -43,6 +44,7 @@ private:
     static void handleSetDefaultModeParams(AsyncWebServerRequest *request);
     static void handleSetManualModeParams(AsyncWebServerRequest *request);
     static void handleSetPotiParams(AsyncWebServerRequest *request);
+    static void handleReboot(AsyncWebServerRequest *request);
 };
 
 bool WebHandler::canHandle(AsyncWebServerRequest *request)
@@ -70,6 +72,8 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
     else if (request->url() == "/potiParams")
         return true;
     else if (request->url() == "/setPotiParams")
+        return true;
+    else if (request->url() == "/reboot")
         return true;
 
     return false;
@@ -101,6 +105,8 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
         handlePotiParams(request);
     else if (request->url() == "/setPotiParams")
         handleSetPotiParams(request);
+    else if (request->url() == "/reboot")
+        handleReboot(request);
 }
 
 void WebHandler::renderLiveData(AsyncResponseStream &response)
@@ -299,6 +305,12 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 HtmlTag li(response, "li");
                 HtmlTag a(response, "a", " href=\"potiParams\"");
                 response.print("Poti params");
+            }
+
+            {
+                HtmlTag li(response, "li");
+                HtmlTag a(response, "a", " href=\"reboot\"");
+                response.print("Reboot");
             }
         }
     }
@@ -1330,5 +1342,16 @@ void WebHandler::handleSetPotiParams(AsyncWebServerRequest *request)
 
         bremsMax = strtol(p->value().c_str(), nullptr, 10);
     }
+
+    request->redirect("/potiParams");
+}
+
+void WebHandler::handleReboot(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+    response.print("Rebooting now");
+    request->send(&response);
+
+    ESP.restart();
 }
 }
