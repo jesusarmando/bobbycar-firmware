@@ -38,19 +38,14 @@ String toString(wl_status_t status)
 
 void fixCommonParams()
 {
-    front.controller.command.left.enable = front.left.enable;
-    front.controller.command.right.enable = front.right.enable;
-    back.controller.command.left.enable = back.left.enable;
-    back.controller.command.right.enable = back.right.enable;
-
-    if (front.left.invert)
-        front.controller.command.left.pwm = -front.controller.command.left.pwm;
-    if (front.right.invert)
-        front.controller.command.right.pwm = -front.controller.command.right.pwm;
-    if (back.left.invert)
-        back.controller.command.left.pwm = -back.controller.command.left.pwm;
-    if (back.right.invert)
-        back.controller.command.right.pwm = -back.controller.command.right.pwm;
+    if (front.invertLeft)
+        front.command.left.pwm = -front.command.left.pwm;
+    if (front.invertRight)
+        front.command.right.pwm = -front.command.right.pwm;
+    if (back.invertLeft)
+        back.command.left.pwm = -back.command.left.pwm;
+    if (back.invertRight)
+        back.command.right.pwm = -back.command.right.pwm;
 }
 
 void sendCommands()

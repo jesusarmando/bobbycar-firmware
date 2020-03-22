@@ -5,6 +5,8 @@
 namespace {
 class Display {
 public:
+    virtual ~Display() = default;
+
     virtual void start() = 0;
     virtual void redraw() = 0;
     virtual void stop() = 0;

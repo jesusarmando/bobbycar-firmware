@@ -125,14 +125,22 @@ void GameOfLifeDisplay::initGrid()
 
 int GameOfLifeDisplay::getNumberOfNeighbors(int x, int y)
 {
-    return grid[x - 1][y] +
-           grid[x - 1][y - 1] +
-           grid[x][y - 1] +
-           grid[x + 1][y - 1] +
-           grid[x + 1][y] +
-           grid[x + 1][y + 1] +
-           grid[x][y + 1] +
-           grid[x - 1][y + 1];
+    int n{};
+    for (auto xOffset : {-1,0,1})
+        for (auto yOffset : {-1,0,1})
+        {
+            if (xOffset == 0 && yOffset == 0)
+                continue;
+
+            const auto new_x = x+xOffset;
+            const auto new_y = y+yOffset;
+
+            if (new_x >= 0 && new_y >= 0 &&
+                new_x < GRIDX && new_y < GRIDY)
+                n+=grid[new_x][new_y];
+        }
+
+    return n;
 }
 
 void GameOfLifeDisplay::computeCA()

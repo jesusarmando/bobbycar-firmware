@@ -27,9 +27,82 @@ public:
     bool canHandle(AsyncWebServerRequest *request) override;
 
     void handleRequest(AsyncWebServerRequest *request) override;
+
+private:
+    static void renderLiveData(AsyncResponseStream &response);
+    static void handleIndex(AsyncWebServerRequest *request);
+    static void handleLive(AsyncWebServerRequest *request);
+    static void handleScreenParams(AsyncWebServerRequest *request);
+    static void handleSetScreenParams(AsyncWebServerRequest *request);
+    static void handleCommonParams(AsyncWebServerRequest *request);
+    static void handleDefaultModeParams(AsyncWebServerRequest *request);
+    static void handleManualModeParams(AsyncWebServerRequest *request);
+    static void handlePotiParams(AsyncWebServerRequest *request);
+    static void handleSetCommonParams(AsyncWebServerRequest *request);
+    static void handleSetDefaultModeParams(AsyncWebServerRequest *request);
+    static void handleSetManualModeParams(AsyncWebServerRequest *request);
+    static void handleSetPotiParams(AsyncWebServerRequest *request);
 };
 
-void renderLiveData(AsyncResponseStream &response)
+bool WebHandler::canHandle(AsyncWebServerRequest *request)
+{
+    if (request->url() == "/")
+        return true;
+    else if (request->url() == "/live")
+        return true;
+    else if (request->url() == "/screenParams")
+        return true;
+    else if (request->url() == "/setScreenParams")
+        return true;
+    else if (request->url() == "/commonParams")
+        return true;
+    else if (request->url() == "/setCommonParams")
+        return true;
+    else if (request->url() == "/defaultModeParams")
+        return true;
+    else if (request->url() == "/setDefaultModeParams")
+        return true;
+    else if (request->url() == "/manualModeParams")
+        return true;
+    else if (request->url() == "/setManualModeParams")
+        return true;
+    else if (request->url() == "/potiParams")
+        return true;
+    else if (request->url() == "/setPotiParams")
+        return true;
+
+    return false;
+}
+
+void WebHandler::handleRequest(AsyncWebServerRequest *request)
+{
+    if (request->url() == "/")
+        handleIndex(request);
+    else if (request->url() == "/live")
+        handleLive(request);
+    else if (request->url() == "/screenParams")
+        handleScreenParams(request);
+    else if (request->url() == "/setScreenParams")
+        handleSetScreenParams(request);
+    else if (request->url() == "/commonParams")
+        handleCommonParams(request);
+    else if (request->url() == "/setCommonParams")
+        handleSetCommonParams(request);
+    else if (request->url() == "/defaultModeParams")
+        handleDefaultModeParams(request);
+    else if (request->url() == "/setDefaultModeParams")
+        handleSetDefaultModeParams(request);
+    else if (request->url() == "/manualModeParams")
+        handleManualModeParams(request);
+    else if (request->url() == "/setManualModeParams")
+        handleSetManualModeParams(request);
+    else if (request->url() == "/potiParams")
+        handlePotiParams(request);
+    else if (request->url() == "/setPotiParams")
+        handleSetPotiParams(request);
+}
+
+void WebHandler::renderLiveData(AsyncResponseStream &response)
 {
     HtmlTag fieldset(response, "fieldset");
 
@@ -79,7 +152,7 @@ void renderLiveData(AsyncResponseStream &response)
             response.print(controller.command.led ? "true" : "false ");
         }
 
-        if (millis() - controller.lastFeedback > 1000)
+        if (!controller.feedbackValid)
         {
             HtmlTag span(response, "span", " style=\"color: red;\"");
             response.print("Dead!");
@@ -160,7 +233,7 @@ void renderLiveData(AsyncResponseStream &response)
     }
 }
 
-void handleIndex(AsyncWebServerRequest *request)
+void WebHandler::handleIndex(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -232,7 +305,7 @@ void handleIndex(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void handleLive(AsyncWebServerRequest *request)
+void WebHandler::handleLive(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -274,7 +347,7 @@ void handleLive(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void handleScreenParams(AsyncWebServerRequest *request)
+void WebHandler::handleScreenParams(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -348,7 +421,7 @@ void handleScreenParams(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void handleSetScreenParams(AsyncWebServerRequest *request)
+void WebHandler::handleSetScreenParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("framerate"))
     {
@@ -406,7 +479,7 @@ void handleSetScreenParams(AsyncWebServerRequest *request)
     request->redirect("/screenParams");
 }
 
-void handleCommonParams(AsyncWebServerRequest *request)
+void WebHandler::handleCommonParams(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -483,35 +556,35 @@ void handleCommonParams(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                checkboxInput(response, front.left.enable, "enableFrontLeft", "Enable front left:");
+                checkboxInput(response, front.command.left.enable, "enableFrontLeft", "Enable front left:");
 
                 breakLine(response);
 
-                checkboxInput(response, front.right.enable, "enableFrontRight", "Enable front right:");
+                checkboxInput(response, front.command.right.enable, "enableFrontRight", "Enable front right:");
 
                 breakLine(response);
 
-                checkboxInput(response, back.left.enable, "enableBackLeft", "Enable back left:");
+                checkboxInput(response, back.command.left.enable, "enableBackLeft", "Enable back left:");
 
                 breakLine(response);
 
-                checkboxInput(response, back.right.enable, "enableBackRight", "Enable back right:");
+                checkboxInput(response, back.command.right.enable, "enableBackRight", "Enable back right:");
 
                 breakLine(response);
 
-                checkboxInput(response, front.left.invert, "invertFrontLeft", "Invert front left:");
+                checkboxInput(response, front.invertLeft, "invertFrontLeft", "Invert front left:");
 
                 breakLine(response);
 
-                checkboxInput(response, front.right.invert, "invertFrontRight", "Invert front right:");
+                checkboxInput(response, front.invertRight, "invertFrontRight", "Invert front right:");
 
                 breakLine(response);
 
-                checkboxInput(response, back.left.invert, "invertBackLeft", "Invert back left:");
+                checkboxInput(response, back.invertLeft, "invertBackLeft", "Invert back left:");
 
                 breakLine(response);
 
-                checkboxInput(response, back.right.invert, "invertBackRight", "Invert back right:");
+                checkboxInput(response, back.invertRight, "invertBackRight", "Invert back right:");
 
                 breakLine(response);
 
@@ -523,7 +596,7 @@ void handleCommonParams(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void handleDefaultModeParams(AsyncWebServerRequest *request)
+void WebHandler::handleDefaultModeParams(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -639,7 +712,7 @@ void handleDefaultModeParams(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void handleManualModeParams(AsyncWebServerRequest *request)
+void WebHandler::handleManualModeParams(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -728,7 +801,7 @@ void handleManualModeParams(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void handlePotiParams(AsyncWebServerRequest *request)
+void WebHandler::handlePotiParams(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -796,7 +869,7 @@ void handlePotiParams(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void handleSetCommonParams(AsyncWebServerRequest *request)
+void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("mode"))
     {
@@ -908,20 +981,20 @@ void handleSetCommonParams(AsyncWebServerRequest *request)
             controller.command.left.phaseAdvMax = controller.command.right.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
-    front.left.enable = request->hasParam("enableFrontLeft") && request->getParam("enableFrontLeft")->value() == "on";
-    front.right.enable = request->hasParam("enableFrontRight") && request->getParam("enableFrontRight")->value() == "on";
-    back.left.enable = request->hasParam("enableBackLeft") && request->getParam("enableBackLeft")->value() == "on";
-    back.right.enable = request->hasParam("enableBackRight") && request->getParam("enableBackRight")->value() == "on";
+    front.command.left.enable = request->hasParam("enableFrontLeft") && request->getParam("enableFrontLeft")->value() == "on";
+    front.command.right.enable = request->hasParam("enableFrontRight") && request->getParam("enableFrontRight")->value() == "on";
+    back.command.left.enable = request->hasParam("enableBackLeft") && request->getParam("enableBackLeft")->value() == "on";
+    back.command.right.enable = request->hasParam("enableBackRight") && request->getParam("enableBackRight")->value() == "on";
 
-    front.left.invert = request->hasParam("invertFrontLeft") && request->getParam("invertFrontLeft")->value() == "on";
-    front.right.invert = request->hasParam("invertFrontRight") && request->getParam("invertFrontRight")->value() == "on";
-    back.left.invert = request->hasParam("invertBackLeft") && request->getParam("invertBackLeft")->value() == "on";
-    back.right.invert = request->hasParam("invertBackRight") && request->getParam("invertBackRight")->value() == "on";
+    front.invertLeft = request->hasParam("invertFrontLeft") && request->getParam("invertFrontLeft")->value() == "on";
+    front.invertRight = request->hasParam("invertFrontRight") && request->getParam("invertFrontRight")->value() == "on";
+    back.invertLeft = request->hasParam("invertBackLeft") && request->getParam("invertBackLeft")->value() == "on";
+    back.invertRight = request->hasParam("invertBackRight") && request->getParam("invertBackRight")->value() == "on";
 
     request->redirect("/commonParams");
 }
 
-void handleSetDefaultModeParams(AsyncWebServerRequest *request)
+void WebHandler::handleSetDefaultModeParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("ctrlTyp"))
     {
@@ -1108,7 +1181,7 @@ void handleSetDefaultModeParams(AsyncWebServerRequest *request)
     request->redirect("/defaultModeParams");
 }
 
-void handleSetManualModeParams(AsyncWebServerRequest *request)
+void WebHandler::handleSetManualModeParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("pwm"))
     {
@@ -1190,7 +1263,7 @@ void handleSetManualModeParams(AsyncWebServerRequest *request)
     request->redirect("/manualModeParams");
 }
 
-void handleSetPotiParams(AsyncWebServerRequest *request)
+void WebHandler::handleSetPotiParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("gasMin"))
     {
@@ -1253,63 +1326,5 @@ void handleSetPotiParams(AsyncWebServerRequest *request)
 
         bremsMax = strtol(p->value().c_str(), nullptr, 10);
     }
-}
-
-bool WebHandler::canHandle(AsyncWebServerRequest *request)
-{
-    if (request->url() == "/")
-        return true;
-    else if (request->url() == "/live")
-        return true;
-    else if (request->url() == "/screenParams")
-        return true;
-    else if (request->url() == "/setScreenParams")
-        return true;
-    else if (request->url() == "/commonParams")
-        return true;
-    else if (request->url() == "/setCommonParams")
-        return true;
-    else if (request->url() == "/defaultModeParams")
-        return true;
-    else if (request->url() == "/setDefaultModeParams")
-        return true;
-    else if (request->url() == "/manualModeParams")
-        return true;
-    else if (request->url() == "/setManualModeParams")
-        return true;
-    else if (request->url() == "/potiParams")
-        return true;
-    else if (request->url() == "/setPotiParams")
-        return true;
-
-    return false;
-}
-
-void WebHandler::handleRequest(AsyncWebServerRequest *request)
-{
-    if (request->url() == "/")
-        handleIndex(request);
-    else if (request->url() == "/live")
-        handleLive(request);
-    else if (request->url() == "/screenParams")
-        handleScreenParams(request);
-    else if (request->url() == "/setScreenParams")
-        handleSetScreenParams(request);
-    else if (request->url() == "/commonParams")
-        handleCommonParams(request);
-    else if (request->url() == "/setCommonParams")
-        handleSetCommonParams(request);
-    else if (request->url() == "/defaultModeParams")
-        handleDefaultModeParams(request);
-    else if (request->url() == "/setDefaultModeParams")
-        handleSetDefaultModeParams(request);
-    else if (request->url() == "/manualModeParams")
-        handleManualModeParams(request);
-    else if (request->url() == "/setManualModeParams")
-        handleSetManualModeParams(request);
-    else if (request->url() == "/potiParams")
-        handlePotiParams(request);
-    else if (request->url() == "/setPotiParams")
-        handleSetPotiParams(request);
 }
 }

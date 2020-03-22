@@ -1,0 +1,85 @@
+#pragma once
+
+#include <cstdint>
+
+#include <HardwareSerial.h>
+
+#include "../../common.h"
+
+namespace {
+class FeedbackParser
+{
+public:
+    FeedbackParser(HardwareSerial &serial, bool &feedbackValid, Feedback &feedback) :
+        m_serial{serial}, m_feedbackValid{feedbackValid}, m_feedback{feedback}
+    {
+    }
+
+    void update()
+    {
+        // Check for new data availability in the Serial buffer
+        while (m_serial.available())
+        {
+            m_incomingByte    = m_serial.read();                                // Read the incoming byte
+            m_bufStartFrame = ((uint16_t)(m_incomingBytePrev) << 8) +  m_incomingByte; // Construct the start frame
+
+            //Serial.printf("received: %x\r\n", m_incomingByte);
+
+            // Copy received data
+            if (m_bufStartFrame == Feedback::VALID_HEADER) {                     // Initialize if new data is detected
+                m_p   = (uint8_t*)&m_newFeedback;
+                *m_p++  = m_incomingBytePrev;
+                *m_p++  = m_incomingByte;
+                m_idx  = 2;
+            } else if (m_idx >= 2 && m_idx < sizeof(m_newFeedback)) { // Save the new received data
+                *m_p++  = m_incomingByte;
+                m_idx++;
+            }
+
+            // Check if we reached the end of the package
+            if (m_idx == sizeof(m_newFeedback)) {
+                uint16_t checksum = calculateChecksum(m_newFeedback);
+
+                // Check validity of the new data
+                if (m_newFeedback.start == Feedback::VALID_HEADER && checksum == m_newFeedback.checksum)
+                {
+                    m_feedbackValid = true;
+                    m_feedback = m_newFeedback;
+                    m_lastFeedback = millis();
+                }
+//                else
+//                {
+//                    if (m_newFeedback.start == Feedback::VALID_HEADER)
+//                        Serial.println("header matched");
+//                    else
+//                        Serial.println("header did not match");
+
+//                    if (checksum == m_newFeedback.checksum)
+//                        Serial.println("checksum matched");
+//                    else
+//                        Serial.println("checksum did not match");
+//                }
+                m_idx = 0; // Reset the index (it prevents to enter in this if condition in the next cycle)
+            }
+
+            // Update previous states
+            m_incomingBytePrev  = m_incomingByte;
+        }
+
+        if (millis() - m_lastFeedback > 500)
+            m_feedbackValid = false;
+    }
+
+private:
+    uint8_t m_idx = 0;                        // Index for new data pointer
+    uint16_t m_bufStartFrame{};               // Buffer Start Frame
+    uint8_t *m_p{};                           // Pointer declaration for the new received data
+    uint8_t m_incomingByte{};
+    uint8_t m_incomingBytePrev{};
+
+    unsigned long m_lastFeedback{millis()};
+    HardwareSerial &m_serial;
+    bool &m_feedbackValid;
+    Feedback &m_feedback, m_newFeedback;
+};
+}

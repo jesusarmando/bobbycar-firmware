@@ -40,13 +40,13 @@ private:
 
     float ltx = 0;    // Saved x coord of bottom of needle
     uint16_t osx = 120, osy = 120; // Saved x & y coords
-    uint32_t updateTime = 0;       // time for next update
 
-    int old_analog =  -999; // Value last displayed
-    int old_digital = -999; // Value last displayed
+    struct ValuePair {
+        int value = 0,
+            old_value = -1;
+    };
+    std::array<ValuePair, 6> values;
 
-    int value[6] = {0, 0, 0, 0, 0, 0};
-    int old_value[6] = { -1, -1, -1, -1, -1, -1};
     int d = 0;
 };
 
@@ -75,21 +75,13 @@ void MetersDisplay::redraw()
 {
     d += 4; if (d >= 360) d = 0;
 
-    //value[0] = map(analogRead(A0), 0, 1023, 0, 100); // Test with value form Analogue 0
-
     // Create a Sine wave for testing
-    value[0] = 50 + 50 * sin((d + 0) * 0.0174532925);
-    value[1] = 50 + 50 * sin((d + 60) * 0.0174532925);
-    value[2] = 50 + 50 * sin((d + 120) * 0.0174532925);
-    value[3] = 50 + 50 * sin((d + 180) * 0.0174532925);
-    value[4] = 50 + 50 * sin((d + 240) * 0.0174532925);
-    value[5] = 50 + 50 * sin((d + 300) * 0.0174532925);
-
-    //unsigned long t = millis();
+    for (auto iter = std::begin(values); iter != std::end(values); iter++)
+        iter->value = 50 + 50 * sin((d + (std::distance(std::begin(values), iter) * 60)) * 0.0174532925);
 
     plotPointer();
 
-    plotNeedle(value[0]);
+    plotNeedle(values[0].value);
 }
 
 void MetersDisplay::stop()
@@ -195,41 +187,33 @@ void MetersDisplay::plotNeedle(int value)
     if (value < -10) value = -10; // Limit value to emulate needle end stops
     if (value > 110) value = 110;
 
-    // Move the needle util new value reached
-    while (!(value == old_analog)) {
-        if (old_analog < value) old_analog++;
-        else old_analog--;
+    float sdeg = map(value, -10, 110, -150, -30); // Map value to angle
+    // Calcualte tip of needle coords
+    float sx = cos(sdeg * 0.0174532925);
+    float sy = sin(sdeg * 0.0174532925);
 
-        old_analog = value;
+    // Calculate x delta of needle start (does not start at pivot point)
+    float tx = tan((sdeg + 90) * 0.0174532925);
 
-        float sdeg = map(old_analog, -10, 110, -150, -30); // Map value to angle
-        // Calcualte tip of needle coords
-        float sx = cos(sdeg * 0.0174532925);
-        float sy = sin(sdeg * 0.0174532925);
+    // Erase old needle image
+    tft.drawLine(120 + 20 * ltx - 1, 140 - 20, osx - 1, osy, TFT_WHITE);
+    tft.drawLine(120 + 20 * ltx, 140 - 20, osx, osy, TFT_WHITE);
+    tft.drawLine(120 + 20 * ltx + 1, 140 - 20, osx + 1, osy, TFT_WHITE);
 
-        // Calculate x delta of needle start (does not start at pivot point)
-        float tx = tan((sdeg + 90) * 0.0174532925);
+    // Re-plot text under needle
+    tft.setTextColor(TFT_BLACK);
+    tft.drawCentreString("%RH", 120, 70, 4); // // Comment out to avoid font 4
 
-        // Erase old needle image
-        tft.drawLine(120 + 20 * ltx - 1, 140 - 20, osx - 1, osy, TFT_WHITE);
-        tft.drawLine(120 + 20 * ltx, 140 - 20, osx, osy, TFT_WHITE);
-        tft.drawLine(120 + 20 * ltx + 1, 140 - 20, osx + 1, osy, TFT_WHITE);
+    // Store new needle end coords for next erase
+    ltx = tx;
+    osx = sx * 98 + 120;
+    osy = sy * 98 + 140;
 
-        // Re-plot text under needle
-        tft.setTextColor(TFT_BLACK);
-        tft.drawCentreString("%RH", 120, 70, 4); // // Comment out to avoid font 4
-
-        // Store new needle end coords for next erase
-        ltx = tx;
-        osx = sx * 98 + 120;
-        osy = sy * 98 + 140;
-
-        // Draw the needle in the new postion, magenta makes needle a bit bolder
-        // draws 3 lines to thicken needle
-        tft.drawLine(120 + 20 * ltx - 1, 140 - 20, osx - 1, osy, TFT_RED);
-        tft.drawLine(120 + 20 * ltx, 140 - 20, osx, osy, TFT_MAGENTA);
-        tft.drawLine(120 + 20 * ltx + 1, 140 - 20, osx + 1, osy, TFT_RED);
-    }
+    // Draw the needle in the new postion, magenta makes needle a bit bolder
+    // draws 3 lines to thicken needle
+    tft.drawLine(120 + 20 * ltx - 1, 140 - 20, osx - 1, osy, TFT_RED);
+    tft.drawLine(120 + 20 * ltx, 140 - 20, osx, osy, TFT_MAGENTA);
+    tft.drawLine(120 + 20 * ltx + 1, 140 - 20, osx + 1, osy, TFT_RED);
 }
 
 void MetersDisplay::plotLinear(const char *label, int x, int y)
@@ -264,27 +248,30 @@ void MetersDisplay::plotPointer()
     tft.setTextColor(TFT_GREEN, TFT_BLACK);
 
     // Move the 6 pointers one pixel towards new value
-    for (int i = 0; i < 6; i++)
+    for (auto iter = std::begin(values); iter != std::end(values); iter++)
     {
-        char buf[8]; dtostrf(value[i], 4, 0, buf);
+        const auto i = std::distance(std::begin(values), iter);
+
+        char buf[8];
+        dtostrf(iter->value, 4, 0, buf);
         tft.drawRightString(buf, i * 40 + 36 - 5, 187 - 27 + 155 - 18, 2);
 
         int dx = 3 + 40 * i;
-        if (value[i] < 0) value[i] = 0; // Limit value to emulate needle end stops
-        if (value[i] > 100) value[i] = 100;
+        if (iter->value < 0) iter->value = 0; // Limit value to emulate needle end stops
+        if (iter->value > 100) iter->value = 100;
 
-        while (!(value[i] == old_value[i])) {
-            dy = 187 + 100 - old_value[i];
-            if (old_value[i] > value[i])
+        while (!(iter->value == iter->old_value)) {
+            dy = 187 + 100 - iter->old_value;
+            if (iter->old_value > iter->value)
             {
                 tft.drawLine(dx, dy - 5, dx + pw, dy, TFT_WHITE);
-                old_value[i]--;
+                iter->old_value--;
                 tft.drawLine(dx, dy + 6, dx + pw, dy + 1, TFT_RED);
             }
             else
             {
                 tft.drawLine(dx, dy + 5, dx + pw, dy, TFT_WHITE);
-                old_value[i]++;
+                iter->old_value++;
                 tft.drawLine(dx, dy - 6, dx + pw, dy - 1, TFT_RED);
             }
         }

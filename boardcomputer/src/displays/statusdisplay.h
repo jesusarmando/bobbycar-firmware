@@ -57,7 +57,7 @@ void StatusDisplay::redraw()
     {
         renderer.drawString(String("pwm: ") + controller.command.left.pwm + ", " + controller.command.right.pwm + "                                                ", 0,y,4); y+=25;
         renderer.fillRect(0, y, renderer.width(), 75, TFT_BLACK);
-        if (millis() - controller.lastFeedback > 1000)
+        if (!controller.feedbackValid)
         {
             renderer.setTextColor(TFT_RED, TFT_BLACK);
             renderer.drawString("No data!", 60, y+25, 4);
@@ -103,9 +103,9 @@ void StatusDisplay::redraw()
     }
 
     renderer.drawString("WiFi: " + toString(WiFi.status()) + "                                                ",0,y,2);
-    renderer.drawString(String("Limit0: ") + front.controller.command.left.iMotMax + "A", 160, y, 2); y+=15;
+    renderer.drawString(String("Limit0: ") + front.command.left.iMotMax + "A", 160, y, 2); y+=15;
     renderer.drawString("IP: " + WiFi.localIP().toString() + "                                                ",0,y,2);
-    renderer.drawString(String("Limit1: ") + front.controller.command.left.iDcMax + "A", 160, y, 2); y+=15;
+    renderer.drawString(String("Limit1: ") + front.command.left.iDcMax + "A", 160, y, 2); y+=15;
     renderer.drawString(String("Performance: ") + performance.last + "                                                ",0,y,2);
     renderer.drawString(String("Mode: ") + currentMode->displayName(), 125, y, 2); y+=15;
 }

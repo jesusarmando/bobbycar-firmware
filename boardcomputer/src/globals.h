@@ -11,10 +11,6 @@
 #include "modebase.h"
 #include "display.h"
 
-#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
-#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
-#endif
-
 namespace {
 uint16_t raw_gas, raw_brems;
 float gas, brems;
@@ -31,13 +27,7 @@ wl_status_t last_status;
 IPAddress last_ip;
 
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
-struct {
-    Controller &controller;
-
-    struct {
-        bool invert, enable;
-    } left, right;
-} front{controllers[0]}, back{controllers[1]};
+Controller &front = controllers[0], &back = controllers[1];
 
 struct {
     unsigned long lastTime = millis();

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
-
 #include "../../common.h"
+
+#include "feedbackparser.h"
 
 class HardwareSerial;
 
@@ -15,15 +15,13 @@ struct Controller {
 
     HardwareSerial &serial;
 
+    bool invertLeft{}, invertRight{};
+
     Command command{};
-    Feedback feedback{}, newFeedback{};
 
-    unsigned long lastFeedback = 0;
+    bool feedbackValid{};
+    Feedback feedback{};
 
-    uint8_t idx = 0;                        // Index for new data pointer
-    uint16_t bufStartFrame{};               // Buffer Start Frame
-    uint8_t *p{};                           // Pointer declaration for the new received data
-    uint8_t incomingByte{};
-    uint8_t incomingBytePrev{};
+    FeedbackParser parser{serial, feedbackValid, feedback};
 };
 }
