@@ -51,6 +51,12 @@ void SpiroDisplay::button(bool pressed)
         currentDisplay = &displays::mainMenu;
 }
 
+void GameOfLifeDisplay::button(bool pressed)
+{
+    if (!pressed)
+        currentDisplay = &displays::mainMenu;
+}
+
 void receiveFeedback()
 {
     for (Controller &controller : controllers)

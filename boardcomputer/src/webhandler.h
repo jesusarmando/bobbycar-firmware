@@ -11,6 +11,7 @@
 #include "displays/starfielddisplay.h"
 #include "displays/pingpongdisplay.h"
 #include "displays/spirodisplay.h"
+#include "displays/gameoflifedisplay.h"
 
 #include "modes/defaultmode.h"
 #include "modes/manualmode.h"
@@ -323,6 +324,7 @@ void handleScreenParams(AsyncWebServerRequest *request)
                     selectOption(response, "starfield", displays::starfield.displayName(), currentDisplay==&displays::starfield);
                     selectOption(response, "pingPong", displays::pingPong.displayName(), currentDisplay==&displays::pingPong);
                     selectOption(response, "spiro", displays::spiro.displayName(), currentDisplay==&displays::spiro);
+                    selectOption(response, "gameOfLife", displays::gameOfLife.displayName(), currentDisplay==&displays::gameOfLife);
                 }
 
                 breakLine(response);
@@ -385,6 +387,8 @@ void handleSetScreenParams(AsyncWebServerRequest *request)
             currentDisplay = &displays::pingPong;
         else if (p->value() == "spiro")
             currentDisplay = &displays::spiro;
+        else if (p->value() == "gameOfLife")
+            currentDisplay = &displays::gameOfLife;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
