@@ -93,8 +93,6 @@ PingPongDisplay::PingPongDisplay()
 
 void PingPongDisplay::start()
 {
-    Serial.println("PingPongDisplay::start()");
-
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
 
@@ -113,8 +111,8 @@ void PingPongDisplay::redraw()
 
 void PingPongDisplay::stop()
 {
-    Serial.println("PingPongDisplay::stop()");
 }
+
 void PingPongDisplay::midline()
 {
     // If the ball is not on the line then don't redraw the line

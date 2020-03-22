@@ -4,6 +4,7 @@
 
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
+#include "displays/menus/modeselectionscreen.h"
 
 namespace {
 class CommonSettingsMenu final : public MenuDisplay
@@ -18,10 +19,12 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SwitchScreenItem item0;
+    SwitchScreenItem item0{displays::modeSelectionMenu, displays::modeSelectionMenu.menuTitle()};
+    SwitchScreenItem item1;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 1> carr{{
-        std::cref<MenuItem>(item0)
+    const std::array<std::reference_wrapper<const MenuItem>, 2> carr{{
+        std::cref<MenuItem>(item0),
+        std::cref<MenuItem>(item1)
     }};
 };
 

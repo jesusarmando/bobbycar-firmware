@@ -11,6 +11,7 @@
 #include "displays/menus/mainmenu.h"
 #include "displays/menus/settingsmenu.h"
 #include "displays/menus/commonsettingsmenu.h"
+#include "displays/menus/modeselectionscreen.h"
 #include "displays/menus/defaultmodesettingsmenu.h"
 #include "displays/menus/manualmodesettingsmenu.h"
 #include "displays/menus/bluetoothmodesettingsmenu.h"
@@ -416,6 +417,7 @@ void WebHandler::handleScreenParams(AsyncWebServerRequest *request)
                     selectOption(response, "mainMenu", displays::mainMenu.displayName(), currentDisplay==&displays::mainMenu);
                     selectOption(response, "settingsMenu", displays::settingsMenu.displayName(), currentDisplay==&displays::settingsMenu);
                     selectOption(response, "commonSettingsMenu", displays::commonSettingsMenu.displayName(), currentDisplay==&displays::commonSettingsMenu);
+                    selectOption(response, "modeSelectionMenu", displays::modeSelectionMenu.displayName(), currentDisplay==&displays::modeSelectionMenu);
                     selectOption(response, "defaultModeSettingsMenu", displays::defaultModeSettingsMenu.displayName(), currentDisplay==&displays::defaultModeSettingsMenu);
                     selectOption(response, "manualModeSettingsMenu", displays::manualModeSettingsMenu.displayName(), currentDisplay==&displays::manualModeSettingsMenu);
                     selectOption(response, "bluetoothModeSettingsMenu", displays::bluetoothModeSettingsMenu.displayName(), currentDisplay==&displays::bluetoothModeSettingsMenu);
@@ -486,6 +488,8 @@ void WebHandler::handleSetScreenParams(AsyncWebServerRequest *request)
             currentDisplay = &displays::settingsMenu;
         else if (p->value() == "commonSettingsMenu")
             currentDisplay = &displays::commonSettingsMenu;
+        else if (p->value() == "modeSelectionMenu")
+            currentDisplay = &displays::modeSelectionMenu;
         else if (p->value() == "defaultModeSettingsMenu")
             currentDisplay = &displays::defaultModeSettingsMenu;
         else if (p->value() == "manualModeSettingsMenu")

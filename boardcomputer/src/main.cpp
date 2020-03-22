@@ -68,7 +68,14 @@ SettingsMenu::SettingsMenu() :
 {}
 
 CommonSettingsMenu::CommonSettingsMenu() :
-    item0{displays::settingsMenu, "Back"}
+    item1{displays::settingsMenu, "Back"}
+{}
+
+ModeSelectionMenu::ModeSelectionMenu() :
+    item0{modes::defaultMode, displays::commonSettingsMenu, "Default"},
+    item1{modes::manualMode, displays::commonSettingsMenu, "Manual"},
+    item2{modes::bluetoothMode, displays::commonSettingsMenu, "Bluetooth"},
+    item3{displays::commonSettingsMenu, "Back"}
 {}
 
 DefaultModeSettingsMenu::DefaultModeSettingsMenu() :

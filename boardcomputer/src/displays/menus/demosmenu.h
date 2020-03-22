@@ -20,14 +20,8 @@ public:
     const char *displayName() const override { return "DemosMenu"; }
     const char *menuTitle() const override { return "Demos"; }
 
-    const std::reference_wrapper<const MenuItem> *begin() const override
-    {
-        return std::begin(carr);
-    };
-    const std::reference_wrapper<const MenuItem> *end() const override
-    {
-        return std::end(carr);
-    };
+    const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
+    const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
     SwitchScreenItem item0{displays::starfield, displays::starfield.displayName()};

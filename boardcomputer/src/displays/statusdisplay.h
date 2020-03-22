@@ -37,7 +37,6 @@ StatusDisplay status;
 
 void StatusDisplay::start()
 {
-    Serial.println("StatusDisplay::start()");
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(0);
 }
@@ -112,6 +111,5 @@ void StatusDisplay::redraw()
 
 void StatusDisplay::stop()
 {
-    Serial.println("StatusDisplay::stop()");
 }
 }

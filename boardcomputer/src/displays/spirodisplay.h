@@ -41,7 +41,6 @@ SpiroDisplay spiro;
 
 void SpiroDisplay::start()
 {
-    Serial.println("SpiroDisplay::start()");
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(3);
 }
@@ -54,7 +53,6 @@ void SpiroDisplay::redraw()
 
 void SpiroDisplay::stop()
 {
-    Serial.println("SpiroDisplay::stop()");
 }
 
 void SpiroDisplay::render()

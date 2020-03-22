@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "display.h"
+#include "globals.h"
 #include "menuitem.h"
 
 namespace {
@@ -32,7 +33,6 @@ private:
 
 void MenuDisplay::start()
 {
-    Serial.println("MenuDisplay::start()");
     tft.setRotation(0);
     m_current = begin();
     m_needsRedraw = true;
@@ -49,7 +49,6 @@ void MenuDisplay::redraw()
 
 void MenuDisplay::stop()
 {
-    Serial.println("MenuDisplay::stop()");
 }
 
 void MenuDisplay::rotate(int offset)
@@ -72,7 +71,11 @@ void MenuDisplay::button(bool pressed)
 void MenuDisplay::redrawMenu() const
 {
     tft.fillScreen(TFT_BLACK);
-    int y = 25;
+    tft.setTextColor(TFT_YELLOW);
+
+    tft.drawString(menuTitle(), 5, 5, 4);
+
+    int y = 50;
     for (auto iter = begin(); iter != end(); iter++)
         y += (*iter).get().draw(y, iter == m_current);
 }

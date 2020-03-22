@@ -46,7 +46,6 @@ StarfieldDisplay::StarfieldDisplay() :
 
 void StarfieldDisplay::start()
 {
-    Serial.println("StarfieldDisplay::start()");
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
 
@@ -97,7 +96,6 @@ void StarfieldDisplay::redraw()
 
 void StarfieldDisplay::stop()
 {
-    Serial.println("StarfieldDisplay::stop()");
 }
 
 uint8_t StarfieldDisplay::rng()
