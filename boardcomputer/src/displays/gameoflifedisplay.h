@@ -12,7 +12,6 @@ public:
 
     void start() override;
     void redraw() override;
-    void stop() override;
 
     int framerate() const override { return 60; }
 
@@ -54,6 +53,8 @@ private:
 
 void GameOfLifeDisplay::start()
 {
+    DemoDisplay::start();
+
     tft.setRotation(3);
     tft.fillScreen(TFT_BLACK);
 }
@@ -76,10 +77,6 @@ void GameOfLifeDisplay::redraw()
 
     if (++gen == NUMGEN)
         gen = 0;
-}
-
-void GameOfLifeDisplay::stop()
-{
 }
 
 void GameOfLifeDisplay::drawGrid()

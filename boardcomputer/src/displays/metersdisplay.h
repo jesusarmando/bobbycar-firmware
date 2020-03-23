@@ -12,7 +12,6 @@ public:
 
     void start() override;
     void redraw() override;
-    void stop() override;
 
     int framerate() const override { return 60; }
 
@@ -51,6 +50,8 @@ private:
 
 void MetersDisplay::start()
 {
+    DemoDisplay::start();
+
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
 
@@ -77,11 +78,6 @@ void MetersDisplay::redraw()
     plotPointer();
 
     plotNeedle(values[0].value);
-}
-
-void MetersDisplay::stop()
-{
-
 }
 
 void MetersDisplay::analogMeter()

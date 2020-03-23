@@ -7,9 +7,9 @@ class Display {
 public:
     virtual ~Display() = default;
 
-    virtual void start() = 0;
+    virtual void start() {};
     virtual void redraw() = 0;
-    virtual void stop() = 0;
+    virtual void stop() {};
     virtual int framerate() const = 0;
 
     virtual const char *displayName() const = 0;

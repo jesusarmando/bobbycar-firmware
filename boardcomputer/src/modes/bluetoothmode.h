@@ -17,7 +17,6 @@ public:
 
     void start() override;
     void update() override;
-    void stop() override {};
 
     const char *displayName() const override { return "Bluetooth"; }
 
@@ -32,6 +31,8 @@ BluetoothMode bluetoothMode;
 
 void BluetoothMode::start()
 {
+    ModeBase::start();
+
     // clear buffer
     while (bluetoothSerial.available())
         bluetoothSerial.read();

@@ -7,9 +7,9 @@ class ModeBase {
 public:
     virtual ~ModeBase() = default;
 
-    virtual void start() = 0;
+    virtual void start() {};
     virtual void update() = 0;
-    virtual void stop() = 0;
+    virtual void stop() {};
 
     virtual const char *displayName() const = 0;
 };

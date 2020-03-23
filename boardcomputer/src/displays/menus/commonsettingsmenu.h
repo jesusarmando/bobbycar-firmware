@@ -3,6 +3,8 @@
 #include <array>
 
 #include "menudisplay.h"
+#include "changenumberdisplay.h"
+#include "globals.h"
 #include "menuitems/switchscreenmenuitem.h"
 #include "displays/menus/selectmodemenu.h"
 
@@ -20,18 +22,23 @@ public:
 
 private:
     SelectModeMenu m_selectModeMenu{*this};
+    int a{17};
+    ChangeNumberDisplay m_changeIMotMaxDisplay{"Set iMotMax", a, *this};
+
 
     SwitchScreenItem item0{m_selectModeMenu, m_selectModeMenu.menuTitle()};
-    SwitchScreenItem item1;
+    SwitchScreenItem item1{m_changeIMotMaxDisplay, m_changeIMotMaxDisplay.title()};
+    SwitchScreenItem item2;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 2> carr{{
+    const std::array<std::reference_wrapper<const MenuItem>, 3> carr{{
         std::cref<MenuItem>(item0),
-        std::cref<MenuItem>(item1)
+        std::cref<MenuItem>(item1),
+        std::cref<MenuItem>(item2)
     }};
 };
 
 CommonSettingsMenu::CommonSettingsMenu(Display &prevDisplay) :
-    item1{prevDisplay, "Back"}
+    item2{prevDisplay, "Back"}
 {
 }
 }

@@ -13,7 +13,7 @@ class MenuDisplay : public Display
 public:
     void start() override;
     void redraw() override final;
-    void stop() override;
+
     int framerate() const override { return 60; }
 
     void rotate(int offset) override;
@@ -24,15 +24,18 @@ public:
     virtual const std::reference_wrapper<const MenuItem> *begin() const = 0;
     virtual const std::reference_wrapper<const MenuItem> *end() const = 0;
 
-    void redrawMenu() const;
-
 protected:
     const std::reference_wrapper<const MenuItem> *m_current;
     bool m_needsRedraw;
+
+private:
+    void redrawMenu() const;
 };
 
 void MenuDisplay::start()
 {
+    Display::start();
+
     tft.setRotation(0);
     m_current = begin();
     m_needsRedraw = true;
@@ -45,10 +48,6 @@ void MenuDisplay::redraw()
         redrawMenu();
         m_needsRedraw = false;
     }
-}
-
-void MenuDisplay::stop()
-{
 }
 
 void MenuDisplay::rotate(int offset)

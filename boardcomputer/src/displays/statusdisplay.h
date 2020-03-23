@@ -20,7 +20,6 @@ public:
 
     void start() override;
     void redraw() override;
-    void stop() override;
 
     int framerate() const override { return m_framerate; }
     void setFramerate(int framerate) { m_framerate = framerate; }
@@ -33,6 +32,8 @@ private:
 
 void StatusDisplay::start()
 {
+    DemoDisplay::start();
+
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(0);
 }
@@ -103,9 +104,5 @@ void StatusDisplay::redraw()
     renderer.drawString(String("Limit1: ") + front.command.left.iDcMax + "A", 160, y, 2); y+=15;
     renderer.drawString(String("Performance: ") + performance.last + "                                                ",0,y,2);
     renderer.drawString(String("Mode: ") + currentMode->displayName(), 125, y, 2); y+=15;
-}
-
-void StatusDisplay::stop()
-{
 }
 }

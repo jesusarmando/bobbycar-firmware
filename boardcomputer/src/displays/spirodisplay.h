@@ -15,7 +15,7 @@ public:
 
     void start() override;
     void redraw() override;
-    void stop() override;
+
     int framerate() const override { return 100; }
 
     const char *displayName() const override { return "Spiro"; }
@@ -36,6 +36,8 @@ private:
 
 void SpiroDisplay::start()
 {
+    DemoDisplay::start();
+
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(3);
 }
@@ -44,10 +46,6 @@ void SpiroDisplay::redraw()
 {
     for (int i = 0; i < std::max(1, n); i++)
         render();
-}
-
-void SpiroDisplay::stop()
-{
 }
 
 void SpiroDisplay::render()

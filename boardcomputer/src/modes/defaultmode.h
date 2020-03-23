@@ -15,9 +15,7 @@ class DefaultMode final : public ModeBase
 public:
     using ModeBase::ModeBase;
 
-    void start() override {};
     void update() override;
-    void stop() override {};
 
     const char *displayName() const override { return "Default"; }
 

@@ -15,7 +15,7 @@ public:
 
     void start() override;
     void redraw() override;
-    void stop() override;
+
     int framerate() const override { return 60; }
 
     const char *displayName() const override { return "PingPong"; }
@@ -87,6 +87,8 @@ PingPongDisplay::PingPongDisplay(Display &prevDisplay) :
 
 void PingPongDisplay::start()
 {
+    DemoDisplay::start();
+
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
 
@@ -101,10 +103,6 @@ void PingPongDisplay::redraw()
     midline();
 
     ball();
-}
-
-void PingPongDisplay::stop()
-{
 }
 
 void PingPongDisplay::midline()

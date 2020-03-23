@@ -696,12 +696,12 @@ void WebHandler::handleManualModeParams(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                label(response, "ctrlTyp2", "Control Type:");
+                label(response, "ctrlTyp", "Control Type:");
 
                 breakLine(response);
 
                 {
-                    HtmlTag select(response, "select", " id=\"ctrlTyp2\" name=\"ctrlTyp\" required");
+                    HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\" required");
                     selectOption(response, "Commutation", "Commutation", modes::manualMode.ctrlTyp == ControlType::Commutation);
                     selectOption(response, "Sinusoidal", "Sinusoidal", modes::manualMode.ctrlTyp == ControlType::Sinusoidal);
                     selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes::manualMode.ctrlTyp == ControlType::FieldOrientedControl);
@@ -709,12 +709,12 @@ void WebHandler::handleManualModeParams(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                label(response, "ctrlMod2", "Control Mode:");
+                label(response, "ctrlMod", "Control Mode:");
 
                 breakLine(response);
 
                 {
-                    HtmlTag select(response, "select", " id=\"ctrlMod2\" name=\"ctrlMod\" required");
+                    HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\" required");
 
                     selectOption(response, "OpenMode", "Open Mode", modes::manualMode.ctrlMod == ControlMode::OpenMode);
                     selectOption(response, "Voltage", "Voltage", modes::manualMode.ctrlMod == ControlMode::Voltage);

@@ -13,7 +13,7 @@ public:
 
     void start() override;
     void redraw() override;
-    void stop() override;
+
     int framerate() const override { return 30; }
 
     const char *displayName() const override { return "Starfield"; }
@@ -41,6 +41,8 @@ StarfieldDisplay::StarfieldDisplay(Display &prevDisplay) :
 
 void StarfieldDisplay::start()
 {
+    DemoDisplay::start();
+
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
 
@@ -87,10 +89,6 @@ void StarfieldDisplay::redraw()
         }
       }
     }
-}
-
-void StarfieldDisplay::stop()
-{
 }
 
 uint8_t StarfieldDisplay::rng()
