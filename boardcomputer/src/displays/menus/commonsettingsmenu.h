@@ -6,7 +6,9 @@
 #include "changenumberdisplay.h"
 #include "globals.h"
 #include "menuitems/switchscreenmenuitem.h"
-#include "displays/menus/selectmodemenu.h"
+#include "selectmodemenu.h"
+#include "enablemenu.h"
+#include "invertmenu.h"
 
 namespace {
 class CommonSettingsMenu final : public MenuDisplay
@@ -26,6 +28,8 @@ private:
     ChangeNumberDisplay m_changeNMotMaxDisplay{"Set nMotMax", settings.nMotMax, *this};
     ChangeNumberDisplay m_changeFieldWeakMaxDisplay{"Set fieldWeakMax", settings.fieldWeakMax, *this};
     ChangeNumberDisplay m_changePhaseAdvMaxDisplay{"Set phaseAdvMax", settings.phaseAdvMax, *this};
+    EnableMenu m_enableMenu{*this};
+    InvertMenu m_invertMenu{*this};
 
     SwitchScreenItem item0{m_selectModeMenu, m_selectModeMenu.menuTitle()};
     SwitchScreenItem item1{m_changeIMotMaxDisplay, m_changeIMotMaxDisplay.title()};
@@ -33,21 +37,25 @@ private:
     SwitchScreenItem item3{m_changeNMotMaxDisplay, m_changeNMotMaxDisplay.title()};
     SwitchScreenItem item4{m_changeFieldWeakMaxDisplay, m_changeFieldWeakMaxDisplay.title()};
     SwitchScreenItem item5{m_changePhaseAdvMaxDisplay, m_changePhaseAdvMaxDisplay.title()};
-    SwitchScreenItem item6;
+    SwitchScreenItem item6{m_enableMenu, m_enableMenu.menuTitle()};
+    SwitchScreenItem item7{m_invertMenu, m_invertMenu.menuTitle()};
+    SwitchScreenItem item8;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 7> carr{{
+    const std::array<std::reference_wrapper<const MenuItem>, 9> carr{{
         std::cref<MenuItem>(item0),
         std::cref<MenuItem>(item1),
         std::cref<MenuItem>(item2),
         std::cref<MenuItem>(item3),
         std::cref<MenuItem>(item4),
         std::cref<MenuItem>(item5),
-        std::cref<MenuItem>(item6)
+        std::cref<MenuItem>(item6),
+        std::cref<MenuItem>(item7),
+        std::cref<MenuItem>(item8)
     }};
 };
 
 CommonSettingsMenu::CommonSettingsMenu(Display &prevDisplay) :
-    item6{prevDisplay, "Back"}
+    item8{prevDisplay, "Back"}
 {
 }
 }

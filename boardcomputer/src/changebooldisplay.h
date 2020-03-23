@@ -4,10 +4,10 @@
 #include "globals.h"
 
 namespace {
-class ChangeNumberDisplay : public Display
+class ChangeBoolDisplay : public Display
 {
 public:
-    ChangeNumberDisplay(const char *title, int &value, Display &prevDisplay);
+    ChangeBoolDisplay(const char *title, bool &value, Display &prevDisplay);
 
     void start() override;
     void redraw() override;
@@ -23,20 +23,20 @@ private:
     void redrawMenu() const;
 
     const char * const m_title;
-    int &m_value;
-    int m_tempValue{};
+    bool &m_value;
+    bool m_tempValue{};
     Display &m_prevDisplay;
     bool m_needsRedraw{};
 };
 
-ChangeNumberDisplay::ChangeNumberDisplay(const char *title, int &value, Display &prevDisplay) :
+ChangeBoolDisplay::ChangeBoolDisplay(const char *title, bool &value, Display &prevDisplay) :
     m_title{title},
     m_value{value},
     m_prevDisplay{prevDisplay}
 {
 }
 
-void ChangeNumberDisplay::start()
+void ChangeBoolDisplay::start()
 {
     Display::start();
 
@@ -46,7 +46,7 @@ void ChangeNumberDisplay::start()
     m_needsRedraw = true;
 }
 
-void ChangeNumberDisplay::redraw()
+void ChangeBoolDisplay::redraw()
 {
     if (m_needsRedraw)
     {
@@ -55,13 +55,17 @@ void ChangeNumberDisplay::redraw()
     }
 }
 
-void ChangeNumberDisplay::rotate(int offset)
+void ChangeBoolDisplay::rotate(int offset)
 {
-    m_tempValue += offset;
+    if (offset > 0)
+        m_tempValue = true;
+    else if (offset < 0)
+        m_tempValue = false;
+
     m_needsRedraw = true;
 }
 
-void ChangeNumberDisplay::button(bool pressed)
+void ChangeBoolDisplay::button(bool pressed)
 {
     if (!pressed)
     {
@@ -70,7 +74,7 @@ void ChangeNumberDisplay::button(bool pressed)
     }
 }
 
-void ChangeNumberDisplay::redrawMenu() const
+void ChangeBoolDisplay::redrawMenu() const
 {
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_YELLOW);
