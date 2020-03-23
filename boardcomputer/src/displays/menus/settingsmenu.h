@@ -17,7 +17,6 @@ class SettingsMenu final : public MenuDisplay
 public:
     SettingsMenu(Display &prevDisplay);
 
-    const char *displayName() const override { return "SettingsMenu"; }
     const char *menuTitle() const override { return "Settings"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };

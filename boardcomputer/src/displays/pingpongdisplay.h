@@ -18,8 +18,6 @@ public:
 
     int framerate() const override { return 60; }
 
-    const char *displayName() const override { return "PingPong"; }
-
     void midline();
     void lpaddle();
     void rpaddle();

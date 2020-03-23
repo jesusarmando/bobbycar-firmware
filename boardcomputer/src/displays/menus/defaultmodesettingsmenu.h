@@ -14,7 +14,6 @@ class DefaultModeSettingsMenu final : public MenuDisplay
 public:
     DefaultModeSettingsMenu(Display &prevDisplay);
 
-    const char *displayName() const override { return "DefaultModeSettingsMenu"; }
     const char *menuTitle() const override { return "Default mode settings"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };

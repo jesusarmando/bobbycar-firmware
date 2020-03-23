@@ -11,7 +11,7 @@ public:
     int draw(int y, bool selected) const;
 
 private:
-    const char *m_text;
+    const char * const m_text;
 };
 
 int MenuItem::draw(int y, bool selected) const

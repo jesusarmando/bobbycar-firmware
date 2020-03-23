@@ -17,7 +17,6 @@ class DemosMenu final : public MenuDisplay
 public:
     DemosMenu(Display &prevDisplay);
 
-    const char *displayName() const override { return "DemosMenu"; }
     const char *menuTitle() const override { return "Demos"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
@@ -30,11 +29,11 @@ private:
     GameOfLifeDisplay m_gameOfLife{*this};
     MetersDisplay m_meters{*this};
 
-    SwitchScreenItem item0{m_starfield, m_starfield.displayName()};
-    SwitchScreenItem item1{m_pingPong, m_pingPong.displayName()};
-    SwitchScreenItem item2{m_spiro, m_spiro.displayName()};
-    SwitchScreenItem item3{m_gameOfLife, m_gameOfLife.displayName()};
-    SwitchScreenItem item4{m_meters, m_meters.displayName()};
+    SwitchScreenItem item0{m_starfield, "Starfield"};
+    SwitchScreenItem item1{m_pingPong, "PingPong"};
+    SwitchScreenItem item2{m_spiro, "Spiro"};
+    SwitchScreenItem item3{m_gameOfLife, "GameOfLife"};
+    SwitchScreenItem item4{m_meters, "Meters"};
     SwitchScreenItem item5;
 
     const std::array<std::reference_wrapper<const MenuItem>, 6> carr{{

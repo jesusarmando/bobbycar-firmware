@@ -38,6 +38,15 @@ String toString(wl_status_t status)
 
 void fixCommonParams()
 {
+    for (auto &controller : controllers)
+    {
+        controller.command.left.iMotMax = controller.command.right.iMotMax = settings.iMotMax;
+        controller.command.left.iDcMax = controller.command.right.iDcMax = settings.iDcMax;
+        controller.command.left.nMotMax = controller.command.right.nMotMax = settings.nMotMax;
+        controller.command.left.fieldWeakMax = controller.command.right.fieldWeakMax = settings.fieldWeakMax;
+        controller.command.left.phaseAdvMax = controller.command.right.phaseAdvMax = settings.phaseAdvMax;
+    }
+
     if (front.invertLeft)
         front.command.left.pwm = -front.command.left.pwm;
     if (front.invertRight)

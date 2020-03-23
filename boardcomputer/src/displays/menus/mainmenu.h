@@ -18,7 +18,6 @@ namespace {
 class MainMenu final : public MenuDisplay
 {
 public:
-    const char *displayName() const override { return "MainMenu"; }
     const char *menuTitle() const override { return "Main menu"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
@@ -29,7 +28,7 @@ private:
     SettingsMenu m_settingsMenu{*this};
     DemosMenu m_demoMenu{*this};
 
-    SwitchScreenItem item0{m_statusDisplay, m_statusDisplay.displayName()};
+    SwitchScreenItem item0{m_statusDisplay, "Status"};
     SwitchScreenItem item1{m_settingsMenu, m_settingsMenu.menuTitle()};
     SwitchScreenItem item2{m_demoMenu, m_demoMenu.menuTitle()};
     RebootItem item3;

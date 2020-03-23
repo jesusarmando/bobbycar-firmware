@@ -15,8 +15,6 @@ public:
 
     int framerate() const override { return 60; }
 
-    const char *displayName() const override { return "GameOfLife"; }
-
 private:
     //Draws the grid on the display
     void drawGrid();

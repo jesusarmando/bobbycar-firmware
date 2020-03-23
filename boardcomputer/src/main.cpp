@@ -140,14 +140,14 @@ void setup()
     controllers[0].serial.begin(38400, SERIAL_8N1, rxPin1, txPin1);
     controllers[1].serial.begin(38400, SERIAL_8N1, rxPin2, txPin2);
 
+    settings.iMotMax = defaultIMotMax;
+    settings.iDcMax = defaultIDcMax;
+    settings.nMotMax = defaultNMotMax;
+    settings.fieldWeakMax = defaultFieldWeakMax;
+    settings.phaseAdvMax = defaultPhaseAdvMax;
+
     for (auto &controller : controllers)
-    {
         controller.command.buzzer = {};
-        controller.command.left.phaseAdvMax = controller.command.right.phaseAdvMax = 25;
-        controller.command.left.iMotMax = controller.command.right.iMotMax = defaultIMotMax;
-        controller.command.left.iDcMax = controller.command.right.iDcMax = defaultIDcMax;
-        controller.command.left.fieldWeakMax = controller.command.right.fieldWeakMax = defaultFieldWeakMax;
-    }
 
     modes::defaultMode.gas1_wert = defaultDefaultModeGas1Wert;
     modes::defaultMode.gas2_wert = defaultDefaultModeGas2Wert;

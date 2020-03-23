@@ -14,7 +14,6 @@ class ManualModeSettingsMenu final : public MenuDisplay
 public:
     ManualModeSettingsMenu(Display &prevDisplay);
 
-    const char *displayName() const override { return "ManualModeSettingsMenu"; }
     const char *menuTitle() const override { return "Manual mode settings"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };

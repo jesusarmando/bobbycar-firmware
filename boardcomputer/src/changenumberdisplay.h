@@ -12,8 +12,6 @@ public:
     void start() override;
     void redraw() override;
 
-    const char *displayName() const override { return "ChangeNumberDisplay"; };
-
     int framerate() const override { return 60; }
 
     void rotate(int offset) override;

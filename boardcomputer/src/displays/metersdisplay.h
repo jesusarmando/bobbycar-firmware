@@ -15,8 +15,6 @@ public:
 
     int framerate() const override { return 60; }
 
-    const char *displayName() const override { return "Meters"; }
-
 private:
     //  Draw the analogue meter on the screen
     void analogMeter();

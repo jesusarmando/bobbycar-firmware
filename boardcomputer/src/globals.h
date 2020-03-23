@@ -26,6 +26,14 @@ unsigned long lastDebug = millis();
 wl_status_t last_status;
 IPAddress last_ip;
 
+struct {
+    int iMotMax = 15;                  // [A] Maximum motor current limit
+    int iDcMax = 17;                   // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+    int nMotMax = 1000;                // [rpm] Maximum motor speed limit
+    int fieldWeakMax = 10;             // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
+    int phaseAdvMax = 40;              // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
+} settings;
+
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
 Controller &front = controllers[0], &back = controllers[1];
 

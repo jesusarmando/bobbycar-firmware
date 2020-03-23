@@ -24,8 +24,6 @@ public:
     int framerate() const override { return m_framerate; }
     void setFramerate(int framerate) { m_framerate = framerate; }
 
-    const char *displayName() const override { return "Status"; }
-
 private:
     int m_framerate{2};
 };

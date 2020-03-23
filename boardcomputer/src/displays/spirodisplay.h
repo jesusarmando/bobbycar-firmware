@@ -18,8 +18,6 @@ public:
 
     int framerate() const override { return 100; }
 
-    const char *displayName() const override { return "Spiro"; }
-
 private:
     void render();
 

@@ -15,7 +15,6 @@ public:
 
     void start() override;
 
-    const char *displayName() const override { return "SelectControlTypeMenu"; }
     const char *menuTitle() const override { return "Select control type"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
