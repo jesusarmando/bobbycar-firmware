@@ -45,19 +45,10 @@ void handleDebugSerial()
         last_ip = ip;
     }
 
-    const auto now = millis();
-    if (false)
-    if (now - lastDebug >= 50)
-    {
-        Serial.print("pwm: ");
-        Serial.println(front.command.left.pwm);
-
-        lastDebug = now;
-    }
-
     while(Serial.available())
     {
         const auto c = Serial.read();
+
         switch (c)
         {
         case 't':
@@ -66,13 +57,6 @@ void handleDebugSerial()
             Serial.printf("power: %d\n", power_toggle);
             for (auto &controller : controllers)
                 controller.command.poweroff = power_toggle;
-            break;
-        case 'l':
-        case 'L':
-            led_toggle = !led_toggle;
-            Serial.printf("led: %d\n", led_toggle);
-            for (auto &controller : controllers)
-                controller.command.led = led_toggle;
             break;
         case '0':
         case '1':
@@ -86,6 +70,21 @@ void handleDebugSerial()
         case '9':
             for (auto &controller : controllers)
                 controller.command.buzzer.freq = c-'0';
+            break;
+        case 'A':
+            if (currentDisplay)
+                currentDisplay->rotate(-1);
+            break;
+        case 'B':
+            if (currentDisplay)
+                currentDisplay->rotate(1);
+            break;
+        case ' ':
+            if (currentDisplay)
+            {
+                currentDisplay->button(true);
+                currentDisplay->button(false);
+            }
             break;
         }
     }
@@ -156,6 +155,9 @@ void setup()
 
     currentMode = &modes::defaultMode;
     currentDisplay = &mainMenu.m_statusDisplay;
+
+    Serial.print("The size of the main menu is: ");
+    Serial.println(sizeof(mainMenu));
 
     web.server.addHandler(&web.handler);
     web.server.begin();

@@ -25,7 +25,7 @@ public:
     virtual const std::reference_wrapper<const MenuItem> *end() const = 0;
 
 protected:
-    const std::reference_wrapper<const MenuItem> *m_current;
+    const std::reference_wrapper<const MenuItem> *m_current {};
     bool m_needsRedraw;
 
 private:
@@ -37,7 +37,8 @@ void MenuDisplay::start()
     Display::start();
 
     tft.setRotation(0);
-    m_current = begin();
+    if (!m_current)
+        m_current = begin();
     m_needsRedraw = true;
 }
 

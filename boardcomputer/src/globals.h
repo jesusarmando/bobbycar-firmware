@@ -18,11 +18,9 @@ float gas, brems;
 uint16_t gasMin, gasMax, bremsMin, bremsMax;
 
 bool power_toggle{false};
-bool led_toggle{false};
 
 unsigned long lastUpdate = millis();
 unsigned long lastRedraw = millis();
-unsigned long lastDebug = millis();
 
 wl_status_t last_status;
 IPAddress last_ip;
