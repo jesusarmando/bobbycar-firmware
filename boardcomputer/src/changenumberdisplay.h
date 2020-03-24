@@ -4,10 +4,11 @@
 #include "globals.h"
 
 namespace {
+template<typename T>
 class ChangeNumberDisplay : public Display
 {
 public:
-    ChangeNumberDisplay(const char *title, int &value, Display &prevDisplay);
+    ChangeNumberDisplay(const char *title, T &value, Display &prevDisplay);
 
     void start() override;
     void redraw() override;
@@ -23,20 +24,22 @@ private:
     void redrawMenu() const;
 
     const char * const m_title;
-    int &m_value;
-    int m_tempValue{};
+    T &m_value;
+    T m_tempValue{};
     Display &m_prevDisplay;
     bool m_needsRedraw{};
 };
 
-ChangeNumberDisplay::ChangeNumberDisplay(const char *title, int &value, Display &prevDisplay) :
+template<typename T>
+ChangeNumberDisplay<T>::ChangeNumberDisplay(const char *title, T &value, Display &prevDisplay) :
     m_title{title},
     m_value{value},
     m_prevDisplay{prevDisplay}
 {
 }
 
-void ChangeNumberDisplay::start()
+template<typename T>
+void ChangeNumberDisplay<T>::start()
 {
     Display::start();
 
@@ -46,7 +49,8 @@ void ChangeNumberDisplay::start()
     m_needsRedraw = true;
 }
 
-void ChangeNumberDisplay::redraw()
+template<typename T>
+void ChangeNumberDisplay<T>::redraw()
 {
     if (m_needsRedraw)
     {
@@ -55,13 +59,26 @@ void ChangeNumberDisplay::redraw()
     }
 }
 
-void ChangeNumberDisplay::rotate(int offset)
+template<typename T>
+void ChangeNumberDisplay<T>::rotate(int offset)
 {
     m_tempValue += offset;
     m_needsRedraw = true;
 }
 
-void ChangeNumberDisplay::button(bool pressed)
+template<>
+void ChangeNumberDisplay<bool>::rotate(int offset)
+{
+    if (offset > 0)
+        m_tempValue = true;
+    else if (offset < 0)
+        m_tempValue = false;
+
+    m_needsRedraw = true;
+}
+
+template<typename T>
+void ChangeNumberDisplay<T>::button(bool pressed)
 {
     if (!pressed)
     {
@@ -70,7 +87,8 @@ void ChangeNumberDisplay::button(bool pressed)
     }
 }
 
-void ChangeNumberDisplay::redrawMenu() const
+template<typename T>
+void ChangeNumberDisplay<T>::redrawMenu() const
 {
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_YELLOW);
