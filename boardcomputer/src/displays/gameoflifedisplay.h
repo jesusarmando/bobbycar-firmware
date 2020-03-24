@@ -3,13 +3,12 @@
 #include <Arduino.h>
 
 #include "demodisplay.h"
+#include "displays/menus/demosmenu.h"
 
 namespace {
-class GameOfLifeDisplay final : public DemoDisplay
+class GameOfLifeDisplay final : public DemoDisplay<DemosMenu>
 {
 public:
-    using DemoDisplay::DemoDisplay;
-
     void start() override;
     void redraw() override;
 

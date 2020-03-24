@@ -22,17 +22,17 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    ChangeValueDisplay<ControlType> m_selectControlTypeMenu{"Set control type", modes::defaultMode.ctrlTyp, *this};
-    ChangeValueDisplay<ControlMode> m_selectControlModeMenu{"Set control mode", modes::defaultMode.ctrlMod, *this};
-    ChangeValueDisplay<bool> m_enableWeakeningSmootheningDisplay{"Enable weakening smoothening", modes::defaultMode.enableWeakeningSmoothening, *this};
-    ChangeValueDisplay<int16_t> m_weakeningSmootheningDisplay{"Weaking smoothening", modes::defaultMode.weakeningSmoothening, *this};
-    ChangeValueDisplay<int16_t> m_frontPercentageDisplay{"Front percentage", modes::defaultMode.frontPercentage, *this};
-    ChangeValueDisplay<int16_t> m_backPercentageDisplay{"Front percentage", modes::defaultMode.backPercentage, *this};
-    ChangeValueDisplay<int16_t> m_add_schwelleDisplay{"Add schwelle", modes::defaultMode.add_schwelle, *this};
-    ChangeValueDisplay<int16_t> m_gas1_wertDisplay{"Gas 1 Wert", modes::defaultMode.gas1_wert, *this};
-    ChangeValueDisplay<int16_t> m_gas2_wertDisplay{"Gas 2 Wert", modes::defaultMode.gas2_wert, *this};
-    ChangeValueDisplay<int16_t> m_brems1_wertDisplay{"Brems 1 Wert", modes::defaultMode.brems1_wert, *this};
-    ChangeValueDisplay<int16_t> m_brems2_wertDisplay{"Brems 2 Wert", modes::defaultMode.brems2_wert, *this};
+    SetDefaultModeCtrlTypDisplay m_selectControlTypeMenu{*this};
+    SetDefaultModeCtrlModDisplay m_selectControlModeMenu{*this};
+    SetDefaultModeEnableFieldWeakeningSmootheningDisplay m_enableWeakeningSmootheningDisplay{*this};
+    SetDefaultModeWeakeningSmootheningDisplay m_weakeningSmootheningDisplay{*this};
+    SetDefaultModeFrontPercentageDisplay m_frontPercentageDisplay{*this};
+    SetDefaultModeBackPercentageDisplay m_backPercentageDisplay{*this};
+    SetDefaultModeAddSchwelleDisplay m_add_schwelleDisplay{*this};
+    SetDefaultModeGas1WertDisplay m_gas1_wertDisplay{*this};
+    SetDefaultModeGas2WertDisplay m_gas2_wertDisplay{*this};
+    SetDefaultModeBrems1WertDisplay m_brems1_wertDisplay{*this};
+    SetDefaultModeBrems2WertDisplay m_brems2_wertDisplay{*this};
 
     SwitchScreenItem item0{m_selectControlTypeMenu, m_selectControlTypeMenu.title()};
     SwitchScreenItem item1{m_selectControlModeMenu, m_selectControlModeMenu.title()};

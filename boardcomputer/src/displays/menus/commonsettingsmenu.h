@@ -23,11 +23,11 @@ public:
 
 private:
     SelectModeMenu m_selectModeMenu{*this};
-    ChangeValueDisplay<int16_t> m_changeIMotMaxDisplay{"Set iMotMax", settings.iMotMax, *this};
-    ChangeValueDisplay<int16_t> m_changeIDcMaxDisplay{"Set iDcMax", settings.iDcMax, *this};
-    ChangeValueDisplay<int16_t> m_changeNMotMaxDisplay{"Set nMotMax", settings.nMotMax, *this};
-    ChangeValueDisplay<int16_t> m_changeFieldWeakMaxDisplay{"Set fieldWeakMax", settings.fieldWeakMax, *this};
-    ChangeValueDisplay<int16_t> m_changePhaseAdvMaxDisplay{"Set phaseAdvMax", settings.phaseAdvMax, *this};
+    SetIMotMaxDisplay m_changeIMotMaxDisplay{*this};
+    SetIDcMaxDisplay m_changeIDcMaxDisplay{*this};
+    SetNMotMaxDisplay m_changeNMotMaxDisplay{*this};
+    SetFieldWeakMaxDisplay m_changeFieldWeakMaxDisplay{*this};
+    SetPhaseAdvMaxDisplay m_changePhaseAdvMaxDisplay{*this};
     EnableMenu m_enableMenu{*this};
     InvertMenu m_invertMenu{*this};
 

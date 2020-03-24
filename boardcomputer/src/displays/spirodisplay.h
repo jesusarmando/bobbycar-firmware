@@ -6,13 +6,12 @@
 #include <HardwareSerial.h>
 
 #include "demodisplay.h"
+#include "displays/menus/demosmenu.h"
 
 namespace {
-class SpiroDisplay final : public DemoDisplay
+class SpiroDisplay final : public DemoDisplay<DemosMenu>
 {
 public:
-    using DemoDisplay::DemoDisplay;
-
     void start() override;
     void redraw() override;
 

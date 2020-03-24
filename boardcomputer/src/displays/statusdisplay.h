@@ -4,6 +4,8 @@
 #include <WiFi.h>
 
 #include "demodisplay.h"
+#include "displays/menus/mainmenu.h"
+
 #include "modebase.h"
 #include "globals.h"
 #include "utils.h"
@@ -13,11 +15,9 @@ namespace {
 }
 
 namespace {
-class StatusDisplay final : public DemoDisplay
+class StatusDisplay final : public DemoDisplay<MainMenu>
 {
 public:
-    using DemoDisplay::DemoDisplay;
-
     void start() override;
     void redraw() override;
 
@@ -30,7 +30,7 @@ private:
 
 void StatusDisplay::start()
 {
-    DemoDisplay::start();
+    DemoDisplay<MainMenu>::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(0);

@@ -2,19 +2,15 @@
 
 #include <array>
 
-#include "displays/statusdisplay.h"
 #include "menudisplay.h"
-#include "settingsmenu.h"
-#include "demosmenu.h"
-#include "buzzermenu.h"
-#include "changevaluedisplay_bool.h"
-
+#include "displays/statusdisplay.h"
+#include "displays/menus/settingsmenu.h"
+#include "displays/menus/demosmenu.h"
+#include "displays/menus/buzzermenu.h"
+#include "displays/changescreens/setfrontleddisplay.h"
+#include "displays/changescreens/setbackleddisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
 #include "menuitems/rebootitem.h"
-
-#include "displays/statusdisplay.h"
-#include "settingsmenu.h"
-#include "demosmenu.h"
 
 namespace {
 class MainMenu final : public MenuDisplay
@@ -25,20 +21,13 @@ public:
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
-    StatusDisplay m_statusDisplay{*this};
 private:
-    SettingsMenu m_settingsMenu{*this};
-    DemosMenu m_demoMenu{*this};
-    BuzzerMenu m_buzzerMenu{*this};
-    ChangeValueDisplay<bool> m_frontLed{"Front LED", front.command.led, *this};
-    ChangeValueDisplay<bool> m_backLed{"Back LED", back.command.led, *this};
-
-    SwitchScreenItem item0{m_statusDisplay, "Status"};
-    SwitchScreenItem item1{m_settingsMenu, m_settingsMenu.title()};
-    SwitchScreenItem item2{m_demoMenu, m_demoMenu.title()};
-    SwitchScreenItem item3{m_buzzerMenu, m_buzzerMenu.title()};
-    SwitchScreenItem item4{m_frontLed, m_frontLed.title()};
-    SwitchScreenItem item5{m_backLed, m_backLed.title()};
+    SwitchScreenItem<StatusDisplay> item0{"Status"};
+    SwitchScreenItem<SettingsMenu> item1{"Settings"};
+    SwitchScreenItem<DemosMenu> item2{"Demos"};
+    SwitchScreenItem<BuzzerMenu> item3{"Buzzer"};
+    SwitchScreenItem<SetFrontLedDisplay> item4{"Set front LED"};
+    SwitchScreenItem<SetBackLedDisplay> item5{"Set back LED"};
     RebootItem item6;
 
     const std::array<std::reference_wrapper<const MenuItem>, 7> carr{{

@@ -3,13 +3,14 @@
 #include <cstdint>
 
 #include "demodisplay.h"
+#include "displays/menus/demosmenu.h"
 #include "globals.h"
 
 namespace {
-class StarfieldDisplay final : public DemoDisplay
+class StarfieldDisplay final : public DemoDisplay<DemosMenu>
 {
 public:
-    StarfieldDisplay(Display &prevDisplay);
+    StarfieldDisplay();
 
     void start() override;
     void redraw() override;
@@ -28,8 +29,7 @@ public:
     uint8_t za, zb, zc, zx;
 };
 
-StarfieldDisplay::StarfieldDisplay(Display &prevDisplay) :
-    DemoDisplay{prevDisplay},
+StarfieldDisplay::StarfieldDisplay() :
     za(random(256)),
     zb(random(256)),
     zc(random(256)),

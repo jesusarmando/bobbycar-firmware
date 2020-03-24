@@ -1,26 +1,20 @@
 #pragma once
 
 #include "display.h"
-#include "globals.h"
+#include "utils.h"
 
 namespace {
+template<typename TnextScreen>
 class DemoDisplay : public Display
 {
 public:
-    DemoDisplay(Display &prevDisplay) :
-        m_prevDisplay{prevDisplay}
-    {
-    }
-
     void button(bool pressed) override final;
-
-private:
-    Display &m_prevDisplay;
 };
 
-void DemoDisplay::button(bool pressed)
+template<typename TnextScreen>
+void DemoDisplay<TnextScreen>::button(bool pressed)
 {
     if (!pressed)
-        currentDisplay = &m_prevDisplay;
+        switchScreen<TnextScreen>();
 }
 }

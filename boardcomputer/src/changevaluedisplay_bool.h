@@ -6,30 +6,16 @@
 #include "menudisplay.h"
 #include "menuitems/setvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
+#include "modes/defaultmode.h"
 
 namespace {
-template<>
-class ChangeValueDisplay<bool> final : public MenuDisplay
+template<typename TnextDisplay>
+class ChangeValueDisplay<bool, TnextDisplay> : public MenuDisplay
 {
 public:
-    ChangeValueDisplay(const char *title, bool &value, Display &prevDisplay) :
-        m_title{title},
-        m_value{value},
-        item0{true, value, prevDisplay, "true"},
-        item1{false, value, prevDisplay, "false"},
-        item2{prevDisplay, "Back"}
-    {
-    }
+    ChangeValueDisplay(const char *title, bool &value);
 
-    void start() override
-    {
-        MenuDisplay::start();
-
-        if (m_value == true)
-            m_current = begin() + 0;
-        else if (m_value == false)
-            m_current = begin() + 1;
-    }
+    void start() override;
 
     const char *title() const override { return m_title; }
 
@@ -41,9 +27,9 @@ private:
 
     bool &m_value;
 
-    SetValueMenuItem<bool> item0;
-    SetValueMenuItem<bool> item1;
-    SwitchScreenItem item2;
+    SetValueMenuItem<bool, true, TnextDisplay> item0;
+    SetValueMenuItem<bool, false, TnextDisplay> item1;
+    SwitchScreenItem<TnextDisplay> item2{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 3> carr{{
         std::cref<MenuItem>(item0),
@@ -51,4 +37,24 @@ private:
         std::cref<MenuItem>(item2)
     }};
 };
+
+template<typename TnextDisplay>
+ChangeValueDisplay<bool, TnextDisplay>::ChangeValueDisplay(const char *title, bool &value) :
+    m_title{title},
+    m_value{value},
+    item0{value, "true"},
+    item1{value, "false"}
+{
+}
+
+template<typename TnextDisplay>
+void ChangeValueDisplay<bool, TnextDisplay>::start()
+{
+    MenuDisplay::start();
+
+    if (m_value == true)
+        m_current = begin() + 0;
+    else if (m_value == false)
+        m_current = begin() + 1;
+}
 }

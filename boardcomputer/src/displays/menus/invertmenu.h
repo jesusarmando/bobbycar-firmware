@@ -19,10 +19,10 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    ChangeValueDisplay<bool> m_frontLeft{"Invert front left", front.invertLeft, *this};
-    ChangeValueDisplay<bool> m_frontRight{"Invert front right", front.invertRight, *this};
-    ChangeValueDisplay<bool> m_backLeft{"Invert back left", back.invertLeft, *this};
-    ChangeValueDisplay<bool> m_backRight{"Invert back right", back.invertRight, *this};
+    SetFrontLeftInvertedDisplay m_frontLeft{*this};
+    SetFrontRightInvertedDisplay m_frontRight{*this};
+    SetBackLeftInvertedDisplay m_backLeft{*this};
+    SetBackRightInvertedDisplay m_backRight{*this};
 
     SwitchScreenItem item0{m_frontLeft, m_frontLeft.title()};
     SwitchScreenItem item1{m_frontRight, m_frontRight.title()};

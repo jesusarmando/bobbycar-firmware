@@ -66,4 +66,8 @@ void sendCommands()
         controller.serial.write((uint8_t *) &controller.command, sizeof(controller.command));
     }
 }
+
+template<typename T>
+void switchScreen();
+
 }

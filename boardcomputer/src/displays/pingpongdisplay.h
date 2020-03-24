@@ -6,12 +6,13 @@
 #include <HardwareSerial.h>
 
 #include "demodisplay.h"
+#include "displays/menus/demosmenu.h"
 
 namespace {
-class PingPongDisplay final : public DemoDisplay
+class PingPongDisplay final : public DemoDisplay<DemosMenu>
 {
 public:
-    PingPongDisplay(Display &prevDisplay);
+    PingPongDisplay();
 
     void start() override;
     void redraw() override;
@@ -71,15 +72,12 @@ public:
     static const constexpr auto GREY = 0x5AEB;
 };
 
-PingPongDisplay::PingPongDisplay(Display &prevDisplay) :
-    DemoDisplay{prevDisplay}
-{
-    lpaddle_y = random(0, h - paddle_h);
-    rpaddle_y = random(0, h - paddle_h);
-
+PingPongDisplay::PingPongDisplay() :
+    lpaddle_y(random(0, h - paddle_h)),
+    rpaddle_y(random(0, h - paddle_h)),
     // ball is placed on the center of the left paddle
-    ball_y = lpaddle_y + (paddle_h / 2);
-
+    ball_y(lpaddle_y + (paddle_h / 2))
+{
     calc_target_y();
 }
 

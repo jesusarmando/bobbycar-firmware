@@ -8,13 +8,13 @@ namespace {
 class RebootItem final : public MenuItem
 {
 public:
-    RebootItem(const char *text = "Reboot");
+    RebootItem();
 
     void triggered() const override;
 };
 
-RebootItem::RebootItem(const char *text) :
-    MenuItem{text}
+RebootItem::RebootItem() :
+    MenuItem{"Reboot"}
 {
 }
 

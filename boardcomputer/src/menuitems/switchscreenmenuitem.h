@@ -1,28 +1,21 @@
 #pragma once
 
-#include "globals.h"
 #include "menuitem.h"
+#include "utils.h"
 
 namespace {
+template<typename T>
 class SwitchScreenItem : public MenuItem
 {
 public:
-    SwitchScreenItem(Display &display, const char *text);
+    using MenuItem::MenuItem;
 
     void triggered() const override;
-
-private:
-    Display &m_display;
 };
 
-SwitchScreenItem::SwitchScreenItem(Display &display, const char *text) :
-    MenuItem{text},
-    m_display{display}
+template<typename T>
+void SwitchScreenItem<T>::triggered() const
 {
-}
-
-void SwitchScreenItem::triggered() const
-{
-    currentDisplay = &m_display;
+    switchScreen<T>();
 }
 }
