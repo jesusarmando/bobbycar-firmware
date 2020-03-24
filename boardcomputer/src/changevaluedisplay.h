@@ -5,10 +5,10 @@
 
 namespace {
 template<typename T>
-class ChangeNumberDisplay : public Display
+class ChangeValueDisplay : public Display
 {
 public:
-    ChangeNumberDisplay(const char *title, T &value, Display &prevDisplay);
+    ChangeValueDisplay(const char *title, T &value, Display &prevDisplay);
 
     void start() override;
     void redraw() override;
@@ -31,7 +31,7 @@ private:
 };
 
 template<typename T>
-ChangeNumberDisplay<T>::ChangeNumberDisplay(const char *title, T &value, Display &prevDisplay) :
+ChangeValueDisplay<T>::ChangeValueDisplay(const char *title, T &value, Display &prevDisplay) :
     m_title{title},
     m_value{value},
     m_prevDisplay{prevDisplay}
@@ -39,7 +39,7 @@ ChangeNumberDisplay<T>::ChangeNumberDisplay(const char *title, T &value, Display
 }
 
 template<typename T>
-void ChangeNumberDisplay<T>::start()
+void ChangeValueDisplay<T>::start()
 {
     Display::start();
 
@@ -50,7 +50,7 @@ void ChangeNumberDisplay<T>::start()
 }
 
 template<typename T>
-void ChangeNumberDisplay<T>::redraw()
+void ChangeValueDisplay<T>::redraw()
 {
     if (m_needsRedraw)
     {
@@ -60,14 +60,14 @@ void ChangeNumberDisplay<T>::redraw()
 }
 
 template<typename T>
-void ChangeNumberDisplay<T>::rotate(int offset)
+void ChangeValueDisplay<T>::rotate(int offset)
 {
     m_tempValue += offset;
     m_needsRedraw = true;
 }
 
 template<>
-void ChangeNumberDisplay<bool>::rotate(int offset)
+void ChangeValueDisplay<bool>::rotate(int offset)
 {
     if (offset > 0)
         m_tempValue = true;
@@ -78,7 +78,7 @@ void ChangeNumberDisplay<bool>::rotate(int offset)
 }
 
 template<typename T>
-void ChangeNumberDisplay<T>::button(bool pressed)
+void ChangeValueDisplay<T>::button(bool pressed)
 {
     if (!pressed)
     {
@@ -88,7 +88,7 @@ void ChangeNumberDisplay<T>::button(bool pressed)
 }
 
 template<typename T>
-void ChangeNumberDisplay<T>::redrawMenu() const
+void ChangeValueDisplay<T>::redrawMenu() const
 {
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_YELLOW);

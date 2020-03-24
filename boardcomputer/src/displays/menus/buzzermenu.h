@@ -1,7 +1,7 @@
 #pragma once
 
 #include "menudisplay.h"
-#include "changenumberdisplay.h"
+#include "changevaluedisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
 
 namespace {
@@ -15,10 +15,10 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); }
 
 private:
-    ChangeNumberDisplay<uint8_t> m_frontFreq{"Front freq", front.command.buzzer.freq, *this};
-    ChangeNumberDisplay<uint8_t> m_frontPattern{"Front pattern", front.command.buzzer.pattern, *this};
-    ChangeNumberDisplay<uint8_t> m_backFreq{"Back freq", back.command.buzzer.freq, *this};
-    ChangeNumberDisplay<uint8_t> m_backPattern{"Back pattern", back.command.buzzer.pattern, *this};
+    ChangeValueDisplay<uint8_t> m_frontFreq{"Front freq", front.command.buzzer.freq, *this};
+    ChangeValueDisplay<uint8_t> m_frontPattern{"Front pattern", front.command.buzzer.pattern, *this};
+    ChangeValueDisplay<uint8_t> m_backFreq{"Back freq", back.command.buzzer.freq, *this};
+    ChangeValueDisplay<uint8_t> m_backPattern{"Back pattern", back.command.buzzer.pattern, *this};
 
     SwitchScreenItem item0{m_frontFreq, m_frontFreq.title()};
     SwitchScreenItem item1{m_frontPattern, m_frontPattern.title()};

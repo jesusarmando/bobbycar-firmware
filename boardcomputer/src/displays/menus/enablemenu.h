@@ -3,7 +3,7 @@
 #include <array>
 
 #include "menudisplay.h"
-#include "changenumberdisplay.h"
+#include "changevaluedisplay.h"
 #include "globals.h"
 #include "menuitems/switchscreenmenuitem.h"
 
@@ -19,10 +19,10 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    ChangeNumberDisplay<bool> m_frontLeft{"Enable front left", front.command.left.enable, *this};
-    ChangeNumberDisplay<bool> m_frontRight{"Enable front right", front.command.right.enable, *this};
-    ChangeNumberDisplay<bool> m_backLeft{"Enable back left", back.command.left.enable, *this};
-    ChangeNumberDisplay<bool> m_backRight{"Enable back right", back.command.right.enable, *this};
+    ChangeValueDisplay<bool> m_frontLeft{"Enable front left", front.command.left.enable, *this};
+    ChangeValueDisplay<bool> m_frontRight{"Enable front right", front.command.right.enable, *this};
+    ChangeValueDisplay<bool> m_backLeft{"Enable back left", back.command.left.enable, *this};
+    ChangeValueDisplay<bool> m_backRight{"Enable back right", back.command.right.enable, *this};
 
     SwitchScreenItem item0{m_frontLeft, m_frontLeft.title()};
     SwitchScreenItem item1{m_frontRight, m_frontRight.title()};

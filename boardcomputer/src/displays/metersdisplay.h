@@ -160,8 +160,8 @@ void MetersDisplay::analogMeter()
         if (i < 50) tft.drawLine(x0, y0, x1, y1, TFT_BLACK);
     }
 
-    tft.drawString("%RH", 5 + 230 - 40, 119 - 20, 2); // Units at bottom right
-    tft.drawCentreString("%RH", 120, 70, 4); // Comment out to avoid font 4
+    tft.drawString("KM/h", 5 + 230 - 40, 119 - 20, 2); // Units at bottom right
+    tft.drawCentreString("KM/h", 120, 70, 4); // Comment out to avoid font 4
     tft.drawRect(5, 3, 230, 119, TFT_BLACK); // Draw bezel line
 
     plotNeedle(0); // Put meter needle at 0
@@ -191,7 +191,7 @@ void MetersDisplay::plotNeedle(int value)
 
     // Re-plot text under needle
     tft.setTextColor(TFT_BLACK);
-    tft.drawCentreString("%RH", 120, 70, 4); // // Comment out to avoid font 4
+    tft.drawCentreString("KM/h", 120, 70, 4); // // Comment out to avoid font 4
 
     // Store new needle end coords for next erase
     ltx = tx;

@@ -7,7 +7,7 @@
 #include "settingsmenu.h"
 #include "demosmenu.h"
 #include "buzzermenu.h"
-#include "changenumberdisplay.h"
+#include "changevaluedisplay.h"
 
 #include "menuitems/switchscreenmenuitem.h"
 #include "menuitems/rebootitem.h"
@@ -30,8 +30,8 @@ private:
     SettingsMenu m_settingsMenu{*this};
     DemosMenu m_demoMenu{*this};
     BuzzerMenu m_buzzerMenu{*this};
-    ChangeNumberDisplay<bool> m_frontLed{"Front LED", front.command.led, *this};
-    ChangeNumberDisplay<bool> m_backLed{"Back LED", back.command.led, *this};
+    ChangeValueDisplay<bool> m_frontLed{"Front LED", front.command.led, *this};
+    ChangeValueDisplay<bool> m_backLed{"Back LED", back.command.led, *this};
 
     SwitchScreenItem item0{m_statusDisplay, "Status"};
     SwitchScreenItem item1{m_settingsMenu, m_settingsMenu.menuTitle()};

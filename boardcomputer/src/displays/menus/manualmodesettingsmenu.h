@@ -4,8 +4,8 @@
 
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
-#include "displays/menus/selectcontroltypemenu.h"
-#include "displays/menus/selectcontrolmodemenu.h"
+#include "changevaluedisplay_controlmode.h"
+#include "changevaluedisplay_controltype.h"
 #include "modes/manualmode.h"
 
 namespace {
@@ -20,8 +20,8 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SelectControlTypeMenu m_selectControlTypeMenu{modes::manualMode.ctrlTyp, *this};
-    SelectControlModeMenu m_selectControlModeMenu{modes::manualMode.ctrlMod, *this};
+    ChangeValueDisplay<ControlType> m_selectControlTypeMenu{"Set control type", modes::manualMode.ctrlTyp, *this};
+    ChangeValueDisplay<ControlMode> m_selectControlModeMenu{"Set control mode", modes::manualMode.ctrlMod, *this};
 
     SwitchScreenItem item0{m_selectControlTypeMenu, m_selectControlTypeMenu.menuTitle()};
     SwitchScreenItem item1{m_selectControlModeMenu, m_selectControlModeMenu.menuTitle()};
