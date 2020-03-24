@@ -5,10 +5,14 @@
 #include "demodisplay.h"
 
 namespace {
-class GameOfLifeDisplay final : public DemoDisplay
+class DemosMenu;
+}
+
+namespace {
+class GameOfLifeDisplay final : public DemoDisplay<DemosMenu>
 {
 public:
-    using DemoDisplay::DemoDisplay;
+    GameOfLifeDisplay();
 
     void start() override;
     void redraw() override;
@@ -38,20 +42,29 @@ private:
 
     static const constexpr auto GEN_DELAY = 0;
 
-    //Current grid
-    uint8_t grid[GRIDX][GRIDY];
+    struct Data {
+        //Current grid
+        uint8_t grid[GRIDX][GRIDY];
 
-    //The new grid for the next generation
-    uint8_t newgrid[GRIDX][GRIDY];
+        //The new grid for the next generation
+        uint8_t newgrid[GRIDX][GRIDY];
+    };
+
+    const std::unique_ptr<Data> m_data;
 
     //Number of generations
     static const constexpr auto NUMGEN = 600;
     int gen = 0;
 };
 
+GameOfLifeDisplay::GameOfLifeDisplay() :
+    m_data{std::make_unique<Data>()}
+{
+}
+
 void GameOfLifeDisplay::start()
 {
-    DemoDisplay::start();
+    DemoDisplay<DemosMenu>::start();
 
     tft.setRotation(3);
     tft.fillScreen(TFT_BLACK);
@@ -69,7 +82,7 @@ void GameOfLifeDisplay::redraw()
     drawGrid();
     for (int16_t x = 1; x < GRIDX-1; x++) {
         for (int16_t y = 1; y < GRIDY-1; y++) {
-            grid[x][y] = newgrid[x][y];
+            m_data->grid[x][y] = m_data->newgrid[x][y];
         }
     }
 
@@ -82,8 +95,8 @@ void GameOfLifeDisplay::drawGrid()
     uint16_t color = TFT_WHITE;
     for (int16_t x = 1; x < GRIDX - 1; x++) {
         for (int16_t y = 1; y < GRIDY - 1; y++) {
-            if ((grid[x][y]) != (newgrid[x][y])) {
-                if (newgrid[x][y] == 1)
+            if ((m_data->grid[x][y]) != (m_data->newgrid[x][y])) {
+                if (m_data->newgrid[x][y] == 1)
                     color = 0xFFFF; //random(0xFFFF);
                 else
                     color = 0;
@@ -97,16 +110,16 @@ void GameOfLifeDisplay::initGrid()
 {
     for (int16_t x = 0; x < GRIDX; x++) {
         for (int16_t y = 0; y < GRIDY; y++) {
-            newgrid[x][y] = 0;
+            m_data->newgrid[x][y] = 0;
 
             if (x == 0 || x == GRIDX - 1 || y == 0 || y == GRIDY - 1)
-                grid[x][y] = 0;
+                m_data->grid[x][y] = 0;
             else
             {
                 if (random(3) == 1)
-                    grid[x][y] = 1;
+                    m_data->grid[x][y] = 1;
                 else
-                    grid[x][y] = 0;
+                    m_data->grid[x][y] = 0;
             }
 
         }
@@ -127,7 +140,7 @@ int GameOfLifeDisplay::getNumberOfNeighbors(int x, int y)
 
             if (new_x >= 0 && new_y >= 0 &&
                 new_x < GRIDX && new_y < GRIDY)
-                n+=grid[new_x][new_y];
+                n+=m_data->grid[new_x][new_y];
         }
 
     return n;
@@ -138,14 +151,14 @@ void GameOfLifeDisplay::computeCA()
     for (int16_t x = 1; x < GRIDX; x++) {
         for (int16_t y = 1; y < GRIDY; y++) {
             int neighbors = getNumberOfNeighbors(x, y);
-            if (grid[x][y] == 1 && (neighbors == 2 || neighbors == 3 ))
-                newgrid[x][y] = 1;
-            else if (grid[x][y] == 1)
-                newgrid[x][y] = 0;
-            if (grid[x][y] == 0 && (neighbors == 3))
-                newgrid[x][y] = 1;
-            else if (grid[x][y] == 0)
-                newgrid[x][y] = 0;
+            if (m_data->grid[x][y] == 1 && (neighbors == 2 || neighbors == 3 ))
+                m_data->newgrid[x][y] = 1;
+            else if (m_data->grid[x][y] == 1)
+                m_data->newgrid[x][y] = 0;
+            if (m_data->grid[x][y] == 0 && (neighbors == 3))
+                m_data->newgrid[x][y] = 1;
+            else if (m_data->grid[x][y] == 0)
+                m_data->newgrid[x][y] = 0;
         }
     }
 }

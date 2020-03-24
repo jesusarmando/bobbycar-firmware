@@ -2,20 +2,22 @@
 
 #include <array>
 
-#include "globals.h"
 #include "menudisplay.h"
-#include "menuitems/setvaluemenuitem.h"
+#include "menuitems/setdynamicvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
+#include "globals.h"
 #include "modes/defaultmode.h"
 #include "modes/manualmode.h"
 #include "modes/bluetoothmode.h"
 
 namespace {
+class CommonSettingsMenu;
+}
+
+namespace {
 class SelectModeMenu final : public MenuDisplay
 {
 public:
-    SelectModeMenu(Display &prevDisplay);
-
     void start() override;
 
     const char *title() const override { return "Select mode"; }
@@ -24,10 +26,10 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SetValueMenuItem<ModeBase*> item0;
-    SetValueMenuItem<ModeBase*> item1;
-    SetValueMenuItem<ModeBase*> item2;
-    SwitchScreenItem item3;
+    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu> item0{currentMode, &modes::defaultMode, "Default"};
+    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu> item1{currentMode, &modes::manualMode, "Manual"};
+    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu> item2{currentMode, &modes::bluetoothMode, "Bluetooth"};
+    SwitchScreenMenuItem<CommonSettingsMenu> item3{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 4> carr{{
         std::cref<MenuItem>(item0),
@@ -36,14 +38,6 @@ private:
         std::cref<MenuItem>(item3)
     }};
 };
-
-SelectModeMenu::SelectModeMenu(Display &prevDisplay) :
-    item0{&modes::defaultMode, currentMode, prevDisplay, "Default"},
-    item1{&modes::manualMode, currentMode, prevDisplay, "Manual"},
-    item2{&modes::bluetoothMode, currentMode, prevDisplay, "Bluetooth"},
-    item3{prevDisplay, "Back"}
-{
-}
 
 void SelectModeMenu::start()
 {

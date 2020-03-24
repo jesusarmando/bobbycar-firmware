@@ -15,14 +15,13 @@
 #include "webhandler.h"
 #include "displays/menus/mainmenu.h"
 #include "modes/defaultmode.h"
+#include "screens.h"
 
 namespace {
 struct {
     AsyncWebServer server{80};
     WebHandler handler;
 } web;
-
-MainMenu mainMenu;
 
 ModeBase *lastMode{};
 Display *lastDisplay{};
@@ -85,6 +84,10 @@ void handleDebugSerial()
                 currentDisplay->button(true);
                 currentDisplay->button(false);
             }
+            break;
+        case 'm':
+        case 'M':
+            printMemoryUsage();
             break;
         }
     }
@@ -154,10 +157,7 @@ void setup()
     modes::defaultMode.brems2_wert = defaultDefaultModeBrems2Wert;
 
     currentMode = &modes::defaultMode;
-    currentDisplay = &mainMenu.m_statusDisplay;
-
-    Serial.print("The size of the main menu is: ");
-    Serial.println(sizeof(mainMenu));
+    switchScreen<StatusDisplay>();
 
     web.server.addHandler(&web.handler);
     web.server.begin();
@@ -205,8 +205,6 @@ void loop()
 
     if (lastDisplay != currentDisplay)
     {
-        if (lastDisplay)
-            lastDisplay->stop();
         lastDisplay = currentDisplay;
         if (currentDisplay)
         {
@@ -215,10 +213,15 @@ void loop()
         }
     }
 
-    if (currentDisplay && now - lastRedraw >= 1000/currentDisplay->framerate())
+    if (currentDisplay)
     {
-        currentDisplay->redraw();
-        lastRedraw = now;
+        currentDisplay->update();
+
+        if (now - lastRedraw >= 1000/currentDisplay->framerate())
+        {
+            currentDisplay->redraw();
+            lastRedraw = now;
+        }
     }
 
     if (now - performance.lastTime >= 1000)

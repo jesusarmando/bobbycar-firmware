@@ -5,11 +5,13 @@
 #include "demodisplay.h"
 
 namespace {
-class MetersDisplay final : public DemoDisplay
+class DemosMenu;
+}
+
+namespace {
+class MetersDisplay final : public DemoDisplay<DemosMenu>
 {
 public:
-    using DemoDisplay::DemoDisplay;
-
     void start() override;
     void redraw() override;
 
@@ -48,7 +50,7 @@ private:
 
 void MetersDisplay::start()
 {
-    DemoDisplay::start();
+    DemoDisplay<DemosMenu>::start();
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);

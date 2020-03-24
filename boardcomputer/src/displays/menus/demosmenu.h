@@ -5,36 +5,31 @@
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
 
-#include "displays/starfielddisplay.h"
-#include "displays/pingpongdisplay.h"
-#include "displays/spirodisplay.h"
-#include "displays/gameoflifedisplay.h"
-#include "displays/metersdisplay.h"
+namespace {
+class StarfieldDisplay;
+class PingPongDisplay;
+class SpiroDisplay;
+class GameOfLifeDisplay;
+class MetersDisplay;
+class MainMenu;
+}
 
 namespace {
 class DemosMenu final : public MenuDisplay
 {
 public:
-    DemosMenu(Display &prevDisplay);
-
     const char *title() const override { return "Demos"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    StarfieldDisplay m_starfield{*this};
-    PingPongDisplay m_pingPong{*this};
-    SpiroDisplay m_spiro{*this};
-    GameOfLifeDisplay m_gameOfLife{*this};
-    MetersDisplay m_meters{*this};
-
-    SwitchScreenItem item0{m_starfield, "Starfield"};
-    SwitchScreenItem item1{m_pingPong, "PingPong"};
-    SwitchScreenItem item2{m_spiro, "Spiro"};
-    SwitchScreenItem item3{m_gameOfLife, "GameOfLife"};
-    SwitchScreenItem item4{m_meters, "Meters"};
-    SwitchScreenItem item5;
+    SwitchScreenMenuItem<StarfieldDisplay> item0{"Starfield"};
+    SwitchScreenMenuItem<PingPongDisplay> item1{"PingPong"};
+    SwitchScreenMenuItem<SpiroDisplay> item2{"Spiro"};
+    SwitchScreenMenuItem<GameOfLifeDisplay> item3{"GameOfLife"};
+    SwitchScreenMenuItem<MetersDisplay> item4{"Meters"};
+    SwitchScreenMenuItem<MainMenu> item5{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 6> carr{{
         std::cref<MenuItem>(item0),
@@ -45,9 +40,4 @@ private:
         std::cref<MenuItem>(item5)
     }};
 };
-
-DemosMenu::DemosMenu(Display &prevDisplay) :
-    item5{prevDisplay, "Back"}
-{
-}
 }

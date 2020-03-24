@@ -8,8 +8,8 @@ public:
     virtual ~Display() = default;
 
     virtual void start() {};
+    virtual void update() {};
     virtual void redraw() = 0;
-    virtual void stop() {};
     virtual int framerate() const = 0;
 
     virtual void rotate(int offset) {}

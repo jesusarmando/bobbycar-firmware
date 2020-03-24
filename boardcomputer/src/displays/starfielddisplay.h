@@ -6,10 +6,14 @@
 #include "globals.h"
 
 namespace {
-class StarfieldDisplay final : public DemoDisplay
+class DemosMenu;
+}
+
+namespace {
+class StarfieldDisplay final : public DemoDisplay<DemosMenu>
 {
 public:
-    StarfieldDisplay(Display &prevDisplay);
+    StarfieldDisplay();
 
     void start() override;
     void redraw() override;
@@ -28,8 +32,7 @@ public:
     uint8_t za, zb, zc, zx;
 };
 
-StarfieldDisplay::StarfieldDisplay(Display &prevDisplay) :
-    DemoDisplay{prevDisplay},
+StarfieldDisplay::StarfieldDisplay() :
     za(random(256)),
     zb(random(256)),
     zc(random(256)),
@@ -39,7 +42,7 @@ StarfieldDisplay::StarfieldDisplay(Display &prevDisplay) :
 
 void StarfieldDisplay::start()
 {
-    DemoDisplay::start();
+    DemoDisplay<DemosMenu>::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);

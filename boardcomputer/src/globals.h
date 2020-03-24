@@ -9,13 +9,12 @@
 
 #include "controller.h"
 #include "modebase.h"
-#include "display.h"
 #include "settings.h"
 
 namespace {
 uint16_t raw_gas, raw_brems;
 float gas, brems;
-uint16_t gasMin, gasMax, bremsMin, bremsMax;
+int16_t gasMin, gasMax, bremsMin, bremsMax;
 
 bool power_toggle{false};
 
@@ -47,5 +46,4 @@ BluetoothSerial bluetoothSerial;
 TFT_eSPI tft = TFT_eSPI();
 
 ModeBase *currentMode{};
-Display *currentDisplay{};
 }

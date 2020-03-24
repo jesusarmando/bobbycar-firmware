@@ -8,11 +8,13 @@
 #include "demodisplay.h"
 
 namespace {
-class SpiroDisplay final : public DemoDisplay
+class DemosMenu;
+}
+
+namespace {
+class SpiroDisplay final : public DemoDisplay<DemosMenu>
 {
 public:
-    using DemoDisplay::DemoDisplay;
-
     void start() override;
     void redraw() override;
 
@@ -34,7 +36,7 @@ private:
 
 void SpiroDisplay::start()
 {
-    DemoDisplay::start();
+    DemoDisplay<DemosMenu>::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(3);
