@@ -19,7 +19,7 @@ public:
     void rotate(int offset) override;
     void button(bool pressed) override;
 
-    virtual const char *menuTitle() const = 0;
+    virtual const char *title() const = 0;
 
     virtual const std::reference_wrapper<const MenuItem> *begin() const = 0;
     virtual const std::reference_wrapper<const MenuItem> *end() const = 0;
@@ -72,7 +72,7 @@ void MenuDisplay::redrawMenu() const
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_YELLOW);
 
-    tft.drawString(menuTitle(), 5, 5, 4);
+    tft.drawString(title(), 5, 5, 4);
 
     int y = 50;
     for (auto iter = begin(); iter != end(); iter++)

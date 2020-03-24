@@ -11,7 +11,7 @@ class BluetoothModeSettingsMenu final : public MenuDisplay
 public:
     BluetoothModeSettingsMenu(Display &prevDisplay);
 
-    const char *menuTitle() const override { return "Bluetooth mode settings"; }
+    const char *title() const override { return "Bluetooth mode settings"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };

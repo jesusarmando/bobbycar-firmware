@@ -11,7 +11,7 @@ class PotiSettingsMenu final : public MenuDisplay
 public:
     PotiSettingsMenu(Display &prevDisplay);
 
-    const char *menuTitle() const override { return "Poti settings"; }
+    const char *title() const override { return "Poti settings"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };

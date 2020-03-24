@@ -18,7 +18,7 @@ public:
 
     void start() override;
 
-    const char *menuTitle() const override { return "Select mode"; }
+    const char *title() const override { return "Select mode"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };

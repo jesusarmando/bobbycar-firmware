@@ -3,7 +3,6 @@
 #include <array>
 
 #include "changevaluedisplay.h"
-#include "globals.h"
 #include "menudisplay.h"
 #include "menuitems/setvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
@@ -13,13 +12,13 @@ template<>
 class ChangeValueDisplay<ControlMode> final : public MenuDisplay
 {
 public:
-    ChangeValueDisplay(const char *title, ControlMode &controlMode, Display &prevDisplay) :
+    ChangeValueDisplay(const char *title, ControlMode &value, Display &prevDisplay) :
         m_title{title},
-        m_controlMode{controlMode},
-        item0{ControlMode::OpenMode, controlMode, prevDisplay, "Open mode"},
-        item1{ControlMode::Voltage, controlMode, prevDisplay, "Voltage"},
-        item2{ControlMode::Speed, controlMode, prevDisplay, "Speed"},
-        item3{ControlMode::Torque, controlMode, prevDisplay, "Torque"},
+        m_value{value},
+        item0{ControlMode::OpenMode, value, prevDisplay, "Open mode"},
+        item1{ControlMode::Voltage, value, prevDisplay, "Voltage"},
+        item2{ControlMode::Speed, value, prevDisplay, "Speed"},
+        item3{ControlMode::Torque, value, prevDisplay, "Torque"},
         item4{prevDisplay, "Back"}
     {
     }
@@ -28,19 +27,19 @@ public:
     {
         MenuDisplay::start();
 
-        if (m_controlMode == ControlMode::OpenMode)
+        if (m_value == ControlMode::OpenMode)
             m_current = begin() + 0;
-        else if (m_controlMode == ControlMode::Voltage)
+        else if (m_value == ControlMode::Voltage)
             m_current = begin() + 1;
-        else if (m_controlMode == ControlMode::Speed)
+        else if (m_value == ControlMode::Speed)
             m_current = begin() + 2;
-        else if (m_controlMode == ControlMode::Torque)
+        else if (m_value == ControlMode::Torque)
             m_current = begin() + 3;
         else
             m_current = begin() + 4;
     }
 
-    const char *menuTitle() const override { return m_title; }
+    const char *title() const override { return m_title; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
@@ -48,7 +47,7 @@ public:
 private:
     const char * const m_title;
 
-    ControlMode &m_controlMode;
+    ControlMode &m_value;
 
     SetValueMenuItem<ControlMode> item0;
     SetValueMenuItem<ControlMode> item1;

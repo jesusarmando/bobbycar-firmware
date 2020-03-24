@@ -3,7 +3,6 @@
 #include <array>
 
 #include "changevaluedisplay.h"
-#include "globals.h"
 #include "menudisplay.h"
 #include "menuitems/setvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
@@ -13,12 +12,12 @@ template<>
 class ChangeValueDisplay<ControlType> final : public MenuDisplay
 {
 public:
-    ChangeValueDisplay(const char *title, ControlType &controlType, Display &prevDisplay) :
+    ChangeValueDisplay(const char *title, ControlType &value, Display &prevDisplay) :
         m_title{title},
-        m_controlType{controlType},
-        item0{ControlType::Commutation, controlType, prevDisplay, "Commutation"},
-        item1{ControlType::Sinusoidal, controlType, prevDisplay, "Sinusoidal"},
-        item2{ControlType::FieldOrientedControl, controlType, prevDisplay, "Field oriented control"},
+        m_value{value},
+        item0{ControlType::Commutation, value, prevDisplay, "Commutation"},
+        item1{ControlType::Sinusoidal, value, prevDisplay, "Sinusoidal"},
+        item2{ControlType::FieldOrientedControl, value, prevDisplay, "Field oriented control"},
         item3{prevDisplay, "Back"}
     {
     }
@@ -27,17 +26,17 @@ public:
     {
         MenuDisplay::start();
 
-        if (m_controlType == ControlType::Commutation)
+        if (m_value == ControlType::Commutation)
             m_current = begin() + 0;
-        else if (m_controlType == ControlType::Sinusoidal)
+        else if (m_value == ControlType::Sinusoidal)
             m_current = begin() + 1;
-        else if (m_controlType == ControlType::FieldOrientedControl)
+        else if (m_value == ControlType::FieldOrientedControl)
             m_current = begin() + 2;
         else
             m_current = begin() + 3;
     }
 
-    const char *menuTitle() const override { return m_title; }
+    const char *title() const override { return m_title; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
@@ -45,7 +44,7 @@ public:
 private:
     const char * const m_title;
 
-    ControlType &m_controlType;
+    ControlType &m_value;
 
     SetValueMenuItem<ControlType> item0;
     SetValueMenuItem<ControlType> item1;

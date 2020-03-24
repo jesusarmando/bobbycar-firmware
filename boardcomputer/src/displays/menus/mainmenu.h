@@ -7,7 +7,7 @@
 #include "settingsmenu.h"
 #include "demosmenu.h"
 #include "buzzermenu.h"
-#include "changevaluedisplay.h"
+#include "changevaluedisplay_bool.h"
 
 #include "menuitems/switchscreenmenuitem.h"
 #include "menuitems/rebootitem.h"
@@ -20,7 +20,7 @@ namespace {
 class MainMenu final : public MenuDisplay
 {
 public:
-    const char *menuTitle() const override { return "Main menu"; }
+    const char *title() const override { return "Main menu"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
@@ -34,9 +34,9 @@ private:
     ChangeValueDisplay<bool> m_backLed{"Back LED", back.command.led, *this};
 
     SwitchScreenItem item0{m_statusDisplay, "Status"};
-    SwitchScreenItem item1{m_settingsMenu, m_settingsMenu.menuTitle()};
-    SwitchScreenItem item2{m_demoMenu, m_demoMenu.menuTitle()};
-    SwitchScreenItem item3{m_buzzerMenu, m_buzzerMenu.menuTitle()};
+    SwitchScreenItem item1{m_settingsMenu, m_settingsMenu.title()};
+    SwitchScreenItem item2{m_demoMenu, m_demoMenu.title()};
+    SwitchScreenItem item3{m_buzzerMenu, m_buzzerMenu.title()};
     SwitchScreenItem item4{m_frontLed, m_frontLed.title()};
     SwitchScreenItem item5{m_backLed, m_backLed.title()};
     RebootItem item6;

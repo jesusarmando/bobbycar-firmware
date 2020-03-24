@@ -14,7 +14,7 @@ class DefaultModeSettingsMenu final : public MenuDisplay
 public:
     DefaultModeSettingsMenu(Display &prevDisplay);
 
-    const char *menuTitle() const override { return "Default mode settings"; }
+    const char *title() const override { return "Default mode settings"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
@@ -23,8 +23,8 @@ private:
     ChangeValueDisplay<ControlType> m_selectControlTypeMenu{"Set control type", modes::defaultMode.ctrlTyp, *this};
     ChangeValueDisplay<ControlMode> m_selectControlModeMenu{"Set control mode", modes::defaultMode.ctrlMod, *this};
 
-    SwitchScreenItem item0{m_selectControlTypeMenu, m_selectControlTypeMenu.menuTitle()};
-    SwitchScreenItem item1{m_selectControlModeMenu, m_selectControlModeMenu.menuTitle()};
+    SwitchScreenItem item0{m_selectControlTypeMenu, m_selectControlTypeMenu.title()};
+    SwitchScreenItem item1{m_selectControlModeMenu, m_selectControlModeMenu.title()};
     SwitchScreenItem item2;
 
     const std::array<std::reference_wrapper<const MenuItem>, 3> carr{{

@@ -3,7 +3,7 @@
 #include <array>
 
 #include "menudisplay.h"
-#include "changevaluedisplay.h"
+#include "changevaluedisplay_bool.h"
 #include "globals.h"
 #include "menuitems/switchscreenmenuitem.h"
 
@@ -13,7 +13,7 @@ class EnableMenu final : public MenuDisplay
 public:
     EnableMenu(Display &prevDisplay);
 
-    const char *menuTitle() const override { return "Enable"; }
+    const char *title() const override { return "Enable"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };

@@ -66,17 +66,6 @@ void ChangeValueDisplay<T>::rotate(int offset)
     m_needsRedraw = true;
 }
 
-template<>
-void ChangeValueDisplay<bool>::rotate(int offset)
-{
-    if (offset > 0)
-        m_tempValue = true;
-    else if (offset < 0)
-        m_tempValue = false;
-
-    m_needsRedraw = true;
-}
-
 template<typename T>
 void ChangeValueDisplay<T>::button(bool pressed)
 {

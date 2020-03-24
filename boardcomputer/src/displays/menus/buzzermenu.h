@@ -10,7 +10,7 @@ class BuzzerMenu : public MenuDisplay
 public:
     BuzzerMenu(Display &prevDisplay);
 
-    const char *menuTitle() const override { return "Buzzer"; }
+    const char *title() const override { return "Buzzer"; }
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); }
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); }
 

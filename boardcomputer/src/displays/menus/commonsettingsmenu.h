@@ -16,7 +16,7 @@ class CommonSettingsMenu final : public MenuDisplay
 public:
     CommonSettingsMenu(Display &prevDisplay);
 
-    const char *menuTitle() const override { return "Common settings"; }
+    const char *title() const override { return "Common settings"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
@@ -31,14 +31,14 @@ private:
     EnableMenu m_enableMenu{*this};
     InvertMenu m_invertMenu{*this};
 
-    SwitchScreenItem item0{m_selectModeMenu, m_selectModeMenu.menuTitle()};
+    SwitchScreenItem item0{m_selectModeMenu, m_selectModeMenu.title()};
     SwitchScreenItem item1{m_changeIMotMaxDisplay, m_changeIMotMaxDisplay.title()};
     SwitchScreenItem item2{m_changeIDcMaxDisplay, m_changeIDcMaxDisplay.title()};
     SwitchScreenItem item3{m_changeNMotMaxDisplay, m_changeNMotMaxDisplay.title()};
     SwitchScreenItem item4{m_changeFieldWeakMaxDisplay, m_changeFieldWeakMaxDisplay.title()};
     SwitchScreenItem item5{m_changePhaseAdvMaxDisplay, m_changePhaseAdvMaxDisplay.title()};
-    SwitchScreenItem item6{m_enableMenu, m_enableMenu.menuTitle()};
-    SwitchScreenItem item7{m_invertMenu, m_invertMenu.menuTitle()};
+    SwitchScreenItem item6{m_enableMenu, m_enableMenu.title()};
+    SwitchScreenItem item7{m_invertMenu, m_invertMenu.title()};
     SwitchScreenItem item8;
 
     const std::array<std::reference_wrapper<const MenuItem>, 9> carr{{

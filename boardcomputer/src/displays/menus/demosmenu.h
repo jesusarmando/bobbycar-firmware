@@ -17,7 +17,7 @@ class DemosMenu final : public MenuDisplay
 public:
     DemosMenu(Display &prevDisplay);
 
-    const char *menuTitle() const override { return "Demos"; }
+    const char *title() const override { return "Demos"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
