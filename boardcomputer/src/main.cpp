@@ -115,10 +115,10 @@ void setup()
     tft.setRotation(0);
     tft.drawString("Booting...", 32, 64, 4);
 
-    WiFi.mode(WIFI_AP);
+    WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("bobbycar", "Passwort_123");
     //WiFi.begin("realraum", "r3alraum");
-    //WiFi.begin("McDonalds Free WiFi 2.4GHz", "Passwort_123");
+    WiFi.begin("McDonalds Free WiFi 2.4GHz", "Passwort_123");
 
     bluetoothSerial.begin("bobbycar");
 

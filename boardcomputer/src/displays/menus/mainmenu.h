@@ -6,6 +6,7 @@
 #include "menudisplay.h"
 #include "settingsmenu.h"
 #include "demosmenu.h"
+#include "changebooldisplay.h"
 
 #include "menuitems/switchscreenmenuitem.h"
 #include "menuitems/rebootitem.h"
@@ -27,17 +28,23 @@ public:
 private:
     SettingsMenu m_settingsMenu{*this};
     DemosMenu m_demoMenu{*this};
+    ChangeBoolDisplay m_frontLed{"Front LED", front.command.led, *this};
+    ChangeBoolDisplay m_backLed{"Back LED", back.command.led, *this};
 
     SwitchScreenItem item0{m_statusDisplay, "Status"};
     SwitchScreenItem item1{m_settingsMenu, m_settingsMenu.menuTitle()};
     SwitchScreenItem item2{m_demoMenu, m_demoMenu.menuTitle()};
-    RebootItem item3;
+    SwitchScreenItem item3{m_frontLed, m_frontLed.title()};
+    SwitchScreenItem item4{m_backLed, m_backLed.title()};
+    RebootItem item5;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 4> carr{{
+    const std::array<std::reference_wrapper<const MenuItem>, 6> carr{{
         std::cref<MenuItem>(item0),
         std::cref<MenuItem>(item1),
         std::cref<MenuItem>(item2),
-        std::cref<MenuItem>(item3)
+        std::cref<MenuItem>(item3),
+        std::cref<MenuItem>(item4),
+        std::cref<MenuItem>(item5)
     }};
 };
 };
