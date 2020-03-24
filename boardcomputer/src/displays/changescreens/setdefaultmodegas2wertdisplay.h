@@ -1,18 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
+#include "texts.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeGas2WertDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>
+class DefaultModeSettingsMenu;
+}
+
+namespace {
+class SetDefaultModeGas2WertDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETGAS2WERT>
 {
 public:
     SetDefaultModeGas2WertDisplay();
 };
 
 SetDefaultModeGas2WertDisplay::SetDefaultModeGas2WertDisplay() :
-    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>{"Set Gas 2 Wert", modes::defaultMode.gas2_wert}
+    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETGAS2WERT>{modes::defaultMode.gas2_wert}
 {
 }
 }

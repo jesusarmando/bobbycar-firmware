@@ -1,18 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
+#include "texts.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeWeakeningSmootheningDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>
+class DefaultModeSettingsMenu;
+}
+
+namespace {
+class SetDefaultModeWeakeningSmootheningDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETWEAKINGSMOOTHENING>
 {
 public:
     SetDefaultModeWeakeningSmootheningDisplay();
 };
 
 SetDefaultModeWeakeningSmootheningDisplay::SetDefaultModeWeakeningSmootheningDisplay() :
-    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>{"Set weaking smoothening", modes::defaultMode.weakeningSmoothening}
+    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETWEAKINGSMOOTHENING>{modes::defaultMode.weakeningSmoothening}
 {
 }
 }

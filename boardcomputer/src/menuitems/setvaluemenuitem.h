@@ -3,11 +3,11 @@
 #include "switchscreenmenuitem.h"
 
 namespace {
-template<typename Tvalue, Tvalue Tset, typename TnextScreen>
-class SetValueMenuItem : public SwitchScreenMenuItem<TnextScreen>
+template<typename Tvalue, Tvalue Tset, typename Tscreen, const char *Ttext>
+class SetValueMenuItem : public SwitchScreenMenuItem<Tscreen, Ttext>
 {
 public:
-    SetValueMenuItem(Tvalue &targetValue, const char *text);
+    SetValueMenuItem(Tvalue &targetValue);
 
     void triggered() const override;
 
@@ -15,18 +15,17 @@ private:
     Tvalue &m_targetValue;
 };
 
-template<typename Tvalue, Tvalue Tset, typename TnextScreen>
-SetValueMenuItem<Tvalue, Tset, TnextScreen>::SetValueMenuItem(Tvalue &targetValue, const char *text) :
-    SwitchScreenMenuItem<TnextScreen>{text},
+template<typename Tvalue, Tvalue Tset, typename Tscreen, const char *Ttext>
+SetValueMenuItem<Tvalue, Tset, Tscreen, Ttext>::SetValueMenuItem(Tvalue &targetValue) :
     m_targetValue{targetValue}
 {
 }
 
-template<typename Tvalue, Tvalue Tset, typename TnextScreen>
-void SetValueMenuItem<Tvalue, Tset, TnextScreen>::triggered() const
+template<typename Tvalue, Tvalue Tset, typename Tscreen, const char *Ttext>
+void SetValueMenuItem<Tvalue, Tset, Tscreen, Ttext>::triggered() const
 {
     m_targetValue = Tset;
 
-    SwitchScreenMenuItem<TnextScreen>::triggered();
+    SwitchScreenMenuItem<Tscreen, Ttext>::triggered();
 }
 }

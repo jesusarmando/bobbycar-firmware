@@ -1,18 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
+#include "texts.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeBackPercentageDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>
+class DefaultModeSettingsMenu;
+}
+
+namespace {
+class SetDefaultModeBackPercentageDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETBACKPERCENTAGE>
 {
 public:
     SetDefaultModeBackPercentageDisplay();
 };
 
 SetDefaultModeBackPercentageDisplay::SetDefaultModeBackPercentageDisplay():
-    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>{"Set back percentage", modes::defaultMode.backPercentage}
+    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETBACKPERCENTAGE>{modes::defaultMode.backPercentage}
 {
 }
 }

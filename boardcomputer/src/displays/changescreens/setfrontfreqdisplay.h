@@ -1,18 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay.h"
-#include "displays/menus/buzzermenu.h"
+#include "texts.h"
 #include "globals.h"
 
 namespace {
-class SetFrontFreqDisplay : public ChangeValueDisplay<uint8_t, BuzzerMenu>
+class BuzzerMenu;
+}
+
+namespace {
+class SetFrontFreqDisplay : public ChangeValueDisplay<uint8_t, BuzzerMenu, TEXT_SETFRONTFREQ>
 {
 public:
     SetFrontFreqDisplay();
 };
 
 SetFrontFreqDisplay::SetFrontFreqDisplay() :
-    ChangeValueDisplay<uint8_t, BuzzerMenu>{"Set front freq", front.command.buzzer.freq}
+    ChangeValueDisplay<uint8_t, BuzzerMenu, TEXT_SETFRONTFREQ>{front.command.buzzer.freq}
 {
 }
 }

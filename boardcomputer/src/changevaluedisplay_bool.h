@@ -6,55 +6,50 @@
 #include "menudisplay.h"
 #include "menuitems/setvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
-#include "modes/defaultmode.h"
+#include "texts.h"
 
 namespace {
-template<typename TnextDisplay>
-class ChangeValueDisplay<bool, TnextDisplay> : public MenuDisplay
+template<typename Tdisplay, const char *Ttext>
+class ChangeValueDisplay<bool, Tdisplay, Ttext> : public MenuDisplay<Ttext>
 {
 public:
-    ChangeValueDisplay(const char *title, bool &value);
+    ChangeValueDisplay(bool &value);
 
     void start() override;
 
-    const char *title() const override { return m_title; }
-
-    const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<const MenuItemInterface> *begin() const override { return std::begin(carr); };
+    const std::reference_wrapper<const MenuItemInterface> *end() const override { return std::end(carr); };
 
 private:
-    const char * const m_title;
-
     bool &m_value;
 
-    SetValueMenuItem<bool, true, TnextDisplay> item0;
-    SetValueMenuItem<bool, false, TnextDisplay> item1;
-    SwitchScreenMenuItem<TnextDisplay> item2{"Back"};
+    SetValueMenuItem<bool, true, Tdisplay, TEXT_TRUE> item0;
+    SetValueMenuItem<bool, false, Tdisplay, TEXT_FALSE> item1;
+    SwitchScreenMenuItem<Tdisplay, TEXT_BACK> item2;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 3> carr{{
-        std::cref<MenuItem>(item0),
-        std::cref<MenuItem>(item1),
-        std::cref<MenuItem>(item2)
+    const std::array<std::reference_wrapper<const MenuItemInterface>, 3> carr{{
+        std::cref<MenuItemInterface>(item0),
+        std::cref<MenuItemInterface>(item1),
+        std::cref<MenuItemInterface>(item2)
     }};
 };
 
-template<typename TnextDisplay>
-ChangeValueDisplay<bool, TnextDisplay>::ChangeValueDisplay(const char *title, bool &value) :
-    m_title{title},
+template<typename Tdisplay, const char *Ttext>
+ChangeValueDisplay<bool, Tdisplay, Ttext>::ChangeValueDisplay(bool &value) :
     m_value{value},
-    item0{value, "true"},
-    item1{value, "false"}
+    item0{value},
+    item1{value}
 {
 }
 
-template<typename TnextDisplay>
-void ChangeValueDisplay<bool, TnextDisplay>::start()
+template<typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<bool, Tdisplay, Ttext>::start()
 {
-    MenuDisplay::start();
+    MenuDisplay<Ttext>::start();
 
     if (m_value == true)
-        m_current = begin() + 0;
+        MenuDisplayInterface::m_current = begin() + 0;
     else if (m_value == false)
-        m_current = begin() + 1;
+        MenuDisplayInterface::m_current = begin() + 1;
 }
 }

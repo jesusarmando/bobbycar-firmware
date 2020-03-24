@@ -1,18 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
+#include "texts.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeFrontPercentageDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>
+class DefaultModeSettingsMenu;
+}
+
+namespace {
+class SetDefaultModeFrontPercentageDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETFRONTPERCENTAGE>
 {
 public:
     SetDefaultModeFrontPercentageDisplay();
 };
 
 SetDefaultModeFrontPercentageDisplay::SetDefaultModeFrontPercentageDisplay() :
-    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>{"Set front percentage", modes::defaultMode.frontPercentage}
+    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETFRONTPERCENTAGE>{modes::defaultMode.frontPercentage}
 {
 }
 }

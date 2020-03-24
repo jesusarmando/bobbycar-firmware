@@ -6,65 +6,62 @@
 #include "menudisplay.h"
 #include "menuitems/setvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
-#include "modes/defaultmode.h"
-#include "modes/manualmode.h"
+#include "texts.h"
 
 namespace {
-template<typename TnextDisplay>
-class ChangeValueDisplay<ControlMode, TnextDisplay> : public MenuDisplay
+template<typename Tdisplay, const char *Ttext>
+class ChangeValueDisplay<ControlMode, Tdisplay, Ttext> : public MenuDisplay<Ttext>
 {
 public:
     ChangeValueDisplay(ControlMode &value);
 
     void start() override;
 
-    const char *title() const override { return "Set control mode"; }
-
-    const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<const MenuItemInterface> *begin() const override { return std::begin(carr); };
+    const std::reference_wrapper<const MenuItemInterface> *end() const override { return std::end(carr); };
 
 private:
     ControlMode &m_value;
 
-    SetValueMenuItem<ControlMode, ControlMode::OpenMode, TnextDisplay> item0;
-    SetValueMenuItem<ControlMode, ControlMode::Voltage, TnextDisplay> item1;
-    SetValueMenuItem<ControlMode, ControlMode::Speed, TnextDisplay> item2;
-    SetValueMenuItem<ControlMode, ControlMode::Torque, TnextDisplay> item3;
-    SwitchScreenMenuItem<TnextDisplay> item4{"Back"};
+    SetValueMenuItem<ControlMode, ControlMode::OpenMode, Tdisplay, TEXT_OPENMODE> item0;
+    SetValueMenuItem<ControlMode, ControlMode::Voltage, Tdisplay, TEXT_VOLTAGE> item1;
+    SetValueMenuItem<ControlMode, ControlMode::Speed, Tdisplay, TEXT_SPEED> item2;
+    SetValueMenuItem<ControlMode, ControlMode::Torque, Tdisplay, TEXT_TORQUE> item3;
+    SwitchScreenMenuItem<Tdisplay, TEXT_BACK> item4;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 5> carr{{
-        std::cref<MenuItem>(item0),
-        std::cref<MenuItem>(item1),
-        std::cref<MenuItem>(item2),
-        std::cref<MenuItem>(item3),
-        std::cref<MenuItem>(item4)
+    const std::array<std::reference_wrapper<const MenuItemInterface>, 5> carr{{
+        std::cref<MenuItemInterface>(item0),
+        std::cref<MenuItemInterface>(item1),
+        std::cref<MenuItemInterface>(item2),
+        std::cref<MenuItemInterface>(item3),
+        std::cref<MenuItemInterface>(item4)
     }};
 };
 
-template<typename TnextDisplay>
-ChangeValueDisplay<ControlMode, TnextDisplay>::ChangeValueDisplay(ControlMode &value) :
+template<typename Tdisplay, const char *Ttext>
+ChangeValueDisplay<ControlMode, Tdisplay, Ttext>::ChangeValueDisplay(ControlMode &value) :
     m_value{value},
-    item0{value, "Open mode"},
-    item1{value, "Voltage"},
-    item2{value, "Speed"},
-    item3{value, "Torque"}
+    item0{value},
+    item1{value},
+    item2{value},
+    item3{value}
 {
 }
 
-template<typename TnextDisplay>
-void ChangeValueDisplay<ControlMode, TnextDisplay>::start()
+template<typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<ControlMode, Tdisplay, Ttext>::start()
 {
-    MenuDisplay::start();
+    MenuDisplay<Ttext>::start();
 
     if (m_value == ControlMode::OpenMode)
-        m_current = begin() + 0;
+        MenuDisplayInterface::m_current = begin() + 0;
     else if (m_value == ControlMode::Voltage)
-        m_current = begin() + 1;
+        MenuDisplayInterface::m_current = begin() + 1;
     else if (m_value == ControlMode::Speed)
-        m_current = begin() + 2;
+        MenuDisplayInterface::m_current = begin() + 2;
     else if (m_value == ControlMode::Torque)
-        m_current = begin() + 3;
+        MenuDisplayInterface::m_current = begin() + 3;
     else
-        m_current = begin() + 4;
+        MenuDisplayInterface::m_current = begin() + 4;
 }
 }

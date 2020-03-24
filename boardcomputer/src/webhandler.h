@@ -27,8 +27,6 @@ private:
     static void renderLiveData(AsyncResponseStream &response);
     static void handleIndex(AsyncWebServerRequest *request);
     static void handleLive(AsyncWebServerRequest *request);
-    static void handleScreenParams(AsyncWebServerRequest *request);
-    static void handleSetScreenParams(AsyncWebServerRequest *request);
     static void handleCommonParams(AsyncWebServerRequest *request);
     static void handleDefaultModeParams(AsyncWebServerRequest *request);
     static void handleManualModeParams(AsyncWebServerRequest *request);
@@ -45,10 +43,6 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
     if (request->url() == "/")
         return true;
     else if (request->url() == "/live")
-        return true;
-    else if (request->url() == "/screenParams")
-        return true;
-    else if (request->url() == "/setScreenParams")
         return true;
     else if (request->url() == "/commonParams")
         return true;
@@ -78,10 +72,6 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
         handleIndex(request);
     else if (request->url() == "/live")
         handleLive(request);
-    else if (request->url() == "/screenParams")
-        handleScreenParams(request);
-    else if (request->url() == "/setScreenParams")
-        handleSetScreenParams(request);
     else if (request->url() == "/commonParams")
         handleCommonParams(request);
     else if (request->url() == "/setCommonParams")
@@ -272,12 +262,6 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
 
             {
                 HtmlTag li(response, "li");
-                HtmlTag a(response, "a", " href=\"screenParams\"");
-                response.print("Screen params");
-            }
-
-            {
-                HtmlTag li(response, "li");
                 HtmlTag a(response, "a", " href=\"commonParams\"");
                 response.print("Common params");
             }
@@ -351,63 +335,6 @@ void WebHandler::handleLive(AsyncWebServerRequest *request)
     }
 
     request->send(&response);
-}
-
-void WebHandler::handleScreenParams(AsyncWebServerRequest *request)
-{
-    AsyncResponseStream &response = *request->beginResponseStream("text/html");
-
-    response.print("<!doctype html>");
-
-    {
-        HtmlTag html(response, "html");
-
-        {
-            HtmlTag head(response, "head");
-
-            response.print("<meta charset=\"utf-8\" />");
-            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
-
-            {
-                HtmlTag title(response, "title");
-                response.print("Bobbycar remote");
-            }
-        }
-
-        {
-            HtmlTag body(response, "body");
-
-            {
-                HtmlTag h1(response, "h1");
-                response.print("Bobbycar remote");
-            }
-
-            {
-                HtmlTag a(response, "a", " href=\"/\"");
-                response.print("Back");
-            }
-
-            {
-                HtmlTag form(response, "form", " action=\"/setScreenParams\"");
-
-                HtmlTag fieldset(response, "fieldset");
-
-                {
-                    HtmlTag legend(response, "legend");
-                    response.print("Screen params:");
-                }
-
-                submitButton(response);
-            }
-        }
-    }
-
-    request->send(&response);
-}
-
-void WebHandler::handleSetScreenParams(AsyncWebServerRequest *request)
-{
-    request->redirect("/screenParams");
 }
 
 void WebHandler::handleCommonParams(AsyncWebServerRequest *request)

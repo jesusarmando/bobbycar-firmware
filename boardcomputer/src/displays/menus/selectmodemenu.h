@@ -5,6 +5,7 @@
 #include "menudisplay.h"
 #include "menuitems/setdynamicvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
+#include "texts.h"
 #include "globals.h"
 #include "modes/defaultmode.h"
 #include "modes/manualmode.h"
@@ -15,27 +16,25 @@ class CommonSettingsMenu;
 }
 
 namespace {
-class SelectModeMenu final : public MenuDisplay
+class SelectModeMenu final : public MenuDisplay<TEXT_SELECTMODE>
 {
 public:
     void start() override;
 
-    const char *title() const override { return "Select mode"; }
-
-    const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<const MenuItemInterface> *begin() const override { return std::begin(carr); };
+    const std::reference_wrapper<const MenuItemInterface> *end() const override { return std::end(carr); };
 
 private:
-    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu> item0{currentMode, &modes::defaultMode, "Default"};
-    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu> item1{currentMode, &modes::manualMode, "Manual"};
-    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu> item2{currentMode, &modes::bluetoothMode, "Bluetooth"};
-    SwitchScreenMenuItem<CommonSettingsMenu> item3{"Back"};
+    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu, TEXT_DEFAULT> item0{currentMode, &modes::defaultMode};
+    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu, TEXT_MANUAL> item1{currentMode, &modes::manualMode};
+    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu, TEXT_BLUETOOTH> item2{currentMode, &modes::bluetoothMode};
+    SwitchScreenMenuItem<CommonSettingsMenu, TEXT_BACK> item3;
 
-    const std::array<std::reference_wrapper<const MenuItem>, 4> carr{{
-        std::cref<MenuItem>(item0),
-        std::cref<MenuItem>(item1),
-        std::cref<MenuItem>(item2),
-        std::cref<MenuItem>(item3)
+    const std::array<std::reference_wrapper<const MenuItemInterface>, 4> carr{{
+        std::cref<MenuItemInterface>(item0),
+        std::cref<MenuItemInterface>(item1),
+        std::cref<MenuItemInterface>(item2),
+        std::cref<MenuItemInterface>(item3)
     }};
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "changevaluedisplay_bool.h"
+#include "texts.h"
 #include "globals.h"
 
 namespace {
@@ -8,14 +9,14 @@ class InvertMenu;
 }
 
 namespace {
-class SetFrontLeftInvertedDisplay : public ChangeValueDisplay<bool, InvertMenu>
+class SetFrontLeftInvertedDisplay : public ChangeValueDisplay<bool, InvertMenu, TEXT_INVERTFRONTLEFT>
 {
 public:
     SetFrontLeftInvertedDisplay();
 };
 
 SetFrontLeftInvertedDisplay::SetFrontLeftInvertedDisplay() :
-    ChangeValueDisplay<bool, InvertMenu>{"Invert front left", front.invertLeft}
+    ChangeValueDisplay<bool, InvertMenu, TEXT_INVERTFRONTLEFT>{front.invertLeft}
 {
 }
 }

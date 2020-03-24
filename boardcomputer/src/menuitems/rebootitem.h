@@ -5,18 +5,12 @@
 #include "menuitem.h"
 
 namespace {
-class RebootItem final : public MenuItem
+constexpr char TEXT_REBOOT[] = "Reboot";
+class RebootItem final : public MenuItem<TEXT_REBOOT>
 {
 public:
-    RebootItem();
-
     void triggered() const override;
 };
-
-RebootItem::RebootItem() :
-    MenuItem{"Reboot"}
-{
-}
 
 void RebootItem::triggered() const
 {

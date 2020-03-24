@@ -4,6 +4,7 @@
 
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
+#include "texts.h"
 
 namespace {
 class SelectModeMenu;
@@ -18,35 +19,17 @@ class SettingsMenu;
 }
 
 namespace {
-class CommonSettingsMenu final : public MenuDisplay
-{
-public:
-    const char *title() const override { return "Common settings"; }
-
-    const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
-
-private:
-    SwitchScreenMenuItem<SelectModeMenu> item0{"Select mode"};
-    SwitchScreenMenuItem<SetIMotMaxDisplay> item1{"Set iMotMax"};
-    SwitchScreenMenuItem<SetIDcMaxDisplay> item2{"Set iDcMax"};
-    SwitchScreenMenuItem<SetNMotMaxDisplay> item3{"Set nMotMax"};
-    SwitchScreenMenuItem<SetFieldWeakMaxDisplay> item4{"Set fieldWeakMax"};
-    SwitchScreenMenuItem<SetPhaseAdvMaxDisplay> item5{"Set phaseAdvMax"};
-    SwitchScreenMenuItem<EnableMenu> item6{"Set enabled"};
-    SwitchScreenMenuItem<InvertMenu> item7{"Set inverted"};
-    SwitchScreenMenuItem<SettingsMenu> item8{"Back"};
-
-    const std::array<std::reference_wrapper<const MenuItem>, 9> carr{{
-        std::cref<MenuItem>(item0),
-        std::cref<MenuItem>(item1),
-        std::cref<MenuItem>(item2),
-        std::cref<MenuItem>(item3),
-        std::cref<MenuItem>(item4),
-        std::cref<MenuItem>(item5),
-        std::cref<MenuItem>(item6),
-        std::cref<MenuItem>(item7),
-        std::cref<MenuItem>(item8)
-    }};
-};
+class CommonSettingsMenu final : public MenuDisplay<
+    TEXT_COMMONSETTINGS,
+    SwitchScreenMenuItem<SelectModeMenu, TEXT_SELECTMODE>,
+    SwitchScreenMenuItem<SetIMotMaxDisplay, TEXT_SETIMOTMAX>,
+    SwitchScreenMenuItem<SetIDcMaxDisplay, TEXT_SETIDCMAX>,
+    SwitchScreenMenuItem<SetNMotMaxDisplay, TEXT_SETNMOTMAX>,
+    SwitchScreenMenuItem<SetFieldWeakMaxDisplay, TEXT_SETFIELDWEAKMAX>,
+    SwitchScreenMenuItem<SetPhaseAdvMaxDisplay, TEXT_SETPHASEADVMAX>,
+    SwitchScreenMenuItem<EnableMenu, TEXT_SETENABLED>,
+    SwitchScreenMenuItem<InvertMenu, TEXT_SETINVERTED>,
+    SwitchScreenMenuItem<SettingsMenu, TEXT_BACK>
+>
+{};
 }

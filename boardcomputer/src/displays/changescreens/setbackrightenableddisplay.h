@@ -1,6 +1,7 @@
 #pragma once
 
 #include "changevaluedisplay_bool.h"
+#include "texts.h"
 #include "globals.h"
 
 namespace {
@@ -8,14 +9,14 @@ class EnableMenu;
 }
 
 namespace {
-class SetBackRightEnabledDisplay : public ChangeValueDisplay<bool, EnableMenu>
+class SetBackRightEnabledDisplay : public ChangeValueDisplay<bool, EnableMenu, TEXT_ENABLEBACKRIGHT>
 {
 public:
     SetBackRightEnabledDisplay();
 };
 
 SetBackRightEnabledDisplay::SetBackRightEnabledDisplay() :
-    ChangeValueDisplay<bool, EnableMenu>{"Enable back right", back.command.right.enable}
+    ChangeValueDisplay<bool, EnableMenu, TEXT_ENABLEBACKRIGHT>{back.command.right.enable}
 {
 }
 }

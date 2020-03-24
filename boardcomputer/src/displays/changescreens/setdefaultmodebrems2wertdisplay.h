@@ -1,18 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
+#include "texts.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeBrems2WertDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>
+class DefaultModeSettingsMenu;
+}
+
+namespace {
+class SetDefaultModeBrems2WertDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETBREMS2WERT>
 {
 public:
     SetDefaultModeBrems2WertDisplay();
 };
 
 SetDefaultModeBrems2WertDisplay::SetDefaultModeBrems2WertDisplay() :
-    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>{"Set Brems 2 Wert", modes::defaultMode.brems2_wert}
+    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETBREMS2WERT>{modes::defaultMode.brems2_wert}
 {
 }
 }

@@ -1,18 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
+#include "texts.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeAddSchwelleDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>
+class DefaultModeSettingsMenu;
+}
+
+namespace {
+class SetDefaultModeAddSchwelleDisplay : public ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETADDSCHWELLE>
 {
 public:
     SetDefaultModeAddSchwelleDisplay();
 };
 
 SetDefaultModeAddSchwelleDisplay::SetDefaultModeAddSchwelleDisplay() :
-    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu>{"Set add Schwelle", modes::defaultMode.add_schwelle}
+    ChangeValueDisplay<int16_t, DefaultModeSettingsMenu, TEXT_SETADDSCHWELLE>{modes::defaultMode.add_schwelle}
 {
 }
 }

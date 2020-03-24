@@ -5,11 +5,11 @@
 #include "utils.h"
 
 namespace {
-template<typename Tvalue, typename TnextDisplay>
+template<typename Tvalue, typename Tdisplay, const char *Ttext>
 class ChangeValueDisplay : public Display
 {
 public:
-    ChangeValueDisplay(const char *title, Tvalue &value);
+    ChangeValueDisplay(Tvalue &value);
 
     void start() override;
     void update() override final;
@@ -20,27 +20,23 @@ public:
     void rotate(int offset) override;
     void button(bool pressed) override;
 
-    const char *title() const { return m_title; }
-
 private:
     void redrawMenu() const;
 
-    const char * const m_title;
     Tvalue &m_value;
     Tvalue m_tempValue{};
     bool m_needsRedraw{};
     bool m_pressed{};
 };
 
-template<typename Tvalue, typename TnextDisplay>
-ChangeValueDisplay<Tvalue, TnextDisplay>::ChangeValueDisplay(const char *title, Tvalue &value) :
-    m_title{title},
+template<typename Tvalue, typename Tdisplay, const char *Ttext>
+ChangeValueDisplay<Tvalue, Tdisplay, Ttext>::ChangeValueDisplay(Tvalue &value) :
     m_value{value}
 {
 }
 
-template<typename Tvalue, typename TnextDisplay>
-void ChangeValueDisplay<Tvalue, TnextDisplay>::start()
+template<typename Tvalue, typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<Tvalue, Tdisplay, Ttext>::start()
 {
     Display::start();
 
@@ -51,18 +47,18 @@ void ChangeValueDisplay<Tvalue, TnextDisplay>::start()
     m_pressed = false;
 }
 
-template<typename Tvalue, typename TnextDisplay>
-void ChangeValueDisplay<Tvalue, TnextDisplay>::update()
+template<typename Tvalue, typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<Tvalue, Tdisplay, Ttext>::update()
 {
     if (m_pressed)
     {
         m_value = m_tempValue;
-        switchScreen<TnextDisplay>();
+        switchScreen<Tdisplay>();
     }
 }
 
-template<typename Tvalue, typename TnextDisplay>
-void ChangeValueDisplay<Tvalue, TnextDisplay>::redraw()
+template<typename Tvalue, typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<Tvalue, Tdisplay, Ttext>::redraw()
 {
     if (m_needsRedraw)
     {
@@ -71,27 +67,27 @@ void ChangeValueDisplay<Tvalue, TnextDisplay>::redraw()
     }
 }
 
-template<typename Tvalue, typename TnextDisplay>
-void ChangeValueDisplay<Tvalue, TnextDisplay>::rotate(int offset)
+template<typename Tvalue, typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<Tvalue, Tdisplay, Ttext>::rotate(int offset)
 {
     m_tempValue += offset;
     m_needsRedraw = true;
 }
 
-template<typename Tvalue, typename TnextDisplay>
-void ChangeValueDisplay<Tvalue, TnextDisplay>::button(bool pressed)
+template<typename Tvalue, typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<Tvalue, Tdisplay, Ttext>::button(bool pressed)
 {
     if (!pressed)
         m_pressed = true;
 }
 
-template<typename Tvalue, typename TnextDisplay>
-void ChangeValueDisplay<Tvalue, TnextDisplay>::redrawMenu() const
+template<typename Tvalue, typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<Tvalue, Tdisplay, Ttext>::redrawMenu() const
 {
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_YELLOW);
 
-    tft.drawString(m_title, 5, 5, 4);
+    tft.drawString(Ttext, 5, 5, 4);
 
     tft.drawNumber(m_tempValue, 50, 50, 7);
 }

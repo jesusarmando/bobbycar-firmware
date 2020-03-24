@@ -1,6 +1,7 @@
 #pragma once
 
 #include "changevaluedisplay.h"
+#include "texts.h"
 #include "globals.h"
 
 namespace {
@@ -8,14 +9,14 @@ class CommonSettingsMenu;
 }
 
 namespace {
-class SetIDcMaxDisplay : public ChangeValueDisplay<int16_t, CommonSettingsMenu>
+class SetIDcMaxDisplay : public ChangeValueDisplay<int16_t, CommonSettingsMenu, TEXT_SETIDCMAX>
 {
 public:
     SetIDcMaxDisplay();
 };
 
 SetIDcMaxDisplay::SetIDcMaxDisplay() :
-    ChangeValueDisplay<int16_t, CommonSettingsMenu>{"Set iDcMax", settings.iDcMax}
+    ChangeValueDisplay<int16_t, CommonSettingsMenu, TEXT_SETIDCMAX>{settings.iDcMax}
 {
 }
 }

@@ -4,7 +4,7 @@
 #include "utils.h"
 
 namespace {
-template<typename TnextScreen>
+template<typename Tscreen>
 class DemoDisplay : public Display
 {
 public:
@@ -17,21 +17,21 @@ private:
     bool m_pressed{};
 };
 
-template<typename TnextScreen>
-void DemoDisplay<TnextScreen>::start()
+template<typename Tscreen>
+void DemoDisplay<Tscreen>::start()
 {
     m_pressed = false;
 }
 
-template<typename TnextScreen>
-void DemoDisplay<TnextScreen>::update()
+template<typename Tscreen>
+void DemoDisplay<Tscreen>::update()
 {
     if (m_pressed)
-        switchScreen<TnextScreen>();
+        switchScreen<Tscreen>();
 }
 
-template<typename TnextScreen>
-void DemoDisplay<TnextScreen>::button(bool pressed)
+template<typename Tscreen>
+void DemoDisplay<Tscreen>::button(bool pressed)
 {
     if (!pressed)
         m_pressed = true;

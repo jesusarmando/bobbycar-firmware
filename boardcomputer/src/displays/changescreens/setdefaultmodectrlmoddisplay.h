@@ -1,18 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay_controlmode.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
+#include "texts.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeCtrlModDisplay : public ChangeValueDisplay<ControlMode, DefaultModeSettingsMenu>
+class DefaultModeSettingsMenu;
+}
+
+namespace {
+class SetDefaultModeCtrlModDisplay : public ChangeValueDisplay<ControlMode, DefaultModeSettingsMenu, TEXT_SETCONTROLMODE>
 {
 public:
     SetDefaultModeCtrlModDisplay();
 };
 
 SetDefaultModeCtrlModDisplay::SetDefaultModeCtrlModDisplay() :
-    ChangeValueDisplay<ControlMode, DefaultModeSettingsMenu>{modes::defaultMode.ctrlMod}
+    ChangeValueDisplay<ControlMode, DefaultModeSettingsMenu, TEXT_SETCONTROLMODE>{modes::defaultMode.ctrlMod}
 {
 }
 }
