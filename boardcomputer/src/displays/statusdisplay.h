@@ -4,7 +4,6 @@
 #include <WiFi.h>
 
 #include "demodisplay.h"
-#include "displays/menus/mainmenu.h"
 
 #include "modebase.h"
 #include "globals.h"
@@ -12,6 +11,10 @@
 
 namespace {
 #include "sprites/alert.h"
+}
+
+namespace {
+class MainMenu;
 }
 
 namespace {

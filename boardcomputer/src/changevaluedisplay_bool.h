@@ -29,7 +29,7 @@ private:
 
     SetValueMenuItem<bool, true, TnextDisplay> item0;
     SetValueMenuItem<bool, false, TnextDisplay> item1;
-    SwitchScreenItem<TnextDisplay> item2{"Back"};
+    SwitchScreenMenuItem<TnextDisplay> item2{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 3> carr{{
         std::cref<MenuItem>(item0),

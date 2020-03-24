@@ -1,15 +1,21 @@
 #pragma once
 
 #include "changevaluedisplay_controlmode.h"
-
 #include "modes/manualmode.h"
 
 namespace {
-class SetManualModeCtrlModDisplay : public ChangeValueDisplay<ControlMode>
+class ManualModeSettingsMenu;
+}
+
+namespace {
+class SetManualModeCtrlModDisplay : public ChangeValueDisplay<ControlMode, ManualModeSettingsMenu>
 {
 public:
-    SetManualModeCtrlModDisplay(Display &prevDisplay) :
-        ChangeValueDisplay<ControlMode>{modes::manualMode.ctrlMod, prevDisplay}
-    {}
+    SetManualModeCtrlModDisplay();
 };
+
+SetManualModeCtrlModDisplay::SetManualModeCtrlModDisplay() :
+    ChangeValueDisplay<ControlMode, ManualModeSettingsMenu>{modes::manualMode.ctrlMod}
+{
+}
 }

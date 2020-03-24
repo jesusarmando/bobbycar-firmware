@@ -5,7 +5,7 @@
 
 namespace {
 template<typename T>
-class SwitchScreenItem : public MenuItem
+class SwitchScreenMenuItem : public MenuItem
 {
 public:
     using MenuItem::MenuItem;
@@ -14,7 +14,7 @@ public:
 };
 
 template<typename T>
-void SwitchScreenItem<T>::triggered() const
+void SwitchScreenMenuItem<T>::triggered() const
 {
     switchScreen<T>();
 }

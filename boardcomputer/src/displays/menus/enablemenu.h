@@ -3,32 +3,31 @@
 #include <array>
 
 #include "menudisplay.h"
-#include "changevaluedisplay_bool.h"
-#include "globals.h"
 #include "menuitems/switchscreenmenuitem.h"
+
+namespace {
+class SetFrontLeftEnabledDisplay;
+class SetFrontRightEnabledDisplay;
+class SetBackLeftEnabledDisplay;
+class SetBackRightEnabledDisplay;
+class CommonSettingsMenu;
+}
 
 namespace {
 class EnableMenu final : public MenuDisplay
 {
 public:
-    EnableMenu(Display &prevDisplay);
-
-    const char *title() const override { return "Enable"; }
+    const char *title() const override { return "Set enabled"; }
 
     const std::reference_wrapper<const MenuItem> *begin() const override { return std::begin(carr); };
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SetFrontLeftEnabledDisplay m_frontLeft{*this};
-    SetFrontRightEnabledDisplay m_frontRight{*this};
-    SetBackLeftEnabledDisplay m_backLeft{*this};
-    SetBackRightEnabledDisplay m_backRight{*this};
-
-    SwitchScreenItem item0{m_frontLeft, m_frontLeft.title()};
-    SwitchScreenItem item1{m_frontRight, m_frontRight.title()};
-    SwitchScreenItem item2{m_backLeft, m_backLeft.title()};
-    SwitchScreenItem item3{m_backRight, m_backRight.title()};
-    SwitchScreenItem item4;
+    SwitchScreenMenuItem<SetFrontLeftEnabledDisplay> item0{"Enable front left"};
+    SwitchScreenMenuItem<SetFrontRightEnabledDisplay> item1{"Enable front right"};
+    SwitchScreenMenuItem<SetBackLeftEnabledDisplay> item2{"Enable back left"};
+    SwitchScreenMenuItem<SetBackRightEnabledDisplay> item3{"Enable back right"};
+    SwitchScreenMenuItem<CommonSettingsMenu> item4{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 5> carr{{
         std::cref<MenuItem>(item0),
@@ -38,9 +37,4 @@ private:
         std::cref<MenuItem>(item4)
     }};
 };
-
-EnableMenu::EnableMenu(Display &prevDisplay):
-   item4{prevDisplay, "Back"}
-{
-}
 }

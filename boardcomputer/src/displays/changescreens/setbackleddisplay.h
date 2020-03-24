@@ -1,8 +1,11 @@
 #pragma once
 
 #include "changevaluedisplay_bool.h"
-#include "displays/menus/mainmenu.h"
 #include "globals.h"
+
+namespace {
+class MainMenu;
+}
 
 namespace {
 class SetBackLedDisplay : public ChangeValueDisplay<bool, MainMenu>

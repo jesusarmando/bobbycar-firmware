@@ -4,11 +4,19 @@
 #include "globals.h"
 
 namespace {
-class SetFieldWeakMaxDisplay : public ChangeValueDisplay<int16_t>
+class CommonSettingsMenu;
+}
+
+namespace {
+class SetFieldWeakMaxDisplay : public ChangeValueDisplay<int16_t, CommonSettingsMenu>
 {
 public:
-    SetFieldWeakMaxDisplay(Display &prevDisplay):
-        ChangeValueDisplay<int16_t>{"Set fieldWeakMax", settings.fieldWeakMax, prevDisplay}
-    {}
+    SetFieldWeakMaxDisplay();
 };
+
+SetFieldWeakMaxDisplay::SetFieldWeakMaxDisplay() :
+    ChangeValueDisplay<int16_t, CommonSettingsMenu>{"Set fieldWeakMax", settings.fieldWeakMax}
+{
 }
+}
+

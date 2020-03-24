@@ -1,15 +1,22 @@
 #pragma once
 
 #include "changevaluedisplay_controltype.h"
-
+#include "displays/menus/defaultmodesettingsmenu.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeCtrlTypDisplay : public ChangeValueDisplay<ControlType>
+class DefaultModeSettingsMenu;
+}
+
+namespace {
+class SetDefaultModeCtrlTypDisplay : public ChangeValueDisplay<ControlType, DefaultModeSettingsMenu>
 {
 public:
-    SetDefaultModeCtrlTypDisplay(Display &prevDisplay) :
-        ChangeValueDisplay<ControlType>{modes::defaultMode.ctrlTyp, prevDisplay}
-    {}
+    SetDefaultModeCtrlTypDisplay();
 };
+
+SetDefaultModeCtrlTypDisplay::SetDefaultModeCtrlTypDisplay() :
+    ChangeValueDisplay<ControlType, DefaultModeSettingsMenu>{modes::defaultMode.ctrlTyp}
+{
+}
 }

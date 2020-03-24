@@ -4,11 +4,18 @@
 #include "globals.h"
 
 namespace {
-class SetFrontRightEnabledDisplay : public ChangeValueDisplay<bool>
+class EnableMenu;
+}
+
+namespace {
+class SetFrontRightEnabledDisplay : public ChangeValueDisplay<bool, EnableMenu>
 {
 public:
-    SetFrontRightEnabledDisplay(Display &prevDisplay) :
-        ChangeValueDisplay<bool>{"Enable front right", front.command.right.enable, prevDisplay}
-    {}
+    SetFrontRightEnabledDisplay();
 };
+
+SetFrontRightEnabledDisplay::SetFrontRightEnabledDisplay() :
+    ChangeValueDisplay<bool, EnableMenu>{"Enable front right", front.command.right.enable}
+{
+}
 }

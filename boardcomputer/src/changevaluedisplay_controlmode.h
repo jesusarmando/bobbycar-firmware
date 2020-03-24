@@ -30,7 +30,7 @@ private:
     SetValueMenuItem<ControlMode, ControlMode::Voltage, TnextDisplay> item1;
     SetValueMenuItem<ControlMode, ControlMode::Speed, TnextDisplay> item2;
     SetValueMenuItem<ControlMode, ControlMode::Torque, TnextDisplay> item3;
-    SwitchScreenItem<TnextDisplay> item4{"Back"};
+    SwitchScreenMenuItem<TnextDisplay> item4{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 5> carr{{
         std::cref<MenuItem>(item0),

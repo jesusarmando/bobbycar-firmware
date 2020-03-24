@@ -4,7 +4,10 @@
 
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
-#include "displays/menus/settingsmenu.h"
+
+namespace {
+class SettingsMenu;
+}
 
 namespace {
 class BluetoothModeSettingsMenu final : public MenuDisplay
@@ -16,7 +19,7 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SwitchScreenItem<SettingsMenu> item0{"Back"};
+    SwitchScreenMenuItem<SettingsMenu> item0{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 1> carr{{
         std::cref<MenuItem>(item0)

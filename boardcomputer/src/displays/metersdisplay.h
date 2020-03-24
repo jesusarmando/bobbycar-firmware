@@ -3,7 +3,10 @@
 #include <Arduino.h>
 
 #include "demodisplay.h"
-#include "displays/menus/demosmenu.h"
+
+namespace {
+class DemosMenu;
+}
 
 namespace {
 class MetersDisplay final : public DemoDisplay<DemosMenu>
@@ -47,7 +50,7 @@ private:
 
 void MetersDisplay::start()
 {
-    DemoDisplay::start();
+    DemoDisplay<DemosMenu>::start();
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);

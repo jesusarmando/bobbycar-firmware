@@ -12,6 +12,7 @@ class MenuDisplay : public Display
 {
 public:
     void start() override;
+    void update() override final;
     void redraw() override final;
 
     int framerate() const override { return 60; }
@@ -45,18 +46,18 @@ void MenuDisplay::start()
     m_pressed = false;
 }
 
+void MenuDisplay::update()
+{
+    if (m_pressed)
+        m_current->get().triggered();
+}
+
 void MenuDisplay::redraw()
 {
     if (m_needsRedraw)
     {
         redrawMenu();
         m_needsRedraw = false;
-    }
-
-    if (m_pressed)
-    {
-        m_current->get().triggered();
-        m_pressed = false;
     }
 }
 

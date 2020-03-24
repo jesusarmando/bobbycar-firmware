@@ -4,11 +4,18 @@
 #include "globals.h"
 
 namespace {
-class SetIDcMaxDisplay : public ChangeValueDisplay<int16_t>
+class CommonSettingsMenu;
+}
+
+namespace {
+class SetIDcMaxDisplay : public ChangeValueDisplay<int16_t, CommonSettingsMenu>
 {
 public:
-    SetIDcMaxDisplay(Display &prevDisplay):
-        ChangeValueDisplay<int16_t>{"Set iDcMax", settings.iDcMax, prevDisplay}
-    {}
+    SetIDcMaxDisplay();
 };
+
+SetIDcMaxDisplay::SetIDcMaxDisplay() :
+    ChangeValueDisplay<int16_t, CommonSettingsMenu>{"Set iDcMax", settings.iDcMax}
+{
+}
 }

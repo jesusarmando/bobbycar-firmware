@@ -4,12 +4,15 @@
 
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
-#include "displays/menus/commonsettingsmenu.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
-#include "displays/menus/manualmodesettingsmenu.h"
-#include "displays/menus/bluetoothmodesettingsmenu.h"
-#include "displays/menus/potisettingsmenu.h"
-#include "displays/menus/mainmenu.h"
+
+namespace {
+class CommonSettingsMenu;
+class DefaultModeSettingsMenu;
+class ManualModeSettingsMenu;
+class BluetoothModeSettingsMenu;
+class PotiSettingsMenu;
+class MainMenu;
+}
 
 namespace {
 class SettingsMenu final : public MenuDisplay
@@ -21,12 +24,12 @@ public:
     const std::reference_wrapper<const MenuItem> *end() const override { return std::end(carr); };
 
 private:
-    SwitchScreenItem<CommonSettingsMenu> item0{"Common settings"};
-    SwitchScreenItem<DefaultModeSettingsMenu> item1{"Default mode settings"};
-    SwitchScreenItem<ManualModeSettingsMenu> item2{"Manual mode settings"};
-    SwitchScreenItem<BluetoothModeSettingsMenu> item3{"Bluetooth mode settings"};
-    SwitchScreenItem<PotiSettingsMenu> item4{"Poti settings"};
-    SwitchScreenItem<MainMenu> item5{"Back"};
+    SwitchScreenMenuItem<CommonSettingsMenu> item0{"Common settings"};
+    SwitchScreenMenuItem<DefaultModeSettingsMenu> item1{"Default mode settings"};
+    SwitchScreenMenuItem<ManualModeSettingsMenu> item2{"Manual mode settings"};
+    SwitchScreenMenuItem<BluetoothModeSettingsMenu> item3{"Bluetooth mode settings"};
+    SwitchScreenMenuItem<PotiSettingsMenu> item4{"Poti settings"};
+    SwitchScreenMenuItem<MainMenu> item5{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 6> carr{{
         std::cref<MenuItem>(item0),

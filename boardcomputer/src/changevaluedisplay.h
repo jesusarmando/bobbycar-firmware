@@ -12,7 +12,8 @@ public:
     ChangeValueDisplay(const char *title, Tvalue &value);
 
     void start() override;
-    void redraw() override;
+    void update() override final;
+    void redraw() override final;
 
     int framerate() const override { return 60; }
 
@@ -27,8 +28,8 @@ private:
     const char * const m_title;
     Tvalue &m_value;
     Tvalue m_tempValue{};
-    Display &m_prevDisplay;
     bool m_needsRedraw{};
+    bool m_pressed{};
 };
 
 template<typename Tvalue, typename TnextDisplay>
@@ -47,6 +48,17 @@ void ChangeValueDisplay<Tvalue, TnextDisplay>::start()
 
     m_tempValue = m_value;
     m_needsRedraw = true;
+    m_pressed = false;
+}
+
+template<typename Tvalue, typename TnextDisplay>
+void ChangeValueDisplay<Tvalue, TnextDisplay>::update()
+{
+    if (m_pressed)
+    {
+        m_value = m_tempValue;
+        switchScreen<TnextDisplay>();
+    }
 }
 
 template<typename Tvalue, typename TnextDisplay>
@@ -70,10 +82,7 @@ template<typename Tvalue, typename TnextDisplay>
 void ChangeValueDisplay<Tvalue, TnextDisplay>::button(bool pressed)
 {
     if (!pressed)
-    {
-        m_value = m_tempValue;
-        switchScreen<TnextDisplay>();
-    }
+        m_pressed = true;
 }
 
 template<typename Tvalue, typename TnextDisplay>

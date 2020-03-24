@@ -1,14 +1,18 @@
 #pragma once
 
 #include "changevaluedisplay_bool.h"
+#include "displays/menus/defaultmodesettingsmenu.h"
 #include "modes/defaultmode.h"
 
 namespace {
-class SetDefaultModeEnableFieldWeakeningSmootheningDisplay : public ChangeValueDisplay<bool>
+class SetDefaultModeEnableFieldWeakeningSmootheningDisplay : public ChangeValueDisplay<bool, DefaultModeSettingsMenu>
 {
 public:
-    SetDefaultModeEnableFieldWeakeningSmootheningDisplay(Display &prevDisplay) :
-        ChangeValueDisplay<bool>{"Enable weakening smoothening", modes::defaultMode.enableWeakeningSmoothening, prevDisplay}
-    {}
+    SetDefaultModeEnableFieldWeakeningSmootheningDisplay();
 };
+
+SetDefaultModeEnableFieldWeakeningSmootheningDisplay::SetDefaultModeEnableFieldWeakeningSmootheningDisplay() :
+    ChangeValueDisplay<bool, DefaultModeSettingsMenu>{"Enable weakening smoothening", modes::defaultMode.enableWeakeningSmoothening}
+{
+}
 }

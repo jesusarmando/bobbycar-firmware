@@ -12,7 +12,7 @@ public:
 };
 
 SetFrontPatternDisplay::SetFrontPatternDisplay() :
-    ChangeValueDisplay<uint8_t, BuzzerMenu>{"Set front freq", front.command.buzzer.pattern}
+    ChangeValueDisplay<uint8_t, BuzzerMenu>{"Set front pattern", front.command.buzzer.pattern}
 {
 }
 }

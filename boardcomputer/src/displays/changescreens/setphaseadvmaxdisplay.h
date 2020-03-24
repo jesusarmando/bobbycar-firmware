@@ -4,11 +4,18 @@
 #include "globals.h"
 
 namespace {
-class SetPhaseAdvMaxDisplay : public ChangeValueDisplay<int16_t>
+class CommonSettingsMenu;
+}
+
+namespace {
+class SetPhaseAdvMaxDisplay : public ChangeValueDisplay<int16_t, CommonSettingsMenu>
 {
 public:
-    SetPhaseAdvMaxDisplay(Display &prevDisplay):
-        ChangeValueDisplay<int16_t>{"Set phaseAdvMax", settings.phaseAdvMax, prevDisplay}
-    {}
+    SetPhaseAdvMaxDisplay();
 };
+
+SetPhaseAdvMaxDisplay::SetPhaseAdvMaxDisplay() :
+    ChangeValueDisplay<int16_t, CommonSettingsMenu>{"Set phaseAdvMax", settings.phaseAdvMax}
+{
+}
 }

@@ -12,7 +12,7 @@ public:
 };
 
 SetBackPatternDisplay::SetBackPatternDisplay() :
-    ChangeValueDisplay<uint8_t, BuzzerMenu>{"Set back freq", back.command.buzzer.pattern}
+    ChangeValueDisplay<uint8_t, BuzzerMenu>{"Set back pattern", back.command.buzzer.pattern}
 {
 }
 }

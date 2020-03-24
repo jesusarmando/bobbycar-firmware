@@ -4,11 +4,18 @@
 #include "globals.h"
 
 namespace {
-class SetBackLeftInvertedDisplay : public ChangeValueDisplay<bool>
+class InvertMenu;
+}
+
+namespace {
+class SetBackLeftInvertedDisplay : public ChangeValueDisplay<bool, InvertMenu>
 {
 public:
-    SetBackLeftInvertedDisplay(Display &prevDisplay) :
-        ChangeValueDisplay<bool>{"Invert back left", back.invertLeft, prevDisplay}
-    {}
+    SetBackLeftInvertedDisplay();
 };
+
+SetBackLeftInvertedDisplay::SetBackLeftInvertedDisplay() :
+    ChangeValueDisplay<bool, InvertMenu>{"Invert back left", back.invertLeft}
+{
+}
 }

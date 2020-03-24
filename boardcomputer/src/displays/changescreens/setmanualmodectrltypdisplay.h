@@ -4,12 +4,18 @@
 #include "modes/manualmode.h"
 
 namespace {
+class ManualModeSettingsMenu;
+}
 
-class SetManualModeCtrlTypDisplay : public ChangeValueDisplay<ControlType>
+namespace {
+class SetManualModeCtrlTypDisplay : public ChangeValueDisplay<ControlType, ManualModeSettingsMenu>
 {
 public:
-    SetManualModeCtrlTypDisplay(Display &prevDisplay) :
-        ChangeValueDisplay<ControlType>{modes::manualMode.ctrlTyp, prevDisplay}
-    {}
+    SetManualModeCtrlTypDisplay();
 };
+
+SetManualModeCtrlTypDisplay::SetManualModeCtrlTypDisplay() :
+    ChangeValueDisplay<ControlType, ManualModeSettingsMenu>{modes::manualMode.ctrlTyp}
+{
+}
 }

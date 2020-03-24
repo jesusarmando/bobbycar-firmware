@@ -3,8 +3,11 @@
 #include <cstdint>
 
 #include "demodisplay.h"
-#include "displays/menus/demosmenu.h"
 #include "globals.h"
+
+namespace {
+class DemosMenu;
+}
 
 namespace {
 class StarfieldDisplay final : public DemoDisplay<DemosMenu>
@@ -39,7 +42,7 @@ StarfieldDisplay::StarfieldDisplay() :
 
 void StarfieldDisplay::start()
 {
-    DemoDisplay::start();
+    DemoDisplay<DemosMenu>::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);

@@ -29,7 +29,7 @@ private:
     SetValueMenuItem<ControlType, ControlType::Commutation, TnextDisplay> item0;
     SetValueMenuItem<ControlType, ControlType::Sinusoidal, TnextDisplay> item1;
     SetValueMenuItem<ControlType, ControlType::FieldOrientedControl, TnextDisplay> item2;
-    SwitchScreenItem<TnextDisplay> item3{"Back"};
+    SwitchScreenMenuItem<TnextDisplay> item3{"Back"};
 
     const std::array<std::reference_wrapper<const MenuItem>, 4> carr{{
         std::cref<MenuItem>(item0),

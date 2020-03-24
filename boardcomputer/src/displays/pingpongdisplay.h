@@ -6,7 +6,10 @@
 #include <HardwareSerial.h>
 
 #include "demodisplay.h"
-#include "displays/menus/demosmenu.h"
+
+namespace {
+class DemosMenu;
+}
 
 namespace {
 class PingPongDisplay final : public DemoDisplay<DemosMenu>
@@ -83,7 +86,7 @@ PingPongDisplay::PingPongDisplay() :
 
 void PingPongDisplay::start()
 {
-    DemoDisplay::start();
+    DemoDisplay<DemosMenu>::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
