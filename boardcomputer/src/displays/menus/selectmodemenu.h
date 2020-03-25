@@ -16,11 +16,7 @@ class CommonSettingsMenu;
 }
 
 namespace {
-struct ModeAccessor
-{
-    static auto getValue() { return currentMode; }
-    template<typename T> static void setValue(T value) { currentMode = value; }
-};
+struct ModeAccessor { static auto &getRef() { return currentMode; } };
 struct DefaultModeGetter { static auto getValue() { return &modes::defaultMode; } };
 struct ManualModeGetter { static auto getValue() { return &modes::manualMode; } };
 struct BluetoothModeGetter { static auto getValue() { return &modes::bluetoothMode; } };
@@ -41,11 +37,11 @@ void SelectModeMenu::start()
 {
     MenuDisplay::start();
 
-    if (ModeAccessor::getValue() == DefaultModeGetter::getValue())
+    if (ModeAccessor::getRef() == DefaultModeGetter::getValue())
         m_current = begin() + 0;
-    else if (ModeAccessor::getValue() == ManualModeGetter::getValue())
+    else if (ModeAccessor::getRef() == ManualModeGetter::getValue())
         m_current = begin() + 1;
-    else if (ModeAccessor::getValue() == BluetoothModeGetter::getValue())
+    else if (ModeAccessor::getRef() == BluetoothModeGetter::getValue())
         m_current = begin() + 2;
     else
         m_current = begin() + 3;

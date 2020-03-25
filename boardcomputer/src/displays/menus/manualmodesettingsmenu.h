@@ -13,16 +13,8 @@ class SettingsMenu;
 }
 
 namespace {
-struct ManualModeCtrlTypAccessor
-{
-    static auto getValue() { return modes::manualMode.ctrlTyp; }
-    template<typename T> static void setValue(T value) { modes::manualMode.ctrlTyp = value; }
-};
-struct ManualModeCtrlModAccessor
-{
-    static auto getValue() { return modes::manualMode.ctrlMod; }
-    template<typename T> static void setValue(T value) { modes::manualMode.ctrlMod = value; }
-};
+struct ManualModeCtrlTypAccessor { static auto &getRef() { return modes::manualMode.ctrlTyp; } };
+struct ManualModeCtrlModAccessor { static auto &getRef() { return modes::manualMode.ctrlMod; } };
 
 class ManualModeSettingsMenu final : public MenuDisplay<
     TEXT_MANUALMODESETTINGS,

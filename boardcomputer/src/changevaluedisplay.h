@@ -101,7 +101,7 @@ void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::start()
 
     tft.setRotation(0);
 
-    m_value = Taccessor::getValue();
+    m_value = Taccessor::getRef();
     m_needsRedraw = true;
     m_pressed = false;
 }
@@ -111,7 +111,7 @@ void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::update()
 {
     if (m_pressed)
     {
-        Taccessor::setValue(m_value);
+        Taccessor::getRef() = m_value;
         switchScreen<Tdisplay>();
     }
 }
@@ -156,9 +156,9 @@ void ChangeValueDisplay<bool, Taccessor, Tdisplay, Ttext>::start()
 {
     Base::start();
 
-    if (Taccessor::getValue() == true)
+    if (Taccessor::getRef() == true)
         Base::m_current = Base::begin() + 0;
-    else if (Taccessor::getValue() == false)
+    else if (Taccessor::getRef() == false)
         Base::m_current = Base::begin() + 1;
 }
 
@@ -167,13 +167,13 @@ void ChangeValueDisplay<ControlMode, Taccessor, Tdisplay, Ttext>::start()
 {
     Base::start();
 
-    if (Taccessor::getValue() == ControlMode::OpenMode)
+    if (Taccessor::getRef() == ControlMode::OpenMode)
         Base::m_current = Base::begin() + 0;
-    else if (Taccessor::getValue() == ControlMode::Voltage)
+    else if (Taccessor::getRef() == ControlMode::Voltage)
         Base::m_current = Base::begin() + 1;
-    else if (Taccessor::getValue() == ControlMode::Speed)
+    else if (Taccessor::getRef() == ControlMode::Speed)
         Base::m_current = Base::begin() + 2;
-    else if (Taccessor::getValue() == ControlMode::Torque)
+    else if (Taccessor::getRef() == ControlMode::Torque)
         Base::m_current = Base::begin() + 3;
     else
         Base::m_current = Base::begin() + 4;
@@ -184,11 +184,11 @@ void ChangeValueDisplay<ControlType, Taccessor, Tdisplay, Ttext>::start()
 {
     Base::start();
 
-    if (Taccessor::getValue() == ControlType::Commutation)
+    if (Taccessor::getRef() == ControlType::Commutation)
         Base::m_current = Base::begin() + 0;
-    else if (Taccessor::getValue() == ControlType::Sinusoidal)
+    else if (Taccessor::getRef() == ControlType::Sinusoidal)
         Base::m_current = Base::begin() + 1;
-    else if (Taccessor::getValue() == ControlType::FieldOrientedControl)
+    else if (Taccessor::getRef() == ControlType::FieldOrientedControl)
         Base::m_current = Base::begin() + 2;
     else
         Base::m_current = Base::begin() + 3;

@@ -13,26 +13,10 @@ class CommonSettingsMenu;
 }
 
 namespace {
-struct FrontLeftEnabledAccessor
-{
-    static auto getValue() { return front.command.left.enable; }
-    template<typename T> static void setValue(T value) { front.command.left.enable = value; }
-};
-struct FrontRightEnabledAccessor
-{
-    static auto getValue() { return front.command.right.enable; }
-    template<typename T> static void setValue(T value) { front.command.right.enable = value; }
-};
-struct BackLeftEnabledAccessor
-{
-    static auto getValue() { return back.command.left.enable; }
-    template<typename T> static void setValue(T value) { back.command.left.enable = value; }
-};
-struct BackRightEnabledAccessor
-{
-    static auto getValue() { return back.command.right.enable; }
-    template<typename T> static void setValue(T value) { back.command.right.enable = value; }
-};
+struct FrontLeftEnabledAccessor { static auto &getRef() { return front.command.left.enable; } };
+struct FrontRightEnabledAccessor { static auto &getRef() { return front.command.right.enable; } };
+struct BackLeftEnabledAccessor { static auto &getRef() { return back.command.left.enable; } };
+struct BackRightEnabledAccessor { static auto &getRef() { return back.command.right.enable; } };
 
 class EnableMenu final : public MenuDisplay<
     TEXT_SETENABLED,

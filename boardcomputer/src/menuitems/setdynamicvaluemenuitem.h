@@ -13,7 +13,7 @@ public:
 template<typename Tvalue, typename Tsetter, typename Tgetter, typename Tscreen, const char *Ttext>
 void SetDynamicValueMenuItem<Tvalue, Tsetter, Tgetter, Tscreen, Ttext>::triggered() const
 {
-    Tsetter::setValue(Tgetter::getValue());
+    Tsetter::getRef() = Tgetter::getValue();
 
     SwitchScreenMenuItem<Tscreen, Ttext>::triggered();
 }

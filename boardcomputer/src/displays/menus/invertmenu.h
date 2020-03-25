@@ -13,26 +13,10 @@ class CommonSettingsMenu;
 }
 
 namespace {
-struct FrontLeftInvertedAccessor
-{
-    static auto getValue() { return front.invertLeft; }
-    template<typename T> static void setValue(T value) { front.invertLeft = value; }
-};
-struct FrontRightInvertedAccessor
-{
-    static auto getValue() { return front.invertRight; }
-    template<typename T> static void setValue(T value) { front.invertRight = value; }
-};
-struct BackLeftInvertedAccessor
-{
-    static auto getValue() { return back.command.left.enable; }
-    template<typename T> static void setValue(T value) { back.invertLeft = value; }
-};
-struct BackRightInvertedAccessor
-{
-    static auto getValue() { return back.invertRight; }
-    template<typename T> static void setValue(T value) { back.invertRight = value; }
-};
+struct FrontLeftInvertedAccessor { static auto &getRef() { return front.invertLeft; } };
+struct FrontRightInvertedAccessor { static auto &getRef() { return front.invertRight; } };
+struct BackLeftInvertedAccessor { static auto &getRef() { return back.command.left.enable; } };
+struct BackRightInvertedAccessor { static auto &getRef() { return back.invertRight; } };
 
 class InvertMenu final : public MenuDisplay<
     TEXT_SETINVERTED,

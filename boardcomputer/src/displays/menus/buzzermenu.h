@@ -11,26 +11,10 @@ class MainMenu;
 }
 
 namespace {
-struct FrontFreqAccessor
-{
-    static auto getValue() { return front.command.buzzer.freq; }
-    template<typename T> static void setValue(T value) { front.command.buzzer.freq = value; }
-};
-struct FrontPatternAccessor
-{
-    static auto getValue() { return front.command.buzzer.pattern; }
-    template<typename T> static void setValue(T value) { front.command.buzzer.pattern = value; }
-};
-struct BackFreqAccessor
-{
-    static auto getValue() { return back.command.buzzer.freq; }
-    template<typename T> static void setValue(T value) { back.command.buzzer.freq = value; }
-};
-struct BackPatternAccessor
-{
-    static auto getValue() { return back.command.buzzer.pattern; }
-    template<typename T> static void setValue(T value) { back.command.buzzer.pattern = value; }
-};
+struct FrontFreqAccessor { static auto &getRef() { return front.command.buzzer.freq; } };
+struct FrontPatternAccessor { static auto &getRef() { return front.command.buzzer.pattern; } };
+struct BackFreqAccessor { static auto &getRef() { return back.command.buzzer.freq; } };
+struct BackPatternAccessor { static auto &getRef() { return back.command.buzzer.pattern; } };
 
 class BuzzerMenu final : public MenuDisplay<
     TEXT_BUZZER,

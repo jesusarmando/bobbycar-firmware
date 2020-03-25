@@ -13,61 +13,17 @@ class SettingsMenu;
 }
 
 namespace {
-struct DefaultModeCtrlTypAccessor
-{
-    static auto getValue() { return modes::defaultMode.ctrlTyp; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.ctrlTyp = value; }
-};
-struct DefaultModeCtrlModAccessor
-{
-    static auto getValue() { return modes::defaultMode.ctrlMod; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.ctrlMod = value; }
-};
-struct DefaultModeEnableFieldWeakeningSmootheningAccessor
-{
-    static auto getValue() { return modes::defaultMode.enableWeakeningSmoothening; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.enableWeakeningSmoothening = value; }
-};
-struct DefaultModeWeakeningSmootheningAccessor
-{
-    static auto getValue() { return modes::defaultMode.weakeningSmoothening; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.weakeningSmoothening = value; }
-};
-struct DefaultModeFrontPercentageAccessor
-{
-    static auto getValue() { return modes::defaultMode.frontPercentage; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.frontPercentage = value; }
-};
-struct DefaultModeBackPercentageAccessor
-{
-    static auto getValue() { return modes::defaultMode.backPercentage; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.backPercentage = value; }
-};
-struct DefaultModeAddSchwelleAccessor
-{
-    static auto getValue() { return modes::defaultMode.add_schwelle; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.add_schwelle = value; }
-};
-struct DefaultModeGas1WertAccessor
-{
-    static auto getValue() { return modes::defaultMode.gas1_wert; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.gas1_wert = value; }
-};
-struct DefaultModeGas2WertAccessor
-{
-    static auto getValue() { return modes::defaultMode.gas2_wert; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.gas2_wert = value; }
-};
-struct DefaultModeBrems1WertAccessor
-{
-    static auto getValue() { return modes::defaultMode.brems1_wert; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.brems1_wert = value; }
-};
-struct DefaultModeBrems2WertAccessor
-{
-    static auto getValue() { return modes::defaultMode.brems2_wert; }
-    template<typename T> static void setValue(T value) { modes::defaultMode.brems2_wert = value; }
-};
+struct DefaultModeCtrlTypAccessor { static auto &getRef() { return modes::defaultMode.ctrlTyp; } };
+struct DefaultModeCtrlModAccessor { static auto &getRef() { return modes::defaultMode.ctrlMod; } };
+struct DefaultModeEnableFieldWeakeningSmootheningAccessor { static auto &getRef() { return modes::defaultMode.enableWeakeningSmoothening; } };
+struct DefaultModeWeakeningSmootheningAccessor { static auto &getRef() { return modes::defaultMode.weakeningSmoothening; } };
+struct DefaultModeFrontPercentageAccessor { static auto &getRef() { return modes::defaultMode.frontPercentage; } };
+struct DefaultModeBackPercentageAccessor { static auto &getRef() { return modes::defaultMode.backPercentage; } };
+struct DefaultModeAddSchwelleAccessor { static auto &getRef() { return modes::defaultMode.add_schwelle; } };
+struct DefaultModeGas1WertAccessor { static auto &getRef() { return modes::defaultMode.gas1_wert; } };
+struct DefaultModeGas2WertAccessor { static auto &getRef() { return modes::defaultMode.gas2_wert; } };
+struct DefaultModeBrems1WertAccessor { static auto &getRef() { return modes::defaultMode.brems1_wert; } };
+struct DefaultModeBrems2WertAccessor { static auto &getRef() { return modes::defaultMode.brems2_wert; } };
 
 class DefaultModeSettingsMenu final : public MenuDisplay<
     TEXT_DEFAULTMODESETTIGNS,

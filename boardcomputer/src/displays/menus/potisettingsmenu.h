@@ -13,26 +13,10 @@ class SettingsMenu;
 }
 
 namespace {
-struct GasMinAccessor
-{
-    static auto getValue() { return gasMin; }
-    template<typename T> static void setValue(T value) { gasMin = value; }
-};
-struct GasMaxAccessor
-{
-    static auto getValue() { return gasMax; }
-    template<typename T> static void setValue(T value) { gasMax = value; }
-};
-struct BremsMinAccessor
-{
-    static auto getValue() { return bremsMin; }
-    template<typename T> static void setValue(T value) { bremsMin = value; }
-};
-struct BremsMaxAccessor
-{
-    static auto getValue() { return bremsMax; }
-    template<typename T> static void setValue(T value) { bremsMax = value; }
-};
+struct GasMinAccessor { static auto &getRef() { return gasMin; } };
+struct GasMaxAccessor { static auto &getRef() { return gasMax; } };
+struct BremsMinAccessor { static auto &getRef() { return bremsMin; } };
+struct BremsMaxAccessor { static auto &getRef() { return bremsMax; } };
 
 class PotiSettingsMenu final : public MenuDisplay<
     TEXT_POTISETTINGS,

@@ -17,16 +17,8 @@ class BuzzerMenu;
 }
 
 namespace {
-struct FrontLedAccessor
-{
-    static auto getValue() { return front.command.led; }
-    template<typename T> static void setValue(T value) { front.command.led = value; }
-};
-struct BackLedAccessor
-{
-    static auto getValue() { return back.command.led; }
-    template<typename T> static void setValue(T value) { back.command.led = value; }
-};
+struct FrontLedAccessor { static auto &getRef() { return front.command.led; } };
+struct BackLedAccessor { static auto &getRef() { return back.command.led; } };
 
 class MainMenu final : public MenuDisplay<
     TEXT_MAINMENU,

@@ -16,31 +16,11 @@ class SettingsMenu;
 }
 
 namespace {
-struct IMotMaxAccessor
-{
-    static auto getValue() { return settings.iMotMax; }
-    template<typename T> static void setValue(T value) { settings.iMotMax = value; }
-};
-struct IDcMaxAccessor
-{
-    static auto getValue() { return settings.iDcMax; }
-    template<typename T> static void setValue(T value) { settings.iDcMax = value; }
-};
-struct NMotMaxAccessor
-{
-    static auto getValue() { return settings.nMotMax; }
-    template<typename T> static void setValue(T value) { settings.nMotMax = value; }
-};
-struct FieldWeakMaxAccessor
-{
-    static auto getValue() { return settings.nMotMax; }
-    template<typename T> static void setValue(T value) { settings.nMotMax = value; }
-};
-struct PhaseAdvMaxAccessor
-{
-    static auto getValue() { return settings.phaseAdvMax; }
-    template<typename T> static void setValue(T value) { settings.phaseAdvMax = value; }
-};
+struct IMotMaxAccessor { static auto &getRef() { return settings.iMotMax; } };
+struct IDcMaxAccessor { static auto &getRef() { return settings.iDcMax; } };
+struct NMotMaxAccessor { static auto &getRef() { return settings.nMotMax; } };
+struct FieldWeakMaxAccessor { static auto &getRef() { return settings.nMotMax; } };
+struct PhaseAdvMaxAccessor { static auto &getRef() { return settings.phaseAdvMax; } };
 
 class CommonSettingsMenu final : public MenuDisplay<
     TEXT_COMMONSETTINGS,
