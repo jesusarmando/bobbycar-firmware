@@ -121,7 +121,4 @@ constexpr char TEXT_COMMUTATION[] = "Commutation";
 constexpr char TEXT_SINUSOIDAL[] = "Sinusoidal";
 constexpr char TEXT_FIELDORIENTEDCONTROL[] = "Field oriented control";
 //constexpr char TEXT_BACK[] = "Back";
-
-//SetDefaultModeEnableFieldWeakeningSmootheningDisplay
-//constexpr char TEXT_ENABLEWEAKENINGSMOOTHENING[] = "Enable weakening smoothening";
 }

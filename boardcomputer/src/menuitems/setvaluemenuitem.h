@@ -3,28 +3,17 @@
 #include "switchscreenmenuitem.h"
 
 namespace {
-template<typename Tvalue, Tvalue Tset, typename Tscreen, const char *Ttext>
+template<typename Tvalue, typename Taccessor, Tvalue Tset, typename Tscreen, const char *Ttext>
 class SetValueMenuItem : public SwitchScreenMenuItem<Tscreen, Ttext>
 {
 public:
-    SetValueMenuItem(Tvalue &targetValue);
-
     void triggered() const override;
-
-private:
-    Tvalue &m_targetValue;
 };
 
-template<typename Tvalue, Tvalue Tset, typename Tscreen, const char *Ttext>
-SetValueMenuItem<Tvalue, Tset, Tscreen, Ttext>::SetValueMenuItem(Tvalue &targetValue) :
-    m_targetValue{targetValue}
+template<typename Tvalue, typename Taccessor, Tvalue Tset, typename Tscreen, const char *Ttext>
+void SetValueMenuItem<Tvalue, Taccessor, Tset, Tscreen, Ttext>::triggered() const
 {
-}
-
-template<typename Tvalue, Tvalue Tset, typename Tscreen, const char *Ttext>
-void SetValueMenuItem<Tvalue, Tset, Tscreen, Ttext>::triggered() const
-{
-    m_targetValue = Tset;
+    Taccessor::setValue(Tset);
 
     SwitchScreenMenuItem<Tscreen, Ttext>::triggered();
 }

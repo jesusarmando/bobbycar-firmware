@@ -16,37 +16,36 @@ class CommonSettingsMenu;
 }
 
 namespace {
-class SelectModeMenu final : public MenuDisplay<TEXT_SELECTMODE>
+struct ModeAccessor
+{
+    static auto getValue() { return currentMode; }
+    template<typename T> static void setValue(T value) { currentMode = value; }
+};
+struct DefaultModeGetter { static auto getValue() { return &modes::defaultMode; } };
+struct ManualModeGetter { static auto getValue() { return &modes::manualMode; } };
+struct BluetoothModeGetter { static auto getValue() { return &modes::bluetoothMode; } };
+
+class SelectModeMenu final : public MenuDisplay<
+    TEXT_SELECTMODE,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, CommonSettingsMenu, TEXT_DEFAULT>,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, CommonSettingsMenu, TEXT_MANUAL>,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, CommonSettingsMenu, TEXT_BLUETOOTH>,
+    SwitchScreenMenuItem<CommonSettingsMenu, TEXT_BACK>
+>
 {
 public:
     void start() override;
-
-    const std::reference_wrapper<const MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<const MenuItemInterface> *end() const override { return std::end(carr); };
-
-private:
-    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu, TEXT_DEFAULT> item0{currentMode, &modes::defaultMode};
-    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu, TEXT_MANUAL> item1{currentMode, &modes::manualMode};
-    SetDynamicValueMenuItem<ModeBase*, CommonSettingsMenu, TEXT_BLUETOOTH> item2{currentMode, &modes::bluetoothMode};
-    SwitchScreenMenuItem<CommonSettingsMenu, TEXT_BACK> item3;
-
-    const std::array<std::reference_wrapper<const MenuItemInterface>, 4> carr{{
-        std::cref<MenuItemInterface>(item0),
-        std::cref<MenuItemInterface>(item1),
-        std::cref<MenuItemInterface>(item2),
-        std::cref<MenuItemInterface>(item3)
-    }};
 };
 
 void SelectModeMenu::start()
 {
     MenuDisplay::start();
 
-    if (currentMode == &modes::defaultMode)
+    if (ModeAccessor::getValue() == DefaultModeGetter::getValue())
         m_current = begin() + 0;
-    else if (currentMode == &modes::manualMode)
+    else if (ModeAccessor::getValue() == ManualModeGetter::getValue())
         m_current = begin() + 1;
-    else if (currentMode == &modes::bluetoothMode)
+    else if (ModeAccessor::getValue() == BluetoothModeGetter::getValue())
         m_current = begin() + 2;
     else
         m_current = begin() + 3;
