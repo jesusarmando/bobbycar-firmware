@@ -8,19 +8,17 @@
 #include "demodisplay.h"
 
 namespace {
-class DemosMenu;
-}
-
-namespace {
-class PingPongDisplay final : public DemoDisplay<DemosMenu>
+template<typename Tscreen>
+class PingPongDisplay final : public DemoDisplay<Tscreen>
 {
 public:
     PingPongDisplay();
 
     void start() override;
-    void redraw() override;
+    void update() override;
 
-    int framerate() const override { return 60; }
+private:
+    void redraw();
 
     void midline();
     void lpaddle();
@@ -73,9 +71,12 @@ public:
     static const constexpr auto BLACK = 0x0000;
     static const constexpr auto WHITE = 0xFFFF;
     static const constexpr auto GREY = 0x5AEB;
+
+    unsigned long m_lastRedraw{};
 };
 
-PingPongDisplay::PingPongDisplay() :
+template<typename Tscreen>
+PingPongDisplay<Tscreen>::PingPongDisplay() :
     lpaddle_y(random(0, h - paddle_h)),
     rpaddle_y(random(0, h - paddle_h)),
     // ball is placed on the center of the left paddle
@@ -84,9 +85,10 @@ PingPongDisplay::PingPongDisplay() :
     calc_target_y();
 }
 
-void PingPongDisplay::start()
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::start()
 {
-    DemoDisplay<DemosMenu>::start();
+    DemoDisplay<Tscreen>::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
@@ -94,7 +96,21 @@ void PingPongDisplay::start()
     midline();
 }
 
-void PingPongDisplay::redraw()
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::update()
+{
+    const auto now = millis();
+    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
+    {
+        redraw();
+        m_lastRedraw = now;
+    }
+
+    DemoDisplay<Tscreen>::update();
+}
+
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::redraw()
 {
     lpaddle();
     rpaddle();
@@ -104,7 +120,8 @@ void PingPongDisplay::redraw()
     ball();
 }
 
-void PingPongDisplay::midline()
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::midline()
 {
     // If the ball is not on the line then don't redraw the line
     if ((ball_x<dashline_x-ball_w) && (ball_x > dashline_x+dashline_w)) return;
@@ -122,7 +139,8 @@ void PingPongDisplay::midline()
     tft.endWrite();
 }
 
-void PingPongDisplay::lpaddle()
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::lpaddle()
 {
     if (lpaddle_d == 1)
     {
@@ -150,7 +168,8 @@ void PingPongDisplay::lpaddle()
     tft.fillRect(lpaddle_x, lpaddle_y, paddle_w, paddle_h, WHITE);
 }
 
-void PingPongDisplay::rpaddle()
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::rpaddle()
 {
     if (rpaddle_d == 1) {
         tft.fillRect(rpaddle_x, rpaddle_y, paddle_w, 1, BLACK);
@@ -174,7 +193,8 @@ void PingPongDisplay::rpaddle()
     tft.fillRect(rpaddle_x, rpaddle_y, paddle_w, paddle_h, WHITE);
 }
 
-void PingPongDisplay::calc_target_y()
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::calc_target_y()
 {
     int16_t target_x;
     int16_t reflections;
@@ -199,7 +219,8 @@ void PingPongDisplay::calc_target_y()
     }
 }
 
-void PingPongDisplay::ball()
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::ball()
 {
     ball_x = ball_x + ball_dx;
     ball_y = ball_y + ball_dy;

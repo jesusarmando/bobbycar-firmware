@@ -5,19 +5,16 @@
 #include "demodisplay.h"
 
 namespace {
-class DemosMenu;
-}
-
-namespace {
-class MetersDisplay final : public DemoDisplay<DemosMenu>
+template<typename Tscreen>
+class MetersDisplay final : public DemoDisplay<Tscreen>
 {
 public:
     void start() override;
-    void redraw() override;
-
-    int framerate() const override { return 60; }
+    void update() override;
 
 private:
+    void redraw();
+
     //  Draw the analogue meter on the screen
     void analogMeter();
 
@@ -46,11 +43,14 @@ private:
     std::array<ValuePair, 6> values;
 
     int d = 0;
+
+    unsigned long m_lastRedraw{};
 };
 
-void MetersDisplay::start()
+template<typename Tscreen>
+void MetersDisplay<Tscreen>::start()
 {
-    DemoDisplay<DemosMenu>::start();
+    DemoDisplay<Tscreen>::start();
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
@@ -67,7 +67,21 @@ void MetersDisplay::start()
     plotLinear("A5", 5 * d, 160);
 }
 
-void MetersDisplay::redraw()
+template<typename Tscreen>
+void MetersDisplay<Tscreen>::update()
+{
+    const auto now = millis();
+    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
+    {
+        redraw();
+        m_lastRedraw = now;
+    }
+
+    DemoDisplay<Tscreen>::update();
+}
+
+template<typename Tscreen>
+void MetersDisplay<Tscreen>::redraw()
 {
     d += 4; if (d >= 360) d = 0;
 
@@ -80,7 +94,8 @@ void MetersDisplay::redraw()
     plotNeedle(values[0].value);
 }
 
-void MetersDisplay::analogMeter()
+template<typename Tscreen>
+void MetersDisplay<Tscreen>::analogMeter()
 {
     // Meter outline
     tft.fillRect(0, 0, 239, 126, TFT_GREY);
@@ -169,7 +184,8 @@ void MetersDisplay::analogMeter()
     plotNeedle(0); // Put meter needle at 0
 }
 
-void MetersDisplay::plotNeedle(int value)
+template<typename Tscreen>
+void MetersDisplay<Tscreen>::plotNeedle(int value)
 {
     tft.setTextColor(TFT_BLACK, TFT_WHITE);
     char buf[8]; dtostrf(value, 4, 0, buf);
@@ -207,7 +223,8 @@ void MetersDisplay::plotNeedle(int value)
     tft.drawLine(120 + 20 * ltx + 1, 140 - 20, osx + 1, osy, TFT_RED);
 }
 
-void MetersDisplay::plotLinear(const char *label, int x, int y)
+template<typename Tscreen>
+void MetersDisplay<Tscreen>::plotLinear(const char *label, int x, int y)
 {
     int w = 36;
     tft.drawRect(x, y, w, 155, TFT_GREY);
@@ -231,7 +248,8 @@ void MetersDisplay::plotLinear(const char *label, int x, int y)
     tft.drawCentreString("---", x + w / 2, y + 155 - 18, 2);
 }
 
-void MetersDisplay::plotPointer()
+template<typename Tscreen>
+void MetersDisplay<Tscreen>::plotPointer()
 {
     int dy = 187;
     byte pw = 16;

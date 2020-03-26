@@ -6,19 +6,17 @@
 #include "globals.h"
 
 namespace {
-class DemosMenu;
-}
-
-namespace {
-class StarfieldDisplay final : public DemoDisplay<DemosMenu>
+template<typename Tscreen>
+class StarfieldDisplay final : public DemoDisplay<Tscreen>
 {
 public:
     StarfieldDisplay();
 
     void start() override;
-    void redraw() override;
+    void update() override;
 
-    int framerate() const override { return 30; }
+private:
+    void redraw();
 
     // Fast 0-255 random number generator from http://eternityforest.com/Projects/rng.php:
     uint8_t rng();
@@ -30,9 +28,12 @@ public:
     uint8_t sz[NSTARS] = {};
 
     uint8_t za, zb, zc, zx;
+
+    unsigned long m_lastRedraw{};
 };
 
-StarfieldDisplay::StarfieldDisplay() :
+template<typename Tscreen>
+StarfieldDisplay<Tscreen>::StarfieldDisplay() :
     za(random(256)),
     zb(random(256)),
     zc(random(256)),
@@ -40,9 +41,10 @@ StarfieldDisplay::StarfieldDisplay() :
 {
 }
 
-void StarfieldDisplay::start()
+template<typename Tscreen>
+void StarfieldDisplay<Tscreen>::start()
 {
-    DemoDisplay<DemosMenu>::start();
+    DemoDisplay<Tscreen>::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
@@ -53,7 +55,21 @@ void StarfieldDisplay::start()
     //tft.fastSetup(); // Prepare plot window range for fast pixel plotting
 }
 
-void StarfieldDisplay::redraw()
+template<typename Tscreen>
+void StarfieldDisplay<Tscreen>::update()
+{
+    const auto now = millis();
+    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
+    {
+        redraw();
+        m_lastRedraw = now;
+    }
+
+    DemoDisplay<Tscreen>::update();
+}
+
+template<typename Tscreen>
+void StarfieldDisplay<Tscreen>::redraw()
 {
     uint8_t spawnDepthVariation = 255;
 
@@ -92,7 +108,8 @@ void StarfieldDisplay::redraw()
     }
 }
 
-uint8_t StarfieldDisplay::rng()
+template<typename Tscreen>
+uint8_t StarfieldDisplay<Tscreen>::rng()
 {
     zx++;
     za = (za^zc^zx);

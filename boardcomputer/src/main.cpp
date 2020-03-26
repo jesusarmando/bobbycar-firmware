@@ -11,7 +11,6 @@
 #include "../../common.h"
 
 #include "globals.h"
-#include "rotary.h"
 #include "webhandler.h"
 #include "displays/menus/mainmenu.h"
 #include "modes/defaultmode.h"
@@ -24,7 +23,6 @@ struct {
 } web;
 
 ModeBase *lastMode{};
-Display *lastDisplay{};
 
 void handleDebugSerial()
 {
@@ -71,19 +69,14 @@ void handleDebugSerial()
                 controller.command.buzzer.freq = c-'0';
             break;
         case 'A':
-            if (currentDisplay)
-                currentDisplay->rotate(-1);
+            InputDispatcher::rotate(-1);
             break;
         case 'B':
-            if (currentDisplay)
-                currentDisplay->rotate(1);
+            InputDispatcher::rotate(1);
             break;
         case ' ':
-            if (currentDisplay)
-            {
-                currentDisplay->button(true);
-                currentDisplay->button(false);
-            }
+            InputDispatcher::button(true);
+            InputDispatcher::button(false);
             break;
         case 'm':
         case 'M':
@@ -92,17 +85,6 @@ void handleDebugSerial()
         }
     }
 }
-
-class InputDispatcher {
-public:
-    void rotate(int offset) { if (currentDisplay) currentDisplay->rotate(offset); }
-    void button(bool pressed) { if (currentDisplay) currentDisplay->button(pressed); }
-};
-
-Rotary<InputDispatcher, rotaryClkPin, rotaryDtPin, rotarySwPin> rotary;
-
-void updateRotate() { rotary.updateRotate(); }
-void updateSwitch() { rotary.updateSwitch(); }
 }
 
 void setup()
@@ -124,32 +106,10 @@ void setup()
 
     bluetoothSerial.begin("bobbycar");
 
-    gasMin = defaultGasMin;
-    gasMax = defaultGasMax;
-    bremsMin = defaultBremsMin;
-    bremsMax = defaultBremsMax;
-
-    front.command.left.enable = defaultEnableFrontLeft;
-    front.command.right.enable = defaultEnableFrontRight;
-    back.command.left.enable = defaultEnableBackLeft;
-    back.command.right.enable = defaultEnableBackRight;
-
-    front.invertLeft = defaultInvertFrontLeft;
-    front.invertRight = defaultInvertFrontRight;
-    back.invertLeft = defaultInvertBackLeft;
-    back.invertRight = defaultInvertBackRight;
-
     controllers[0].serial.begin(38400, SERIAL_8N1, rxPin1, txPin1);
     controllers[1].serial.begin(38400, SERIAL_8N1, rxPin2, txPin2);
 
-    settings.iMotMax = defaultIMotMax;
-    settings.iDcMax = defaultIDcMax;
-    settings.nMotMax = defaultNMotMax;
-    settings.fieldWeakMax = defaultFieldWeakMax;
-    settings.phaseAdvMax = defaultPhaseAdvMax;
-
-    for (auto &controller : controllers)
-        controller.command.buzzer = {};
+    applyDefaultSettings();
 
     modes::defaultMode.gas1_wert = defaultDefaultModeGas1Wert;
     modes::defaultMode.gas2_wert = defaultDefaultModeGas2Wert;
@@ -157,13 +117,12 @@ void setup()
     modes::defaultMode.brems2_wert = defaultDefaultModeBrems2Wert;
 
     currentMode = &modes::defaultMode;
-    switchScreen<StatusDisplay>();
 
     web.server.addHandler(&web.handler);
     web.server.begin();
 
-    attachInterrupt(decltype(rotary)::ClkPin, updateRotate, CHANGE);
-    attachInterrupt(decltype(rotary)::SwPin, updateSwitch, CHANGE);
+    initScreen();
+    initRotary();
 }
 
 void loop()
@@ -203,26 +162,7 @@ void loop()
         performance.current++;
     }
 
-    if (lastDisplay != currentDisplay)
-    {
-        lastDisplay = currentDisplay;
-        if (currentDisplay)
-        {
-            currentDisplay->start();
-            currentDisplay->redraw();
-        }
-    }
-
-    if (currentDisplay)
-    {
-        currentDisplay->update();
-
-        if (now - lastRedraw >= 1000/currentDisplay->framerate())
-        {
-            currentDisplay->redraw();
-            lastRedraw = now;
-        }
-    }
+    updateScreen();
 
     if (now - performance.lastTime >= 1000)
     {

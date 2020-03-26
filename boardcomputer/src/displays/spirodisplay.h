@@ -8,20 +8,15 @@
 #include "demodisplay.h"
 
 namespace {
-class DemosMenu;
-}
-
-namespace {
-class SpiroDisplay final : public DemoDisplay<DemosMenu>
+template<typename Tscreen>
+class SpiroDisplay final : public DemoDisplay<Tscreen>
 {
 public:
     void start() override;
-    void redraw() override;
-
-    int framerate() const override { return 100; }
+    void update() override;
 
 private:
-    void render();
+    void redraw();
 
     constexpr static auto DEG2RAD = 0.0174532925;
 
@@ -32,75 +27,90 @@ private:
 
     long i{0};
     int n{}, r{}, colour{};
+
+    unsigned long m_lastRedraw{};
 };
 
-void SpiroDisplay::start()
+template<typename Tscreen>
+void SpiroDisplay<Tscreen>::start()
 {
-    DemoDisplay<DemosMenu>::start();
+    DemoDisplay<Tscreen>::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(3);
 }
 
-void SpiroDisplay::redraw()
+template<typename Tscreen>
+void SpiroDisplay<Tscreen>::update()
 {
-    for (int i = 0; i < std::max(1, n); i++)
-        render();
+    const auto now = millis();
+    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
+    {
+        redraw();
+        m_lastRedraw = now;
+    }
+
+    DemoDisplay<Tscreen>::update();
 }
 
-void SpiroDisplay::render()
+template<typename Tscreen>
+void SpiroDisplay<Tscreen>::redraw()
 {
-    if (i == 0)
+    for (int j = 0; j < std::max(1, n); j++)
     {
-        tft.fillScreen(TFT_BLACK);
-        n = random(2, 23);
-        r = random(20, 100);
-        colour = 0; //rainbow();
+        if (i == 0)
+        {
+            tft.fillScreen(TFT_BLACK);
+            n = random(2, 23);
+            r = random(20, 100);
+            colour = 0; //rainbow();
+        }
+
+        if (i < (360 * n))
+        {
+            sx = std::cos((i / n - 90) * DEG2RAD);
+            sy = std::sin((i / n - 90) * DEG2RAD);
+            x0 = sx * (120 - r) + 159;
+            yy0 = sy * (120 - r) + 119;
+
+
+            sy = std::cos(((i % 360) - 90) * DEG2RAD);
+            sx = std::sin(((i % 360) - 90) * DEG2RAD);
+            x1 = sx * r + x0;
+            yy1 = sy * r + yy0;
+            tft.drawPixel(x1, yy1, rainbow(map(i%360,0,360,0,127))); //colour);
+        }
+
+        if (i == (360 * n))
+        {
+            r = random(20, 100);//r = r / random(2,4);
+        }
+
+        if (i >= (360 * n))
+        {
+            auto new_i = i - (360 * n);
+
+            sx = std::cos((new_i / n - 90) * DEG2RAD);
+            sy = std::sin((new_i / n - 90) * DEG2RAD);
+            x0 = sx * (120 - r) + 159;
+            yy0 = sy * (120 - r) + 119;
+
+
+            sy = std::cos(((new_i % 360) - 90) * DEG2RAD);
+            sx = std::sin(((new_i % 360) - 90) * DEG2RAD);
+            x1 = sx * r + x0;
+            yy1 = sy * r + yy0;
+            tft.drawPixel(x1, yy1, rainbow(map(new_i%360,0,360,0,127))); //colour);
+        }
+
+        i++;
+        if (i == 2* (360 * n))
+            i = 0;
     }
-
-    if (i < (360 * n))
-    {
-        sx = std::cos((i / n - 90) * DEG2RAD);
-        sy = std::sin((i / n - 90) * DEG2RAD);
-        x0 = sx * (120 - r) + 159;
-        yy0 = sy * (120 - r) + 119;
-
-
-        sy = std::cos(((i % 360) - 90) * DEG2RAD);
-        sx = std::sin(((i % 360) - 90) * DEG2RAD);
-        x1 = sx * r + x0;
-        yy1 = sy * r + yy0;
-        tft.drawPixel(x1, yy1, rainbow(map(i%360,0,360,0,127))); //colour);
-    }
-
-    if (i == (360 * n))
-    {
-        r = random(20, 100);//r = r / random(2,4);
-    }
-
-    if (i >= (360 * n))
-    {
-        auto new_i = i - (360 * n);
-
-        sx = std::cos((new_i / n - 90) * DEG2RAD);
-        sy = std::sin((new_i / n - 90) * DEG2RAD);
-        x0 = sx * (120 - r) + 159;
-        yy0 = sy * (120 - r) + 119;
-
-
-        sy = std::cos(((new_i % 360) - 90) * DEG2RAD);
-        sx = std::sin(((new_i % 360) - 90) * DEG2RAD);
-        x1 = sx * r + x0;
-        yy1 = sy * r + yy0;
-        tft.drawPixel(x1, yy1, rainbow(map(new_i%360,0,360,0,127))); //colour);
-    }
-
-    i++;
-    if (i == 2* (360 * n))
-        i = 0;
 }
 
-unsigned int SpiroDisplay::rainbow(int value)
+template<typename Tscreen>
+unsigned int SpiroDisplay<Tscreen>::rainbow(int value)
 {
     // Value is expected to be in range 0-127
     // The value is converted to a spectrum colour from 0 = blue through to red = blue

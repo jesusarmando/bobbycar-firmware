@@ -12,10 +12,7 @@ class MenuDisplayInterface : public Display
 {
 public:
     void start() override;
-    void update() override final;
-    void redraw() override final;
-
-    int framerate() const override final { return 60; }
+    void update() override;
 
     void rotate(int offset) override;
     void button(bool pressed) override;
@@ -26,13 +23,15 @@ public:
     virtual const std::reference_wrapper<const MenuItemInterface> *end() const = 0;
 
 protected:
-    const std::reference_wrapper<const MenuItemInterface> *m_current{};
-    bool m_needsRedraw{};
+    void requestRedraw();
+    void setSelectedItem(const std::reference_wrapper<const MenuItemInterface> *item);
 
 private:
-    bool m_pressed{};
+    void redraw() const;
 
-    void redrawMenu() const;
+    const std::reference_wrapper<const MenuItemInterface> *m_prev{}, *m_current{};
+    bool m_needsRedraw{};
+    bool m_pressed{};
 };
 
 template<const char *Ttext, typename ...T>
@@ -359,29 +358,39 @@ public:
 
 void MenuDisplayInterface::start()
 {
-    Display::start();
-
-    tft.setRotation(0);
-    if (!m_current)
-        m_current = begin();
-
+    m_current = begin();
     m_needsRedraw = true;
     m_pressed = false;
+
+    tft.setRotation(0);
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_YELLOW);
+
+    tft.drawString(title(), 5, 5, 4);
+
+    tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
+
+    tft.setTextColor(TFT_WHITE);
+
+    int y = 45;
+    for (auto iter = begin(); iter != end(); iter++)
+    {
+        tft.drawString((*iter).get().text(), 10, y, 4);
+
+        y += 25;
+    }
 }
 
 void MenuDisplayInterface::update()
 {
-    if (m_pressed)
-        m_current->get().triggered();
-}
-
-void MenuDisplayInterface::redraw()
-{
     if (m_needsRedraw)
     {
-        redrawMenu();
         m_needsRedraw = false;
+        redraw();
     }
+
+    if (m_pressed)
+        m_current->get().triggered();
 }
 
 void MenuDisplayInterface::rotate(int offset)
@@ -391,8 +400,7 @@ void MenuDisplayInterface::rotate(int offset)
         selected = begin();
     if (selected >= end())
         selected = end() - 1;
-    m_current = selected;
-    m_needsRedraw = true;
+    setSelectedItem(selected);
 }
 
 void MenuDisplayInterface::button(bool pressed)
@@ -401,24 +409,27 @@ void MenuDisplayInterface::button(bool pressed)
         m_pressed = true;
 }
 
-void MenuDisplayInterface::redrawMenu() const
+void MenuDisplayInterface::requestRedraw()
 {
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_YELLOW);
+    m_needsRedraw = true;
+}
 
-    tft.drawString(title(), 5, 5, 4);
+void MenuDisplayInterface::setSelectedItem(const std::reference_wrapper<const MenuItemInterface> *item)
+{
+    m_prev = m_current;
+    m_current = item;
+    requestRedraw();
+}
 
-    int y = 50;
+void MenuDisplayInterface::redraw() const
+{
+    int y = 45;
     for (auto iter = begin(); iter != end(); iter++)
     {
-        const auto selected = iter == m_current;
-
-        tft.setTextColor(selected ? TFT_ORANGE : TFT_WHITE);
-
-        tft.drawString((*iter).get().text(), 10, y, 4);
-
-        if (selected)
+        if (iter == m_current)
             tft.drawRect(5, y-2, tft.width() - 5, 25, TFT_WHITE);
+        else if (iter == m_prev)
+            tft.drawRect(5, y-2, tft.width() - 5, 25, TFT_BLACK);
 
         y += 25;
     }

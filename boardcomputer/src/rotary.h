@@ -6,7 +6,7 @@ namespace {
 using pin_t = int;
 
 template<typename HANDLER, pin_t CLK, pin_t DT, pin_t SW>
-class Rotary : public HANDLER
+class Rotary
 {
 public:
     static constexpr auto ClkPin = CLK;

@@ -14,32 +14,44 @@ namespace {
 }
 
 namespace {
-class MainMenu;
-}
-
-namespace {
-class StatusDisplay final : public DemoDisplay<MainMenu>
+template<typename Tscreen>
+class StatusDisplay final : public DemoDisplay<Tscreen>
 {
 public:
     void start() override;
-    void redraw() override;
-
-    int framerate() const override { return m_framerate; }
-    void setFramerate(int framerate) { m_framerate = framerate; }
+    void update() override;
 
 private:
-    int m_framerate{2};
+    void redraw() const;
+
+    unsigned long m_lastRedraw{};
 };
 
-void StatusDisplay::start()
+template<typename Tscreen>
+void StatusDisplay<Tscreen>::start()
 {
-    DemoDisplay<MainMenu>::start();
+    DemoDisplay<Tscreen>::start();
 
-    tft.fillScreen(TFT_BLACK);
     tft.setRotation(0);
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_WHITE);
 }
 
-void StatusDisplay::redraw()
+template<typename Tscreen>
+void StatusDisplay<Tscreen>::update()
+{
+    const auto now = millis();
+    if (!m_lastRedraw || now-m_lastRedraw >= 1000/2)
+    {
+        redraw();
+        m_lastRedraw = now;
+    }
+
+    DemoDisplay<Tscreen>::update();
+}
+
+template<typename Tscreen>
+void StatusDisplay<Tscreen>::redraw() const
 {
     int y = 0;
 

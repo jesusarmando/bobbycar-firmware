@@ -10,7 +10,7 @@
 #include "globals.h"
 
 namespace {
-class StatusDisplay;
+template<typename T> class StatusDisplay;
 class SettingsMenu;
 class DemosMenu;
 class BuzzerMenu;
@@ -22,7 +22,7 @@ struct BackLedAccessor { static auto &getRef() { return back.command.led; } };
 
 class MainMenu final : public MenuDisplay<
     TEXT_MAINMENU,
-    SwitchScreenMenuItem<StatusDisplay, TEXT_STATUS>,
+    SwitchScreenMenuItem<StatusDisplay<MainMenu>, TEXT_STATUS>,
     SwitchScreenMenuItem<SettingsMenu, TEXT_SETTINGS>,
     SwitchScreenMenuItem<DemosMenu, TEXT_DEMOS>,
     SwitchScreenMenuItem<BuzzerMenu, TEXT_BUZZER>,

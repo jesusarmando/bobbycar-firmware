@@ -19,7 +19,6 @@ int16_t gasMin, gasMax, bremsMin, bremsMax;
 bool power_toggle{false};
 
 unsigned long lastUpdate = millis();
-unsigned long lastRedraw = millis();
 
 wl_status_t last_status;
 IPAddress last_ip;
@@ -46,4 +45,31 @@ BluetoothSerial bluetoothSerial;
 TFT_eSPI tft = TFT_eSPI();
 
 ModeBase *currentMode{};
+
+void applyDefaultSettings()
+{
+    gasMin = defaultGasMin;
+    gasMax = defaultGasMax;
+    bremsMin = defaultBremsMin;
+    bremsMax = defaultBremsMax;
+
+    front.command.left.enable = defaultEnableFrontLeft;
+    front.command.right.enable = defaultEnableFrontRight;
+    back.command.left.enable = defaultEnableBackLeft;
+    back.command.right.enable = defaultEnableBackRight;
+
+    front.invertLeft = defaultInvertFrontLeft;
+    front.invertRight = defaultInvertFrontRight;
+    back.invertLeft = defaultInvertBackLeft;
+    back.invertRight = defaultInvertBackRight;
+
+    settings.iMotMax = defaultIMotMax;
+    settings.iDcMax = defaultIDcMax;
+    settings.nMotMax = defaultNMotMax;
+    settings.fieldWeakMax = defaultFieldWeakMax;
+    settings.phaseAdvMax = defaultPhaseAdvMax;
+
+    for (auto &controller : controllers)
+        controller.command.buzzer = {};
+}
 }

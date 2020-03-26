@@ -9,21 +9,28 @@
 #include "menuitems/switchscreenmenuitem.h"
 
 namespace {
+class ChangeValueDisplayInterface : public Display
+{
+public:
+    void start() override;
+
+    virtual const char *title() const = 0;
+};
+
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay final : public Display
+class ChangeValueDisplay final : public ChangeValueDisplayInterface
 {
 public:
     void start() override;
     void update() override final;
-    void redraw() override final;
-
-    int framerate() const override { return 60; }
 
     void rotate(int offset) override;
     void button(bool pressed) override;
 
+    const char *title() const override { return Ttext; }
+
 private:
-    void redrawMenu() const;
+    void redraw() const;
 
     Tvalue m_value{};
     bool m_needsRedraw{};
@@ -94,35 +101,44 @@ public:
     void start() override;
 };
 
+void ChangeValueDisplayInterface::start()
+{
+    tft.setRotation(0);
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_YELLOW);
+
+    tft.drawString(title(), 5, 5, 4);
+
+    tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
+
+    tft.drawRect(25, 75, 190, 65, TFT_WHITE);
+
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+}
+
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
 void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::start()
 {
-    Display::start();
-
-    tft.setRotation(0);
-
     m_value = Taccessor::getRef();
     m_needsRedraw = true;
     m_pressed = false;
+
+    ChangeValueDisplayInterface::start();
 }
 
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
 void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::update()
 {
+    if (m_needsRedraw)
+    {
+        redraw();
+        m_needsRedraw = false;
+    }
+
     if (m_pressed)
     {
         Taccessor::getRef() = m_value;
         switchScreen<Tdisplay>();
-    }
-}
-
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::redraw()
-{
-    if (m_needsRedraw)
-    {
-        redrawMenu();
-        m_needsRedraw = false;
     }
 }
 
@@ -141,14 +157,9 @@ void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::button(bool pressed
 }
 
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::redrawMenu() const
+void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::redraw() const
 {
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_YELLOW);
-
-    tft.drawString(Ttext, 5, 5, 4);
-
-    tft.drawNumber(m_value, 50, 50, 7);
+    tft.drawCentreString(String() + ' ' + m_value + ' ', tft.width()/2, 80, 7);
 }
 
 template<typename Taccessor, typename Tdisplay, const char *Ttext>
@@ -157,9 +168,9 @@ void ChangeValueDisplay<bool, Taccessor, Tdisplay, Ttext>::start()
     Base::start();
 
     if (Taccessor::getRef() == true)
-        Base::m_current = Base::begin() + 0;
+        Base::setSelectedItem(Base::begin() + 0);
     else if (Taccessor::getRef() == false)
-        Base::m_current = Base::begin() + 1;
+        Base::setSelectedItem(Base::begin() + 1);
 }
 
 template<typename Taccessor, typename Tdisplay, const char *Ttext>
@@ -168,15 +179,15 @@ void ChangeValueDisplay<ControlMode, Taccessor, Tdisplay, Ttext>::start()
     Base::start();
 
     if (Taccessor::getRef() == ControlMode::OpenMode)
-        Base::m_current = Base::begin() + 0;
+        Base::setSelectedItem(Base::begin() + 0);
     else if (Taccessor::getRef() == ControlMode::Voltage)
-        Base::m_current = Base::begin() + 1;
+        Base::setSelectedItem(Base::begin() + 1);
     else if (Taccessor::getRef() == ControlMode::Speed)
-        Base::m_current = Base::begin() + 2;
+        Base::setSelectedItem(Base::begin() + 2);
     else if (Taccessor::getRef() == ControlMode::Torque)
-        Base::m_current = Base::begin() + 3;
+        Base::setSelectedItem(Base::begin() + 3);
     else
-        Base::m_current = Base::begin() + 4;
+        Base::setSelectedItem(Base::begin() + 4);
 }
 
 template<typename Taccessor, typename Tdisplay, const char *Ttext>
@@ -185,12 +196,13 @@ void ChangeValueDisplay<ControlType, Taccessor, Tdisplay, Ttext>::start()
     Base::start();
 
     if (Taccessor::getRef() == ControlType::Commutation)
-        Base::m_current = Base::begin() + 0;
+        Base::setSelectedItem(Base::begin() + 0);
     else if (Taccessor::getRef() == ControlType::Sinusoidal)
-        Base::m_current = Base::begin() + 1;
+        Base::setSelectedItem(Base::begin() + 1);
     else if (Taccessor::getRef() == ControlType::FieldOrientedControl)
-        Base::m_current = Base::begin() + 2;
+        Base::setSelectedItem(Base::begin() + 2);
     else
-        Base::m_current = Base::begin() + 3;
+        Base::setSelectedItem(Base::begin() + 3);
 }
+
 }

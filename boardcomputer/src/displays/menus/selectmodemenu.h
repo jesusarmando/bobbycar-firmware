@@ -38,12 +38,12 @@ void SelectModeMenu::start()
     MenuDisplay::start();
 
     if (ModeAccessor::getRef() == DefaultModeGetter::getValue())
-        m_current = begin() + 0;
+        setSelectedItem(begin() + 0);
     else if (ModeAccessor::getRef() == ManualModeGetter::getValue())
-        m_current = begin() + 1;
+        setSelectedItem(begin() + 1);
     else if (ModeAccessor::getRef() == BluetoothModeGetter::getValue())
-        m_current = begin() + 2;
+        setSelectedItem(begin() + 2);
     else
-        m_current = begin() + 3;
+        setSelectedItem(begin() + 3);
 }
 }

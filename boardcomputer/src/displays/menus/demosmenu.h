@@ -7,22 +7,22 @@
 #include "texts.h"
 
 namespace {
-class StarfieldDisplay;
-class PingPongDisplay;
-class SpiroDisplay;
-class GameOfLifeDisplay;
-class MetersDisplay;
+template<typename T> class StarfieldDisplay;
+template<typename T> class PingPongDisplay;
+template<typename T> class SpiroDisplay;
+template<typename T> class GameOfLifeDisplay;
+template<typename T> class MetersDisplay;
 class MainMenu;
 }
 
 namespace {
 class DemosMenu final : public MenuDisplay<
     TEXT_DEMOS,
-    SwitchScreenMenuItem<StarfieldDisplay, TEXT_STARFIELD>,
-    SwitchScreenMenuItem<PingPongDisplay, TEXT_PINGPONG>,
-    SwitchScreenMenuItem<SpiroDisplay, TEXT_SPIRO>,
-    SwitchScreenMenuItem<GameOfLifeDisplay, TEXT_GAMEOFLIFE>,
-    SwitchScreenMenuItem<MetersDisplay, TEXT_METERS>,
+    SwitchScreenMenuItem<StarfieldDisplay<DemosMenu>, TEXT_STARFIELD>,
+    SwitchScreenMenuItem<PingPongDisplay<DemosMenu>, TEXT_PINGPONG>,
+    SwitchScreenMenuItem<SpiroDisplay<DemosMenu>, TEXT_SPIRO>,
+    SwitchScreenMenuItem<GameOfLifeDisplay<DemosMenu>, TEXT_GAMEOFLIFE>,
+    SwitchScreenMenuItem<MetersDisplay<DemosMenu>, TEXT_METERS>,
     SwitchScreenMenuItem<MainMenu, TEXT_BACK>
 >
 {};
