@@ -22,6 +22,11 @@ public:
     virtual const std::reference_wrapper<const MenuItemInterface> *begin() const = 0;
     virtual const std::reference_wrapper<const MenuItemInterface> *end() const = 0;
 
+    MenuDisplayInterface *asMenuDisplayInterface() override { return this; }
+    const MenuDisplayInterface *asMenuDisplayInterface() const override { return this; }
+
+    const std::reference_wrapper<const MenuItemInterface> *selectedItem() const { return m_current; }
+
 protected:
     void requestRedraw();
     void setSelectedItem(const std::reference_wrapper<const MenuItemInterface> *item);

@@ -6,6 +6,7 @@
 #include "htmlutils.h"
 #include "globals.h"
 #include "settings.h"
+#include "menudisplay.h"
 
 #include "displays/statusdisplay.h"
 
@@ -35,6 +36,8 @@ private:
     static void handleSetDefaultModeParams(AsyncWebServerRequest *request);
     static void handleSetManualModeParams(AsyncWebServerRequest *request);
     static void handleSetPotiParams(AsyncWebServerRequest *request);
+    static void handleDisplay(AsyncWebServerRequest *request);
+    static void handleDisplayAction(AsyncWebServerRequest *request);
     static void handleReboot(AsyncWebServerRequest *request);
 };
 
@@ -59,6 +62,10 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
     else if (request->url() == "/potiParams")
         return true;
     else if (request->url() == "/setPotiParams")
+        return true;
+    else if (request->url() == "/display")
+        return true;
+    else if (request->url() == "/displayAction")
         return true;
     else if (request->url() == "/reboot")
         return true;
@@ -88,6 +95,10 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
         handlePotiParams(request);
     else if (request->url() == "/setPotiParams")
         handleSetPotiParams(request);
+    else if (request->url() == "/display")
+        handleDisplay(request);
+    else if (request->url() == "/displayAction")
+        handleDisplayAction(request);
     else if (request->url() == "/reboot")
         handleReboot(request);
 }
@@ -282,6 +293,12 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
                 HtmlTag li(response, "li");
                 HtmlTag a(response, "a", " href=\"potiParams\"");
                 response.print("Poti params");
+            }
+
+            {
+                HtmlTag li(response, "li");
+                HtmlTag a(response, "a", " href=\"display\"");
+                response.print("Display");
             }
 
             {
@@ -1186,6 +1203,164 @@ void WebHandler::handleSetPotiParams(AsyncWebServerRequest *request)
     }
 
     request->redirect("/potiParams");
+}
+
+void WebHandler::handleDisplay(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream &response = *request->beginResponseStream("text/html");
+
+    response.print("<!doctype html>");
+
+    {
+        HtmlTag html(response, "html");
+
+        {
+            HtmlTag head(response, "head");
+
+            response.print("<meta charset=\"utf-8\" />");
+            response.print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />");
+
+            {
+                HtmlTag title(response, "title");
+                response.print("Bobbycar remote");
+            }
+        }
+
+        {
+            HtmlTag body(response, "body");
+
+            {
+                HtmlTag h1(response, "h1");
+                response.print("Bobbycar remote");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/displayAction?action=rotaryUp\"");
+                response.print("Up");
+            }
+
+            response.print(" - ");
+
+            {
+                HtmlTag a(response, "a", " href=\"/displayAction?action=rotaryDown\"");
+                response.print("Down");
+            }
+
+            response.print(" - ");
+
+            {
+                HtmlTag a(response, "a", " href=\"/displayAction?action=button\"");
+                response.print("Button");
+            }
+
+            if (auto menuDisplay = currentDisplay->asMenuDisplayInterface())
+            {
+                {
+                    HtmlTag h2(response, "h2");
+                    response.print(menuDisplay->title());
+                }
+
+                HtmlTag ul(response, "ul");
+
+                const auto *selected = menuDisplay->selectedItem();
+
+                for (auto iter = menuDisplay->begin(); iter != menuDisplay->end(); iter++)
+                {
+                    HtmlTag li(response, "li", iter==selected?" style=\"border: 1px solid black;\"":"");
+                    HtmlTag a(response, "a", String(" href=\"/displayAction?action=triggerItem&index=") + std::distance(menuDisplay->begin(), iter) + "\"");
+                    response.print(iter->get().text());
+                }
+            }
+            else
+            {
+                HtmlTag p(response, "p");
+                response.print("No specialized controls available for current display.");
+            }
+
+            {
+                HtmlTag a(response, "a", " href=\"/\"");
+                response.print("Back");
+            }
+        }
+    }
+
+    request->send(&response);
+}
+
+void WebHandler::handleDisplayAction(AsyncWebServerRequest *request)
+{
+    if (!request->hasParam("action"))
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("no action specified");
+        request->send(&response);
+        return;
+    }
+
+    AsyncWebParameter* action = request->getParam("action");
+    if (action->value() == "rotaryUp")
+    {
+        InputDispatcher::rotate(-1);
+        request->redirect("/display");
+    }
+    else if (action->value() == "rotaryDown")
+    {
+        InputDispatcher::rotate(1);
+        request->redirect("/display");
+    }
+    else if (action->value() == "button")
+    {
+        InputDispatcher::button(true);
+        InputDispatcher::button(false);
+        request->redirect("/display");
+    }
+    else if (action->value() == "triggerItem")
+    {
+        if (auto menuDisplay = currentDisplay->asMenuDisplayInterface())
+        {
+            if (!request->hasParam("index"))
+            {
+                AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+                response.setCode(400);
+                response.print("no index specified");
+                request->send(&response);
+                return;
+            }
+
+            AsyncWebParameter* p = request->getParam("index");
+            const auto index = strtol(p->value().c_str(), nullptr, 10);
+
+            if (index < 0 || index >= std::distance(menuDisplay->begin(), menuDisplay->end()))
+            {
+                AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+                response.setCode(400);
+                response.print("index out of range");
+                request->send(&response);
+                return;
+            }
+
+            (menuDisplay->begin() + index)->get().triggered();
+
+            request->redirect("/display");
+        }
+        else
+        {
+            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+            response.setCode(400);
+            response.print("current display isn't a menu");
+            request->send(&response);
+            return;
+        }
+    }
+    else
+    {
+        AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+        response.setCode(400);
+        response.print("invalid action specified");
+        request->send(&response);
+        return;
+    }
 }
 
 void WebHandler::handleReboot(AsyncWebServerRequest *request)

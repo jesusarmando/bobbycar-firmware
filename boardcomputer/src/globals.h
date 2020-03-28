@@ -8,8 +8,10 @@
 #include <SPI.h>
 
 #include "controller.h"
+#include "display.h"
 #include "modebase.h"
 #include "settings.h"
+#include "rotary.h"
 
 namespace {
 uint16_t raw_gas, raw_brems;
@@ -45,6 +47,25 @@ BluetoothSerial bluetoothSerial;
 TFT_eSPI tft = TFT_eSPI();
 
 ModeBase *currentMode{};
+
+Display *currentDisplay{};
+
+class InputDispatcher {
+public:
+    static void rotate(int offset) { currentDisplay->rotate(offset); }
+    static void button(bool pressed) { currentDisplay->button(pressed); }
+};
+
+Rotary<InputDispatcher, rotaryClkPin, rotaryDtPin, rotarySwPin> rotary;
+
+void updateRotate() { rotary.updateRotate(); }
+void updateSwitch() { rotary.updateSwitch(); }
+
+void initRotary()
+{
+    attachInterrupt(decltype(rotary)::ClkPin, updateRotate, CHANGE);
+    attachInterrupt(decltype(rotary)::SwPin, updateSwitch, CHANGE);
+}
 
 void applyDefaultSettings()
 {

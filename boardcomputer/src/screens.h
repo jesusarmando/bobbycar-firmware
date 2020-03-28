@@ -22,7 +22,7 @@
 #include "displays/starfielddisplay.h"
 #include "displays/statusdisplay.h"
 
-#include "rotary.h"
+#include "globals.h"
 
 namespace {
 union X {
@@ -162,8 +162,6 @@ template<> decltype(displays.changeGasMax)                                     &
 template<> decltype(displays.changeBremsMin)                                   &getRefByType<decltype(displays.changeBremsMin)>()                                   { return displays.changeBremsMin; }
 template<> decltype(displays.changeBremsMax)                                   &getRefByType<decltype(displays.changeBremsMax)>()                                   { return displays.changeBremsMax; }
 
-Display *currentDisplay{};
-
 template<typename T> void switchScreen()
 {
     if (currentDisplay)
@@ -177,23 +175,6 @@ template<typename T> void switchScreen()
     currentDisplay = &ref;
     ref.start();
     ref.update();
-}
-
-class InputDispatcher {
-public:
-    static void rotate(int offset) { currentDisplay->rotate(offset); }
-    static void button(bool pressed) { currentDisplay->button(pressed); }
-};
-
-Rotary<InputDispatcher, rotaryClkPin, rotaryDtPin, rotarySwPin> rotary;
-
-void updateRotate() { rotary.updateRotate(); }
-void updateSwitch() { rotary.updateSwitch(); }
-
-void initRotary()
-{
-    attachInterrupt(decltype(rotary)::ClkPin, updateRotate, CHANGE);
-    attachInterrupt(decltype(rotary)::SwPin, updateSwitch, CHANGE);
 }
 
 void initScreen()
