@@ -15,19 +15,39 @@ void label(AsyncResponseStream &stream, const char *name, const char *text)
 }
 
 template<typename T>
+void input(AsyncResponseStream &stream, T value, const char *type, const char *id, const char *name, const char *additionalAttributes = nullptr)
+{
+    stream.print("<input type=\"");
+    stream.print(type);
+    if (id)
+    {
+        stream.print("\" id=\"");
+        stream.print(id);
+    }
+    stream.print("\" name=\"");
+    stream.print(name);
+    stream.print("\" value=\"");
+    stream.print(value);
+    stream.print("\"");
+    if (additionalAttributes)
+        stream.print(additionalAttributes);
+    stream.print("/>");
+}
+
+template<typename T>
+void hiddenInput(AsyncResponseStream &stream, T value, const char *name)
+{
+    input(stream, value, "hidden", nullptr, name);
+}
+
+template<typename T>
 void numberInput(AsyncResponseStream &stream, T value, const char *id, const char *name, const char *text)
 {
     label(stream, id, text);
 
     breakLine(stream);
 
-    stream.print("<input type=\"number\" id=\"");
-    stream.print(id);
-    stream.print("\" name=\"");
-    stream.print(name);
-    stream.print("\" value=\"");
-    stream.print(value);
-    stream.print("\" required />");
+    input(stream, value, "number", id, name, " required");
 }
 
 template<typename T>
@@ -48,14 +68,7 @@ void checkboxInput(AsyncResponseStream &stream, bool value, const char *id, cons
 
     breakLine(stream);
 
-    stream.print("<input type=\"checkbox\" id=\"");
-    stream.print(id);
-    stream.print("\" name=\"");
-    stream.print(name);
-    stream.print("\" value=\"on\"");
-    if (value)
-        stream.print(" checked");
-    stream.print(" />");
+    input(stream, "on", "checkbox", id, name, value?" checked":"");
 }
 
 void checkboxInput(AsyncResponseStream &stream, bool value, const char *name, const char *text)

@@ -7,6 +7,7 @@
 #include "globals.h"
 #include "settings.h"
 #include "menudisplay.h"
+#include "changevaluedisplay.h"
 
 #include "displays/statusdisplay.h"
 
@@ -1271,6 +1272,28 @@ void WebHandler::handleDisplay(AsyncWebServerRequest *request)
                     response.print(iter->get().text());
                 }
             }
+            else if (auto changeValueDisplay = currentDisplay->asChangeValueDisplayInterface())
+            {
+                {
+                    HtmlTag h2(response, "h2");
+                    response.print(changeValueDisplay->title());
+                }
+
+                HtmlTag form(response, "form", " method=\"GET\" action=\"displayAction\"");
+
+                hiddenInput(response, "changeValue", "action");
+
+                numberInput(response, changeValueDisplay->value(), "value", "Value:");
+
+                {
+                    HtmlTag button(response, "button", " type=\"submit\" name=\"subAction\" value=\"update\"");
+                    response.print("Update");
+                }
+                {
+                    HtmlTag button(response, "button", " type=\"submit\" name=\"subAction\" value=\"confirm\"");
+                    response.print("Confirm");
+                }
+            }
             else
             {
                 HtmlTag p(response, "p");
@@ -1348,7 +1371,64 @@ void WebHandler::handleDisplayAction(AsyncWebServerRequest *request)
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
             response.setCode(400);
-            response.print("current display isn't a menu");
+            response.print("current display isn't a menu display");
+            request->send(&response);
+            return;
+        }
+    }
+    else if (action->value() == "changeValue")
+    {
+        if (auto changeDisplay = currentDisplay->asChangeValueDisplayInterface())
+        {
+            if (!request->hasParam("value"))
+            {
+                AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+                response.setCode(400);
+                response.print("no value specified");
+                request->send(&response);
+                return;
+            }
+            if (!request->hasParam("subAction"))
+            {
+                AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+                response.setCode(400);
+                response.print("no subAction specified");
+                request->send(&response);
+                return;
+            }
+
+            bool confirm;
+            {
+                AsyncWebParameter* p = request->getParam("subAction");
+                if (p->value() == "update")
+                    confirm = false;
+                else if (p->value() == "confirm")
+                    confirm = true;
+                else
+                {
+                    AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+                    response.setCode(400);
+                    response.print("invalid subAction specified");
+                    request->send(&response);
+                    return;
+                }
+            }
+
+            AsyncWebParameter* p = request->getParam("value");
+            const auto value = strtol(p->value().c_str(), nullptr, 10);
+
+            changeDisplay->setValue(value);
+
+            if (confirm)
+                changeDisplay->confirm();
+
+            request->redirect("/display");
+        }
+        else
+        {
+            AsyncResponseStream &response = *request->beginResponseStream("text/plain");
+            response.setCode(400);
+            response.print("current display isn't a change display");
             request->send(&response);
             return;
         }

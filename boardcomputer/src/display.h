@@ -4,6 +4,7 @@
 
 namespace {
 class MenuDisplayInterface;
+class ChangeValueDisplayInterface;
 }
 
 namespace {
@@ -19,5 +20,8 @@ public:
 
     virtual MenuDisplayInterface *asMenuDisplayInterface() { return nullptr; }
     virtual const MenuDisplayInterface *asMenuDisplayInterface() const { return nullptr; }
+
+    virtual ChangeValueDisplayInterface *asChangeValueDisplayInterface() { return nullptr; }
+    virtual const ChangeValueDisplayInterface *asChangeValueDisplayInterface() const { return nullptr; }
 };
 }

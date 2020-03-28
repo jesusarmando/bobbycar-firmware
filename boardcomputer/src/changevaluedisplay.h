@@ -15,6 +15,14 @@ public:
     void start() override;
 
     virtual const char *title() const = 0;
+
+    ChangeValueDisplayInterface *asChangeValueDisplayInterface() override { return this; }
+    const ChangeValueDisplayInterface *asChangeValueDisplayInterface() const override { return this; }
+
+    virtual int value() const = 0;
+    virtual void setValue(int value) = 0;
+
+    virtual void confirm() = 0;
 };
 
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
@@ -28,6 +36,11 @@ public:
     void button(bool pressed) override;
 
     const char *title() const override { return Ttext; }
+
+    int value() const { return m_value; }
+    void setValue(int value) { m_value = value; m_needsRedraw = true; }
+
+    void confirm() override;
 
 private:
     void redraw() const;
@@ -153,7 +166,13 @@ template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Tte
 void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::button(bool pressed)
 {
     if (!pressed)
-        m_pressed = true;
+        confirm();
+}
+
+template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::confirm()
+{
+    m_pressed = true;
 }
 
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
