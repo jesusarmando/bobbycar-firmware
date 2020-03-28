@@ -4,26 +4,23 @@
 
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
+#include "displays/starfielddisplay.h"
+#include "displays/pingpongdisplay.h"
+#include "displays/spirodisplay.h"
+#include "displays/gameoflifedisplay.h"
+#include "displays/metersdisplay.h"
 #include "texts.h"
 
 namespace {
-template<typename T> class StarfieldDisplay;
-template<typename T> class PingPongDisplay;
-template<typename T> class SpiroDisplay;
-template<typename T> class GameOfLifeDisplay;
-template<typename T> class MetersDisplay;
-class MainMenu;
-}
-
-namespace {
+template<typename Tscreen>
 class DemosMenu final : public MenuDisplay<
     TEXT_DEMOS,
-    SwitchScreenMenuItem<StarfieldDisplay<DemosMenu>, TEXT_STARFIELD>,
-    SwitchScreenMenuItem<PingPongDisplay<DemosMenu>, TEXT_PINGPONG>,
-    SwitchScreenMenuItem<SpiroDisplay<DemosMenu>, TEXT_SPIRO>,
-    SwitchScreenMenuItem<GameOfLifeDisplay<DemosMenu>, TEXT_GAMEOFLIFE>,
-    SwitchScreenMenuItem<MetersDisplay<DemosMenu>, TEXT_METERS>,
-    SwitchScreenMenuItem<MainMenu, TEXT_BACK>
+    SwitchScreenMenuItem<StarfieldDisplay<DemosMenu<Tscreen>>, TEXT_STARFIELD>,
+    SwitchScreenMenuItem<PingPongDisplay<DemosMenu<Tscreen>>, TEXT_PINGPONG>,
+    SwitchScreenMenuItem<SpiroDisplay<DemosMenu<Tscreen>>, TEXT_SPIRO>,
+    SwitchScreenMenuItem<GameOfLifeDisplay<DemosMenu<Tscreen>>, TEXT_GAMEOFLIFE>,
+    SwitchScreenMenuItem<MetersDisplay<DemosMenu<Tscreen>>, TEXT_METERS>,
+    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {};
 }

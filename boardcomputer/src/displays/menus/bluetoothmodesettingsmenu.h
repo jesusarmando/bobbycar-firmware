@@ -7,13 +7,10 @@
 #include "texts.h"
 
 namespace {
-class SettingsMenu;
-}
-
-namespace {
+template<typename Tscreen>
 class BluetoothModeSettingsMenu final : public MenuDisplay<
     TEXT_BLUETOOTHMODESETTINGS,
-    SwitchScreenMenuItem<SettingsMenu, TEXT_BACK>
+    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {};
 }

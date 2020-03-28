@@ -12,38 +12,43 @@
 #include "modes/bluetoothmode.h"
 
 namespace {
-class CommonSettingsMenu;
-}
-
-namespace {
 struct ModeAccessor { static auto &getRef() { return currentMode; } };
 struct DefaultModeGetter { static auto getValue() { return &modes::defaultMode; } };
 struct ManualModeGetter { static auto getValue() { return &modes::manualMode; } };
 struct BluetoothModeGetter { static auto getValue() { return &modes::bluetoothMode; } };
 
+template<typename Tscreen>
 class SelectModeMenu final : public MenuDisplay<
     TEXT_SELECTMODE,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, CommonSettingsMenu, TEXT_DEFAULT>,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, CommonSettingsMenu, TEXT_MANUAL>,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, CommonSettingsMenu, TEXT_BLUETOOTH>,
-    SwitchScreenMenuItem<CommonSettingsMenu, TEXT_BACK>
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, SelectModeMenu<Tscreen>, TEXT_DEFAULT>,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, SelectModeMenu<Tscreen>, TEXT_MANUAL>,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, SelectModeMenu<Tscreen>, TEXT_BLUETOOTH>,
+    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {
+    using Base = MenuDisplay<
+        TEXT_SELECTMODE,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, SelectModeMenu<Tscreen>, TEXT_DEFAULT>,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, SelectModeMenu<Tscreen>, TEXT_MANUAL>,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, SelectModeMenu<Tscreen>, TEXT_BLUETOOTH>,
+        SwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >;
 public:
     void start() override;
 };
 
-void SelectModeMenu::start()
+template<typename Tscreen>
+void SelectModeMenu<Tscreen>::start()
 {
-    MenuDisplay::start();
+    Base::start();
 
     if (ModeAccessor::getRef() == DefaultModeGetter::getValue())
-        setSelectedItem(begin() + 0);
+        Base::setSelectedItem(Base::begin() + 0);
     else if (ModeAccessor::getRef() == ManualModeGetter::getValue())
-        setSelectedItem(begin() + 1);
+        Base::setSelectedItem(Base::begin() + 1);
     else if (ModeAccessor::getRef() == BluetoothModeGetter::getValue())
-        setSelectedItem(begin() + 2);
+        Base::setSelectedItem(Base::begin() + 2);
     else
-        setSelectedItem(begin() + 3);
+        Base::setSelectedItem(Base::begin() + 3);
 }
 }
