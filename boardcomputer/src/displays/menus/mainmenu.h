@@ -15,7 +15,12 @@
 
 namespace {
 struct FrontLedAccessor { static auto &getRef() { return front.command.led; } };
+template<typename Tscreen>
+using FrontLedChangeScreen = ChangeValueDisplay<bool, FrontLedAccessor, Tscreen, TEXT_SETFRONTLED>;
+
 struct BackLedAccessor { static auto &getRef() { return back.command.led; } };
+template<typename Tscreen>
+using BackLedChangeScreen = ChangeValueDisplay<bool, BackLedAccessor, Tscreen, TEXT_SETBACKLED>;
 
 class MainMenu final : public MenuDisplay<
     TEXT_MAINMENU,
@@ -23,8 +28,8 @@ class MainMenu final : public MenuDisplay<
     SwitchScreenMenuItem<SettingsMenu<MainMenu>, TEXT_SETTINGS>,
     SwitchScreenMenuItem<DemosMenu<MainMenu>, TEXT_DEMOS>,
     SwitchScreenMenuItem<BuzzerMenu<MainMenu>, TEXT_BUZZER>,
-    SwitchScreenMenuItem<ChangeValueDisplay<bool, FrontLedAccessor, MainMenu, TEXT_SETFRONTLED>, TEXT_SETFRONTLED>,
-    SwitchScreenMenuItem<ChangeValueDisplay<bool, BackLedAccessor, MainMenu, TEXT_SETBACKLED>, TEXT_SETBACKLED>,
+    SwitchScreenMenuItem<FrontLedChangeScreen<MainMenu>, TEXT_SETFRONTLED>,
+    SwitchScreenMenuItem<BackLedChangeScreen<MainMenu>, TEXT_SETBACKLED>,
     RebootItem
 >
 {};

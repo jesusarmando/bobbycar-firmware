@@ -49,42 +49,49 @@ union X {
     StarfieldDisplay<DemosMenu<MainMenu>> starFieldDisplay;
     StatusDisplay<MainMenu> statusDisplay;
 
-    ChangeValueDisplay<uint8_t, FrontFreqAccessor, BuzzerMenu<MainMenu>, TEXT_SETFRONTFREQ> changeFrontFreq;
-    ChangeValueDisplay<uint8_t, FrontPatternAccessor, BuzzerMenu<MainMenu>, TEXT_SETFRONTPATTERN> changeFrontPattern;
-    ChangeValueDisplay<uint8_t, BackFreqAccessor, BuzzerMenu<MainMenu>, TEXT_SETBACKFREQ> changeBackFreq;
-    ChangeValueDisplay<uint8_t, BackPatternAccessor, BuzzerMenu<MainMenu>, TEXT_SETBACKPATTERN> changeBackPattern;
-    ChangeValueDisplay<int16_t, IMotMaxAccessor, CommonSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETIMOTMAX> changeIMotMax;
-    ChangeValueDisplay<int16_t, IDcMaxAccessor, CommonSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETIDCMAX> changeIDcMax;
-    ChangeValueDisplay<int16_t, NMotMaxAccessor, CommonSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETNMOTMAX> changeNMotMax;
-    ChangeValueDisplay<int16_t, FieldWeakMaxAccessor, CommonSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETFIELDWEAKMAX> changeFieldWeakMax;
-    ChangeValueDisplay<int16_t, PhaseAdvMaxAccessor, CommonSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETPHASEADVMAX> changePhaseAdvMax;
-    ChangeValueDisplay<ControlType, DefaultModeCtrlTypAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETCONTROLTYPE> changeDefaultModeCtrlTyp;
-    ChangeValueDisplay<ControlMode, DefaultModeCtrlModAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETCONTROLMODE> changeDefaultModeCtrlMod;
-    ChangeValueDisplay<bool, DefaultModeEnableFieldWeakeningSmootheningAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_ENABLEWEAKENINGSMOOTHENING> changeDefaultModeEnableFieldWeakeningSmoothening;
-    ChangeValueDisplay<int16_t, DefaultModeWeakeningSmootheningAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETWEAKINGSMOOTHENING> changeDefaultModeWeakeningSmoothening;
-    ChangeValueDisplay<int16_t, DefaultModeFrontPercentageAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETFRONTPERCENTAGE> changeDefaultModeFrontPercentage;
-    ChangeValueDisplay<int16_t, DefaultModeBackPercentageAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETBACKPERCENTAGE> changeDefaultModeBackPercentage;
-    ChangeValueDisplay<int16_t, DefaultModeAddSchwelleAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETADDSCHWELLE> changeDefaultModeAddSchwelle;
-    ChangeValueDisplay<int16_t, DefaultModeGas1WertAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETGAS1WERT> changeDefaultModeGas1Wert;
-    ChangeValueDisplay<int16_t, DefaultModeGas2WertAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETGAS2WERT> changeDefaultModeGas2Wert;
-    ChangeValueDisplay<int16_t, DefaultModeBrems1WertAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETBREMS1WERT> changeDefaultModeBrems1Wert;
-    ChangeValueDisplay<int16_t, DefaultModeBrems2WertAccessor, DefaultModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETBREMS2WERT> changeDefaultModeBrems2Wert;
-    ChangeValueDisplay<bool, FrontLeftEnabledAccessor, EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>, TEXT_ENABLEFRONTLEFT> changeFrontLeftEnabled;
-    ChangeValueDisplay<bool, FrontRightEnabledAccessor, EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>, TEXT_ENABLEFRONTRIGHT> changeFrontRightEnabled;
-    ChangeValueDisplay<bool, BackLeftEnabledAccessor, EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>, TEXT_ENABLEBACKLEFT> changeBackLeftEnabled;
-    ChangeValueDisplay<bool, BackRightEnabledAccessor, EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>, TEXT_ENABLEBACKRIGHT> changeBackRightEnabled;
-    ChangeValueDisplay<bool, FrontLeftInvertedAccessor, InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>, TEXT_INVERTFRONTLEFT> changeFrontLeftInverted;
-    ChangeValueDisplay<bool, FrontRightInvertedAccessor, InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>, TEXT_INVERTFRONTRIGHT> changeFrontRightInverted;
-    ChangeValueDisplay<bool, BackLeftInvertedAccessor, InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>, TEXT_INVERTBACKLEFT> changeBackLeftInverted;
-    ChangeValueDisplay<bool, BackRightInvertedAccessor, InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>, TEXT_INVERTBACKRIGHT> changeBackRightInverted;
-    ChangeValueDisplay<bool, FrontLedAccessor, MainMenu, TEXT_SETFRONTLED> changeFrontLed;
-    ChangeValueDisplay<bool, BackLedAccessor, MainMenu, TEXT_SETBACKLED> changeBackLed;
-    ChangeValueDisplay<ControlType, ManualModeCtrlTypAccessor, ManualModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETCONTROLMODE> changeManualModeCtrlTyp;
-    ChangeValueDisplay<ControlMode, ManualModeCtrlModAccessor, ManualModeSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETCONTROLMODE> changeManualModeCtrlMod;
-    ChangeValueDisplay<int16_t, GasMinAccessor, PotiSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETGASMIN> changeGasMin;
-    ChangeValueDisplay<int16_t, GasMaxAccessor, PotiSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETGASMAX> changeGasMax;
-    ChangeValueDisplay<int16_t, BremsMinAccessor, PotiSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETBREMSMIN> changeBremsMin;
-    ChangeValueDisplay<int16_t, BremsMaxAccessor, PotiSettingsMenu<SettingsMenu<MainMenu>>, TEXT_SETBREMSMAX> changeBremsMax;
+    FrontFreqChangeScreen<BuzzerMenu<MainMenu>> changeFrontFreq;
+    FrontPatternChangeScreen<BuzzerMenu<MainMenu>> changeFrontPattern;
+    BackFreqChangeScreen<BuzzerMenu<MainMenu>> changeBackFreq;
+    BackPatternChangeScreen<BuzzerMenu<MainMenu>> changeBackPattern;
+
+    IMotMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeIMotMax;
+    IDcMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeIDcMax;
+    NMotMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeNMotMax;
+    FieldWeakMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeFieldWeakMax;
+    PhaseAdvMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changePhaseAdvMax;
+
+    DefaultModeCtrlTypDefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeCtrlTyp;
+    DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeCtrlMod;
+    DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeEnableFieldWeakeningSmoothening;
+    DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeWeakeningSmoothening;
+    DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeFrontPercentage;
+    DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeBackPercentage;
+    DefaultModeAddSchwelleChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeAddSchwelle;
+    DefaultModeGas1WertChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeGas1Wert;
+    DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeGas2Wert;
+    DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeBrems1Wert;
+    DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeBrems2Wert;
+
+    FrontLeftEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontLeftEnabled;
+    FrontRightEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontRightEnabled;
+    BackLeftEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackLeftEnabled;
+    BackRightEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackRightEnabled;
+
+    FrontLeftInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontLeftInverted;
+    FrontRightInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontRightInverted;
+    BackLeftInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackLeftInverted;
+    BackRightInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackRightInverted;
+
+    FrontLedChangeScreen<MainMenu> changeFrontLed;
+    BackLedChangeScreen<MainMenu> changeBackLed;
+
+    ManualModeCtrlTypChangeScreen<ManualModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlTyp;
+    ManualModeCtrlModChangeScreen<ManualModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlMod;
+
+    GasMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMin;
+    GasMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMax;
+    BremsMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeBremsMin;
+    BremsMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeBremsMax;
 } displays;
 
 using DefaultScreen = decltype(displays.statusDisplay);
@@ -103,21 +110,25 @@ template<> decltype(displays.manualModeSettingsMenu)                           &
 template<> decltype(displays.potiSettingsMenu)                                 &getRefByType<decltype(displays.potiSettingsMenu)>()                                 { return displays.potiSettingsMenu; }
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }
 template<> decltype(displays.settingsMenu)                                     &getRefByType<decltype(displays.settingsMenu)>()                                     { return displays.settingsMenu; }
+
 template<> decltype(displays.gameOfLifeDisplay)                                &getRefByType<decltype(displays.gameOfLifeDisplay)>()                                { return displays.gameOfLifeDisplay; }
 template<> decltype(displays.metersDisplay)                                    &getRefByType<decltype(displays.metersDisplay)>()                                    { return displays.metersDisplay; }
 template<> decltype(displays.pingPongDisplay)                                  &getRefByType<decltype(displays.pingPongDisplay)>()                                  { return displays.pingPongDisplay; }
 template<> decltype(displays.spiroDisplay)                                     &getRefByType<decltype(displays.spiroDisplay)>()                                     { return displays.spiroDisplay; }
 template<> decltype(displays.starFieldDisplay)                                 &getRefByType<decltype(displays.starFieldDisplay)>()                                 { return displays.starFieldDisplay; }
 template<> decltype(displays.statusDisplay)                                    &getRefByType<decltype(displays.statusDisplay)>()                                    { return displays.statusDisplay; }
+
 template<> decltype(displays.changeFrontFreq)                                  &getRefByType<decltype(displays.changeFrontFreq)>()                                  { return displays.changeFrontFreq; }
 template<> decltype(displays.changeFrontPattern)                               &getRefByType<decltype(displays.changeFrontPattern)>()                               { return displays.changeFrontPattern; }
 template<> decltype(displays.changeBackFreq)                                   &getRefByType<decltype(displays.changeBackFreq)>()                                   { return displays.changeBackFreq; }
 template<> decltype(displays.changeBackPattern)                                &getRefByType<decltype(displays.changeBackPattern)>()                                { return displays.changeBackPattern; }
+
 template<> decltype(displays.changeIMotMax)                                    &getRefByType<decltype(displays.changeIMotMax)>()                                    { return displays.changeIMotMax; }
 template<> decltype(displays.changeIDcMax)                                     &getRefByType<decltype(displays.changeIDcMax)>()                                     { return displays.changeIDcMax; }
 template<> decltype(displays.changeNMotMax)                                    &getRefByType<decltype(displays.changeNMotMax)>()                                    { return displays.changeNMotMax; }
 template<> decltype(displays.changeFieldWeakMax)                               &getRefByType<decltype(displays.changeFieldWeakMax)>()                               { return displays.changeFieldWeakMax; }
 template<> decltype(displays.changePhaseAdvMax)                                &getRefByType<decltype(displays.changePhaseAdvMax)>()                                { return displays.changePhaseAdvMax; }
+
 template<> decltype(displays.changeDefaultModeCtrlTyp)                         &getRefByType<decltype(displays.changeDefaultModeCtrlTyp)>()                         { return displays.changeDefaultModeCtrlTyp; }
 template<> decltype(displays.changeDefaultModeCtrlMod)                         &getRefByType<decltype(displays.changeDefaultModeCtrlMod)>()                         { return displays.changeDefaultModeCtrlMod; }
 template<> decltype(displays.changeDefaultModeEnableFieldWeakeningSmoothening) &getRefByType<decltype(displays.changeDefaultModeEnableFieldWeakeningSmoothening)>() { return displays.changeDefaultModeEnableFieldWeakeningSmoothening; }
@@ -129,18 +140,23 @@ template<> decltype(displays.changeDefaultModeGas1Wert)                        &
 template<> decltype(displays.changeDefaultModeGas2Wert)                        &getRefByType<decltype(displays.changeDefaultModeGas2Wert)>()                        { return displays.changeDefaultModeGas2Wert; }
 template<> decltype(displays.changeDefaultModeBrems1Wert)                      &getRefByType<decltype(displays.changeDefaultModeBrems1Wert)>()                      { return displays.changeDefaultModeBrems1Wert; }
 template<> decltype(displays.changeDefaultModeBrems2Wert)                      &getRefByType<decltype(displays.changeDefaultModeBrems2Wert)>()                      { return displays.changeDefaultModeBrems2Wert; }
+
 template<> decltype(displays.changeFrontLeftEnabled)                           &getRefByType<decltype(displays.changeFrontLeftEnabled)>()                           { return displays.changeFrontLeftEnabled; }
 template<> decltype(displays.changeFrontRightEnabled)                          &getRefByType<decltype(displays.changeFrontRightEnabled)>()                          { return displays.changeFrontRightEnabled; }
 template<> decltype(displays.changeBackLeftEnabled)                            &getRefByType<decltype(displays.changeBackLeftEnabled)>()                            { return displays.changeBackLeftEnabled; }
 template<> decltype(displays.changeBackRightEnabled)                           &getRefByType<decltype(displays.changeBackRightEnabled)>()                           { return displays.changeBackRightEnabled; }
+
 template<> decltype(displays.changeFrontLeftInverted)                          &getRefByType<decltype(displays.changeFrontLeftInverted)>()                          { return displays.changeFrontLeftInverted; }
 template<> decltype(displays.changeFrontRightInverted)                         &getRefByType<decltype(displays.changeFrontRightInverted)>()                         { return displays.changeFrontRightInverted; }
 template<> decltype(displays.changeBackLeftInverted)                           &getRefByType<decltype(displays.changeBackLeftInverted)>()                           { return displays.changeBackLeftInverted; }
 template<> decltype(displays.changeBackRightInverted)                          &getRefByType<decltype(displays.changeBackRightInverted)>()                          { return displays.changeBackRightInverted; }
+
 template<> decltype(displays.changeFrontLed)                                   &getRefByType<decltype(displays.changeFrontLed)>()                                   { return displays.changeFrontLed; }
 template<> decltype(displays.changeBackLed)                                    &getRefByType<decltype(displays.changeBackLed)>()                                    { return displays.changeBackLed; }
+
 template<> decltype(displays.changeManualModeCtrlTyp)                          &getRefByType<decltype(displays.changeManualModeCtrlTyp)>()                          { return displays.changeManualModeCtrlTyp; }
 template<> decltype(displays.changeManualModeCtrlMod)                          &getRefByType<decltype(displays.changeManualModeCtrlMod)>()                          { return displays.changeManualModeCtrlMod; }
+
 template<> decltype(displays.changeGasMin)                                     &getRefByType<decltype(displays.changeGasMin)>()                                     { return displays.changeGasMin; }
 template<> decltype(displays.changeGasMax)                                     &getRefByType<decltype(displays.changeGasMax)>()                                     { return displays.changeGasMax; }
 template<> decltype(displays.changeBremsMin)                                   &getRefByType<decltype(displays.changeBremsMin)>()                                   { return displays.changeBremsMin; }

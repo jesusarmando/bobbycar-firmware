@@ -109,7 +109,7 @@ constexpr char TEXT_TRUE[] = "true";
 constexpr char TEXT_FALSE[] = "false";
 //constexpr char TEXT_BACK[] = "Back";
 
-//ChangeValueDisplay
+//ChangeValueDisplay<ControlMode>
 constexpr char TEXT_OPENMODE[] = "Open mode";
 constexpr char TEXT_VOLTAGE[] = "Voltage";
 constexpr char TEXT_SPEED[] = "Speed";
