@@ -20,6 +20,8 @@ private:
 template<int x, int y, int width, int height, int font>
 void Label<x, y, width, height, font>::start()
 {
+    m_lastX = x;
+    m_lastStr.clear();
 }
 
 template<int x, int y, int width, int height, int font>

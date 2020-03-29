@@ -23,10 +23,10 @@ private:
 
     unsigned int m_lastRedraw{};
 
-    Label<25, 50, 100, 25> m_label0;
-    Label<25, 75, 100, 25> m_label1;
-    Label<25, 100, 100, 25> m_label2;
-    Label<25, 125, 100, 25> m_label3;
+    Label<25, 50, 100, 23> m_label0;
+    Label<25, 75, 100, 23> m_label1;
+    Label<25, 100, 100, 23> m_label2;
+    Label<25, 125, 100, 23> m_label3;
     ProgressBar<20, 200, 200, 10, 0, 1000> m_progressBar0;
     ProgressBar<20, 230, 200, 10, 0, 1000> m_progressBar1;
 };

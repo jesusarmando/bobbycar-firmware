@@ -16,6 +16,42 @@ namespace {
 }
 
 namespace {
+template<int y>
+class MotorStatus
+{
+public:
+    void start();
+    void redraw(const MotorFeedback &motor);
+
+private:
+    Label<18, y, 18, 22, 4> m_labelError;
+    Label<40, y, 85, 22, 4> m_labelCurrent;
+    Label<135, y, 75, 22, 4> m_labelSpeed;
+    Label<210, y, 30, 15, 2> m_labelHallSensors;
+};
+
+template<int y>
+class BoardStatus
+{
+public:
+    void start();
+    void redraw(const Controller &controller);
+
+private:
+    void drawWarning();
+
+    bool m_lastFeedbackValid{};
+
+    Label<65, y, 80, 22, 4> m_labelLeftPwm;
+    Label<155, y, 80, 22, 4> m_labelRightPwm;
+
+    Label<30, y+25, 85, 22, 4> m_labelVoltage;
+    Label<150, y+25, 85, 22, 4> m_labelTemperature;
+
+    MotorStatus<y+50> m_leftMotor;
+    MotorStatus<y+75> m_rightMotor;
+};
+
 template<typename Tscreen>
 class StatusDisplay final : public DemoDisplay<Tscreen>
 {
@@ -33,18 +69,6 @@ private:
     Label<45, 15, 40, 15, 2> m_labelRawBrems;
     Label<90, 15, 60, 15, 2> m_labelBrems;
     ProgressBar<150, 15, 90, 15, 0, 1000> m_progressBarBrems;
-
-    template<int y>
-    class BoardStatus
-    {
-    public:
-        void start();
-        void redraw(Controller &controller);
-
-    private:
-        Label<65, y, 80, 25, 4> m_labelLeftPwm;
-        Label<155, y, 80, 25, 4> m_labelRightPwm;
-    };
 
     BoardStatus<42> m_frontStatus;
     BoardStatus<142> m_backStatus;
@@ -66,7 +90,7 @@ void StatusDisplay<Tscreen>::start()
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(TFT_WHITE);
 
     tft.drawString("gas", 0, 0, 2);
     m_labelRawGas.start();
@@ -98,7 +122,7 @@ template<typename Tscreen>
 void StatusDisplay<Tscreen>::update()
 {
     const auto now = millis();
-    if (!m_lastRedraw || now-m_lastRedraw >= 1000/20)
+    if (!m_lastRedraw || now-m_lastRedraw >= 1000/60)
     {
         redraw();
         m_lastRedraw = now;
@@ -110,6 +134,8 @@ void StatusDisplay<Tscreen>::update()
 template<typename Tscreen>
 void StatusDisplay<Tscreen>::redraw()
 {
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
     m_labelRawGas.repaint(String{raw_gas});
     m_labelGas.repaint(String{gas});
     m_progressBarGas.repaint(gas);
@@ -120,58 +146,6 @@ void StatusDisplay<Tscreen>::redraw()
     m_frontStatus.redraw(front);
     m_backStatus.redraw(back);
 
-    auto &renderer = tft;
-
-    int y = 42;
-    const auto print_controller = [&](const Controller &controller)
-    {
-        y+=25;
-        renderer.fillRect(0, y, renderer.width(), 75, TFT_BLACK);
-        if (!controller.feedbackValid)
-        {
-            renderer.setTextColor(TFT_RED, TFT_BLACK);
-            renderer.drawString("No data!", 60, y+25, 4);
-            renderer.setTextColor(TFT_WHITE, TFT_BLACK);
-
-            renderer.setSwapBytes(true);
-            renderer.pushImage(10, y+15, alertWidth, alertHeight, alert);
-            renderer.setSwapBytes(false);
-
-            y+=75;
-        }
-        else
-        {
-            renderer.drawString(String("U=") + (controller.feedback.batVoltage/100.) + "V, T=" + (controller.feedback.boardTemp/10.) + "C",0,y,4); y+=25;
-            const auto print_motor = [&](const char *pre, const MotorFeedback &motor)
-            {
-                renderer.drawString(pre, 0, y, 4);
-                if (motor.error)
-                    renderer.setTextColor(TFT_RED, TFT_BLACK);
-                else
-                    renderer.setTextColor(TFT_GREEN, TFT_BLACK);
-                renderer.drawString(String() + motor.error + "   ", 15, y, 4);
-                renderer.setTextColor(TFT_WHITE, TFT_BLACK);
-                renderer.drawString(String("") + std::abs(motor.current/50.) + "A"
-                                       "    " +
-                                       (motor.speed/32.133),45,y,4);
-
-                renderer.drawString(String("") +
-                                       (motor.hallA ? '1' : '0') + (motor.hallB ? '1' : '0') + (motor.hallC ? '1' : '0')
-                                       , 215, y, 2);
-                y+=25;
-            };
-
-            print_motor("l: ", controller.feedback.left);
-            print_motor("r: ", controller.feedback.right);
-        }
-    };
-
-    for (const auto &controller : controllers)
-    {
-        print_controller(controller);
-        y+=12;
-    }
-
     m_labelWifiStatus.repaint(toString(WiFi.status()));
     m_labelLimit0.repaint(String{front.command.left.iMotMax} + "A");
     m_labelIpAddress.repaint(WiFi.localIP().toString());
@@ -179,19 +153,88 @@ void StatusDisplay<Tscreen>::redraw()
     m_labelPerformance.repaint(String{performance.last});
     m_labelMode.repaint(currentMode->displayName());
 }
-}
 
-template<typename Tscreen> template<int y>
-void StatusDisplay<Tscreen>::BoardStatus<y>::start()
+template<int y>
+void BoardStatus<y>::start()
 {
     tft.drawString("pwm:", 0, y, 4);
     m_labelLeftPwm.start();
     m_labelRightPwm.start();
+    drawWarning();
 }
 
-template<typename Tscreen> template<int y>
-void StatusDisplay<Tscreen>::BoardStatus<y>::redraw(Controller &controller)
+template<int y>
+void BoardStatus<y>::redraw(const Controller &controller)
 {
     m_labelLeftPwm.repaint(String{controller.command.left.pwm});
     m_labelRightPwm.repaint(String{controller.command.right.pwm});
+
+    if (controller.feedbackValid != m_lastFeedbackValid)
+    {
+        tft.fillRect(0, y+25, tft.width(), 75, TFT_BLACK);
+
+        if (controller.feedbackValid)
+        {
+            tft.setTextColor(TFT_WHITE);
+
+            tft.drawString("U=", 0, y+25, 4);
+            m_labelVoltage.start();
+            tft.drawString("T=", 120, y+25, 4);
+            m_labelTemperature.start();
+            tft.drawString("l:", 0, y+50, 4);
+            m_leftMotor.start();
+            tft.drawString("r:", 0, y+75, 4);
+            m_rightMotor.start();
+
+            tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        }
+        else
+            drawWarning();
+
+        m_lastFeedbackValid = controller.feedbackValid;
+    }
+
+    if (controller.feedbackValid)
+    {
+        m_labelVoltage.repaint(String{controller.feedback.batVoltage/100.} + 'V');
+        m_labelTemperature.repaint(String{controller.feedback.boardTemp/10.} + 'C');
+        m_leftMotor.redraw(controller.feedback.left);
+        m_rightMotor.redraw(controller.feedback.right);
+    }
+}
+
+template<int y>
+void BoardStatus<y>::drawWarning()
+{
+    tft.setTextColor(TFT_RED);
+    tft.drawString("No data!", 60, y+50, 4);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+    tft.setSwapBytes(true);
+    tft.pushImage(10, y+40, alertWidth, alertHeight, alert);
+    tft.setSwapBytes(false);
+}
+
+template<int y>
+void MotorStatus<y>::start()
+{
+    m_labelError.start();
+    m_labelCurrent.start();
+    m_labelSpeed.start();
+    m_labelHallSensors.start();
+}
+
+template<int y>
+void MotorStatus<y>::redraw(const MotorFeedback &motor)
+{
+    tft.setTextColor(motor.error?TFT_RED:TFT_GREEN, TFT_BLACK);
+    m_labelError.repaint(String{motor.error});
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+    m_labelCurrent.repaint(String{std::abs(motor.current/50.)} + 'A');
+    m_labelSpeed.repaint(String{motor.speed/32.133}); //
+    m_labelHallSensors.repaint(String{} + (motor.hallA ? '1' : '0') + (motor.hallB ? '1' : '0') + (motor.hallC ? '1' : '0'));
+
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+}
 }
