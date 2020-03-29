@@ -101,8 +101,8 @@ void setup()
 
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("bobbycar", "Passwort_123");
-    WiFi.begin("realraum", "r3alraum");
-    //WiFi.begin("McDonalds Free WiFi 2.4GHz", "Passwort_123");
+    //WiFi.begin("realraum", "r3alraum");
+    WiFi.begin("McDonalds Free WiFi 2.4GHz", "Passwort_123");
 
     bluetoothSerial.begin("bobbycar");
 
@@ -127,7 +127,6 @@ void setup()
 
 void loop()
 {
-    Serial.println("mode update");
     const auto now = millis();
     if (now - lastUpdate >= 1000/50)
     {
@@ -162,11 +161,8 @@ void loop()
 
         performance.current++;
     }
-
-    Serial.println("screen update");
     updateScreen();
 
-    Serial.println("performance update");
     if (now - performance.lastTime >= 1000)
     {
         performance.last = performance.current;
@@ -174,10 +170,8 @@ void loop()
         performance.lastTime = now;
     }
 
-    Serial.println("controller update");
     for (auto &controller : controllers)
         controller.parser.update();
 
-    Serial.println("debug serial update");
     handleDebugSerial();
 }

@@ -46,6 +46,11 @@ void CalibrateDisplay<Tscreen>::start()
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
+    m_label0.start();
+    m_label1.start();
+    m_label2.start();
+    m_label3.start();
+
     m_progressBar0.start();
     m_progressBar1.start();
 }

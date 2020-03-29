@@ -9,6 +9,7 @@
 #include "globals.h"
 #include "utils.h"
 #include "label.h"
+#include "progressbar.h"
 
 namespace {
 #include "sprites/alert.h"
@@ -25,16 +26,28 @@ public:
 private:
     void redraw();
 
-    Label<50, 0, 75, 15, 2> m_labelRawGas;
-    Label<150, 0, 75, 15, 2> m_labelGas;
-    Label<50, 15, 75, 15, 2> m_labelRawBrems;
-    Label<150, 15, 75, 15, 2> m_labelBrems;
+    Label<45, 0, 40, 15, 2> m_labelRawGas;
+    Label<90, 0, 60, 15, 2> m_labelGas;
+    ProgressBar<150, 0, 90, 15, 0, 1000> m_progressBarGas;
 
-    Label<65, 42, 80, 25, 4> m_labelFrontLeftPwm;
-    Label<155, 42, 80, 25, 4> m_labelFrontRightPwm;
+    Label<45, 15, 40, 15, 2> m_labelRawBrems;
+    Label<90, 15, 60, 15, 2> m_labelBrems;
+    ProgressBar<150, 15, 90, 15, 0, 1000> m_progressBarBrems;
 
-    Label<65, 142, 80, 25, 4> m_labelBackLeftPwm;
-    Label<155, 142, 80, 25, 4> m_labelBackRightPwm;
+    template<int y>
+    class BoardStatus
+    {
+    public:
+        void start();
+        void redraw(Controller &controller);
+
+    private:
+        Label<65, y, 80, 25, 4> m_labelLeftPwm;
+        Label<155, y, 80, 25, 4> m_labelRightPwm;
+    };
+
+    BoardStatus<42> m_frontStatus;
+    BoardStatus<142> m_backStatus;
 
     Label<35, 266, 120, 15, 2> m_labelWifiStatus;
     Label<205, 266, 35, 15, 2> m_labelLimit0;
@@ -56,25 +69,36 @@ void StatusDisplay<Tscreen>::start()
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
     tft.drawString("gas", 0, 0, 2);
+    m_labelRawGas.start();
+    m_labelGas.start();
+    m_progressBarGas.start();
     tft.drawString("brems", 0, 15, 2);
+    m_labelRawBrems.start();
+    m_labelBrems.start();
+    m_progressBarBrems.start();
 
-    tft.drawString("pwm:", 0, 42, 4);
-
-    tft.drawString("pwm:", 0, 142, 4);
+    m_frontStatus.start();
+    m_backStatus.start();
 
     tft.drawString("WiFi:", 0, 266, 2);
+    m_labelWifiStatus.start();
     tft.drawString("Limit0:", 160, 266, 2);
+    m_labelLimit0.start();
     tft.drawString("IP:", 0, 281, 2);
+    m_labelIpAddress.start();
     tft.drawString("Limit1:", 160, 281, 2);
+    m_labelLimit1.start();
     tft.drawString("Performance:", 0, 296, 2);
+    m_labelPerformance.start();
     tft.drawString("Mode:", 125, 296, 2);
+    m_labelMode.start();
 }
 
 template<typename Tscreen>
 void StatusDisplay<Tscreen>::update()
 {
     const auto now = millis();
-    if (!m_lastRedraw || now-m_lastRedraw >= 1000/2)
+    if (!m_lastRedraw || now-m_lastRedraw >= 1000/20)
     {
         redraw();
         m_lastRedraw = now;
@@ -88,13 +112,13 @@ void StatusDisplay<Tscreen>::redraw()
 {
     m_labelRawGas.repaint(String{raw_gas});
     m_labelGas.repaint(String{gas});
+    m_progressBarGas.repaint(gas);
     m_labelRawBrems.repaint(String{raw_brems});
     m_labelBrems.repaint(String{brems});
+    m_progressBarBrems.repaint(brems);
 
-    m_labelFrontLeftPwm.repaint(String{front.command.left.pwm});
-    m_labelFrontRightPwm.repaint(String{front.command.right.pwm});
-    m_labelBackLeftPwm.repaint(String{back.command.left.pwm});
-    m_labelBackRightPwm.repaint(String{back.command.right.pwm});
+    m_frontStatus.redraw(front);
+    m_backStatus.redraw(back);
 
     auto &renderer = tft;
 
@@ -155,4 +179,19 @@ void StatusDisplay<Tscreen>::redraw()
     m_labelPerformance.repaint(String{performance.last});
     m_labelMode.repaint(currentMode->displayName());
 }
+}
+
+template<typename Tscreen> template<int y>
+void StatusDisplay<Tscreen>::BoardStatus<y>::start()
+{
+    tft.drawString("pwm:", 0, y, 4);
+    m_labelLeftPwm.start();
+    m_labelRightPwm.start();
+}
+
+template<typename Tscreen> template<int y>
+void StatusDisplay<Tscreen>::BoardStatus<y>::redraw(Controller &controller)
+{
+    m_labelLeftPwm.repaint(String{controller.command.left.pwm});
+    m_labelRightPwm.repaint(String{controller.command.right.pwm});
 }

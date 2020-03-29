@@ -412,23 +412,23 @@ void WebHandler::handleCommonParams(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                numberInput(response, controllers[0].command.left.iMotMax, "iMotMax", "Maximum current:");
+                numberInput(response, settings.iMotMax, "iMotMax", "Maximum current:");
 
                 breakLine(response);
 
-                numberInput(response, controllers[0].command.left.iDcMax, "iDcMax", "Maximum link current:");
+                numberInput(response, settings.iDcMax, "iDcMax", "Maximum link current:");
 
                 breakLine(response);
 
-                numberInput(response, controllers[0].command.left.nMotMax, "nMotMax", "Maximum speed:");
+                numberInput(response, settings.nMotMax, "nMotMax", "Maximum speed:");
 
                 breakLine(response);
 
-                numberInput(response, controllers[0].command.left.fieldWeakMax, "fieldWeakMax", "Maximum field weakening current:");
+                numberInput(response, settings.fieldWeakMax, "fieldWeakMax", "Maximum field weakening current:");
 
                 breakLine(response);
 
-                numberInput(response, controllers[0].command.left.phaseAdvMax, "phaseAdvMax", "Maximum phase adv angle:");
+                numberInput(response, settings.phaseAdvMax, "phaseAdvMax", "Maximum phase adv angle:");
 
                 breakLine(response);
 
@@ -824,37 +824,27 @@ void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
 
     {
         AsyncWebParameter* p = request->getParam("iMotMax");
-
-        for (auto &controller : controllers)
-            controller.command.left.iMotMax = controller.command.right.iMotMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.iMotMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("iDcMax");
-
-        for (auto &controller : controllers)
-            controller.command.left.iDcMax = controller.command.right.iDcMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.iDcMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("nMotMax");
-
-        for (auto &controller : controllers)
-            controller.command.left.nMotMax = controller.command.right.nMotMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.nMotMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("fieldWeakMax");
-
-        for (auto &controller : controllers)
-            controller.command.left.fieldWeakMax = controller.command.right.fieldWeakMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.fieldWeakMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("phaseAdvMax");
-
-        for (auto &controller : controllers)
-            controller.command.left.phaseAdvMax = controller.command.right.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     front.command.left.enable = request->hasParam("enableFrontLeft") && request->getParam("enableFrontLeft")->value() == "on";
