@@ -8,6 +8,7 @@
 #include "modebase.h"
 #include "globals.h"
 #include "utils.h"
+#include "label.h"
 
 namespace {
 #include "sprites/alert.h"
@@ -22,7 +23,25 @@ public:
     void update() override;
 
 private:
-    void redraw() const;
+    void redraw();
+
+    Label<50, 0, 75, 15, 2> m_labelRawGas;
+    Label<150, 0, 75, 15, 2> m_labelGas;
+    Label<50, 15, 75, 15, 2> m_labelRawBrems;
+    Label<150, 15, 75, 15, 2> m_labelBrems;
+
+    Label<65, 42, 80, 25, 4> m_labelFrontLeftPwm;
+    Label<155, 42, 80, 25, 4> m_labelFrontRightPwm;
+
+    Label<65, 142, 80, 25, 4> m_labelBackLeftPwm;
+    Label<155, 142, 80, 25, 4> m_labelBackRightPwm;
+
+    Label<35, 266, 120, 15, 2> m_labelWifiStatus;
+    Label<205, 266, 35, 15, 2> m_labelLimit0;
+    Label<25, 281, 130, 15, 2> m_labelIpAddress;
+    Label<205, 281, 35, 15, 2> m_labelLimit1;
+    Label<85, 296, 40, 15, 2> m_labelPerformance;
+    Label<165, 296, 75, 15, 2> m_labelMode;
 
     unsigned long m_lastRedraw{};
 };
@@ -35,6 +54,20 @@ void StatusDisplay<Tscreen>::start()
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+    tft.drawString("gas", 0, 0, 2);
+    tft.drawString("brems", 0, 15, 2);
+
+    tft.drawString("pwm:", 0, 42, 4);
+
+    tft.drawString("pwm:", 0, 142, 4);
+
+    tft.drawString("WiFi:", 0, 266, 2);
+    tft.drawString("Limit0:", 160, 266, 2);
+    tft.drawString("IP:", 0, 281, 2);
+    tft.drawString("Limit1:", 160, 281, 2);
+    tft.drawString("Performance:", 0, 296, 2);
+    tft.drawString("Mode:", 125, 296, 2);
 }
 
 template<typename Tscreen>
@@ -51,20 +84,24 @@ void StatusDisplay<Tscreen>::update()
 }
 
 template<typename Tscreen>
-void StatusDisplay<Tscreen>::redraw() const
+void StatusDisplay<Tscreen>::redraw()
 {
-    int y = 0;
+    m_labelRawGas.repaint(String{raw_gas});
+    m_labelGas.repaint(String{gas});
+    m_labelRawBrems.repaint(String{raw_brems});
+    m_labelBrems.repaint(String{brems});
+
+    m_labelFrontLeftPwm.repaint(String{front.command.left.pwm});
+    m_labelFrontRightPwm.repaint(String{front.command.right.pwm});
+    m_labelBackLeftPwm.repaint(String{back.command.left.pwm});
+    m_labelBackRightPwm.repaint(String{back.command.right.pwm});
 
     auto &renderer = tft;
 
-    renderer.drawString(String("gas=") + raw_gas + " -> " + gas + "                                                ",0,y,2); y+=15;
-    renderer.drawString(String("brems=") + raw_brems + " -> " + brems + "                                                ",0,y,2); y+=15;
-
-    y+=12;
-
+    int y = 42;
     const auto print_controller = [&](const Controller &controller)
     {
-        renderer.drawString(String("pwm: ") + controller.command.left.pwm + ", " + controller.command.right.pwm + "                                                ", 0,y,4); y+=25;
+        y+=25;
         renderer.fillRect(0, y, renderer.width(), 75, TFT_BLACK);
         if (!controller.feedbackValid)
         {
@@ -111,11 +148,11 @@ void StatusDisplay<Tscreen>::redraw() const
         y+=12;
     }
 
-    renderer.drawString("WiFi: " + toString(WiFi.status()) + "                                                ",0,y,2);
-    renderer.drawString(String("Limit0: ") + front.command.left.iMotMax + "A", 160, y, 2); y+=15;
-    renderer.drawString("IP: " + WiFi.localIP().toString() + "                                                ",0,y,2);
-    renderer.drawString(String("Limit1: ") + front.command.left.iDcMax + "A", 160, y, 2); y+=15;
-    renderer.drawString(String("Performance: ") + performance.last + "                                                ",0,y,2);
-    renderer.drawString(String("Mode: ") + currentMode->displayName(), 125, y, 2); y+=15;
+    m_labelWifiStatus.repaint(toString(WiFi.status()));
+    m_labelLimit0.repaint(String{front.command.left.iMotMax} + "A");
+    m_labelIpAddress.repaint(WiFi.localIP().toString());
+    m_labelLimit1.repaint(String{front.command.left.iDcMax} + "A");
+    m_labelPerformance.repaint(String{performance.last});
+    m_labelMode.repaint(currentMode->displayName());
 }
 }

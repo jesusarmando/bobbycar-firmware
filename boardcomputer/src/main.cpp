@@ -122,11 +122,12 @@ void setup()
     web.server.begin();
 
     initScreen();
-    initRotary();
+    //initRotary();
 }
 
 void loop()
 {
+    Serial.println("mode update");
     const auto now = millis();
     if (now - lastUpdate >= 1000/50)
     {
@@ -162,8 +163,10 @@ void loop()
         performance.current++;
     }
 
+    Serial.println("screen update");
     updateScreen();
 
+    Serial.println("performance update");
     if (now - performance.lastTime >= 1000)
     {
         performance.last = performance.current;
@@ -171,8 +174,10 @@ void loop()
         performance.lastTime = now;
     }
 
+    Serial.println("controller update");
     for (auto &controller : controllers)
         controller.parser.update();
 
+    Serial.println("debug serial update");
     handleDebugSerial();
 }

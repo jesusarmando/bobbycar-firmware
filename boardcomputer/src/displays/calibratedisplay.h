@@ -44,6 +44,8 @@ void CalibrateDisplay<Tscreen>::start()
 
     tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
 
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
     m_progressBar0.start();
     m_progressBar1.start();
 }
@@ -72,10 +74,10 @@ void CalibrateDisplay<Tscreen>::button(bool pressed)
 template<typename Tscreen>
 void CalibrateDisplay<Tscreen>::redraw()
 {
-    m_label0.repaint(gas);
-    m_label1.repaint(brems);
-    m_label2.repaint((long)raw_gas);
-    m_label3.repaint((long)raw_brems);
+    m_label0.repaint(String{gas});
+    m_label1.repaint(String{brems});
+    m_label2.repaint(String{raw_gas});
+    m_label3.repaint(String{raw_brems});
 
     m_progressBar0.repaint(gas);
     m_progressBar1.repaint(brems);

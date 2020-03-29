@@ -52,8 +52,8 @@ Display *currentDisplay{};
 
 class InputDispatcher {
 public:
-    static void rotate(int offset) { currentDisplay->rotate(offset); }
-    static void button(bool pressed) { currentDisplay->button(pressed); }
+    static void rotate(int offset) { if (currentDisplay) currentDisplay->rotate(offset); }
+    static void button(bool pressed) { if (currentDisplay) currentDisplay->button(pressed); }
 };
 
 Rotary<InputDispatcher, rotaryClkPin, rotaryDtPin, rotarySwPin> rotary;
@@ -63,6 +63,7 @@ void updateSwitch() { rotary.updateSwitch(); }
 
 void initRotary()
 {
+    rotary.begin();
     attachInterrupt(decltype(rotary)::ClkPin, updateRotate, CHANGE);
     attachInterrupt(decltype(rotary)::SwPin, updateSwitch, CHANGE);
 }

@@ -13,7 +13,7 @@ public:
     static constexpr auto DtPin = DT;
     static constexpr auto SwPin = SW;
 
-    Rotary();
+    void begin();
 
     void updateRotate();
     void updateSwitch();
@@ -26,7 +26,7 @@ private:
 };
 
 template<typename HANDLER, pin_t CLK, pin_t DT, pin_t SW>
-Rotary<HANDLER, CLK, DT, SW>::Rotary()
+void Rotary<HANDLER, CLK, DT, SW>::begin()
 {
     m_lastMillis = millis();
 
