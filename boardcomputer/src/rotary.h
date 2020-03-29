@@ -2,9 +2,9 @@
 
 #include <Arduino.h>
 
-namespace {
-using pin_t = int;
+#include "globals.h"
 
+namespace {
 template<typename HANDLER, pin_t CLK, pin_t DT, pin_t SW>
 class Rotary
 {
@@ -67,5 +67,17 @@ void Rotary<HANDLER, CLK, DT, SW>::updateSwitch()
         HANDLER::button(!currentSw);
         m_lastSw = currentSw;
     }
+}
+
+Rotary<InputDispatcher, PINS_ROTARY_CLK, PINS_ROTARY_DT, PINS_ROTARY_SW> rotary;
+
+void updateRotate() { rotary.updateRotate(); }
+void updateSwitch() { rotary.updateSwitch(); }
+
+void initRotary()
+{
+    rotary.begin();
+    attachInterrupt(decltype(rotary)::ClkPin, updateRotate, CHANGE);
+    attachInterrupt(decltype(rotary)::SwPin, updateSwitch, CHANGE);
 }
 }

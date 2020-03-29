@@ -1437,4 +1437,15 @@ void WebHandler::handleReboot(AsyncWebServerRequest *request)
 
     ESP.restart();
 }
+
+struct {
+    AsyncWebServer server{80};
+    WebHandler handler;
+} web;
+
+void initWebserver()
+{
+    web.server.addHandler(&web.handler);
+    web.server.begin();
+}
 }

@@ -3,88 +3,18 @@
 #include <HardwareSerial.h>
 #include <WiFi.h>
 
-#include <array>
-#include <algorithm>
-#include <functional>
-#include <cstdint>
-
 #include "../../common.h"
 
 #include "globals.h"
-#include "webhandler.h"
-#include "displays/menus/mainmenu.h"
+#include "webserver.h"
 #include "modes/defaultmode.h"
 #include "screens.h"
+#include "rotary.h"
+#include "serialhandler.h"
 
 namespace {
-struct {
-    AsyncWebServer server{80};
-    WebHandler handler;
-} web;
-
 ModeBase *lastMode{};
-
-void handleDebugSerial()
-{
-    const auto status = WiFi.status();
-    if (last_status != status)
-    {
-        Serial.print("Status changed to: ");
-        Serial.println(toString(status));
-        last_status = status;
-    }
-
-    const auto ip = WiFi.localIP();
-    if (last_ip != ip)
-    {
-        Serial.print("IP changed to: ");
-        Serial.println(ip.toString());
-        last_ip = ip;
-    }
-
-    while(Serial.available())
-    {
-        const auto c = Serial.read();
-
-        switch (c)
-        {
-        case 't':
-        case 'T':
-            power_toggle = !power_toggle;
-            Serial.printf("power: %d\n", power_toggle);
-            for (auto &controller : controllers)
-                controller.command.poweroff = power_toggle;
-            break;
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            for (auto &controller : controllers)
-                controller.command.buzzer.freq = c-'0';
-            break;
-        case 'A':
-            InputDispatcher::rotate(-1);
-            break;
-        case 'B':
-            InputDispatcher::rotate(1);
-            break;
-        case ' ':
-            InputDispatcher::button(true);
-            InputDispatcher::button(false);
-            break;
-        case 'm':
-        case 'M':
-            printMemoryUsage();
-            break;
-        }
-    }
-}
+unsigned long lastUpdate{};
 }
 
 void setup()
@@ -93,11 +23,7 @@ void setup()
     Serial.setDebugOutput(true);
     Serial.println("setup()");
 
-    tft.init();
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setRotation(0);
-    tft.drawString("Booting...", 32, 64, 4);
+    initScreen();
 
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("bobbycar", "Passwort_123");
@@ -111,6 +37,7 @@ void setup()
 
     applyDefaultSettings();
 
+    // applyDefaultSettings is in global, global cannot include default mode, circular dependency
     modes::defaultMode.gas1_wert = defaultDefaultModeGas1Wert;
     modes::defaultMode.gas2_wert = defaultDefaultModeGas2Wert;
     modes::defaultMode.brems1_wert = defaultDefaultModeBrems1Wert;
@@ -118,17 +45,15 @@ void setup()
 
     currentMode = &modes::defaultMode;
 
-    web.server.addHandler(&web.handler);
-    web.server.begin();
-
-    initScreen();
-    //initRotary();
+    initWebserver();
+    switchScreen<DefaultScreen>();
+    initRotary();
 }
 
 void loop()
 {
     const auto now = millis();
-    if (now - lastUpdate >= 1000/50)
+    if (!lastUpdate || now - lastUpdate >= 1000/50)
     {
         constexpr auto times = 100;
         const auto read_n_times = [](int pin){
@@ -173,5 +98,5 @@ void loop()
     for (auto &controller : controllers)
         controller.parser.update();
 
-    handleDebugSerial();
+    handleSerial();
 }

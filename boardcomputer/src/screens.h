@@ -182,7 +182,11 @@ template<typename T> void switchScreen()
 
 void initScreen()
 {
-    switchScreen<DefaultScreen>();
+    tft.init();
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setRotation(0);
+    tft.drawString("Booting...", 32, 64, 4);
 }
 
 void updateScreen()

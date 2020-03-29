@@ -11,19 +11,13 @@
 #include "display.h"
 #include "modebase.h"
 #include "settings.h"
-#include "rotary.h"
 
 namespace {
+using pin_t = int;
+
 uint16_t raw_gas, raw_brems;
 float gas, brems;
 int16_t gasMin, gasMax, bremsMin, bremsMax;
-
-bool power_toggle{false};
-
-unsigned long lastUpdate = millis();
-
-wl_status_t last_status;
-IPAddress last_ip;
 
 struct {
     int16_t iMotMax = defaultIMotMax;           // [A] Maximum motor current limit
@@ -55,18 +49,6 @@ public:
     static void rotate(int offset) { if (currentDisplay) currentDisplay->rotate(offset); }
     static void button(bool pressed) { if (currentDisplay) currentDisplay->button(pressed); }
 };
-
-Rotary<InputDispatcher, PINS_ROTARY_CLK, PINS_ROTARY_DT, PINS_ROTARY_SW> rotary;
-
-void updateRotate() { rotary.updateRotate(); }
-void updateSwitch() { rotary.updateSwitch(); }
-
-void initRotary()
-{
-    rotary.begin();
-    attachInterrupt(decltype(rotary)::ClkPin, updateRotate, CHANGE);
-    attachInterrupt(decltype(rotary)::SwPin, updateSwitch, CHANGE);
-}
 
 void applyDefaultSettings()
 {
