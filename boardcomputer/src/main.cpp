@@ -106,8 +106,8 @@ void setup()
 
     bluetoothSerial.begin("bobbycar");
 
-    controllers[0].serial.begin(38400, SERIAL_8N1, rxPin1, txPin1);
-    controllers[1].serial.begin(38400, SERIAL_8N1, rxPin2, txPin2);
+    controllers[0].serial.begin(38400, SERIAL_8N1, PINS_RX1, PINS_TX1);
+    controllers[1].serial.begin(38400, SERIAL_8N1, PINS_RX2, PINS_TX2);
 
     applyDefaultSettings();
 
@@ -139,10 +139,10 @@ void loop()
             return sum/times;
         };
 
-        raw_gas = read_n_times(gasPin);
+        raw_gas = read_n_times(PINS_GAS);
         gas = scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
 
-        raw_brems = read_n_times(bremsPin);
+        raw_brems = read_n_times(PINS_BREMS);
         brems = scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
 
         if (lastMode != currentMode)

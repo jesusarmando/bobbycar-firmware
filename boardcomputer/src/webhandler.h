@@ -119,10 +119,6 @@ void WebHandler::renderLiveData(AsyncResponseStream &response)
         response.print(raw_gas);
         response.print(" raw_brems=");
         response.print(raw_brems);
-        response.print(" gasPin=");
-        response.print(gasPin);
-        response.print(" bremsPin=");
-        response.print(bremsPin);
         response.print(" gas=");
         response.print(gas);
         response.print(" brems=");

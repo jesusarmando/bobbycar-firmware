@@ -56,7 +56,7 @@ public:
     static void button(bool pressed) { if (currentDisplay) currentDisplay->button(pressed); }
 };
 
-Rotary<InputDispatcher, rotaryClkPin, rotaryDtPin, rotarySwPin> rotary;
+Rotary<InputDispatcher, PINS_ROTARY_CLK, PINS_ROTARY_DT, PINS_ROTARY_SW> rotary;
 
 void updateRotate() { rotary.updateRotate(); }
 void updateSwitch() { rotary.updateSwitch(); }
