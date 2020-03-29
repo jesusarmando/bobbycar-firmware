@@ -5,6 +5,7 @@
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
 #include "changevaluedisplay.h"
+#include "displays/calibratedisplay.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -32,6 +33,7 @@ class PotiSettingsMenu final : public MenuDisplay<
     SwitchScreenMenuItem<GasMaxChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETGASMAX>,
     SwitchScreenMenuItem<BremsMinChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETBREMSMIN>,
     SwitchScreenMenuItem<BremsMaxChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETBREMSMAX>,
+    SwitchScreenMenuItem<CalibrateDisplay<PotiSettingsMenu<Tscreen>>, TEXT_CALIBRATE>,
     SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {};

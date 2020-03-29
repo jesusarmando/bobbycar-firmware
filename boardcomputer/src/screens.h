@@ -15,6 +15,7 @@
 #include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/selectmodemenu.h"
 #include "displays/menus/settingsmenu.h"
+#include "displays/calibratedisplay.h"
 #include "displays/gameoflifedisplay.h"
 #include "displays/metersdisplay.h"
 #include "displays/pingpongdisplay.h"
@@ -42,6 +43,7 @@ union X {
     SelectModeMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> selectModeMenu;
     SettingsMenu<MainMenu> settingsMenu;
 
+    CalibrateDisplay<PotiSettingsMenu<SettingsMenu<MainMenu>>> calibrateDisplay;
     GameOfLifeDisplay<DemosMenu<MainMenu>> gameOfLifeDisplay;
     MetersDisplay<DemosMenu<MainMenu>> metersDisplay;
     PingPongDisplay<DemosMenu<MainMenu>> pingPongDisplay;
@@ -60,7 +62,7 @@ union X {
     FieldWeakMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeFieldWeakMax;
     PhaseAdvMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changePhaseAdvMax;
 
-    DefaultModeCtrlTypDefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeCtrlTyp;
+    DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeCtrlTyp;
     DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeCtrlMod;
     DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeEnableFieldWeakeningSmoothening;
     DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeWeakeningSmoothening;
@@ -111,6 +113,7 @@ template<> decltype(displays.potiSettingsMenu)                                 &
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }
 template<> decltype(displays.settingsMenu)                                     &getRefByType<decltype(displays.settingsMenu)>()                                     { return displays.settingsMenu; }
 
+template<> decltype(displays.calibrateDisplay)                                 &getRefByType<decltype(displays.calibrateDisplay)>()                                 { return displays.calibrateDisplay; }
 template<> decltype(displays.gameOfLifeDisplay)                                &getRefByType<decltype(displays.gameOfLifeDisplay)>()                                { return displays.gameOfLifeDisplay; }
 template<> decltype(displays.metersDisplay)                                    &getRefByType<decltype(displays.metersDisplay)>()                                    { return displays.metersDisplay; }
 template<> decltype(displays.pingPongDisplay)                                  &getRefByType<decltype(displays.pingPongDisplay)>()                                  { return displays.pingPongDisplay; }

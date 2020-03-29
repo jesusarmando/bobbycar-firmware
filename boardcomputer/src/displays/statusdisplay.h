@@ -34,7 +34,7 @@ void StatusDisplay<Tscreen>::start()
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_WHITE);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
 template<typename Tscreen>

@@ -11,7 +11,7 @@
 namespace {
 struct DefaultModeCtrlTypAccessor { static auto &getRef() { return modes::defaultMode.ctrlTyp; } };
 template<typename Tscreen>
-using DefaultModeCtrlTypDefaultModeCtrlTypChangeDisplay = ChangeValueDisplay<ControlType, DefaultModeCtrlTypAccessor, Tscreen, TEXT_SETCONTROLTYPE>;
+using DefaultModeCtrlTypChangeDisplay = ChangeValueDisplay<ControlType, DefaultModeCtrlTypAccessor, Tscreen, TEXT_SETCONTROLTYPE>;
 
 struct DefaultModeCtrlModAccessor { static auto &getRef() { return modes::defaultMode.ctrlMod; } };
 template<typename Tscreen>
@@ -56,7 +56,7 @@ using DefaultModeBrems2WertChangeDisplay = ChangeValueDisplay<int16_t, DefaultMo
 template<typename Tscreen>
 class DefaultModeSettingsMenu final : public MenuDisplay<
     TEXT_DEFAULTMODESETTIGNS,
-    SwitchScreenMenuItem<DefaultModeCtrlTypDefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLTYPE>,
+    SwitchScreenMenuItem<DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLTYPE>,
     SwitchScreenMenuItem<DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLMODE>,
     SwitchScreenMenuItem<DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_ENABLEWEAKENINGSMOOTHENING>,
     SwitchScreenMenuItem<DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETWEAKINGSMOOTHENING>,

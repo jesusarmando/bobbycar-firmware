@@ -95,6 +95,7 @@ constexpr char TEXT_SETGASMIN[] = "Set gasMin";
 constexpr char TEXT_SETGASMAX[] = "Set gasMax";
 constexpr char TEXT_SETBREMSMIN[] = "Set bremsMin";
 constexpr char TEXT_SETBREMSMAX[] = "Set bremsMax";
+constexpr char TEXT_CALIBRATE[] = "Calibrate";
 //constexpr char TEXT_BACK[] = "Back";
 
 //SelectModeMenu
