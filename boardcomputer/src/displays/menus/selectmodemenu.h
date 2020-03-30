@@ -20,17 +20,17 @@ struct BluetoothModeGetter { static auto getValue() { return &modes::bluetoothMo
 template<typename Tscreen>
 class SelectModeMenu final : public MenuDisplay<
     TEXT_SELECTMODE,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, SelectModeMenu<Tscreen>, TEXT_DEFAULT>,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, SelectModeMenu<Tscreen>, TEXT_MANUAL>,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, SelectModeMenu<Tscreen>, TEXT_BLUETOOTH>,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, Tscreen, TEXT_MANUAL>,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
     SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {
     using Base = MenuDisplay<
         TEXT_SELECTMODE,
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, SelectModeMenu<Tscreen>, TEXT_DEFAULT>,
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, SelectModeMenu<Tscreen>, TEXT_MANUAL>,
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, SelectModeMenu<Tscreen>, TEXT_BLUETOOTH>,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, Tscreen, TEXT_MANUAL>,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
         SwitchScreenMenuItem<Tscreen, TEXT_BACK>
     >;
 public:
