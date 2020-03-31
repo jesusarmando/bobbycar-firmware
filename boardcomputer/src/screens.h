@@ -11,7 +11,7 @@
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/invertmenu.h"
 #include "displays/menus/mainmenu.h"
-#include "displays/menus/manualmodesettingsmenu.h"
+#include "displays/menus/tempomatmodesettingsmenu.h"
 #include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/selectmodemenu.h"
 #include "displays/menus/settingsmenu.h"
@@ -19,9 +19,11 @@
 #include "displays/gameoflifedisplay.h"
 #include "displays/metersdisplay.h"
 #include "displays/pingpongdisplay.h"
+#include "displays/poweroffdisplay.h"
 #include "displays/spirodisplay.h"
 #include "displays/starfielddisplay.h"
 #include "displays/statusdisplay.h"
+#include "displays/versiondisplay.h"
 
 #include "globals.h"
 
@@ -38,18 +40,22 @@ union X {
     DemosMenu<MainMenu> demosMenu;
     EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> enableMenu;
     InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> invertMenu;
-    ManualModeSettingsMenu<SettingsMenu<MainMenu>> manualModeSettingsMenu;
+    TempomatModeSettingsMenu<SettingsMenu<MainMenu>> tempomatModeSettingsMenu;
     PotiSettingsMenu<SettingsMenu<MainMenu>> potiSettingsMenu;
-    SelectModeMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> selectModeMenu;
+    PresetsMenu<MainMenu> presetsMenu;
+    SelectModeMenu<MainMenu> selectModeMenu;
     SettingsMenu<MainMenu> settingsMenu;
 
     CalibrateDisplay<PotiSettingsMenu<SettingsMenu<MainMenu>>> calibrateDisplay;
     GameOfLifeDisplay<DemosMenu<MainMenu>> gameOfLifeDisplay;
+    Lockscreen<MainMenu> lockScreen;
     MetersDisplay<DemosMenu<MainMenu>> metersDisplay;
     PingPongDisplay<DemosMenu<MainMenu>> pingPongDisplay;
+    PoweroffDisplay<MainMenu> poweroffDisplay;
     SpiroDisplay<DemosMenu<MainMenu>> spiroDisplay;
     StarfieldDisplay<DemosMenu<MainMenu>> starFieldDisplay;
     StatusDisplay<MainMenu> statusDisplay;
+    VersionDisplay<SettingsMenu<MainMenu>> versionDisplay;
 
     FrontFreqChangeScreen<BuzzerMenu<MainMenu>> changeFrontFreq;
     FrontPatternChangeScreen<BuzzerMenu<MainMenu>> changeFrontPattern;
@@ -87,8 +93,8 @@ union X {
     FrontLedChangeScreen<MainMenu> changeFrontLed;
     BackLedChangeScreen<MainMenu> changeBackLed;
 
-    ManualModeCtrlTypChangeScreen<ManualModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlTyp;
-    ManualModeCtrlModChangeScreen<ManualModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlMod;
+    TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlTyp;
+    TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlMod;
 
     GasMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMin;
     GasMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMax;
@@ -97,7 +103,7 @@ union X {
 } displays;
 
 using DefaultScreen = decltype(displays.statusDisplay);
-//using DefaultScreen = decltype(displays.changeNMotMax);
+//using DefaultScreen = decltype(displays.lockScreen);
 
 template<typename T> T &getRefByType() = delete;
 template<> decltype(displays.bluetoothModeSettingsMenu)                        &getRefByType<decltype(displays.bluetoothModeSettingsMenu)>()                        { return displays.bluetoothModeSettingsMenu; }
@@ -108,18 +114,22 @@ template<> decltype(displays.demosMenu)                                        &
 template<> decltype(displays.enableMenu)                                       &getRefByType<decltype(displays.enableMenu)>()                                       { return displays.enableMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
 template<> decltype(displays.mainMenu)                                         &getRefByType<decltype(displays.mainMenu)>()                                         { return displays.mainMenu; }
-template<> decltype(displays.manualModeSettingsMenu)                           &getRefByType<decltype(displays.manualModeSettingsMenu)>()                           { return displays.manualModeSettingsMenu; }
+template<> decltype(displays.tempomatModeSettingsMenu)                         &getRefByType<decltype(displays.tempomatModeSettingsMenu)>()                         { return displays.tempomatModeSettingsMenu; }
 template<> decltype(displays.potiSettingsMenu)                                 &getRefByType<decltype(displays.potiSettingsMenu)>()                                 { return displays.potiSettingsMenu; }
+template<> decltype(displays.presetsMenu)                                      &getRefByType<decltype(displays.presetsMenu)>()                                      { return displays.presetsMenu; }
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }
 template<> decltype(displays.settingsMenu)                                     &getRefByType<decltype(displays.settingsMenu)>()                                     { return displays.settingsMenu; }
 
 template<> decltype(displays.calibrateDisplay)                                 &getRefByType<decltype(displays.calibrateDisplay)>()                                 { return displays.calibrateDisplay; }
 template<> decltype(displays.gameOfLifeDisplay)                                &getRefByType<decltype(displays.gameOfLifeDisplay)>()                                { return displays.gameOfLifeDisplay; }
+template<> decltype(displays.lockScreen)                                       &getRefByType<decltype(displays.lockScreen)>()                                       { return displays.lockScreen; }
 template<> decltype(displays.metersDisplay)                                    &getRefByType<decltype(displays.metersDisplay)>()                                    { return displays.metersDisplay; }
 template<> decltype(displays.pingPongDisplay)                                  &getRefByType<decltype(displays.pingPongDisplay)>()                                  { return displays.pingPongDisplay; }
+template<> decltype(displays.poweroffDisplay)                                  &getRefByType<decltype(displays.poweroffDisplay)>()                                  { return displays.poweroffDisplay; }
 template<> decltype(displays.spiroDisplay)                                     &getRefByType<decltype(displays.spiroDisplay)>()                                     { return displays.spiroDisplay; }
 template<> decltype(displays.starFieldDisplay)                                 &getRefByType<decltype(displays.starFieldDisplay)>()                                 { return displays.starFieldDisplay; }
 template<> decltype(displays.statusDisplay)                                    &getRefByType<decltype(displays.statusDisplay)>()                                    { return displays.statusDisplay; }
+template<> decltype(displays.versionDisplay)                                   &getRefByType<decltype(displays.versionDisplay)>()                                   { return displays.versionDisplay; }
 
 template<> decltype(displays.changeFrontFreq)                                  &getRefByType<decltype(displays.changeFrontFreq)>()                                  { return displays.changeFrontFreq; }
 template<> decltype(displays.changeFrontPattern)                               &getRefByType<decltype(displays.changeFrontPattern)>()                               { return displays.changeFrontPattern; }
@@ -165,13 +175,18 @@ template<> decltype(displays.changeGasMax)                                     &
 template<> decltype(displays.changeBremsMin)                                   &getRefByType<decltype(displays.changeBremsMin)>()                                   { return displays.changeBremsMin; }
 template<> decltype(displays.changeBremsMax)                                   &getRefByType<decltype(displays.changeBremsMax)>()                                   { return displays.changeBremsMax; }
 
-template<typename T> void switchScreen()
+void deconstructScreen()
 {
     if (currentDisplay)
     {
         currentDisplay->~Display();
         currentDisplay = nullptr;
     }
+}
+
+template<typename T> void switchScreen()
+{
+    deconstructScreen();
 
     T &ref = getRefByType<T>();
     new (&ref) T;
@@ -206,7 +221,7 @@ void printMemoryUsage(){
     test[sizeof(displays.enableMenu)].insert("displays.enableMenu");
     test[sizeof(displays.invertMenu)].insert("displays.invertMenu");
     test[sizeof(displays.mainMenu)].insert("displays.mainMenu");
-    test[sizeof(displays.manualModeSettingsMenu)].insert("displays.manualModeSettingsMenu");
+    test[sizeof(displays.tempomatModeSettingsMenu)].insert("displays.tempomatModeSettingsMenu");
     test[sizeof(displays.potiSettingsMenu)].insert("displays.potiSettingsMenu");
     test[sizeof(displays.selectModeMenu)].insert("displays.selectModeMenu");
     test[sizeof(displays.settingsMenu)].insert("displays.settingsMenu");
@@ -217,6 +232,7 @@ void printMemoryUsage(){
     test[sizeof(displays.spiroDisplay)].insert("displays.spiroDisplay");
     test[sizeof(displays.starFieldDisplay)].insert("displays.starFieldDisplay");
     test[sizeof(displays.statusDisplay)].insert("displays.statusDisplay");
+    test[sizeof(displays.versionDisplay)].insert("displays.versionDisplay");
 
     test[sizeof(displays.changeFrontFreq)].insert("changeFrontFreq");
     test[sizeof(displays.changeFrontPattern)].insert("changeFrontPattern");

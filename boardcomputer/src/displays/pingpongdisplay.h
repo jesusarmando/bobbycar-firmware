@@ -11,6 +11,8 @@ namespace {
 template<typename Tscreen>
 class PingPongDisplay final : public DemoDisplay<Tscreen>
 {
+    using Base = DemoDisplay<Tscreen>;
+
 public:
     PingPongDisplay();
 
@@ -88,7 +90,7 @@ PingPongDisplay<Tscreen>::PingPongDisplay() :
 template<typename Tscreen>
 void PingPongDisplay<Tscreen>::start()
 {
-    DemoDisplay<Tscreen>::start();
+    Base::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
@@ -106,7 +108,7 @@ void PingPongDisplay<Tscreen>::update()
         m_lastRedraw = now;
     }
 
-    DemoDisplay<Tscreen>::update();
+    Base::update();
 }
 
 template<typename Tscreen>

@@ -1,27 +1,25 @@
 #pragma once
 
-#include <array>
-
 #include "menudisplay.h"
 #include "menuitems/setdynamicvaluemenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
 #include "texts.h"
 #include "globals.h"
 #include "modes/defaultmode.h"
-#include "modes/manualmode.h"
+#include "modes/tempomatmode.h"
 #include "modes/bluetoothmode.h"
 
 namespace {
 struct ModeAccessor { static auto &getRef() { return currentMode; } };
 struct DefaultModeGetter { static auto getValue() { return &modes::defaultMode; } };
-struct ManualModeGetter { static auto getValue() { return &modes::manualMode; } };
+struct TempomatModeGetter { static auto getValue() { return &modes::tempomatMode; } };
 struct BluetoothModeGetter { static auto getValue() { return &modes::bluetoothMode; } };
 
 template<typename Tscreen>
 class SelectModeMenu final : public MenuDisplay<
     TEXT_SELECTMODE,
     SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, Tscreen, TEXT_MANUAL>,
+    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, TempomatModeGetter, Tscreen, TEXT_TEMPOMAT>,
     SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
     SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
@@ -29,7 +27,7 @@ class SelectModeMenu final : public MenuDisplay<
     using Base = MenuDisplay<
         TEXT_SELECTMODE,
         SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, ManualModeGetter, Tscreen, TEXT_MANUAL>,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, TempomatModeGetter, Tscreen, TEXT_TEMPOMAT>,
         SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
         SwitchScreenMenuItem<Tscreen, TEXT_BACK>
     >;
@@ -44,7 +42,7 @@ void SelectModeMenu<Tscreen>::start()
 
     if (ModeAccessor::getRef() == DefaultModeGetter::getValue())
         Base::setSelectedItem(Base::begin() + 0);
-    else if (ModeAccessor::getRef() == ManualModeGetter::getValue())
+    else if (ModeAccessor::getRef() == TempomatModeGetter::getValue())
         Base::setSelectedItem(Base::begin() + 1);
     else if (ModeAccessor::getRef() == BluetoothModeGetter::getValue())
         Base::setSelectedItem(Base::begin() + 2);

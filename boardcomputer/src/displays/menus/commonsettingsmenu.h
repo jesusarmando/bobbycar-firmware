@@ -1,10 +1,7 @@
 #pragma once
 
-#include <array>
-
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
-#include "displays/menus/selectmodemenu.h"
 #include "changevaluedisplay.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/invertmenu.h"
@@ -35,7 +32,6 @@ using PhaseAdvMaxChangeScreen = ChangeValueDisplay<int16_t, PhaseAdvMaxAccessor,
 template<typename Tscreen>
 class CommonSettingsMenu final : public MenuDisplay<
     TEXT_COMMONSETTINGS,
-    SwitchScreenMenuItem<SelectModeMenu<CommonSettingsMenu<Tscreen>>, TEXT_SELECTMODE>,
     SwitchScreenMenuItem<IMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETIMOTMAX>,
     SwitchScreenMenuItem<IDcMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETIDCMAX>,
     SwitchScreenMenuItem<NMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETNMOTMAX>,

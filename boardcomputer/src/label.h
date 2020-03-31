@@ -9,6 +9,11 @@ template<int x, int y, int width, int height, int font=4>
 class Label
 {
 public:
+    static constexpr auto X = x;
+    static constexpr auto Y = y;
+    static constexpr auto WIDTH = width;
+    static constexpr auto HEIGHT = height;
+
     void start();
     void repaint(const String &str);
 

@@ -9,14 +9,14 @@
 #include "defaultmode.h"
 
 namespace {
-class ManualMode final : public ModeBase
+class TempomatMode final : public ModeBase
 {
 public:
     using ModeBase::ModeBase;
 
     void update() override;
 
-    const char *displayName() const override { return "Manual"; }
+    const char *displayName() const override { return "Tempomat"; }
 
     bool potiControl = true;
     int16_t pwm = 0;
@@ -25,10 +25,10 @@ public:
 };
 
 namespace modes {
-ManualMode manualMode;
+TempomatMode tempomatMode;
 }
 
-void ManualMode::update()
+void TempomatMode::update()
 {
     if (potiControl)
     {

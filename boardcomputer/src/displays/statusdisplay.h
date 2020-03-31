@@ -55,6 +55,8 @@ private:
 template<typename Tscreen>
 class StatusDisplay final : public DemoDisplay<Tscreen>
 {
+    using Base = DemoDisplay<Tscreen>;
+
 public:
     void start() override;
     void update() override;
@@ -86,7 +88,7 @@ private:
 template<typename Tscreen>
 void StatusDisplay<Tscreen>::start()
 {
-    DemoDisplay<Tscreen>::start();
+    Base::start();
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
@@ -128,7 +130,7 @@ void StatusDisplay<Tscreen>::update()
         m_lastRedraw = now;
     }
 
-    DemoDisplay<Tscreen>::update();
+    Base::update();
 }
 
 template<typename Tscreen>

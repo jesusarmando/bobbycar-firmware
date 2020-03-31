@@ -1,7 +1,5 @@
 #pragma once
 
-#include <array>
-
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
 #include "displays/starfielddisplay.h"

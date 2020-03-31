@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <Arduino.h>
 
 #include "demodisplay.h"
@@ -8,6 +10,8 @@ namespace {
 template<typename Tscreen>
 class MetersDisplay final : public DemoDisplay<Tscreen>
 {
+    using Base = DemoDisplay<Tscreen>;
+
 public:
     void start() override;
     void update() override;
@@ -50,7 +54,7 @@ private:
 template<typename Tscreen>
 void MetersDisplay<Tscreen>::start()
 {
-    DemoDisplay<Tscreen>::start();
+    Base::start();
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
@@ -77,7 +81,7 @@ void MetersDisplay<Tscreen>::update()
         m_lastRedraw = now;
     }
 
-    DemoDisplay<Tscreen>::update();
+    Base::update();
 }
 
 template<typename Tscreen>

@@ -8,7 +8,11 @@ constexpr char TEXT_BACK[] = "Back";
 //MainMenu
 constexpr char TEXT_MAINMENU[] = "Main menu";
 constexpr char TEXT_STATUS[] = "Status";
+constexpr char TEXT_SELECTMODE[] = "Select mode";
+constexpr char TEXT_PRESETS[] = "Presets";
 constexpr char TEXT_SETTINGS[] = "Settings";
+constexpr char TEXT_LOCKVEHICLE[] = "Lock vehicle";
+constexpr char TEXT_POWEROFF[] = "Poweroff";
 constexpr char TEXT_DEMOS[] = "Demos";
 constexpr char TEXT_BUZZER[] = "Buzzer";
 constexpr char TEXT_SETFRONTLED[] = "Set front LED";
@@ -18,9 +22,11 @@ constexpr char TEXT_SETBACKLED[] = "Set back LED";
 //constexpr char TEXT_SETTINGS[] = "Settings";
 constexpr char TEXT_COMMONSETTINGS[] = "Common settings";
 constexpr char TEXT_DEFAULTMODESETTIGNS[] = "Default mode settings";
-constexpr char TEXT_MANUALMODESETTINGS[] = "Manual mode settings";
+constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
 //constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
 constexpr char TEXT_POTISETTINGS[] = "Poti settings";
+constexpr char TEXT_REBOOT[] = "Reboot";
+constexpr char TEXT_VERSION[] = "Version";
 //constexpr char TEXT_BACK[] = "Back";
 
 //DemosMenu
@@ -42,7 +48,6 @@ constexpr char TEXT_SETBACKPATTERN[] = "Set back pattern";
 
 //CommonSettingsMenu
 //constexpr char TEXT_COMMONSETTINGS[] = "Common settings";
-constexpr char TEXT_SELECTMODE[] = "Select mode";
 constexpr char TEXT_SETIMOTMAX[] = "Set iMotMax";
 constexpr char TEXT_SETIDCMAX[] = "Set iDcMax";
 constexpr char TEXT_SETNMOTMAX[] = "Set nMotMax";
@@ -83,8 +88,8 @@ constexpr char TEXT_INVERTBACKLEFT[] = "Invert back left";
 constexpr char TEXT_INVERTBACKRIGHT[] = "Invert back right";
 //constexpr char TEXT_BACK[] = "Back";
 
-//ManualModeSettingsMenu
-//constexpr char TEXT_MANUALMODESETTINGS[] = "Manual mode settings";
+//TempomatModeSettingsMenu
+//constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
 //constexpr char TEXT_SETCONTROLTYPE[] = "Set control type";
 //constexpr char TEXT_SETCONTROLMODE[] = "Set control mode";
 //constexpr char TEXT_BACK[] = "Back";
@@ -98,10 +103,17 @@ constexpr char TEXT_SETBREMSMAX[] = "Set bremsMax";
 constexpr char TEXT_CALIBRATE[] = "Calibrate";
 //constexpr char TEXT_BACK[] = "Back";
 
+//PresetsMenu
+//constexpr char TEXT_PRESETS[] = "Presets";
+constexpr char TEXT_STREET[] = "Street";
+constexpr char TEXT_SIDEWALK[] = "Sidewalk";
+constexpr char TEXT_POLICE[] = "Police";
+constexpr char TEXT_RACE[] = "Race";
+
 //SelectModeMenu
 //constexpr char TEXT_SELECTMODE[] = "Select mode";
 constexpr char TEXT_DEFAULT[] = "Default";
-constexpr char TEXT_MANUAL[] = "Manual";
+constexpr char TEXT_TEMPOMAT[] = "Tempomat";
 constexpr char TEXT_BLUETOOTH[] = "Bluetooth";
 //constexpr char TEXT_BACK[] = "Back";
 

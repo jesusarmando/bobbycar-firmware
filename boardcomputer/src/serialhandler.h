@@ -5,6 +5,7 @@
 
 #include "globals.h"
 #include "utils.h"
+#include "screens.h"
 
 namespace {
 wl_status_t last_status;

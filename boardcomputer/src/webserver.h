@@ -12,7 +12,7 @@
 #include "displays/statusdisplay.h"
 
 #include "modes/defaultmode.h"
-#include "modes/manualmode.h"
+#include "modes/tempomatmode.h"
 #include "modes/bluetoothmode.h"
 
 namespace {
@@ -31,11 +31,11 @@ private:
     static void handleLive(AsyncWebServerRequest *request);
     static void handleCommonParams(AsyncWebServerRequest *request);
     static void handleDefaultModeParams(AsyncWebServerRequest *request);
-    static void handleManualModeParams(AsyncWebServerRequest *request);
+    static void handleTempomatModeParams(AsyncWebServerRequest *request);
     static void handlePotiParams(AsyncWebServerRequest *request);
     static void handleSetCommonParams(AsyncWebServerRequest *request);
     static void handleSetDefaultModeParams(AsyncWebServerRequest *request);
-    static void handleSetManualModeParams(AsyncWebServerRequest *request);
+    static void handleSetTempomatModeParams(AsyncWebServerRequest *request);
     static void handleSetPotiParams(AsyncWebServerRequest *request);
     static void handleDisplay(AsyncWebServerRequest *request);
     static void handleDisplayAction(AsyncWebServerRequest *request);
@@ -56,9 +56,9 @@ bool WebHandler::canHandle(AsyncWebServerRequest *request)
         return true;
     else if (request->url() == "/setDefaultModeParams")
         return true;
-    else if (request->url() == "/manualModeParams")
+    else if (request->url() == "/tempomatModeParams")
         return true;
-    else if (request->url() == "/setManualModeParams")
+    else if (request->url() == "/setTempomatModeParams")
         return true;
     else if (request->url() == "/potiParams")
         return true;
@@ -88,10 +88,10 @@ void WebHandler::handleRequest(AsyncWebServerRequest *request)
         handleDefaultModeParams(request);
     else if (request->url() == "/setDefaultModeParams")
         handleSetDefaultModeParams(request);
-    else if (request->url() == "/manualModeParams")
-        handleManualModeParams(request);
-    else if (request->url() == "/setManualModeParams")
-        handleSetManualModeParams(request);
+    else if (request->url() == "/tempomatModeParams")
+        handleTempomatModeParams(request);
+    else if (request->url() == "/setTempomatModeParams")
+        handleSetTempomatModeParams(request);
     else if (request->url() == "/potiParams")
         handlePotiParams(request);
     else if (request->url() == "/setPotiParams")
@@ -282,8 +282,8 @@ void WebHandler::handleIndex(AsyncWebServerRequest *request)
 
             {
                 HtmlTag li(response, "li");
-                HtmlTag a(response, "a", " href=\"manualModeParams\"");
-                response.print("Manual mode params");
+                HtmlTag a(response, "a", " href=\"tempomatModeParams\"");
+                response.print("Tempomat mode params");
             }
 
             {
@@ -402,7 +402,7 @@ void WebHandler::handleCommonParams(AsyncWebServerRequest *request)
                 {
                     HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
                     selectOption(response, "defaultMode", modes::defaultMode.displayName(), currentMode==&modes::defaultMode);
-                    selectOption(response, "manualMode", modes::manualMode.displayName(), currentMode==&modes::manualMode);
+                    selectOption(response, "tempomatMode", modes::tempomatMode.displayName(), currentMode==&modes::tempomatMode);
                     selectOption(response, "bluetoothMode", modes::bluetoothMode.displayName(), currentMode==&modes::bluetoothMode);
                 }
 
@@ -584,7 +584,7 @@ void WebHandler::handleDefaultModeParams(AsyncWebServerRequest *request)
     request->send(&response);
 }
 
-void WebHandler::handleManualModeParams(AsyncWebServerRequest *request)
+void WebHandler::handleTempomatModeParams(AsyncWebServerRequest *request)
 {
     AsyncResponseStream &response = *request->beginResponseStream("text/html");
 
@@ -619,21 +619,21 @@ void WebHandler::handleManualModeParams(AsyncWebServerRequest *request)
             }
 
             {
-                HtmlTag form(response, "form", " action=\"/setManualModeParams\"");
+                HtmlTag form(response, "form", " action=\"/setTempomatModeParams\"");
 
                 HtmlTag fieldset(response, "fieldset");
 
 
                 {
                     HtmlTag legend(response, "legend");
-                    response.print("Manual Mode:");
+                    response.print("Tempomat Mode:");
                 }
 
-                checkboxInput(response, modes::manualMode.potiControl, "potiControl", "Poti control:");
+                checkboxInput(response, modes::tempomatMode.potiControl, "potiControl", "Poti control:");
 
                 breakLine(response);
 
-                numberInput(response, modes::manualMode.pwm, "pwm", "Pwm:");
+                numberInput(response, modes::tempomatMode.pwm, "pwm", "Pwm:");
 
                 breakLine(response);
 
@@ -643,9 +643,9 @@ void WebHandler::handleManualModeParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\" required");
-                    selectOption(response, "Commutation", "Commutation", modes::manualMode.ctrlTyp == ControlType::Commutation);
-                    selectOption(response, "Sinusoidal", "Sinusoidal", modes::manualMode.ctrlTyp == ControlType::Sinusoidal);
-                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes::manualMode.ctrlTyp == ControlType::FieldOrientedControl);
+                    selectOption(response, "Commutation", "Commutation", modes::tempomatMode.ctrlTyp == ControlType::Commutation);
+                    selectOption(response, "Sinusoidal", "Sinusoidal", modes::tempomatMode.ctrlTyp == ControlType::Sinusoidal);
+                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes::tempomatMode.ctrlTyp == ControlType::FieldOrientedControl);
                 }
 
                 breakLine(response);
@@ -657,10 +657,10 @@ void WebHandler::handleManualModeParams(AsyncWebServerRequest *request)
                 {
                     HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\" required");
 
-                    selectOption(response, "OpenMode", "Open Mode", modes::manualMode.ctrlMod == ControlMode::OpenMode);
-                    selectOption(response, "Voltage", "Voltage", modes::manualMode.ctrlMod == ControlMode::Voltage);
-                    selectOption(response, "Speed", "Speed", modes::manualMode.ctrlMod == ControlMode::Speed);
-                    selectOption(response, "Torque", "Torque", modes::manualMode.ctrlMod == ControlMode::Torque);
+                    selectOption(response, "OpenMode", "Open Mode", modes::tempomatMode.ctrlMod == ControlMode::OpenMode);
+                    selectOption(response, "Voltage", "Voltage", modes::tempomatMode.ctrlMod == ControlMode::Voltage);
+                    selectOption(response, "Speed", "Speed", modes::tempomatMode.ctrlMod == ControlMode::Speed);
+                    selectOption(response, "Torque", "Torque", modes::tempomatMode.ctrlMod == ControlMode::Torque);
                 }
 
                 breakLine(response);
@@ -804,8 +804,8 @@ void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
 
         if (p->value() == "defaultMode")
             currentMode = &modes::defaultMode;
-        else if (p->value() == "manualMode")
-            currentMode = &modes::manualMode;
+        else if (p->value() == "tempomatMode")
+            currentMode = &modes::tempomatMode;
         else if (p->value() == "bluetoothMode")
             currentMode = &modes::bluetoothMode;
         else
@@ -1043,7 +1043,7 @@ void WebHandler::handleSetDefaultModeParams(AsyncWebServerRequest *request)
     request->redirect("/defaultModeParams");
 }
 
-void WebHandler::handleSetManualModeParams(AsyncWebServerRequest *request)
+void WebHandler::handleSetTempomatModeParams(AsyncWebServerRequest *request)
 {
     if (!request->hasParam("pwm"))
     {
@@ -1074,23 +1074,23 @@ void WebHandler::handleSetManualModeParams(AsyncWebServerRequest *request)
 
 
 
-    modes::manualMode.potiControl = request->hasParam("potiControl") && request->getParam("potiControl")->value() == "on";
+    modes::tempomatMode.potiControl = request->hasParam("potiControl") && request->getParam("potiControl")->value() == "on";
 
     {
         AsyncWebParameter* p = request->getParam("pwm");
 
-        modes::manualMode.pwm = strtol(p->value().c_str(), nullptr, 10);
+        modes::tempomatMode.pwm = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("ctrlTyp");
 
         if (p->value() == "Commutation")
-            modes::manualMode.ctrlTyp = ControlType::Commutation;
+            modes::tempomatMode.ctrlTyp = ControlType::Commutation;
         else if (p->value() == "Sinusoidal")
-            modes::manualMode.ctrlTyp = ControlType::Sinusoidal;
+            modes::tempomatMode.ctrlTyp = ControlType::Sinusoidal;
         else if (p->value() == "FieldOrientedControl")
-            modes::manualMode.ctrlTyp = ControlType::FieldOrientedControl;
+            modes::tempomatMode.ctrlTyp = ControlType::FieldOrientedControl;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -1105,13 +1105,13 @@ void WebHandler::handleSetManualModeParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("ctrlMod");
 
         if (p->value() == "OpenMode")
-            modes::manualMode.ctrlMod = ControlMode::OpenMode;
+            modes::tempomatMode.ctrlMod = ControlMode::OpenMode;
         else if (p->value() == "Voltage")
-            modes::manualMode.ctrlMod = ControlMode::Voltage;
+            modes::tempomatMode.ctrlMod = ControlMode::Voltage;
         else if (p->value() == "Speed")
-            modes::manualMode.ctrlMod = ControlMode::Speed;
+            modes::tempomatMode.ctrlMod = ControlMode::Speed;
         else if (p->value() == "Torque")
-            modes::manualMode.ctrlMod = ControlMode::Torque;
+            modes::tempomatMode.ctrlMod = ControlMode::Torque;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -1122,7 +1122,7 @@ void WebHandler::handleSetManualModeParams(AsyncWebServerRequest *request)
         }
     }
 
-    request->redirect("/manualModeParams");
+    request->redirect("/tempomatModeParams");
 }
 
 void WebHandler::handleSetPotiParams(AsyncWebServerRequest *request)
@@ -1255,7 +1255,7 @@ void WebHandler::handleDisplay(AsyncWebServerRequest *request)
                 {
                     HtmlTag li(response, "li", iter==selected?" style=\"border: 1px solid black;\"":"");
                     HtmlTag a(response, "a", String(" href=\"/displayAction?action=triggerItem&index=") + std::distance(menuDisplay->begin(), iter) + "\"");
-                    response.print(iter->get().text());
+                    response.print(iter->get().title());
                 }
             }
             else if (auto changeValueDisplay = currentDisplay->asChangeValueDisplayInterface())

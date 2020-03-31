@@ -1,14 +1,16 @@
 #pragma once
 
+#include <array>
 #include <functional>
 #include <utility>
 
 #include "display.h"
 #include "globals.h"
 #include "menuitem.h"
+#include "titleinterface.h"
 
 namespace {
-class MenuDisplayInterface : public Display
+class MenuDisplayInterface : public Display, public virtual TitleInterface
 {
 public:
     void start() override;
@@ -16,8 +18,6 @@ public:
 
     void rotate(int offset) override;
     void button(bool pressed) override;
-
-    virtual const char *title() const = 0;
 
     virtual const std::reference_wrapper<const MenuItemInterface> *begin() const = 0;
     virtual const std::reference_wrapper<const MenuItemInterface> *end() const = 0;
@@ -355,10 +355,8 @@ private:
 };
 
 template<const char *Ttext>
-class MenuDisplay<Ttext> : public MenuDisplayInterface
+class MenuDisplay<Ttext> : public MenuDisplayInterface, public TitleImpl<Ttext>
 {
-public:
-    const char *title() const override final { return Ttext; }
 };
 
 void MenuDisplayInterface::start()
@@ -380,7 +378,7 @@ void MenuDisplayInterface::start()
     int y = 45;
     for (auto iter = begin(); iter != end(); iter++)
     {
-        tft.drawString((*iter).get().text(), 10, y, 4);
+        tft.drawString((*iter).get().title(), 10, y, 4);
 
         y += 25;
     }

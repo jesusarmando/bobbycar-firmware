@@ -10,6 +10,8 @@ namespace {
 template<typename Tscreen>
 class GameOfLifeDisplay final : public DemoDisplay<Tscreen>
 {
+    using Base = DemoDisplay<Tscreen>;
+
 public:
     void start() override;
     void update() override;
@@ -64,7 +66,7 @@ private:
 template<typename Tscreen>
 void GameOfLifeDisplay<Tscreen>::start()
 {
-    DemoDisplay<Tscreen>::start();
+    Base::start();
 
     tft.setRotation(3);
     tft.fillScreen(TFT_BLACK);
@@ -80,7 +82,7 @@ void GameOfLifeDisplay<Tscreen>::update()
         m_lastRedraw = now;
     }
 
-    DemoDisplay<Tscreen>::update();
+    Base::update();
 }
 
 template<typename Tscreen>

@@ -11,6 +11,8 @@ namespace {
 template<typename Tscreen>
 class SpiroDisplay final : public DemoDisplay<Tscreen>
 {
+    using Base = DemoDisplay<Tscreen>;
+
 public:
     void start() override;
     void update() override;
@@ -34,7 +36,7 @@ private:
 template<typename Tscreen>
 void SpiroDisplay<Tscreen>::start()
 {
-    DemoDisplay<Tscreen>::start();
+    Base::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(3);
@@ -50,7 +52,7 @@ void SpiroDisplay<Tscreen>::update()
         m_lastRedraw = now;
     }
 
-    DemoDisplay<Tscreen>::update();
+    Base::update();
 }
 
 template<typename Tscreen>

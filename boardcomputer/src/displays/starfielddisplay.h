@@ -9,6 +9,8 @@ namespace {
 template<typename Tscreen>
 class StarfieldDisplay final : public DemoDisplay<Tscreen>
 {
+    using Base = DemoDisplay<Tscreen>;
+
 public:
     StarfieldDisplay();
 
@@ -44,7 +46,7 @@ StarfieldDisplay<Tscreen>::StarfieldDisplay() :
 template<typename Tscreen>
 void StarfieldDisplay<Tscreen>::start()
 {
-    DemoDisplay<Tscreen>::start();
+    Base::start();
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
@@ -65,7 +67,7 @@ void StarfieldDisplay<Tscreen>::update()
         m_lastRedraw = now;
     }
 
-    DemoDisplay<Tscreen>::update();
+    Base::update();
 }
 
 template<typename Tscreen>

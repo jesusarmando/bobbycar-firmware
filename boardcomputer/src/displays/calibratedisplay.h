@@ -1,5 +1,6 @@
 #pragma once
 
+#include "demodisplay.h"
 #include "display.h"
 #include "globals.h"
 #include "texts.h"
@@ -8,18 +9,16 @@
 
 namespace {
 template<typename Tscreen>
-class CalibrateDisplay final : public Display
+class CalibrateDisplay final : public DemoDisplay<Tscreen>
 {
+    using Base = DemoDisplay<Tscreen>;
+
 public:
     void start() override;
     void update() override;
 
-    void button(bool pressed) override;
-
 private:
     void redraw();
-
-    bool m_pressed{};
 
     unsigned int m_lastRedraw{};
 
@@ -34,7 +33,7 @@ private:
 template<typename Tscreen>
 void CalibrateDisplay<Tscreen>::start()
 {
-    m_pressed = false;
+    Base::start();
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
@@ -65,15 +64,7 @@ void CalibrateDisplay<Tscreen>::update()
         m_lastRedraw = now;
     }
 
-    if (m_pressed)
-        switchScreen<Tscreen>();
-}
-
-template<typename Tscreen>
-void CalibrateDisplay<Tscreen>::button(bool pressed)
-{
-    if (!pressed)
-        m_pressed = true;
+    Base::update();
 }
 
 template<typename Tscreen>
