@@ -393,7 +393,10 @@ void MenuDisplayInterface::update()
     }
 
     if (m_pressed)
+    {
         m_current->get().triggered();
+        m_pressed = false;
+    }
 }
 
 void MenuDisplayInterface::rotate(int offset)
