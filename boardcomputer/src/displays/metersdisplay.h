@@ -47,8 +47,6 @@ private:
     std::array<ValuePair, 6> values;
 
     int d = 0;
-
-    unsigned long m_lastRedraw{};
 };
 
 template<typename Tscreen>
@@ -74,13 +72,7 @@ void MetersDisplay<Tscreen>::start()
 template<typename Tscreen>
 void MetersDisplay<Tscreen>::update()
 {
-    const auto now = millis();
-    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
-    {
-        redraw();
-        m_lastRedraw = now;
-    }
-
+    redraw();
     Base::update();
 }
 

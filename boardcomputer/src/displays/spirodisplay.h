@@ -29,8 +29,6 @@ private:
 
     long i{0};
     int n{}, r{}, colour{};
-
-    unsigned long m_lastRedraw{};
 };
 
 template<typename Tscreen>
@@ -45,12 +43,7 @@ void SpiroDisplay<Tscreen>::start()
 template<typename Tscreen>
 void SpiroDisplay<Tscreen>::update()
 {
-    const auto now = millis();
-    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
-    {
-        redraw();
-        m_lastRedraw = now;
-    }
+    redraw();
 
     Base::update();
 }

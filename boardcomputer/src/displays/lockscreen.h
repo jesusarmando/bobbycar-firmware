@@ -38,8 +38,6 @@ private:
     bool m_pressed{};
     int m_rotated{};
 
-    unsigned long m_lastRedraw{};
-
     ModeBase *m_oldMode{};
     LockscreenMode m_mode;
 };

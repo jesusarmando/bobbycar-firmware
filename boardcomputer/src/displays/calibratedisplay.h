@@ -1,5 +1,7 @@
 #pragma once
 
+#include <WString.h>
+
 #include "demodisplay.h"
 #include "display.h"
 #include "globals.h"
@@ -19,8 +21,6 @@ public:
 
 private:
     void redraw();
-
-    unsigned int m_lastRedraw{};
 
     Label<25, 50, 100, 23> m_label0;
     Label<25, 75, 100, 23> m_label1;
@@ -57,12 +57,7 @@ void CalibrateDisplay<Tscreen>::start()
 template<typename Tscreen>
 void CalibrateDisplay<Tscreen>::update()
 {
-    const auto now = millis();
-    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
-    {
-        redraw();
-        m_lastRedraw = now;
-    }
+    redraw();
 
     Base::update();
 }

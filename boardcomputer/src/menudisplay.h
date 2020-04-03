@@ -25,17 +25,15 @@ public:
     MenuDisplayInterface *asMenuDisplayInterface() override { return this; }
     const MenuDisplayInterface *asMenuDisplayInterface() const override { return this; }
 
-    const std::reference_wrapper<const MenuItemInterface> *selectedItem() const { return m_current; }
+    const std::reference_wrapper<const MenuItemInterface> *selectedItem() const { return m_selected; }
 
 protected:
-    void requestRedraw();
     void setSelectedItem(const std::reference_wrapper<const MenuItemInterface> *item);
 
 private:
-    void redraw() const;
+    void redraw(bool RenderText);
 
-    const std::reference_wrapper<const MenuItemInterface> *m_prev{}, *m_current{};
-    bool m_needsRedraw{};
+    const std::reference_wrapper<const MenuItemInterface> *m_selected{}, *m_rendered{};
     bool m_pressed{};
 };
 
@@ -361,8 +359,8 @@ class MenuDisplay<Ttext> : public MenuDisplayInterface, public TitleImpl<Ttext>
 
 void MenuDisplayInterface::start()
 {
-    m_current = begin();
-    m_needsRedraw = true;
+    m_selected = begin();
+    m_rendered = nullptr;
     m_pressed = false;
 
     tft.setRotation(0);
@@ -375,33 +373,23 @@ void MenuDisplayInterface::start()
 
     tft.setTextColor(TFT_WHITE);
 
-    int y = 45;
-    for (auto iter = begin(); iter != end(); iter++)
-    {
-        tft.drawString((*iter).get().title(), 10, y, 4);
-
-        y += 25;
-    }
+    redraw(true);
 }
 
 void MenuDisplayInterface::update()
 {
-    if (m_needsRedraw)
-    {
-        m_needsRedraw = false;
-        redraw();
-    }
+    redraw(false);
 
     if (m_pressed)
     {
-        m_current->get().triggered();
+        m_selected->get().triggered();
         m_pressed = false;
     }
 }
 
 void MenuDisplayInterface::rotate(int offset)
 {
-    auto selected = m_current + offset;
+    auto selected = m_selected + offset;
     if (selected < begin())
         selected = begin();
     if (selected >= end())
@@ -415,29 +403,31 @@ void MenuDisplayInterface::button(bool pressed)
         m_pressed = true;
 }
 
-void MenuDisplayInterface::requestRedraw()
-{
-    m_needsRedraw = true;
-}
-
 void MenuDisplayInterface::setSelectedItem(const std::reference_wrapper<const MenuItemInterface> *item)
 {
-    m_prev = m_current;
-    m_current = item;
-    requestRedraw();
+    m_selected = item;
 }
 
-void MenuDisplayInterface::redraw() const
+void MenuDisplayInterface::redraw(bool renderText)
 {
+    const auto * const selected = m_selected;
+    if (selected == m_rendered)
+        return;
+
     int y = 45;
     for (auto iter = begin(); iter != end(); iter++)
     {
-        if (iter == m_current)
+        if (renderText)
+            tft.drawString((*iter).get().title(), 10, y, 4);
+
+        if (iter == selected)
             tft.drawRect(5, y-2, tft.width() - 5, 25, TFT_WHITE);
-        else if (iter == m_prev)
+        else if (iter == m_rendered && m_rendered != selected)
             tft.drawRect(5, y-2, tft.width() - 5, 25, TFT_BLACK);
 
         y += 25;
     }
+
+    m_rendered = selected;
 }
 }

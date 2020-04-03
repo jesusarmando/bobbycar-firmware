@@ -67,7 +67,7 @@ void sendCommands()
     }
 }
 
-template<typename T>
-void switchScreen();
+template<typename T, typename... Args>
+void switchScreen(Args&&... args);
 
 }

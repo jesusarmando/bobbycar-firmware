@@ -26,6 +26,7 @@
 #include "displays/versiondisplay.h"
 
 #include "globals.h"
+#include "utils.h"
 
 namespace {
 union X {
@@ -184,12 +185,13 @@ void deconstructScreen()
     }
 }
 
-template<typename T> void switchScreen()
+template<typename T, typename... Args>
+void switchScreen(Args&&... args)
 {
     deconstructScreen();
 
     T &ref = getRefByType<T>();
-    new (&ref) T;
+    new (&ref) T{std::forward<Args>(args)...};
     currentDisplay = &ref;
     ref.start();
     ref.update();
@@ -204,7 +206,7 @@ void initScreen()
     tft.drawString("Booting...", 32, 64, 4);
 }
 
-void updateScreen()
+void updateDisplay()
 {
     currentDisplay->update();
 }

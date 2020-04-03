@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include <Arduino.h>
+
 #include "demodisplay.h"
 #include "globals.h"
 
@@ -30,8 +32,6 @@ private:
     uint8_t sz[NSTARS] = {};
 
     uint8_t za, zb, zc, zx;
-
-    unsigned long m_lastRedraw{};
 };
 
 template<typename Tscreen>
@@ -60,13 +60,7 @@ void StarfieldDisplay<Tscreen>::start()
 template<typename Tscreen>
 void StarfieldDisplay<Tscreen>::update()
 {
-    const auto now = millis();
-    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
-    {
-        redraw();
-        m_lastRedraw = now;
-    }
-
+    redraw();
     Base::update();
 }
 

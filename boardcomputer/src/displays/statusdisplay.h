@@ -81,8 +81,6 @@ private:
     Label<205, 281, 35, 15, 2> m_labelLimit1;
     Label<85, 296, 40, 15, 2> m_labelPerformance;
     Label<165, 296, 75, 15, 2> m_labelMode;
-
-    unsigned long m_lastRedraw{};
 };
 
 template<typename Tscreen>
@@ -123,12 +121,7 @@ void StatusDisplay<Tscreen>::start()
 template<typename Tscreen>
 void StatusDisplay<Tscreen>::update()
 {
-    const auto now = millis();
-    if (!m_lastRedraw || now-m_lastRedraw >= 1000/60)
-    {
-        redraw();
-        m_lastRedraw = now;
-    }
+    redraw();
 
     Base::update();
 }

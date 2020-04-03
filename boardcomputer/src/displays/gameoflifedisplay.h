@@ -3,6 +3,7 @@
 #include <bitset>
 
 #include <Arduino.h>
+#include <HardwareSerial.h>
 
 #include "demodisplay.h"
 
@@ -59,8 +60,6 @@ private:
     std::bitset<GRIDX*GRIDY> grid, newgrid;
 
     int gen = 0;
-
-    unsigned int m_lastRedraw{};
 };
 
 template<typename Tscreen>
@@ -75,12 +74,7 @@ void GameOfLifeDisplay<Tscreen>::start()
 template<typename Tscreen>
 void GameOfLifeDisplay<Tscreen>::update()
 {
-    const auto now = millis();
-    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
-    {
-        redraw();
-        m_lastRedraw = now;
-    }
+    redraw();
 
     Base::update();
 }

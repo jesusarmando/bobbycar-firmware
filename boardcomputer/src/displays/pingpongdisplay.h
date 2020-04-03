@@ -73,8 +73,6 @@ private:
     static const constexpr auto BLACK = 0x0000;
     static const constexpr auto WHITE = 0xFFFF;
     static const constexpr auto GREY = 0x5AEB;
-
-    unsigned long m_lastRedraw{};
 };
 
 template<typename Tscreen>
@@ -101,13 +99,7 @@ void PingPongDisplay<Tscreen>::start()
 template<typename Tscreen>
 void PingPongDisplay<Tscreen>::update()
 {
-    const auto now = millis();
-    if (!m_lastRedraw || now - m_lastRedraw >= 1000/60)
-    {
-        redraw();
-        m_lastRedraw = now;
-    }
-
+    redraw();
     Base::update();
 }
 

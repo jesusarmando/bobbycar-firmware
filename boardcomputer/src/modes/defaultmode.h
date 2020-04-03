@@ -23,17 +23,18 @@ public:
     ControlMode ctrlMod = ControlMode::Torque;
     bool enableWeakeningSmoothening{true};
     int16_t weakeningSmoothening{20};
-    unsigned long lastTime{millis()};
-    float lastPwm{0};
     int16_t frontPercentage{100}, backPercentage{100};
+
+    int16_t add_schwelle;
+    int16_t gas1_wert;
+    int16_t gas2_wert;
+    int16_t brems1_wert;
+    int16_t brems2_wert;
+
     bool waitForGasLoslass{false};
     bool waitForBremsLoslass{false};
-
-    int16_t add_schwelle = 950;
-    int16_t gas1_wert = 1000;
-    int16_t gas2_wert = 1000;
-    int16_t brems1_wert = 500;
-    int16_t brems2_wert = 750;
+    unsigned long lastTime{millis()};
+    float lastPwm{0};
 };
 
 namespace modes {

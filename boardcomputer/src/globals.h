@@ -15,16 +15,16 @@
 namespace {
 using pin_t = int;
 
-uint16_t raw_gas, raw_brems;
+int16_t raw_gas, raw_brems;
 float gas, brems;
 int16_t gasMin, gasMax, bremsMin, bremsMax;
 
 struct {
-    int16_t iMotMax = defaultIMotMax;           // [A] Maximum motor current limit
-    int16_t iDcMax = defaultIDcMax;             // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
-    int16_t nMotMax = defaultNMotMax;           // [rpm] Maximum motor speed limit
-    int16_t fieldWeakMax = defaultFieldWeakMax; // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
-    int16_t phaseAdvMax = defaultPhaseAdvMax;   // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
+    int16_t iMotMax;      // [A] Maximum motor current limit
+    int16_t iDcMax;       // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+    int16_t nMotMax;      // [rpm] Maximum motor speed limit
+    int16_t fieldWeakMax; // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
+    int16_t phaseAdvMax;  // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
 } settings;
 
 std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
