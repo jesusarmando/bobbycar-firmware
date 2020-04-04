@@ -5,6 +5,8 @@
 #include <Arduino.h>
 
 #include "demodisplay.h"
+#include "globals.h"
+#include "utils.h"
 
 namespace {
 template<typename Tscreen>
@@ -23,11 +25,7 @@ private:
     void analogMeter();
 
     // Update needle position
-    // This function is blocking while needle moves, time depends on ms_delay
-    // 10ms minimises needle flicker if text is drawn within needle sweep area
-    // Smaller values OK if text not in sweep area, zero for instant movement but
-    // does not look realistic... (note: 100 increments for full scale deflection)
-    void plotNeedle(int value);
+    void plotNeedle(float value);
 
     //  Draw a linear meter on the screen
     void plotLinear(const char *label, int x, int y);
@@ -87,7 +85,22 @@ void MetersDisplay<Tscreen>::redraw()
 
     plotPointer();
 
-    plotNeedle(values[0].value);
+    float speedSum{0.f};
+    uint8_t count{0};
+
+    for (const auto &controller : controllers)
+    {
+        if (!controller.feedbackValid)
+            continue;
+
+        speedSum +=
+                controller.feedback.left.speed * (controller.invertLeft ? -1 : 1) +
+                controller.feedback.right.speed * (controller.invertRight ? -1 : 1);
+
+        count +=2;
+    }
+
+    plotNeedle(count == 0 ? 0.f : convertToKmh(speedSum / count));
 }
 
 template<typename Tscreen>
@@ -157,10 +170,10 @@ void MetersDisplay<Tscreen>::analogMeter()
             y0 = sy * (100 + tl + 10) + 140;
             switch (i / 25) {
                 case -2: tft.drawCentreString("0", x0, y0 - 12, 2); break;
-                case -1: tft.drawCentreString("25", x0, y0 - 9, 2); break;
-                case 0: tft.drawCentreString("50", x0, y0 - 6, 2); break;
-                case 1: tft.drawCentreString("75", x0, y0 - 9, 2); break;
-                case 2: tft.drawCentreString("100", x0, y0 - 12, 2); break;
+                case -1: tft.drawCentreString("7.5", x0, y0 - 9, 2); break;
+                case 0: tft.drawCentreString("15", x0, y0 - 6, 2); break;
+                case 1: tft.drawCentreString("22.5", x0, y0 - 9, 2); break;
+                case 2: tft.drawCentreString("30", x0, y0 - 12, 2); break;
             }
         }
 
@@ -177,20 +190,20 @@ void MetersDisplay<Tscreen>::analogMeter()
     tft.drawCentreString("KM/h", 120, 70, 4); // Comment out to avoid font 4
     tft.drawRect(5, 3, 230, 119, TFT_BLACK); // Draw bezel line
 
-    plotNeedle(0); // Put meter needle at 0
+    plotNeedle(0.f); // Put meter needle at 0
 }
 
 template<typename Tscreen>
-void MetersDisplay<Tscreen>::plotNeedle(int value)
+void MetersDisplay<Tscreen>::plotNeedle(float value)
 {
     tft.setTextColor(TFT_BLACK, TFT_WHITE);
     char buf[8]; dtostrf(value, 4, 0, buf);
-    tft.drawRightString(buf, 40, 119 - 20, 2);
+    tft.drawRightString(buf, 50, 119 - 25, 4);
 
-    if (value < -10) value = -10; // Limit value to emulate needle end stops
-    if (value > 110) value = 110;
+    if (value < -3) value = -3; // Limit value to emulate needle end stops
+    if (value > 33) value = 33;
 
-    float sdeg = map(value, -10, 110, -150, -30); // Map value to angle
+    float sdeg = map(value, -3, 33, -150, -30); // Map value to angle
     // Calcualte tip of needle coords
     float sx = cos(sdeg * 0.0174532925);
     float sy = sin(sdeg * 0.0174532925);

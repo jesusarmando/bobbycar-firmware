@@ -227,7 +227,7 @@ void MotorStatus<y>::redraw(const MotorFeedback &motor)
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
     m_labelCurrent.repaint(String{std::abs(motor.current/50.)} + 'A');
-    m_labelSpeed.repaint(String{motor.speed/32.133}); //
+    m_labelSpeed.repaint(String{convertToKmh(motor.speed)}); //
     m_labelHallSensors.repaint(String{} + (motor.hallA ? '1' : '0') + (motor.hallB ? '1' : '0') + (motor.hallC ? '1' : '0'));
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);

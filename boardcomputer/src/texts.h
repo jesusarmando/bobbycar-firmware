@@ -3,6 +3,7 @@
 namespace {
 //BluetoothModeSettingsMenu
 constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
+constexpr char TEXT_BLUETOOTHSTATUS[] = "Bluetooth status";
 constexpr char TEXT_BACK[] = "Back";
 
 //MainMenu

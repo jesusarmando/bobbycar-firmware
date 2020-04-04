@@ -17,17 +17,10 @@ namespace {
 ModeBase *lastMode{};
 unsigned long lastModeUpdate{};
 unsigned long lastDisplayUpdate{};
-double gasSum, bremsSum;
-int16_t sampleCount;
 }
 
 void setup()
 {
-//    pinMode(TFT_MOSI, OUTPUT);
-//    pinMode(TFT_SCLK, OUTPUT);
-//    pinMode(TFT_CS, OUTPUT);
-//    pinMode(TFT_DC, OUTPUT);
-//    pinMode(TFT_RST, OUTPUT);
     Serial.begin(115200);
     Serial.setDebugOutput(true);
     Serial.println("setup()");
@@ -48,9 +41,6 @@ void setup()
     raw_brems = 0;
     gas = 0;
     brems = 0;
-    gasSum = 0.;
-    bremsSum = 0.;
-    sampleCount = 0;
 
     applyDefaultSettings();
 
@@ -70,41 +60,26 @@ void setup()
 
 void loop()
 {
-    //digitalWrite(TFT_MOSI, HIGH);
-    //digitalWrite(TFT_SCLK, HIGH);
-    //digitalWrite(TFT_CS, HIGH);
-    //digitalWrite(TFT_DC, HIGH);
-    //digitalWrite(TFT_RST, HIGH);
-    //delay(1000);
-    //digitalWrite(TFT_MOSI, LOW);
-    //digitalWrite(TFT_SCLK, LOW);
-    //digitalWrite(TFT_CS, LOW);
-    //digitalWrite(TFT_DC, LOW);
-    //digitalWrite(TFT_RST, LOW);
-    //delay(1000);
-
-    performance.current++;
-
-    analogRead(PINS_GAS);
-    gasSum += analogRead(PINS_GAS);
-    analogRead(PINS_BREMS);
-    bremsSum += analogRead(PINS_BREMS);
-    sampleCount++;
-
     const auto now = millis();
+
     if (!lastModeUpdate)
         lastModeUpdate = now;
     else if (now - lastModeUpdate >= 1000/50)
     {
-        raw_gas = gasSum / sampleCount;
+        constexpr auto times = 100;
+        const auto read_n_times = [](int pin){
+            analogRead(pin);
+            double sum{};
+            for (int i = 0; i < times; i++)
+                sum += analogRead(pin);
+            return sum/times;
+        };
+
+        raw_gas = read_n_times(PINS_GAS);
         gas = scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
 
-        raw_brems = bremsSum / sampleCount;
+        raw_brems = read_n_times(PINS_BREMS);
         brems = scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
-
-        gasSum = 0.;
-        bremsSum = 0.;
-        sampleCount = 0;
 
         if (lastMode != currentMode)
         {
@@ -119,6 +94,8 @@ void loop()
             currentMode->update();
 
         lastModeUpdate = now;
+
+        performance.current++;
     }
 
     if (!lastDisplayUpdate || now - lastDisplayUpdate >= 1000/60)

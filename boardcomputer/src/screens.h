@@ -15,6 +15,7 @@
 #include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/selectmodemenu.h"
 #include "displays/menus/settingsmenu.h"
+#include "displays/bluetoothstatusdisplay.h"
 #include "displays/calibratedisplay.h"
 #include "displays/gameoflifedisplay.h"
 #include "displays/metersdisplay.h"
@@ -47,6 +48,7 @@ union X {
     SelectModeMenu<MainMenu> selectModeMenu;
     SettingsMenu<MainMenu> settingsMenu;
 
+    BluetoothStatusDisplay<BluetoothModeSettingsMenu<SettingsMenu<MainMenu>>> bluetoothStatusDisplay;
     CalibrateDisplay<PotiSettingsMenu<SettingsMenu<MainMenu>>> calibrateDisplay;
     GameOfLifeDisplay<DemosMenu<MainMenu>> gameOfLifeDisplay;
     Lockscreen<MainMenu> lockScreen;
@@ -121,6 +123,7 @@ template<> decltype(displays.presetsMenu)                                      &
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }
 template<> decltype(displays.settingsMenu)                                     &getRefByType<decltype(displays.settingsMenu)>()                                     { return displays.settingsMenu; }
 
+template<> decltype(displays.bluetoothStatusDisplay)                           &getRefByType<decltype(displays.bluetoothStatusDisplay)>()                           { return displays.bluetoothStatusDisplay; }
 template<> decltype(displays.calibrateDisplay)                                 &getRefByType<decltype(displays.calibrateDisplay)>()                                 { return displays.calibrateDisplay; }
 template<> decltype(displays.gameOfLifeDisplay)                                &getRefByType<decltype(displays.gameOfLifeDisplay)>()                                { return displays.gameOfLifeDisplay; }
 template<> decltype(displays.lockScreen)                                       &getRefByType<decltype(displays.lockScreen)>()                                       { return displays.lockScreen; }
