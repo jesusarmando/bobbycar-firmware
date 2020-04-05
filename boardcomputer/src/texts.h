@@ -37,6 +37,7 @@ constexpr char TEXT_PINGPONG[] = "PingPong";
 constexpr char TEXT_SPIRO[] = "Spiro";
 constexpr char TEXT_GAMEOFLIFE[] = "GameOfLife";
 constexpr char TEXT_METERS[] = "Meters";
+constexpr char TEXT_MATRIX[] = "Matrix";
 //constexpr char TEXT_BACK[] = "Back";
 
 //BuzzerMenu

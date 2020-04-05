@@ -21,7 +21,7 @@ struct NMotMaxAccessor { static auto &getRef() { return settings.nMotMax; } };
 template<typename Tscreen>
 using NMotMaxChangeScreen = ChangeValueDisplay<int16_t, NMotMaxAccessor, Tscreen, TEXT_SETNMOTMAX>;
 
-struct FieldWeakMaxAccessor { static auto &getRef() { return settings.nMotMax; } };
+struct FieldWeakMaxAccessor { static auto &getRef() { return settings.fieldWeakMax; } };
 template<typename Tscreen>
 using FieldWeakMaxChangeScreen = ChangeValueDisplay<int16_t, FieldWeakMaxAccessor, Tscreen, TEXT_SETFIELDWEAKMAX>;
 

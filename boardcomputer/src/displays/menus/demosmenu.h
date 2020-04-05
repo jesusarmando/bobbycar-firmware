@@ -7,6 +7,7 @@
 #include "displays/spirodisplay.h"
 #include "displays/gameoflifedisplay.h"
 #include "displays/metersdisplay.h"
+#include "displays/matrixdisplay.h"
 #include "texts.h"
 
 namespace {
@@ -18,6 +19,7 @@ class DemosMenu final : public MenuDisplay<
     SwitchScreenMenuItem<SpiroDisplay<DemosMenu<Tscreen>>, TEXT_SPIRO>,
     SwitchScreenMenuItem<GameOfLifeDisplay<DemosMenu<Tscreen>>, TEXT_GAMEOFLIFE>,
     SwitchScreenMenuItem<MetersDisplay<DemosMenu<Tscreen>>, TEXT_METERS>,
+    SwitchScreenMenuItem<MatrixDisplay<DemosMenu<Tscreen>>, TEXT_MATRIX>,
     SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {};

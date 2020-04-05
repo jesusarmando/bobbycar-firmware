@@ -18,6 +18,7 @@
 #include "displays/bluetoothstatusdisplay.h"
 #include "displays/calibratedisplay.h"
 #include "displays/gameoflifedisplay.h"
+#include "displays/matrixdisplay.h"
 #include "displays/metersdisplay.h"
 #include "displays/pingpongdisplay.h"
 #include "displays/poweroffdisplay.h"
@@ -52,6 +53,7 @@ union X {
     CalibrateDisplay<PotiSettingsMenu<SettingsMenu<MainMenu>>> calibrateDisplay;
     GameOfLifeDisplay<DemosMenu<MainMenu>> gameOfLifeDisplay;
     Lockscreen<MainMenu> lockScreen;
+    MatrixDisplay<DemosMenu<MainMenu>> matrixDisplay;
     MetersDisplay<DemosMenu<MainMenu>> metersDisplay;
     PingPongDisplay<DemosMenu<MainMenu>> pingPongDisplay;
     PoweroffDisplay<MainMenu> poweroffDisplay;
@@ -127,6 +129,7 @@ template<> decltype(displays.bluetoothStatusDisplay)                           &
 template<> decltype(displays.calibrateDisplay)                                 &getRefByType<decltype(displays.calibrateDisplay)>()                                 { return displays.calibrateDisplay; }
 template<> decltype(displays.gameOfLifeDisplay)                                &getRefByType<decltype(displays.gameOfLifeDisplay)>()                                { return displays.gameOfLifeDisplay; }
 template<> decltype(displays.lockScreen)                                       &getRefByType<decltype(displays.lockScreen)>()                                       { return displays.lockScreen; }
+template<> decltype(displays.matrixDisplay)                                    &getRefByType<decltype(displays.matrixDisplay)>()                                    { return displays.matrixDisplay; }
 template<> decltype(displays.metersDisplay)                                    &getRefByType<decltype(displays.metersDisplay)>()                                    { return displays.metersDisplay; }
 template<> decltype(displays.pingPongDisplay)                                  &getRefByType<decltype(displays.pingPongDisplay)>()                                  { return displays.pingPongDisplay; }
 template<> decltype(displays.poweroffDisplay)                                  &getRefByType<decltype(displays.poweroffDisplay)>()                                  { return displays.poweroffDisplay; }
