@@ -3,10 +3,12 @@
 #include <map>
 #include <set>
 
+#include "displays/menus/bluetoothsettingsmenu.h"
 #include "displays/menus/bluetoothmodesettingsmenu.h"
 #include "displays/menus/buzzermenu.h"
 #include "displays/menus/commonsettingsmenu.h"
 #include "displays/menus/defaultmodesettingsmenu.h"
+#include "displays/menus/debugmenu.h"
 #include "displays/menus/demosmenu.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/invertmenu.h"
@@ -36,10 +38,12 @@ union X {
     ~X() { ((Display&)statusDisplay).~Display(); }
 
     MainMenu mainMenu;
+    BluetoothSettingsMenu<SettingsMenu<MainMenu>> bluetoothSettingsMenu;
     BluetoothModeSettingsMenu<SettingsMenu<MainMenu>> bluetoothModeSettingsMenu;
-    BuzzerMenu<MainMenu> buzzerMenu;
+    BuzzerMenu<DebugMenu<MainMenu>> buzzerMenu;
     CommonSettingsMenu<SettingsMenu<MainMenu>> commonSettingsMenu;
     DefaultModeSettingsMenu<SettingsMenu<MainMenu>> defaultModeSettingsMenu;
+    DebugMenu<MainMenu> debugMenu;
     DemosMenu<MainMenu> demosMenu;
     EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> enableMenu;
     InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> invertMenu;
@@ -49,7 +53,7 @@ union X {
     SelectModeMenu<MainMenu> selectModeMenu;
     SettingsMenu<MainMenu> settingsMenu;
 
-    BluetoothStatusDisplay<BluetoothModeSettingsMenu<SettingsMenu<MainMenu>>> bluetoothStatusDisplay;
+    BluetoothStatusDisplay<BluetoothSettingsMenu<SettingsMenu<MainMenu>>> bluetoothStatusDisplay;
     CalibrateDisplay<PotiSettingsMenu<SettingsMenu<MainMenu>>> calibrateDisplay;
     GameOfLifeDisplay<DemosMenu<MainMenu>> gameOfLifeDisplay;
     Lockscreen<MainMenu> lockScreen;
@@ -62,10 +66,10 @@ union X {
     StatusDisplay<MainMenu> statusDisplay;
     VersionDisplay<SettingsMenu<MainMenu>> versionDisplay;
 
-    FrontFreqChangeScreen<BuzzerMenu<MainMenu>> changeFrontFreq;
-    FrontPatternChangeScreen<BuzzerMenu<MainMenu>> changeFrontPattern;
-    BackFreqChangeScreen<BuzzerMenu<MainMenu>> changeBackFreq;
-    BackPatternChangeScreen<BuzzerMenu<MainMenu>> changeBackPattern;
+    FrontFreqChangeScreen<BuzzerMenu<DebugMenu<MainMenu>>> changeFrontFreq;
+    FrontPatternChangeScreen<BuzzerMenu<DebugMenu<MainMenu>>> changeFrontPattern;
+    BackFreqChangeScreen<BuzzerMenu<DebugMenu<MainMenu>>> changeBackFreq;
+    BackPatternChangeScreen<BuzzerMenu<DebugMenu<MainMenu>>> changeBackPattern;
 
     IMotMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeIMotMax;
     IDcMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeIDcMax;
@@ -95,8 +99,8 @@ union X {
     BackLeftInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackLeftInverted;
     BackRightInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackRightInverted;
 
-    FrontLedChangeScreen<MainMenu> changeFrontLed;
-    BackLedChangeScreen<MainMenu> changeBackLed;
+    FrontLedChangeScreen<DebugMenu<MainMenu>> changeFrontLed;
+    BackLedChangeScreen<DebugMenu<MainMenu>> changeBackLed;
 
     TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlTyp;
     TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlMod;
@@ -111,10 +115,12 @@ using DefaultScreen = decltype(displays.statusDisplay);
 //using DefaultScreen = decltype(displays.lockScreen);
 
 template<typename T> T &getRefByType() = delete;
+template<> decltype(displays.bluetoothSettingsMenu)                            &getRefByType<decltype(displays.bluetoothSettingsMenu)>()                            { return displays.bluetoothSettingsMenu; }
 template<> decltype(displays.bluetoothModeSettingsMenu)                        &getRefByType<decltype(displays.bluetoothModeSettingsMenu)>()                        { return displays.bluetoothModeSettingsMenu; }
 template<> decltype(displays.buzzerMenu)                                       &getRefByType<decltype(displays.buzzerMenu)>()                                       { return displays.buzzerMenu; }
 template<> decltype(displays.commonSettingsMenu)                               &getRefByType<decltype(displays.commonSettingsMenu)>()                               { return displays.commonSettingsMenu; }
 template<> decltype(displays.defaultModeSettingsMenu)                          &getRefByType<decltype(displays.defaultModeSettingsMenu)>()                          { return displays.defaultModeSettingsMenu; }
+template<> decltype(displays.debugMenu)                                        &getRefByType<decltype(displays.debugMenu)>()                                        { return displays.debugMenu; }
 template<> decltype(displays.demosMenu)                                        &getRefByType<decltype(displays.demosMenu)>()                                        { return displays.demosMenu; }
 template<> decltype(displays.enableMenu)                                       &getRefByType<decltype(displays.enableMenu)>()                                       { return displays.enableMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
@@ -186,6 +192,7 @@ void deconstructScreen()
 {
     if (currentDisplay)
     {
+        currentDisplay->stop();
         currentDisplay->~Display();
         currentDisplay = nullptr;
     }
@@ -221,10 +228,12 @@ void printMemoryUsage(){
     std::map<int, std::set<const char *>> test;
 
     test[sizeof(displays)].insert("displays");
+    test[sizeof(displays.bluetoothSettingsMenu)].insert("displays.bluetoothSettingsMenu");
     test[sizeof(displays.bluetoothModeSettingsMenu)].insert("displays.bluetoothModeSettingsMenu");
     test[sizeof(displays.buzzerMenu)].insert("displays.buzzerMenu");
     test[sizeof(displays.commonSettingsMenu)].insert("displays.commonSettingsMenu");
     test[sizeof(displays.defaultModeSettingsMenu)].insert("displays.defaultModeSettingsMenu");
+    test[sizeof(displays.debugMenu)].insert("displays.debugMenu");
     test[sizeof(displays.demosMenu)].insert("displays.demosMenu");
     test[sizeof(displays.enableMenu)].insert("displays.enableMenu");
     test[sizeof(displays.invertMenu)].insert("displays.invertMenu");

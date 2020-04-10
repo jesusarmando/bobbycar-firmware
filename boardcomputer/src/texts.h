@@ -1,10 +1,15 @@
 #pragma once
 
 namespace {
-//BluetoothModeSettingsMenu
-constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
+//BluetoothSettingsMenu
+constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
 constexpr char TEXT_BLUETOOTHSTATUS[] = "Bluetooth status";
 constexpr char TEXT_BACK[] = "Back";
+
+
+//BluetoothModeSettingsMenu
+constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
+//constexpr char TEXT_BACK[] = "Back";
 
 //MainMenu
 constexpr char TEXT_MAINMENU[] = "Main menu";
@@ -13,15 +18,14 @@ constexpr char TEXT_SELECTMODE[] = "Select mode";
 constexpr char TEXT_PRESETS[] = "Presets";
 constexpr char TEXT_SETTINGS[] = "Settings";
 constexpr char TEXT_LOCKVEHICLE[] = "Lock vehicle";
-constexpr char TEXT_POWEROFF[] = "Poweroff";
 constexpr char TEXT_DEMOS[] = "Demos";
-constexpr char TEXT_BUZZER[] = "Buzzer";
-constexpr char TEXT_SETFRONTLED[] = "Set front LED";
-constexpr char TEXT_SETBACKLED[] = "Set back LED";
+constexpr char TEXT_DEBUG[] = "Debug";
+constexpr char TEXT_POWEROFF[] = "Poweroff";
 
 //SettingsMenu
 //constexpr char TEXT_SETTINGS[] = "Settings";
 constexpr char TEXT_COMMONSETTINGS[] = "Common settings";
+//constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
 constexpr char TEXT_DEFAULTMODESETTIGNS[] = "Default mode settings";
 constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
 //constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
@@ -57,6 +61,13 @@ constexpr char TEXT_SETFIELDWEAKMAX[] = "Set fieldWeakMax";
 constexpr char TEXT_SETPHASEADVMAX[] = "Set phaseAdvMax";
 constexpr char TEXT_SETENABLED[] = "Set enabled";
 constexpr char TEXT_SETINVERTED[] = "Set inverted";
+//constexpr char TEXT_BACK[] = "Back";
+
+//DebugMenu
+//constexpr char TEXT_DEBUG[] = "Debug";
+constexpr char TEXT_BUZZER[] = "Buzzer";
+constexpr char TEXT_SETFRONTLED[] = "Set front LED";
+constexpr char TEXT_SETBACKLED[] = "Set back LED";
 //constexpr char TEXT_BACK[] = "Back";
 
 //DefaultModeSettingsMenu

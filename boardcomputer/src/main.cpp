@@ -28,11 +28,11 @@ void setup()
     initScreen();
 
     WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP("bobbycar", "Passwort_123");
+    WiFi.softAP("bobbyquad", "Passwort_123");
     //WiFi.begin("realraum", "r3alraum");
     WiFi.begin("McDonalds Free WiFi 2.4GHz", "Passwort_123");
 
-    bluetoothSerial.begin("bobbycar");
+    bluetoothSerial.begin("bobbyquad");
 
     controllers[0].serial.begin(38400, SERIAL_8N1, PINS_RX1, PINS_TX1);
     controllers[1].serial.begin(38400, SERIAL_8N1, PINS_RX2, PINS_TX2);
