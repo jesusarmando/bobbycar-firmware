@@ -25,6 +25,7 @@ constexpr char TEXT_POWEROFF[] = "Poweroff";
 //SettingsMenu
 //constexpr char TEXT_SETTINGS[] = "Settings";
 constexpr char TEXT_COMMONSETTINGS[] = "Common settings";
+constexpr char TEXT_WIFISETTINGS[] = "WiFi settings";
 //constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
 constexpr char TEXT_DEFAULTMODESETTIGNS[] = "Default mode settings";
 constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
@@ -110,6 +111,11 @@ constexpr char TEXT_INVERTBACKRIGHT[] = "Invert back right";
 //constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
 //constexpr char TEXT_SETCONTROLTYPE[] = "Set control type";
 //constexpr char TEXT_SETCONTROLMODE[] = "Set control mode";
+//constexpr char TEXT_BACK[] = "Back";
+
+//WiFiSettingsMenu
+//constexpr char TEXT_WIFISETTINGS[] = "WiFi settings";
+constexpr char TEXT_WIFISCAN[] = "WiFi scan";
 //constexpr char TEXT_BACK[] = "Back";
 
 //PotiSettingsMenu

@@ -3,6 +3,7 @@
 #include "menudisplay.h"
 #include "menuitems/switchscreenmenuitem.h"
 #include "displays/menus/commonsettingsmenu.h"
+#include "displays/menus/wifisettingsmenu.h"
 #include "displays/menus/bluetoothsettingsmenu.h"
 #include "displays/menus/defaultmodesettingsmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
@@ -17,6 +18,7 @@ template<typename Tscreen>
 class SettingsMenu final : public MenuDisplay<
     TEXT_SETTINGS,
     SwitchScreenMenuItem<CommonSettingsMenu<SettingsMenu<Tscreen>>, TEXT_COMMONSETTINGS>,
+    SwitchScreenMenuItem<WifiSettingsMenu<SettingsMenu<Tscreen>>, TEXT_WIFISETTINGS>,
     SwitchScreenMenuItem<BluetoothSettingsMenu<SettingsMenu<Tscreen>>, TEXT_BLUETOOTHSETTINGS>,
     SwitchScreenMenuItem<DefaultModeSettingsMenu<SettingsMenu<Tscreen>>, TEXT_DEFAULTMODESETTIGNS>,
     SwitchScreenMenuItem<TempomatModeSettingsMenu<SettingsMenu<Tscreen>>, TEXT_TEMPOMATMODESETTINGS>,

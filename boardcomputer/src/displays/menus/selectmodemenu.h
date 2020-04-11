@@ -41,12 +41,12 @@ void SelectModeMenu<Tscreen>::start()
     Base::start();
 
     if (ModeAccessor::getRef() == DefaultModeGetter::getValue())
-        Base::setSelectedItem(Base::begin() + 0);
+        Base::setSelectedIndex(0);
     else if (ModeAccessor::getRef() == TempomatModeGetter::getValue())
-        Base::setSelectedItem(Base::begin() + 1);
+        Base::setSelectedIndex(1);
     else if (ModeAccessor::getRef() == BluetoothModeGetter::getValue())
-        Base::setSelectedItem(Base::begin() + 2);
+        Base::setSelectedIndex(2);
     else
-        Base::setSelectedItem(Base::begin() + 3);
+        Base::setSelectedIndex(3);
 }
 }

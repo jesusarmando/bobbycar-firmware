@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <algorithm>
 #include <functional>
 #include <utility>
 
@@ -28,16 +29,18 @@ public:
     MenuDisplayInterface *asMenuDisplayInterface() override { return this; }
     const MenuDisplayInterface *asMenuDisplayInterface() const override { return this; }
 
-    const std::reference_wrapper<MenuItemInterface> *selectedItem() const { return m_selected; }
+    int selectedIndex() const { return m_selectedIndex; }
 
 protected:
-    void setSelectedItem(const std::reference_wrapper<MenuItemInterface> *item);
+    void setSelectedIndex(int selectedIndex) { m_selectedIndex = selectedIndex; }
 
 private:
+    int m_rotateOffset;
+
     Label<5, 5, 230, 25> m_titleLabel;
     int m_lastY;
 
-    const std::reference_wrapper<MenuItemInterface> *m_selected{};
+    int m_selectedIndex;
     bool m_pressed{};
 };
 
@@ -363,7 +366,7 @@ class MenuDisplay<Ttext> : public MenuDisplayInterface, public TitleImpl<Ttext>
 
 void MenuDisplayInterface::start()
 {
-    m_selected = begin();
+    m_selectedIndex = 0;
     m_pressed = false;
     m_lastY = 0;
 
@@ -381,13 +384,32 @@ void MenuDisplayInterface::update()
 {
     if (!m_pressed)
     {
+        const auto offset = m_rotateOffset;
+        m_rotateOffset = 0;
+
+        const auto itemCount = std::distance(begin(), end());
+        if (itemCount)
+        {
+            if (m_selectedIndex == -1)
+                m_selectedIndex = 0;
+
+            m_selectedIndex = m_selectedIndex + offset;
+
+            if (m_selectedIndex < 0)
+                m_selectedIndex = 0;
+            if (m_selectedIndex >= itemCount)
+                m_selectedIndex = itemCount - 1;
+        }
+        else
+            m_selectedIndex = -1;
+
         for (auto iter = begin(); iter != end(); iter++)
             iter->get().update();
     }
-    else
+    else if (m_selectedIndex >= 0)
     {
         m_pressed = false;
-        m_selected->get().triggered();
+        (begin()+m_selectedIndex)->get().triggered();
     }
 }
 
@@ -398,11 +420,11 @@ void MenuDisplayInterface::redraw()
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
-    const auto * const selected = m_selected;
-
     int y = 45;
-    for (auto iter = begin(); iter != end(); iter++)
-        iter->get().redraw(y, iter == selected);
+    const auto menuBegin = begin();
+    const auto menuEnd = end();
+    for (auto iter = menuBegin; iter != menuEnd; iter++)
+        iter->get().redraw(y, std::distance(menuBegin, iter) == m_selectedIndex);
 
     if (y < m_lastY)
         tft.fillRect(0, y, tft.width(), m_lastY - y, TFT_BLACK);
@@ -418,22 +440,12 @@ void MenuDisplayInterface::stop()
 
 void MenuDisplayInterface::rotate(int offset)
 {
-    auto selected = m_selected + offset;
-    if (selected < begin())
-        selected = begin();
-    if (selected >= end())
-        selected = end() - 1;
-    setSelectedItem(selected);
+    m_rotateOffset += offset;
 }
 
 void MenuDisplayInterface::button(bool pressed)
 {
     if (!pressed)
         m_pressed = true;
-}
-
-void MenuDisplayInterface::setSelectedItem(const std::reference_wrapper<MenuItemInterface> *item)
-{
-    m_selected = item;
 }
 }

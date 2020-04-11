@@ -1249,11 +1249,12 @@ void WebHandler::handleDisplay(AsyncWebServerRequest *request)
 
                 HtmlTag ul(response, "ul");
 
-                const auto *selected = menuDisplay->selectedItem();
-
-                for (auto iter = menuDisplay->begin(); iter != menuDisplay->end(); iter++)
+                const auto menuBegin = menuDisplay->begin();
+                const auto menuEnd = menuDisplay->end();
+                const auto selectedIndex = menuDisplay->selectedIndex();
+                for (auto iter = menuBegin; iter != menuEnd; iter++)
                 {
-                    HtmlTag li(response, "li", iter==selected?" style=\"border: 1px solid black;\"":"");
+                    HtmlTag li(response, "li", std::distance(menuBegin, iter)==selectedIndex?" style=\"border: 1px solid black;\"":"");
                     HtmlTag a(response, "a", String(" href=\"/displayAction?action=triggerItem&index=") + std::distance(menuDisplay->begin(), iter) + "\"");
                     response.print(iter->get().title());
                 }

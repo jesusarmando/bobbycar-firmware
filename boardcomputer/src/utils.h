@@ -72,8 +72,8 @@ void sendCommands()
     }
 }
 
-template<typename T>
-void switchScreen();
+template<typename T, typename... Args>
+void switchScreen(Args&&... args);
 
 void setupScrollArea(uint16_t TFA, uint16_t BFA) {
   tft.writecommand(ILI9341_VSCRDEF); // Vertical scroll definition

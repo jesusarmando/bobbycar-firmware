@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <Arduino.h>
 #include <WString.h>
 

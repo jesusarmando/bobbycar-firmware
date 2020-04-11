@@ -185,9 +185,9 @@ void ChangeValueDisplay<bool, Taccessor, Tdisplay, Ttext>::start()
     Base::start();
 
     if (Taccessor::getRef() == true)
-        Base::setSelectedItem(Base::begin() + 0);
+        Base::setSelectedIndex(0);
     else if (Taccessor::getRef() == false)
-        Base::setSelectedItem(Base::begin() + 1);
+        Base::setSelectedIndex(1);
 }
 
 template<typename Taccessor, typename Tdisplay, const char *Ttext>
@@ -196,15 +196,15 @@ void ChangeValueDisplay<ControlMode, Taccessor, Tdisplay, Ttext>::start()
     Base::start();
 
     if (Taccessor::getRef() == ControlMode::OpenMode)
-        Base::setSelectedItem(Base::begin() + 0);
+        Base::setSelectedIndex(0);
     else if (Taccessor::getRef() == ControlMode::Voltage)
-        Base::setSelectedItem(Base::begin() + 1);
+        Base::setSelectedIndex(1);
     else if (Taccessor::getRef() == ControlMode::Speed)
-        Base::setSelectedItem(Base::begin() + 2);
+        Base::setSelectedIndex(2);
     else if (Taccessor::getRef() == ControlMode::Torque)
-        Base::setSelectedItem(Base::begin() + 3);
+        Base::setSelectedIndex(3);
     else
-        Base::setSelectedItem(Base::begin() + 4);
+        Base::setSelectedIndex(4);
 }
 
 template<typename Taccessor, typename Tdisplay, const char *Ttext>
@@ -213,13 +213,13 @@ void ChangeValueDisplay<ControlType, Taccessor, Tdisplay, Ttext>::start()
     Base::start();
 
     if (Taccessor::getRef() == ControlType::Commutation)
-        Base::setSelectedItem(Base::begin() + 0);
+        Base::setSelectedIndex(0);
     else if (Taccessor::getRef() == ControlType::Sinusoidal)
-        Base::setSelectedItem(Base::begin() + 1);
+        Base::setSelectedIndex(1);
     else if (Taccessor::getRef() == ControlType::FieldOrientedControl)
-        Base::setSelectedItem(Base::begin() + 2);
+        Base::setSelectedIndex(2);
     else
-        Base::setSelectedItem(Base::begin() + 3);
+        Base::setSelectedIndex(3);
 }
 
 }

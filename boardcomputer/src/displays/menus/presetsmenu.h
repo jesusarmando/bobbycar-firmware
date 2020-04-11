@@ -9,10 +9,10 @@ namespace {
 template<typename Tscreen>
 class PresetsMenu : public MenuDisplay<
     TEXT_PRESETS,
-    DummyMenuItem<TEXT_STREET>,
-    DummyMenuItem<TEXT_SIDEWALK>,
-    DummyMenuItem<TEXT_POLICE>,
-    DummyMenuItem<TEXT_RACE>,
+    StaticDummyMenuItem<TEXT_STREET>,
+    StaticDummyMenuItem<TEXT_SIDEWALK>,
+    StaticDummyMenuItem<TEXT_POLICE>,
+    StaticDummyMenuItem<TEXT_RACE>,
     SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {};

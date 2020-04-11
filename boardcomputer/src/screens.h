@@ -18,6 +18,8 @@
 #include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/selectmodemenu.h"
 #include "displays/menus/settingsmenu.h"
+#include "displays/menus/wifiscanmenu.h"
+#include "displays/menus/wifisettingsmenu.h"
 #include "displays/bluetoothstatusdisplay.h"
 #include "displays/calibratedisplay.h"
 #include "displays/gameoflifedisplay.h"
@@ -54,6 +56,8 @@ union X {
     PresetsMenu<MainMenu> presetsMenu;
     SelectModeMenu<MainMenu> selectModeMenu;
     SettingsMenu<MainMenu> settingsMenu;
+    WifiScanMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> wifiScanMenu;
+    WifiSettingsMenu<SettingsMenu<MainMenu>> wifiSettingsMenu;
 
     BluetoothStatusDisplay<BluetoothSettingsMenu<SettingsMenu<MainMenu>>> bluetoothStatusDisplay;
     CalibrateDisplay<PotiSettingsMenu<SettingsMenu<MainMenu>>> calibrateDisplay;
@@ -133,6 +137,8 @@ template<> decltype(displays.potiSettingsMenu)                                 &
 template<> decltype(displays.presetsMenu)                                      &getRefByType<decltype(displays.presetsMenu)>()                                      { return displays.presetsMenu; }
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }
 template<> decltype(displays.settingsMenu)                                     &getRefByType<decltype(displays.settingsMenu)>()                                     { return displays.settingsMenu; }
+template<> decltype(displays.wifiScanMenu)                                     &getRefByType<decltype(displays.wifiScanMenu)>()                                     { return displays.wifiScanMenu; }
+template<> decltype(displays.wifiSettingsMenu)                                 &getRefByType<decltype(displays.wifiSettingsMenu)>()                                 { return displays.wifiSettingsMenu; }
 
 template<> decltype(displays.bluetoothStatusDisplay)                           &getRefByType<decltype(displays.bluetoothStatusDisplay)>()                           { return displays.bluetoothStatusDisplay; }
 template<> decltype(displays.calibrateDisplay)                                 &getRefByType<decltype(displays.calibrateDisplay)>()                                 { return displays.calibrateDisplay; }
@@ -201,13 +207,13 @@ void deconstructScreen()
     }
 }
 
-template<typename T>
-void switchScreenImpl()
+template<typename T, typename... Args>
+void switchScreenImpl(Args&&... args)
 {
     deconstructScreen();
 
     T &ref = getRefByType<T>();
-    new (&ref) T;
+    new (&ref) T{std::forward<Args>(args)...};
     currentDisplay = &ref;
     ref.start();
     ref.redraw();
@@ -215,13 +221,13 @@ void switchScreenImpl()
 
 std::function<void()> changeScreenCallback;
 
-template<typename T>
-void switchScreen()
+template<typename T, typename... Args>
+void switchScreen(Args&&... args)
 {
     if (currentDisplay)
-        changeScreenCallback = switchScreenImpl<T>;
+        changeScreenCallback = [args...](){ switchScreenImpl<T>(std::forward<Args>(args)...); };
     else
-        switchScreenImpl<T>();
+        switchScreenImpl<T>(std::forward<Args>(args)...);
 }
 
 void initScreen()
@@ -267,6 +273,8 @@ void printMemoryUsage(){
     test[sizeof(displays.potiSettingsMenu)].insert("displays.potiSettingsMenu");
     test[sizeof(displays.selectModeMenu)].insert("displays.selectModeMenu");
     test[sizeof(displays.settingsMenu)].insert("displays.settingsMenu");
+    test[sizeof(displays.wifiScanMenu)].insert("displays.wifiScanMenu");
+    test[sizeof(displays.wifiSettingsMenu)].insert("displays.wifiSettingsMenu");
 
     test[sizeof(displays.gameOfLifeDisplay)].insert("displays.gameOfLifeDisplay");
     test[sizeof(displays.metersDisplay)].insert("displays.metersDisplay");
