@@ -1,6 +1,10 @@
 #pragma once
 
 namespace {
+//AccessPointWifiSettingsMenu
+constexpr char TEXT_ACCESSPOINTWIFISETTINGS[] = "Access Point WiFi settings";
+//constexpr char TEXT_BACK[] = "Back";
+
 //BluetoothSettingsMenu
 constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
 constexpr char TEXT_BLUETOOTHBEGIN[] = "begin()";
@@ -37,6 +41,10 @@ constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
 constexpr char TEXT_POTISETTINGS[] = "Poti settings";
 constexpr char TEXT_REBOOT[] = "Reboot";
 constexpr char TEXT_VERSION[] = "Version";
+//constexpr char TEXT_BACK[] = "Back";
+
+//StationWifiSettingsMenu
+constexpr char TEXT_STATIONWIFISETTINGS[] = "Station WiFi settings";
 //constexpr char TEXT_BACK[] = "Back";
 
 //DemosMenu
@@ -103,6 +111,14 @@ constexpr char TEXT_ENABLEBACKLEFT[] = "Enable back left";
 constexpr char TEXT_ENABLEBACKRIGHT[] = "Enable back right";
 //constexpr char TEXT_BACK[] = "Back";
 
+//GenericWifiSettingsMenu
+constexpr char TEXT_GENERICWIFISETTINGS[] = "Generic WiFi settings";
+constexpr char TEXT_WIFICHANGEMODE[] = "Change mode";
+constexpr char TEXT_WIFICHANGESLEEP[] = "Change sleep";
+constexpr char TEXT_WIFICHANGETXPOWER[] = "Change tx power";
+constexpr char TEXT_WIFISCAN[] = "WiFi scan";
+//constexpr char TEXT_BACK[] = "Back";
+
 //InvertMenu
 //constexpr char TEXT_SETINVERTED[] = "Set inverted";
 constexpr char TEXT_INVERTFRONTLEFT[] = "Invert front left";
@@ -119,7 +135,7 @@ constexpr char TEXT_INVERTBACKRIGHT[] = "Invert back right";
 
 //WiFiSettingsMenu
 //constexpr char TEXT_WIFISETTINGS[] = "WiFi settings";
-constexpr char TEXT_WIFISCAN[] = "WiFi scan";
+//constexpr char TEXT_GENERICWIFISETTINGS[] = "Generic WiFi settings";
 //constexpr char TEXT_BACK[] = "Back";
 
 //PotiSettingsMenu
@@ -161,5 +177,28 @@ constexpr char TEXT_TORQUE[] = "Torque";
 constexpr char TEXT_COMMUTATION[] = "Commutation";
 constexpr char TEXT_SINUSOIDAL[] = "Sinusoidal";
 constexpr char TEXT_FIELDORIENTEDCONTROL[] = "Field oriented control";
+//constexpr char TEXT_BACK[] = "Back";
+
+//ChangeValueDisplay<wifi_mode_t>
+constexpr char TEXT_WIFI_MODE_NULL[] = "WIFI_MODE_NULL";
+constexpr char TEXT_WIFI_MODE_STA[] = "WIFI_MODE_STA";
+constexpr char TEXT_WIFI_MODE_AP[] = "WIFI_MODE_AP";
+constexpr char TEXT_WIFI_MODE_APSTA[] = "WIFI_MODE_APSTA";
+constexpr char TEXT_WIFI_MODE_MAX[] = "WIFI_MODE_MAX";
+//constexpr char TEXT_BACK[] = "Back";
+
+//ChangeValueDisplay<wifi_power_t>
+constexpr char TEXT_WIFI_POWER_19_5dBm[] = "19.5dBm";
+constexpr char TEXT_WIFI_POWER_19dBm[] = "19dBm";
+constexpr char TEXT_WIFI_POWER_18_5dBm[] = "18.5dBm";
+constexpr char TEXT_WIFI_POWER_17dBm[] = "17dBm";
+constexpr char TEXT_WIFI_POWER_15dBm[] = "15dBm";
+constexpr char TEXT_WIFI_POWER_13dBm[] = "13dBm";
+constexpr char TEXT_WIFI_POWER_11dBm[] = "11dBm";
+constexpr char TEXT_WIFI_POWER_8_5dBm[] = "8.5dBm";
+constexpr char TEXT_WIFI_POWER_7dBm[] = "7dBm";
+constexpr char TEXT_WIFI_POWER_5dBm[] = "5dBm";
+constexpr char TEXT_WIFI_POWER_2dBm[] = "2dBm";
+constexpr char TEXT_WIFI_POWER_MINUS_1dBm[] = "-1dBm";
 //constexpr char TEXT_BACK[] = "Back";
 }

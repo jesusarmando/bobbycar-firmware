@@ -1,8 +1,6 @@
 #pragma once
 
-#include <map>
-#include <set>
-
+#include "displays/menus/accesspointwifisettingsmenu.h"
 #include "displays/menus/bluetoothsettingsmenu.h"
 #include "displays/menus/bluetoothmodesettingsmenu.h"
 #include "displays/menus/buzzermenu.h"
@@ -12,12 +10,14 @@
 #include "displays/menus/demosmenu.h"
 #include "displays/menus/dynamicdebugmenu.h"
 #include "displays/menus/enablemenu.h"
+#include "displays/menus/genericwifisettingsmenu.h"
 #include "displays/menus/invertmenu.h"
 #include "displays/menus/mainmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
 #include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/selectmodemenu.h"
 #include "displays/menus/settingsmenu.h"
+#include "displays/menus/stationwifisettingsmenu.h"
 #include "displays/menus/wifiscanmenu.h"
 #include "displays/menus/wifisettingsmenu.h"
 #include "displays/calibratedisplay.h"
@@ -40,6 +40,7 @@ union X {
     ~X() { ((Display&)statusDisplay).~Display(); }
 
     MainMenu mainMenu;
+    AccessPointWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> accessPointWifiSettingsMenu;
     BluetoothSettingsMenu<SettingsMenu<MainMenu>> bluetoothSettingsMenu;
     BluetoothModeSettingsMenu<SettingsMenu<MainMenu>> bluetoothModeSettingsMenu;
     BuzzerMenu<DebugMenu<MainMenu>> buzzerMenu;
@@ -49,12 +50,14 @@ union X {
     DemosMenu<MainMenu> demosMenu;
     DynamicDebugMenu<DebugMenu<MainMenu>> dynamicDebugMenu;
     EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> enableMenu;
+    GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> genericWifiSettingsMenu;
     InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> invertMenu;
     TempomatModeSettingsMenu<SettingsMenu<MainMenu>> tempomatModeSettingsMenu;
     PotiSettingsMenu<SettingsMenu<MainMenu>> potiSettingsMenu;
     PresetsMenu<MainMenu> presetsMenu;
     SelectModeMenu<MainMenu> selectModeMenu;
     SettingsMenu<MainMenu> settingsMenu;
+    StationWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> stationWifiSettingsMenu;
     WifiScanMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> wifiScanMenu;
     WifiSettingsMenu<SettingsMenu<MainMenu>> wifiSettingsMenu;
 
@@ -113,12 +116,17 @@ union X {
     GasMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMax;
     BremsMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeBremsMin;
     BremsMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeBremsMax;
+
+    WifiModeChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiModeChangeScreen;
+    WifiSleepChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiSleepChangeScreen;
+    WifiTxPowerChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiTxPowerChangeScreen;
 } displays;
 
 using DefaultScreen = decltype(displays.statusDisplay);
 //using DefaultScreen = decltype(displays.lockScreen);
 
 template<typename T> T &getRefByType() = delete;
+template<> decltype(displays.accessPointWifiSettingsMenu)                      &getRefByType<decltype(displays.accessPointWifiSettingsMenu)>()                      { return displays.accessPointWifiSettingsMenu; }
 template<> decltype(displays.bluetoothSettingsMenu)                            &getRefByType<decltype(displays.bluetoothSettingsMenu)>()                            { return displays.bluetoothSettingsMenu; }
 template<> decltype(displays.bluetoothModeSettingsMenu)                        &getRefByType<decltype(displays.bluetoothModeSettingsMenu)>()                        { return displays.bluetoothModeSettingsMenu; }
 template<> decltype(displays.buzzerMenu)                                       &getRefByType<decltype(displays.buzzerMenu)>()                                       { return displays.buzzerMenu; }
@@ -128,6 +136,7 @@ template<> decltype(displays.defaultModeSettingsMenu)                          &
 template<> decltype(displays.demosMenu)                                        &getRefByType<decltype(displays.demosMenu)>()                                        { return displays.demosMenu; }
 template<> decltype(displays.dynamicDebugMenu)                                 &getRefByType<decltype(displays.dynamicDebugMenu)>()                                 { return displays.dynamicDebugMenu; }
 template<> decltype(displays.enableMenu)                                       &getRefByType<decltype(displays.enableMenu)>()                                       { return displays.enableMenu; }
+template<> decltype(displays.genericWifiSettingsMenu)                          &getRefByType<decltype(displays.genericWifiSettingsMenu)>()                          { return displays.genericWifiSettingsMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
 template<> decltype(displays.mainMenu)                                         &getRefByType<decltype(displays.mainMenu)>()                                         { return displays.mainMenu; }
 template<> decltype(displays.tempomatModeSettingsMenu)                         &getRefByType<decltype(displays.tempomatModeSettingsMenu)>()                         { return displays.tempomatModeSettingsMenu; }
@@ -135,6 +144,7 @@ template<> decltype(displays.potiSettingsMenu)                                 &
 template<> decltype(displays.presetsMenu)                                      &getRefByType<decltype(displays.presetsMenu)>()                                      { return displays.presetsMenu; }
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }
 template<> decltype(displays.settingsMenu)                                     &getRefByType<decltype(displays.settingsMenu)>()                                     { return displays.settingsMenu; }
+template<> decltype(displays.stationWifiSettingsMenu)                          &getRefByType<decltype(displays.stationWifiSettingsMenu)>()                          { return displays.stationWifiSettingsMenu; }
 template<> decltype(displays.wifiScanMenu)                                     &getRefByType<decltype(displays.wifiScanMenu)>()                                     { return displays.wifiScanMenu; }
 template<> decltype(displays.wifiSettingsMenu)                                 &getRefByType<decltype(displays.wifiSettingsMenu)>()                                 { return displays.wifiSettingsMenu; }
 
@@ -194,6 +204,10 @@ template<> decltype(displays.changeGasMax)                                     &
 template<> decltype(displays.changeBremsMin)                                   &getRefByType<decltype(displays.changeBremsMin)>()                                   { return displays.changeBremsMin; }
 template<> decltype(displays.changeBremsMax)                                   &getRefByType<decltype(displays.changeBremsMax)>()                                   { return displays.changeBremsMax; }
 
+template<> decltype(displays.wifiModeChangeScreen)                             &getRefByType<decltype(displays.wifiModeChangeScreen)>()                             { return displays.wifiModeChangeScreen; }
+template<> decltype(displays.wifiSleepChangeScreen)                            &getRefByType<decltype(displays.wifiSleepChangeScreen)>()                            { return displays.wifiSleepChangeScreen; }
+template<> decltype(displays.wifiTxPowerChangeScreen)                          &getRefByType<decltype(displays.wifiTxPowerChangeScreen)>()                          { return displays.wifiTxPowerChangeScreen; }
+
 void deconstructScreen()
 {
     if (currentDisplay)
@@ -249,84 +263,5 @@ void updateDisplay()
 void redrawDisplay()
 {
     currentDisplay->redraw();
-}
-
-void printMemoryUsage(){
-    std::map<int, std::set<const char *>> test;
-
-    test[sizeof(displays)].insert("displays");
-    test[sizeof(displays.bluetoothSettingsMenu)].insert("displays.bluetoothSettingsMenu");
-    test[sizeof(displays.bluetoothModeSettingsMenu)].insert("displays.bluetoothModeSettingsMenu");
-    test[sizeof(displays.buzzerMenu)].insert("displays.buzzerMenu");
-    test[sizeof(displays.commonSettingsMenu)].insert("displays.commonSettingsMenu");
-    test[sizeof(displays.debugMenu)].insert("displays.debugMenu");
-    test[sizeof(displays.defaultModeSettingsMenu)].insert("displays.defaultModeSettingsMenu");
-    test[sizeof(displays.demosMenu)].insert("displays.demosMenu");
-    test[sizeof(displays.dynamicDebugMenu)].insert("displays.dynamicDebugMenu");
-    test[sizeof(displays.enableMenu)].insert("displays.enableMenu");
-    test[sizeof(displays.invertMenu)].insert("displays.invertMenu");
-    test[sizeof(displays.mainMenu)].insert("displays.mainMenu");
-    test[sizeof(displays.tempomatModeSettingsMenu)].insert("displays.tempomatModeSettingsMenu");
-    test[sizeof(displays.potiSettingsMenu)].insert("displays.potiSettingsMenu");
-    test[sizeof(displays.selectModeMenu)].insert("displays.selectModeMenu");
-    test[sizeof(displays.settingsMenu)].insert("displays.settingsMenu");
-    test[sizeof(displays.wifiScanMenu)].insert("displays.wifiScanMenu");
-    test[sizeof(displays.wifiSettingsMenu)].insert("displays.wifiSettingsMenu");
-
-    test[sizeof(displays.gameOfLifeDisplay)].insert("displays.gameOfLifeDisplay");
-    test[sizeof(displays.metersDisplay)].insert("displays.metersDisplay");
-    test[sizeof(displays.pingPongDisplay)].insert("displays.pingPongDisplay");
-    test[sizeof(displays.spiroDisplay)].insert("displays.spiroDisplay");
-    test[sizeof(displays.starFieldDisplay)].insert("displays.starFieldDisplay");
-    test[sizeof(displays.statusDisplay)].insert("displays.statusDisplay");
-    test[sizeof(displays.versionDisplay)].insert("displays.versionDisplay");
-
-    test[sizeof(displays.changeFrontFreq)].insert("changeFrontFreq");
-    test[sizeof(displays.changeFrontPattern)].insert("changeFrontPattern");
-    test[sizeof(displays.changeBackFreq)].insert("changeBackFreq");
-    test[sizeof(displays.changeBackPattern)].insert("changeBackPattern");
-    test[sizeof(displays.changeIMotMax)].insert("changeIMotMax");
-    test[sizeof(displays.changeIDcMax)].insert("changeIDcMax");
-    test[sizeof(displays.changeNMotMax)].insert("changeNMotMax");
-    test[sizeof(displays.changeFieldWeakMax)].insert("changeFieldWeakMax");
-    test[sizeof(displays.changePhaseAdvMax)].insert("changePhaseAdvMax");
-    test[sizeof(displays.changeDefaultModeCtrlTyp)].insert("changeDefaultModeCtrlTyp");
-    test[sizeof(displays.changeDefaultModeCtrlMod)].insert("changeDefaultModeCtrlMod");
-    test[sizeof(displays.changeDefaultModeEnableFieldWeakeningSmoothening)].insert("changeDefaultModeEnableFieldWeakeningSmoothening");
-    test[sizeof(displays.changeDefaultModeWeakeningSmoothening)].insert("changeDefaultModeWeakeningSmoothening");
-    test[sizeof(displays.changeDefaultModeFrontPercentage)].insert("changeDefaultModeFrontPercentage");
-    test[sizeof(displays.changeDefaultModeBackPercentage)].insert("changeDefaultModeBackPercentage");
-    test[sizeof(displays.changeDefaultModeAddSchwelle)].insert("changeDefaultModeAddSchwelle");
-    test[sizeof(displays.changeDefaultModeGas1Wert)].insert("changeDefaultModeGas1Wert");
-    test[sizeof(displays.changeDefaultModeGas2Wert)].insert("changeDefaultModeGas2Wert");
-    test[sizeof(displays.changeDefaultModeBrems1Wert)].insert("changeDefaultModeBrems1Wert");
-    test[sizeof(displays.changeDefaultModeBrems2Wert)].insert("changeDefaultModeBrems2Wert");
-    test[sizeof(displays.changeFrontLeftEnabled)].insert("changeFrontLeftEnabled");
-    test[sizeof(displays.changeFrontRightEnabled)].insert("changeFrontRightEnabled");
-    test[sizeof(displays.changeBackLeftEnabled)].insert("changeBackLeftEnabled");
-    test[sizeof(displays.changeBackRightEnabled)].insert("changeBackRightEnabled");
-    test[sizeof(displays.changeFrontLeftInverted)].insert("changeFrontLeftInverted");
-    test[sizeof(displays.changeFrontRightInverted)].insert("changeFrontRightInverted");
-    test[sizeof(displays.changeBackLeftInverted)].insert("changeBackLeftInverted");
-    test[sizeof(displays.changeBackRightInverted)].insert("changeBackRightInverted");
-    test[sizeof(displays.changeFrontLed)].insert("changeFrontLed");
-    test[sizeof(displays.changeBackLed)].insert("changeBackLed");
-    test[sizeof(displays.changeManualModeCtrlTyp)].insert("changeManualModeCtrlTyp");
-    test[sizeof(displays.changeManualModeCtrlMod)].insert("changeManualModeCtrlMod");
-    test[sizeof(displays.changeGasMin)].insert("changeGasMin");
-    test[sizeof(displays.changeGasMax)].insert("changeGasMax");
-    test[sizeof(displays.changeBremsMin)].insert("changeBremsMin");
-    test[sizeof(displays.changeBremsMax)].insert("changeBremsMax");
-
-    for (auto iter = std::cbegin(test); iter != std::cend(test); iter++)
-    {
-        Serial.print("Folloging have a size of ");
-        Serial.println(iter->first);
-
-        for (const auto &x : iter->second)
-            Serial.println(x);
-
-        Serial.println();
-    }
 }
 }

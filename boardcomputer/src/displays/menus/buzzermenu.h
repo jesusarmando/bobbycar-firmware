@@ -3,25 +3,26 @@
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
 #include "changevaluedisplay.h"
+#include "accessorhelper.h"
 #include "texts.h"
 #include "globals.h"
 
 namespace {
 struct FrontFreqAccessor { static auto &getRef() { return front.command.buzzer.freq; } };
 template<typename Tscreen>
-using FrontFreqChangeScreen = ChangeValueDisplay<uint8_t, FrontFreqAccessor, Tscreen, TEXT_SETFRONTFREQ>;
+using FrontFreqChangeScreen = ChangeValueDisplay<uint8_t, AccessorHelper<FrontFreqAccessor>, Tscreen, TEXT_SETFRONTFREQ>;
 
 struct FrontPatternAccessor { static auto &getRef() { return front.command.buzzer.pattern; } };
 template<typename Tscreen>
-using FrontPatternChangeScreen = ChangeValueDisplay<uint8_t, FrontPatternAccessor, Tscreen, TEXT_SETFRONTPATTERN>;
+using FrontPatternChangeScreen = ChangeValueDisplay<uint8_t, AccessorHelper<FrontPatternAccessor>, Tscreen, TEXT_SETFRONTPATTERN>;
 
 struct BackFreqAccessor { static auto &getRef() { return back.command.buzzer.freq; } };
 template<typename Tscreen>
-using BackFreqChangeScreen = ChangeValueDisplay<uint8_t, BackFreqAccessor, Tscreen, TEXT_SETBACKFREQ>;
+using BackFreqChangeScreen = ChangeValueDisplay<uint8_t, AccessorHelper<BackFreqAccessor>, Tscreen, TEXT_SETBACKFREQ>;
 
 struct BackPatternAccessor { static auto &getRef() { return back.command.buzzer.pattern; } };
 template<typename Tscreen>
-using BackPatternChangeScreen = ChangeValueDisplay<uint8_t, BackPatternAccessor, Tscreen, TEXT_SETBACKPATTERN>;
+using BackPatternChangeScreen = ChangeValueDisplay<uint8_t, AccessorHelper<BackPatternAccessor>, Tscreen, TEXT_SETBACKPATTERN>;
 
 template<typename Tscreen>
 class BuzzerMenu final :

@@ -15,7 +15,7 @@ public:
 template<typename Tvalue, typename Taccessor, Tvalue Tset, typename Tscreen, const char *Ttext>
 void SetValueMenuItem<Tvalue, Taccessor, Tset, Tscreen, Ttext>::triggered()
 {
-    Taccessor::getRef() = Tset;
+    Taccessor::setValue(Tset);
 
     Base::triggered();
 }

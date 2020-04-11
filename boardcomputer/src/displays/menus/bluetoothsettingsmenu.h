@@ -14,8 +14,9 @@
 namespace {
 struct BluetoothAvailableLiveStatus { static String getText() { return String{"available: "} + bluetoothSerial.available(); } };
 struct BluetoothHasClientLiveStatus { static String getText() { return String{"hasClient: "} + (bluetoothSerial.hasClient() ? "true" : "false"); } };
-struct BluetoothConnectedLiveStatus { static String getText() { return String{"connected: "} + (bluetoothSerial.connected() ? "true" : "false"); } };
+//struct BluetoothConnectedLiveStatus { static String getText() { return String{"connected: "} + (bluetoothSerial.connected() ? "true" : "false"); } };
 struct BluetoothIsReadyLiveStatus { static String getText() { return String{"isReady: "} + (bluetoothSerial.isReady() ? "true" : "false"); } };
+struct BluetoothIsReadyMasterLiveStatus { static String getText() { return String{"isReady (M): "} + (bluetoothSerial.isReady(true) ? "true" : "false"); } };
 
 template<typename Tscreen>
 class BluetoothSettingsMenu final :
@@ -23,8 +24,9 @@ class BluetoothSettingsMenu final :
     public StaticMenuDisplay<
         LiveStatusMenuItem<BluetoothAvailableLiveStatus>,
         LiveStatusMenuItem<BluetoothHasClientLiveStatus>,
-        LiveStatusMenuItem<BluetoothConnectedLiveStatus>,
+//        LiveStatusMenuItem<BluetoothConnectedLiveStatus>,
         LiveStatusMenuItem<BluetoothIsReadyLiveStatus>,
+        LiveStatusMenuItem<BluetoothIsReadyMasterLiveStatus>,
         BluetoothBeginMenuItem<TEXT_BLUETOOTHBEGIN>,
         BluetoothBeginMasterMenuItem<TEXT_BLUETOOTHBEGINMASTER>,
         BluetoothFlushMenuItem<TEXT_BLUETOOTHFLUSH>,

@@ -1,12 +1,9 @@
 #pragma once
 
-#include "menuitem.h"
+#include "menuitems/dummymenuitem.h"
 #include "titleinterface.h"
 
 namespace {
-class DynamicDummyMenuItem : public MenuItem, public DynamicTitle
-{
-public:
-    void triggered() final {}
-};
+class DynamicDummyMenuItem : public DummyMenuItem, public DynamicTitle
+{};
 }

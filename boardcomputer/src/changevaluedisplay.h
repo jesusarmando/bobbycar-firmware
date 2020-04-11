@@ -54,70 +54,6 @@ private:
     bool m_pressed{};
 };
 
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay<bool, Taccessor, Tdisplay, Ttext> final :
-    public StaticTitle<Ttext>,
-    public StaticMenuDisplay<
-        SetValueMenuItem<bool, Taccessor, true, Tdisplay, TEXT_TRUE>,
-        SetValueMenuItem<bool, Taccessor, false, Tdisplay, TEXT_FALSE>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >
-{
-    using Base = StaticMenuDisplay<
-        SetValueMenuItem<bool, Taccessor, true, Tdisplay, TEXT_TRUE>,
-        SetValueMenuItem<bool, Taccessor, false, Tdisplay, TEXT_FALSE>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >;
-
-public:
-    void start() override;
-};
-
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay<ControlMode, Taccessor, Tdisplay, Ttext> final :
-    public StaticTitle<Ttext>,
-    public StaticMenuDisplay<
-        SetValueMenuItem<ControlMode, Taccessor, ControlMode::OpenMode, Tdisplay, TEXT_OPENMODE>,
-        SetValueMenuItem<ControlMode, Taccessor, ControlMode::Voltage, Tdisplay, TEXT_VOLTAGE>,
-        SetValueMenuItem<ControlMode, Taccessor, ControlMode::Speed, Tdisplay, TEXT_SPEED>,
-        SetValueMenuItem<ControlMode, Taccessor, ControlMode::Torque, Tdisplay, TEXT_TORQUE>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >
-{
-    using Base = StaticMenuDisplay<
-        SetValueMenuItem<ControlMode, Taccessor, ControlMode::OpenMode, Tdisplay, TEXT_OPENMODE>,
-        SetValueMenuItem<ControlMode, Taccessor, ControlMode::Voltage, Tdisplay, TEXT_VOLTAGE>,
-        SetValueMenuItem<ControlMode, Taccessor, ControlMode::Speed, Tdisplay, TEXT_SPEED>,
-        SetValueMenuItem<ControlMode, Taccessor, ControlMode::Torque, Tdisplay, TEXT_TORQUE>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >;
-
-public:
-    void start() override;
-};
-
-
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay<ControlType, Taccessor, Tdisplay, Ttext> final :
-    public StaticTitle<Ttext>,
-    public StaticMenuDisplay<
-        SetValueMenuItem<ControlType, Taccessor, ControlType::Commutation, Tdisplay, TEXT_COMMUTATION>,
-        SetValueMenuItem<ControlType, Taccessor, ControlType::Sinusoidal, Tdisplay, TEXT_SINUSOIDAL>,
-        SetValueMenuItem<ControlType, Taccessor, ControlType::FieldOrientedControl, Tdisplay, TEXT_FIELDORIENTEDCONTROL>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >
-{
-    using Base = StaticMenuDisplay<
-        SetValueMenuItem<ControlType, Taccessor, ControlType::Commutation, Tdisplay, TEXT_COMMUTATION>,
-        SetValueMenuItem<ControlType, Taccessor, ControlType::Sinusoidal, Tdisplay, TEXT_SINUSOIDAL>,
-        SetValueMenuItem<ControlType, Taccessor, ControlType::FieldOrientedControl, Tdisplay, TEXT_FIELDORIENTEDCONTROL>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >;
-
-public:
-    void start() override;
-};
-
 void ChangeValueDisplayInterface::start()
 {
     tft.setRotation(0);
@@ -143,7 +79,7 @@ void ChangeValueDisplayInterface::start()
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
 void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::start()
 {
-    m_value = Taccessor::getRef();
+    m_value = Taccessor::getValue();
 
     m_rotateOffset = 0;
     m_pressed = false;
@@ -163,7 +99,7 @@ void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::update()
     }
     else
     {
-        Taccessor::getRef() = m_value;
+        Taccessor::setValue(m_value);
         switchScreen<Tdisplay>();
     }
 }
@@ -192,48 +128,10 @@ void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::confirm()
 {
     m_pressed = true;
 }
-
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<bool, Taccessor, Tdisplay, Ttext>::start()
-{
-    Base::start();
-
-    if (Taccessor::getRef() == true)
-        Base::setSelectedIndex(0);
-    else if (Taccessor::getRef() == false)
-        Base::setSelectedIndex(1);
 }
 
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<ControlMode, Taccessor, Tdisplay, Ttext>::start()
-{
-    Base::start();
-
-    if (Taccessor::getRef() == ControlMode::OpenMode)
-        Base::setSelectedIndex(0);
-    else if (Taccessor::getRef() == ControlMode::Voltage)
-        Base::setSelectedIndex(1);
-    else if (Taccessor::getRef() == ControlMode::Speed)
-        Base::setSelectedIndex(2);
-    else if (Taccessor::getRef() == ControlMode::Torque)
-        Base::setSelectedIndex(3);
-    else
-        Base::setSelectedIndex(4);
-}
-
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<ControlType, Taccessor, Tdisplay, Ttext>::start()
-{
-    Base::start();
-
-    if (Taccessor::getRef() == ControlType::Commutation)
-        Base::setSelectedIndex(0);
-    else if (Taccessor::getRef() == ControlType::Sinusoidal)
-        Base::setSelectedIndex(1);
-    else if (Taccessor::getRef() == ControlType::FieldOrientedControl)
-        Base::setSelectedIndex(2);
-    else
-        Base::setSelectedIndex(3);
-}
-
-}
+#include "changevaluedisplay_bool.h"
+#include "changevaluedisplay_controlmode.h"
+#include "changevaluedisplay_controltype.h"
+#include "changevaluedisplay_wifi_mode_t.h"
+#include "changevaluedisplay_wifi_power_t.h"

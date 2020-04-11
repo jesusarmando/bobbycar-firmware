@@ -317,4 +317,43 @@ private:
         std::ref<MenuItem>(item11)
     }};
 };
+
+template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12>
+class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : public MenuDisplay
+{
+public:
+    const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItem> *end() const override { return std::end(arr); };
+
+private:
+    T0 item0;
+    T1 item1;
+    T2 item2;
+    T3 item3;
+    T4 item4;
+    T5 item5;
+    T6 item6;
+    T7 item7;
+    T8 item8;
+    T9 item9;
+    T10 item10;
+    T11 item11;
+    T12 item12;
+
+    const std::array<std::reference_wrapper<MenuItem>, 13> arr{{
+        std::ref<MenuItem>(item0),
+        std::ref<MenuItem>(item1),
+        std::ref<MenuItem>(item2),
+        std::ref<MenuItem>(item3),
+        std::ref<MenuItem>(item4),
+        std::ref<MenuItem>(item5),
+        std::ref<MenuItem>(item6),
+        std::ref<MenuItem>(item7),
+        std::ref<MenuItem>(item8),
+        std::ref<MenuItem>(item9),
+        std::ref<MenuItem>(item10),
+        std::ref<MenuItem>(item11),
+        std::ref<MenuItem>(item12)
+    }};
+};
 }

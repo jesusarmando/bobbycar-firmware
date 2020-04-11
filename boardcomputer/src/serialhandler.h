@@ -67,10 +67,6 @@ void handleSerial()
             InputDispatcher::button(true);
             InputDispatcher::button(false);
             break;
-        case 'm':
-        case 'M':
-            printMemoryUsage();
-            break;
         }
     }
 }

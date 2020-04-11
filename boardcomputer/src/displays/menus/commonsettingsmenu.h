@@ -3,6 +3,7 @@
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
 #include "changevaluedisplay.h"
+#include "accessorhelper.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/invertmenu.h"
 #include "texts.h"
@@ -11,23 +12,23 @@
 namespace {
 struct IMotMaxAccessor { static auto &getRef() { return settings.iMotMax; } };
 template<typename Tscreen>
-using IMotMaxChangeScreen = ChangeValueDisplay<int16_t, IMotMaxAccessor, Tscreen, TEXT_SETIMOTMAX>;
+using IMotMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<IMotMaxAccessor>, Tscreen, TEXT_SETIMOTMAX>;
 
 struct IDcMaxAccessor { static auto &getRef() { return settings.iDcMax; } };
 template<typename Tscreen>
-using IDcMaxChangeScreen = ChangeValueDisplay<int16_t, IDcMaxAccessor, Tscreen, TEXT_SETIDCMAX>;
+using IDcMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<IDcMaxAccessor>, Tscreen, TEXT_SETIDCMAX>;
 
 struct NMotMaxAccessor { static auto &getRef() { return settings.nMotMax; } };
 template<typename Tscreen>
-using NMotMaxChangeScreen = ChangeValueDisplay<int16_t, NMotMaxAccessor, Tscreen, TEXT_SETNMOTMAX>;
+using NMotMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<NMotMaxAccessor>, Tscreen, TEXT_SETNMOTMAX>;
 
 struct FieldWeakMaxAccessor { static auto &getRef() { return settings.fieldWeakMax; } };
 template<typename Tscreen>
-using FieldWeakMaxChangeScreen = ChangeValueDisplay<int16_t, FieldWeakMaxAccessor, Tscreen, TEXT_SETFIELDWEAKMAX>;
+using FieldWeakMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<FieldWeakMaxAccessor>, Tscreen, TEXT_SETFIELDWEAKMAX>;
 
 struct PhaseAdvMaxAccessor { static auto &getRef() { return settings.phaseAdvMax; } };
 template<typename Tscreen>
-using PhaseAdvMaxChangeScreen = ChangeValueDisplay<int16_t, PhaseAdvMaxAccessor, Tscreen, TEXT_SETPHASEADVMAX>;
+using PhaseAdvMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<PhaseAdvMaxAccessor>, Tscreen, TEXT_SETPHASEADVMAX>;
 
 template<typename Tscreen>
 class CommonSettingsMenu final :

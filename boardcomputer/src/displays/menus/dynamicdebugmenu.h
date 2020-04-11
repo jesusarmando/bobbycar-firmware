@@ -12,21 +12,15 @@
 #include "globals.h"
 
 namespace {
-struct GasLiveStatus { static String getText() { return String{"gas: "} + gas; } };
-struct BremsLiveStatus { static String getText() { return String{"brems: "} + brems; } };
 struct RandomNumberLiveStatus { static String getText() { return String{"random: "} + random(0, 100); } };
 
 template<typename Tscreen>
 class DynamicDebugMenu final : public StaticMenuDisplay<
-    LiveStatusMenuItem<GasLiveStatus>,
-    LiveStatusMenuItem<BremsLiveStatus>,
     LiveStatusMenuItem<RandomNumberLiveStatus>,
     StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {
     using Base = StaticMenuDisplay<
-        LiveStatusMenuItem<GasLiveStatus>,
-        LiveStatusMenuItem<BremsLiveStatus>,
         LiveStatusMenuItem<RandomNumberLiveStatus>,
         StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
     >;

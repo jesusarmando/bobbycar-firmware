@@ -15,7 +15,7 @@ public:
 template<typename Tvalue, typename Tsetter, typename Tgetter, typename Tscreen, const char *Ttext>
 void SetDynamicValueMenuItem<Tvalue, Tsetter, Tgetter, Tscreen, Ttext>::triggered()
 {
-    Tsetter::getRef() = Tgetter::getValue();
+    Tsetter::setValue(Tgetter::getValue());
 
     Base::triggered();
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "staticmenudisplay.h"
+#include "accessorhelper.h"
 #include "menuitems/setdynamicvaluemenuitem.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
 #include "texts.h"
@@ -11,24 +12,24 @@
 
 namespace {
 struct ModeAccessor { static auto &getRef() { return currentMode; } };
-struct DefaultModeGetter { static auto getValue() { return &modes::defaultMode; } };
-struct TempomatModeGetter { static auto getValue() { return &modes::tempomatMode; } };
-struct BluetoothModeGetter { static auto getValue() { return &modes::bluetoothMode; } };
+struct DefaultModeAccessor { static auto getValue() { return &modes::defaultMode; } };
+struct TempomatModeAccessor { static auto getValue() { return &modes::tempomatMode; } };
+struct BluetoothModeAccessor { static auto getValue() { return &modes::bluetoothMode; } };
 
 template<typename Tscreen>
 class SelectModeMenu final :
     public StaticTitle<TEXT_SELECTMODE>,
     public StaticMenuDisplay<
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, TempomatModeGetter, Tscreen, TEXT_TEMPOMAT>,
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
+        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, DefaultModeAccessor, Tscreen, TEXT_DEFAULT>,
+        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, TempomatModeAccessor, Tscreen, TEXT_TEMPOMAT>,
+        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, BluetoothModeAccessor, Tscreen, TEXT_BLUETOOTH>,
         StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
     >
 {
     using Base = StaticMenuDisplay<
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, TempomatModeGetter, Tscreen, TEXT_TEMPOMAT>,
-        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
+        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, DefaultModeAccessor, Tscreen, TEXT_DEFAULT>,
+        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, TempomatModeAccessor, Tscreen, TEXT_TEMPOMAT>,
+        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, BluetoothModeAccessor, Tscreen, TEXT_BLUETOOTH>,
         StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
     >;
 
@@ -41,11 +42,11 @@ void SelectModeMenu<Tscreen>::start()
 {
     Base::start();
 
-    if (ModeAccessor::getRef() == DefaultModeGetter::getValue())
+    if (AccessorHelper<ModeAccessor>::getValue() == DefaultModeAccessor::getValue())
         Base::setSelectedIndex(0);
-    else if (ModeAccessor::getRef() == TempomatModeGetter::getValue())
+    else if (AccessorHelper<ModeAccessor>::getValue() == TempomatModeAccessor::getValue())
         Base::setSelectedIndex(1);
-    else if (ModeAccessor::getRef() == BluetoothModeGetter::getValue())
+    else if (AccessorHelper<ModeAccessor>::getValue() == BluetoothModeAccessor::getValue())
         Base::setSelectedIndex(2);
     else
         Base::setSelectedIndex(3);
