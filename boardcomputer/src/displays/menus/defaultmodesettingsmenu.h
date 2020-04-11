@@ -1,7 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "changevaluedisplay.h"
 #include "texts.h"
 #include "modes/defaultmode.h"
@@ -52,20 +52,21 @@ template<typename Tscreen>
 using DefaultModeBrems2WertChangeDisplay = ChangeValueDisplay<int16_t, DefaultModeBrems2WertAccessor, Tscreen, TEXT_SETBREMS2WERT>;
 
 template<typename Tscreen>
-class DefaultModeSettingsMenu final : public MenuDisplay<
-    TEXT_DEFAULTMODESETTIGNS,
-    SwitchScreenMenuItem<DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLTYPE>,
-    SwitchScreenMenuItem<DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLMODE>,
-    SwitchScreenMenuItem<DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_ENABLEWEAKENINGSMOOTHENING>,
-    SwitchScreenMenuItem<DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETWEAKINGSMOOTHENING>,
-    SwitchScreenMenuItem<DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETFRONTPERCENTAGE>,
-    SwitchScreenMenuItem<DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBACKPERCENTAGE>,
-    SwitchScreenMenuItem<DefaultModeAddSchwelleChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETADDSCHWELLE>,
-    SwitchScreenMenuItem<DefaultModeGas1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETGAS1WERT>,
-    SwitchScreenMenuItem<DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETGAS2WERT>,
-    SwitchScreenMenuItem<DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBREMS1WERT>,
-    SwitchScreenMenuItem<DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBREMS2WERT>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class DefaultModeSettingsMenu final :
+    public StaticTitle<TEXT_DEFAULTMODESETTIGNS>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLTYPE>,
+        StaticSwitchScreenMenuItem<DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLMODE>,
+        StaticSwitchScreenMenuItem<DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_ENABLEWEAKENINGSMOOTHENING>,
+        StaticSwitchScreenMenuItem<DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETWEAKINGSMOOTHENING>,
+        StaticSwitchScreenMenuItem<DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETFRONTPERCENTAGE>,
+        StaticSwitchScreenMenuItem<DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBACKPERCENTAGE>,
+        StaticSwitchScreenMenuItem<DefaultModeAddSchwelleChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETADDSCHWELLE>,
+        StaticSwitchScreenMenuItem<DefaultModeGas1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETGAS1WERT>,
+        StaticSwitchScreenMenuItem<DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETGAS2WERT>,
+        StaticSwitchScreenMenuItem<DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBREMS1WERT>,
+        StaticSwitchScreenMenuItem<DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBREMS2WERT>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

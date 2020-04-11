@@ -1,7 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "displays/starfielddisplay.h"
 #include "displays/pingpongdisplay.h"
 #include "displays/spirodisplay.h"
@@ -12,15 +12,16 @@
 
 namespace {
 template<typename Tscreen>
-class DemosMenu final : public MenuDisplay<
-    TEXT_DEMOS,
-    SwitchScreenMenuItem<StarfieldDisplay<DemosMenu<Tscreen>>, TEXT_STARFIELD>,
-    SwitchScreenMenuItem<PingPongDisplay<DemosMenu<Tscreen>>, TEXT_PINGPONG>,
-    SwitchScreenMenuItem<SpiroDisplay<DemosMenu<Tscreen>>, TEXT_SPIRO>,
-    SwitchScreenMenuItem<GameOfLifeDisplay<DemosMenu<Tscreen>>, TEXT_GAMEOFLIFE>,
-    SwitchScreenMenuItem<MetersDisplay<DemosMenu<Tscreen>>, TEXT_METERS>,
-    SwitchScreenMenuItem<MatrixDisplay<DemosMenu<Tscreen>>, TEXT_MATRIX>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class DemosMenu final :
+    public StaticTitle<TEXT_DEMOS>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<StarfieldDisplay<DemosMenu<Tscreen>>, TEXT_STARFIELD>,
+        StaticSwitchScreenMenuItem<PingPongDisplay<DemosMenu<Tscreen>>, TEXT_PINGPONG>,
+        StaticSwitchScreenMenuItem<SpiroDisplay<DemosMenu<Tscreen>>, TEXT_SPIRO>,
+        StaticSwitchScreenMenuItem<GameOfLifeDisplay<DemosMenu<Tscreen>>, TEXT_GAMEOFLIFE>,
+        StaticSwitchScreenMenuItem<MetersDisplay<DemosMenu<Tscreen>>, TEXT_METERS>,
+        StaticSwitchScreenMenuItem<MatrixDisplay<DemosMenu<Tscreen>>, TEXT_MATRIX>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "changevaluedisplay.h"
 #include "displays/calibratedisplay.h"
 #include "texts.h"
@@ -25,14 +25,15 @@ template<typename Tscreen>
 using BremsMaxChangeScreen = ChangeValueDisplay<int16_t, BremsMaxAccessor, Tscreen, TEXT_SETBREMSMAX>;
 
 template<typename Tscreen>
-class PotiSettingsMenu final : public MenuDisplay<
-    TEXT_POTISETTINGS,
-    SwitchScreenMenuItem<GasMinChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETGASMIN>,
-    SwitchScreenMenuItem<GasMaxChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETGASMAX>,
-    SwitchScreenMenuItem<BremsMinChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETBREMSMIN>,
-    SwitchScreenMenuItem<BremsMaxChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETBREMSMAX>,
-    SwitchScreenMenuItem<CalibrateDisplay<PotiSettingsMenu<Tscreen>>, TEXT_CALIBRATE>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class PotiSettingsMenu final :
+    public StaticTitle<TEXT_POTISETTINGS>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<GasMinChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETGASMIN>,
+        StaticSwitchScreenMenuItem<GasMaxChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETGASMAX>,
+        StaticSwitchScreenMenuItem<BremsMinChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETBREMSMIN>,
+        StaticSwitchScreenMenuItem<BremsMaxChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETBREMSMAX>,
+        StaticSwitchScreenMenuItem<CalibrateDisplay<PotiSettingsMenu<Tscreen>>, TEXT_CALIBRATE>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

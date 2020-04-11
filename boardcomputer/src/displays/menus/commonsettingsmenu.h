@@ -1,7 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "changevaluedisplay.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/invertmenu.h"
@@ -30,16 +30,17 @@ template<typename Tscreen>
 using PhaseAdvMaxChangeScreen = ChangeValueDisplay<int16_t, PhaseAdvMaxAccessor, Tscreen, TEXT_SETPHASEADVMAX>;
 
 template<typename Tscreen>
-class CommonSettingsMenu final : public MenuDisplay<
-    TEXT_COMMONSETTINGS,
-    SwitchScreenMenuItem<IMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETIMOTMAX>,
-    SwitchScreenMenuItem<IDcMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETIDCMAX>,
-    SwitchScreenMenuItem<NMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETNMOTMAX>,
-    SwitchScreenMenuItem<FieldWeakMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETFIELDWEAKMAX>,
-    SwitchScreenMenuItem<PhaseAdvMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETPHASEADVMAX>,
-    SwitchScreenMenuItem<EnableMenu<CommonSettingsMenu<Tscreen>>, TEXT_SETENABLED>,
-    SwitchScreenMenuItem<InvertMenu<CommonSettingsMenu<Tscreen>>, TEXT_SETINVERTED>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class CommonSettingsMenu final :
+    public StaticTitle<TEXT_COMMONSETTINGS>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<IMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETIMOTMAX>,
+        StaticSwitchScreenMenuItem<IDcMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETIDCMAX>,
+        StaticSwitchScreenMenuItem<NMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETNMOTMAX>,
+        StaticSwitchScreenMenuItem<FieldWeakMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETFIELDWEAKMAX>,
+        StaticSwitchScreenMenuItem<PhaseAdvMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETPHASEADVMAX>,
+        StaticSwitchScreenMenuItem<EnableMenu<CommonSettingsMenu<Tscreen>>, TEXT_SETENABLED>,
+        StaticSwitchScreenMenuItem<InvertMenu<CommonSettingsMenu<Tscreen>>, TEXT_SETINVERTED>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

@@ -1,14 +1,15 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "texts.h"
 
 namespace {
 template<typename Tscreen>
-class BluetoothModeSettingsMenu final : public MenuDisplay<
-    TEXT_BLUETOOTHMODESETTINGS,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class BluetoothModeSettingsMenu final :
+    public StaticTitle<TEXT_BLUETOOTHMODESETTINGS>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "changevaluedisplay.h"
 #include "texts.h"
 #include "globals.h"
@@ -24,13 +24,14 @@ template<typename Tscreen>
 using BackRightInvertedChangeScreen = ChangeValueDisplay<bool, BackRightInvertedAccessor, Tscreen, TEXT_INVERTBACKRIGHT>;
 
 template<typename Tscreen>
-class InvertMenu final : public MenuDisplay<
-    TEXT_SETINVERTED,
-    SwitchScreenMenuItem<FrontLeftInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTFRONTLEFT>,
-    SwitchScreenMenuItem<FrontRightInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTFRONTRIGHT>,
-    SwitchScreenMenuItem<BackLeftInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTBACKLEFT>,
-    SwitchScreenMenuItem<BackRightInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTBACKRIGHT>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class InvertMenu final :
+    public StaticTitle<TEXT_SETINVERTED>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<FrontLeftInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTFRONTLEFT>,
+        StaticSwitchScreenMenuItem<FrontRightInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTFRONTRIGHT>,
+        StaticSwitchScreenMenuItem<BackLeftInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTBACKLEFT>,
+        StaticSwitchScreenMenuItem<BackRightInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTBACKRIGHT>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

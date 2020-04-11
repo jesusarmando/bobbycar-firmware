@@ -1,11 +1,13 @@
 #pragma once
 
-#include "switchscreenmenuitem.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 
 namespace {
 template<typename Tvalue, typename Tsetter, typename Tgetter, typename Tscreen, const char *Ttext>
-class SetDynamicValueMenuItem : public SwitchScreenMenuItem<Tscreen, Ttext>
+class SetDynamicValueMenuItem : public StaticSwitchScreenMenuItem<Tscreen, Ttext>
 {
+    using Base = StaticSwitchScreenMenuItem<Tscreen, Ttext>;
+
 public:
     void triggered() override;
 };
@@ -15,6 +17,6 @@ void SetDynamicValueMenuItem<Tvalue, Tsetter, Tgetter, Tscreen, Ttext>::triggere
 {
     Tsetter::getRef() = Tgetter::getValue();
 
-    SwitchScreenMenuItem<Tscreen, Ttext>::triggered();
+    Base::triggered();
 }
 }

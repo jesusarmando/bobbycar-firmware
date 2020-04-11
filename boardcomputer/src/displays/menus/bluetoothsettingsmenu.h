@@ -1,16 +1,36 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
-#include "displays/bluetoothstatusdisplay.h"
+#include "staticmenudisplay.h"
+#include "menuitems/livestatusmenuitem.h"
+#include "menuitems/bluetoothbeginmenuitem.h"
+#include "menuitems/bluetoothbeginmastermenuitem.h"
+#include "menuitems/bluetoothflushmenuitem.h"
+#include "menuitems/bluetoothendmenuitem.h"
+#include "menuitems/bluetoothdisconnectmenuitem.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
+#include "globals.h"
 #include "texts.h"
 
 namespace {
+struct BluetoothAvailableLiveStatus { static String getText() { return String{"available: "} + bluetoothSerial.available(); } };
+struct BluetoothHasClientLiveStatus { static String getText() { return String{"hasClient: "} + (bluetoothSerial.hasClient() ? "true" : "false"); } };
+struct BluetoothConnectedLiveStatus { static String getText() { return String{"connected: "} + (bluetoothSerial.connected() ? "true" : "false"); } };
+struct BluetoothIsReadyLiveStatus { static String getText() { return String{"isReady: "} + (bluetoothSerial.isReady() ? "true" : "false"); } };
+
 template<typename Tscreen>
-class BluetoothSettingsMenu final : public MenuDisplay<
-    TEXT_BLUETOOTHSETTINGS,
-    SwitchScreenMenuItem<BluetoothStatusDisplay<BluetoothSettingsMenu<Tscreen>>, TEXT_BLUETOOTHSTATUS>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class BluetoothSettingsMenu final :
+    public StaticTitle<TEXT_BLUETOOTHSETTINGS>,
+    public StaticMenuDisplay<
+        LiveStatusMenuItem<BluetoothAvailableLiveStatus>,
+        LiveStatusMenuItem<BluetoothHasClientLiveStatus>,
+        LiveStatusMenuItem<BluetoothConnectedLiveStatus>,
+        LiveStatusMenuItem<BluetoothIsReadyLiveStatus>,
+        BluetoothBeginMenuItem<TEXT_BLUETOOTHBEGIN>,
+        BluetoothBeginMasterMenuItem<TEXT_BLUETOOTHBEGINMASTER>,
+        BluetoothFlushMenuItem<TEXT_BLUETOOTHFLUSH>,
+        BluetoothEndMenuItem<TEXT_BLUETOOTHEND>,
+        BluetoothDisconnectMenuItem<TEXT_BLUETOOTHDISCONNECT>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

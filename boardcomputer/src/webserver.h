@@ -1240,7 +1240,7 @@ void WebHandler::handleDisplay(AsyncWebServerRequest *request)
                 response.print("Button");
             }
 
-            if (auto menuDisplay = currentDisplay->asMenuDisplayInterface())
+            if (auto menuDisplay = currentDisplay->asMenuDisplay())
             {
                 {
                     HtmlTag h2(response, "h2");
@@ -1327,7 +1327,7 @@ void WebHandler::handleDisplayAction(AsyncWebServerRequest *request)
     }
     else if (action->value() == "triggerItem")
     {
-        if (auto menuDisplay = currentDisplay->asMenuDisplayInterface())
+        if (auto menuDisplay = currentDisplay->asMenuDisplay())
         {
             if (!request->hasParam("index"))
             {

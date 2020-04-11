@@ -1,7 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "changevaluedisplay.h"
 #include "texts.h"
 #include "globals.h"
@@ -24,13 +24,14 @@ template<typename Tscreen>
 using BackPatternChangeScreen = ChangeValueDisplay<uint8_t, BackPatternAccessor, Tscreen, TEXT_SETBACKPATTERN>;
 
 template<typename Tscreen>
-class BuzzerMenu final : public MenuDisplay<
-    TEXT_BUZZER,
-    SwitchScreenMenuItem<FrontFreqChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETFRONTFREQ>,
-    SwitchScreenMenuItem<FrontPatternChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETFRONTPATTERN>,
-    SwitchScreenMenuItem<BackFreqChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETBACKFREQ>,
-    SwitchScreenMenuItem<BackPatternChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETBACKPATTERN>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class BuzzerMenu final :
+    public StaticTitle<TEXT_BUZZER>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<FrontFreqChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETFRONTFREQ>,
+        StaticSwitchScreenMenuItem<FrontPatternChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETFRONTPATTERN>,
+        StaticSwitchScreenMenuItem<BackFreqChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETBACKFREQ>,
+        StaticSwitchScreenMenuItem<BackPatternChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETBACKPATTERN>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

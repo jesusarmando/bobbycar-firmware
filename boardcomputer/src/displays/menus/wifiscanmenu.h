@@ -7,44 +7,35 @@
 #include <WString.h>
 
 #include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
-#include "menuitems/dummymenuitem.h"
+#include "menuitems/endwifiscanmenuitem.h"
+#include "menuitems/dynamicdummymenuitem.h"
 #include "texts.h"
 #include "globals.h"
 
 namespace {
-template<typename Tscreen, const char *Ttext>
-class EndScanMenuItem : public SwitchScreenMenuItem<Tscreen, Ttext>
+template<typename Tscreen>
+class WifiScanMenu final : public MenuDisplay
 {
-    using Base = SwitchScreenMenuItem<Tscreen, Ttext>;
+    using Base = MenuDisplay;
 
 public:
     using Base::Base;
 
-    void triggered() override;
-};
-
-template<typename Tscreen>
-class WifiScanMenu final : public MenuDisplayInterface
-{
-    using Base = MenuDisplayInterface;
-
-public:
     String title() const override { return String{TEXT_WIFISCAN} + ": " + WiFi.scanComplete(); }
 
     void start() override;
     void update() override;
 
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return &(*std::begin(refVec)); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return &(*std::end(refVec)); };
+    const std::reference_wrapper<MenuItem> *begin() const override { return &(*std::begin(refVec)); };
+    const std::reference_wrapper<MenuItem> *end() const override { return &(*std::end(refVec)); };
 
 private:
-    EndScanMenuItem<Tscreen, TEXT_BACK> m_backItem;
+    EndWifiScanMenuItem<Tscreen, TEXT_BACK> m_backItem;
 
-    std::vector<DummyMenuItem> vec;
+    std::vector<DynamicDummyMenuItem> vec;
 
-    std::vector<std::reference_wrapper<MenuItemInterface>> refVec{{
-        std::ref<MenuItemInterface>(m_backItem)
+    std::vector<std::reference_wrapper<MenuItem>> refVec{{
+        std::ref<MenuItem>(m_backItem)
     }};
 
     unsigned long m_lastScanComplete;
@@ -102,12 +93,5 @@ void WifiScanMenu<Tscreen>::update()
     }
 
     Base::update();
-}
-
-template<typename Tscreen, const char *Ttext>
-void EndScanMenuItem<Tscreen, Ttext>::triggered()
-{
-    WiFi.scanDelete();
-    Base::triggered();
 }
 }

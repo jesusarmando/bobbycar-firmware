@@ -1,7 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "changevaluedisplay.h"
 #include "texts.h"
 #include "globals.h"
@@ -24,13 +24,14 @@ template<typename Tscreen>
 using BackRightEnabledChangeScreen = ChangeValueDisplay<bool, BackRightEnabledAccessor, Tscreen, TEXT_ENABLEBACKRIGHT>;
 
 template<typename Tscreen>
-class EnableMenu final : public MenuDisplay<
-    TEXT_SETENABLED,
-    SwitchScreenMenuItem<FrontLeftEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEFRONTLEFT>,
-    SwitchScreenMenuItem<FrontRightEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEFRONTRIGHT>,
-    SwitchScreenMenuItem<BackLeftEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEBACKLEFT>,
-    SwitchScreenMenuItem<BackRightEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEBACKRIGHT>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class EnableMenu final :
+    public StaticTitle<TEXT_SETENABLED>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<FrontLeftEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEFRONTLEFT>,
+        StaticSwitchScreenMenuItem<FrontRightEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEFRONTRIGHT>,
+        StaticSwitchScreenMenuItem<BackLeftEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEBACKLEFT>,
+        StaticSwitchScreenMenuItem<BackRightEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEBACKRIGHT>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

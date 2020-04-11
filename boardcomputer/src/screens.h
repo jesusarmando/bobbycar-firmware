@@ -20,7 +20,6 @@
 #include "displays/menus/settingsmenu.h"
 #include "displays/menus/wifiscanmenu.h"
 #include "displays/menus/wifisettingsmenu.h"
-#include "displays/bluetoothstatusdisplay.h"
 #include "displays/calibratedisplay.h"
 #include "displays/gameoflifedisplay.h"
 #include "displays/matrixdisplay.h"
@@ -59,7 +58,6 @@ union X {
     WifiScanMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> wifiScanMenu;
     WifiSettingsMenu<SettingsMenu<MainMenu>> wifiSettingsMenu;
 
-    BluetoothStatusDisplay<BluetoothSettingsMenu<SettingsMenu<MainMenu>>> bluetoothStatusDisplay;
     CalibrateDisplay<PotiSettingsMenu<SettingsMenu<MainMenu>>> calibrateDisplay;
     GameOfLifeDisplay<DemosMenu<MainMenu>> gameOfLifeDisplay;
     Lockscreen<MainMenu> lockScreen;
@@ -140,7 +138,6 @@ template<> decltype(displays.settingsMenu)                                     &
 template<> decltype(displays.wifiScanMenu)                                     &getRefByType<decltype(displays.wifiScanMenu)>()                                     { return displays.wifiScanMenu; }
 template<> decltype(displays.wifiSettingsMenu)                                 &getRefByType<decltype(displays.wifiSettingsMenu)>()                                 { return displays.wifiSettingsMenu; }
 
-template<> decltype(displays.bluetoothStatusDisplay)                           &getRefByType<decltype(displays.bluetoothStatusDisplay)>()                           { return displays.bluetoothStatusDisplay; }
 template<> decltype(displays.calibrateDisplay)                                 &getRefByType<decltype(displays.calibrateDisplay)>()                                 { return displays.calibrateDisplay; }
 template<> decltype(displays.gameOfLifeDisplay)                                &getRefByType<decltype(displays.gameOfLifeDisplay)>()                                { return displays.gameOfLifeDisplay; }
 template<> decltype(displays.lockScreen)                                       &getRefByType<decltype(displays.lockScreen)>()                                       { return displays.lockScreen; }

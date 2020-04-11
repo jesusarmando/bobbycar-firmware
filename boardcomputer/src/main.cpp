@@ -56,8 +56,6 @@ void setup()
     initWebserver();
     switchScreen<DefaultScreen>();
     initRotary();
-
-    WiFi.scanNetworks();
 }
 
 void loop()

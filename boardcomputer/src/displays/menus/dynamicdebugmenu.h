@@ -5,86 +5,50 @@
 #include <Arduino.h>
 #include <WString.h>
 
-#include "menudisplay.h"
-#include "menuitems/dummymenuitem.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/livestatusmenuitem.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "texts.h"
 #include "globals.h"
 
 namespace {
-class DynamicMenuGasItem final : public MenuItemInterface
-{
-public:
-    String title() const override { return String("gas: ") + gas; }
-    void triggered() override {}
-};
-
-class DynamicMenuBremsItem final : public MenuItemInterface
-{
-public:
-    String title() const override { return String("brems: ") + brems; }
-    void triggered() override {}
-};
-
-class DynamicMenuRandomItem final : public DummyMenuItem
-{
-    using Base = MenuItemInterface;
-
-public:
-    void start() override { MenuItemInterface::start(); updateTitle(); }
-    void update() override;
-
-private:
-    void updateTitle();
-
-    unsigned long m_lastUpdate;
-};
+struct GasLiveStatus { static String getText() { return String{"gas: "} + gas; } };
+struct BremsLiveStatus { static String getText() { return String{"brems: "} + brems; } };
+struct RandomNumberLiveStatus { static String getText() { return String{"random: "} + random(0, 100); } };
 
 template<typename Tscreen>
-class DynamicDebugMenu final : public MenuDisplayInterface
+class DynamicDebugMenu final : public StaticMenuDisplay<
+    LiveStatusMenuItem<GasLiveStatus>,
+    LiveStatusMenuItem<BremsLiveStatus>,
+    LiveStatusMenuItem<RandomNumberLiveStatus>,
+    StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+>
 {
-    using Base = MenuDisplayInterface;
+    using Base = StaticMenuDisplay<
+        LiveStatusMenuItem<GasLiveStatus>,
+        LiveStatusMenuItem<BremsLiveStatus>,
+        LiveStatusMenuItem<RandomNumberLiveStatus>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >;
 
 public:
     String title() const override { return m_title; }
 
-    void start() override { MenuDisplayInterface::start(); updateTitle(); }
+    void start() override;
     void update() override;
-
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     void updateTitle();
 
     unsigned long m_lastUpdate;
     String m_title;
-
-    DynamicMenuGasItem m_dynamicMenuGasItem;
-    DynamicMenuBremsItem m_dynamicMenuBremsItem;
-    DynamicMenuRandomItem m_dynamicMenuRandomItem;
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK> m_backItem;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 4> arr{{
-        std::ref<MenuItemInterface>(m_dynamicMenuGasItem),
-        std::ref<MenuItemInterface>(m_dynamicMenuBremsItem),
-        std::ref<MenuItemInterface>(m_dynamicMenuRandomItem),
-        std::ref<MenuItemInterface>(m_backItem)
-    }};
 };
 
-void DynamicMenuRandomItem::update()
+template<typename Tscreen>
+void DynamicDebugMenu<Tscreen>::start()
 {
-    Base::update();
-
-    if (millis() - m_lastUpdate >= 100)
-        updateTitle();
-}
-
-void DynamicMenuRandomItem::updateTitle()
-{
-    setTitle(String{"random: "} + random(0, 100));
-    m_lastUpdate = millis();
+    Base::start();
+    updateTitle();
 }
 
 template<typename Tscreen>

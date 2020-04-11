@@ -1,8 +1,8 @@
 #pragma once
 
-#include "menudisplay.h"
+#include "staticmenudisplay.h"
 #include "menuitems/setdynamicvaluemenuitem.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "texts.h"
 #include "globals.h"
 #include "modes/defaultmode.h"
@@ -16,21 +16,22 @@ struct TempomatModeGetter { static auto getValue() { return &modes::tempomatMode
 struct BluetoothModeGetter { static auto getValue() { return &modes::bluetoothMode; } };
 
 template<typename Tscreen>
-class SelectModeMenu final : public MenuDisplay<
-    TEXT_SELECTMODE,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, TempomatModeGetter, Tscreen, TEXT_TEMPOMAT>,
-    SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
-{
-    using Base = MenuDisplay<
-        TEXT_SELECTMODE,
+class SelectModeMenu final :
+    public StaticTitle<TEXT_SELECTMODE>,
+    public StaticMenuDisplay<
         SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
         SetDynamicValueMenuItem<ModeBase*, ModeAccessor, TempomatModeGetter, Tscreen, TEXT_TEMPOMAT>,
         SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
-        SwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
+{
+    using Base = StaticMenuDisplay<
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, DefaultModeGetter, Tscreen, TEXT_DEFAULT>,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, TempomatModeGetter, Tscreen, TEXT_TEMPOMAT>,
+        SetDynamicValueMenuItem<ModeBase*, ModeAccessor, BluetoothModeGetter, Tscreen, TEXT_BLUETOOTH>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
     >;
+
 public:
     void start() override;
 };

@@ -4,17 +4,15 @@
 #include "utils.h"
 
 namespace {
-template<typename Tscreen, const char *Ttext>
-class SwitchScreenMenuItem : public MenuItem<Ttext>
+template<typename Tscreen>
+class SwitchScreenMenuItem : public MenuItem
 {
 public:
-    using MenuItem<Ttext>::MenuItem;
-
     void triggered() override;
 };
 
-template<typename Tscreen, const char *Ttext>
-void SwitchScreenMenuItem<Tscreen, Ttext>::triggered()
+template<typename Tscreen>
+void SwitchScreenMenuItem<Tscreen>::triggered()
 {
     switchScreen<Tscreen>();
 }

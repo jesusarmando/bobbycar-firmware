@@ -3,12 +3,13 @@
 #include <Esp.h>
 
 #include "menuitem.h"
+#include "titleinterface.h"
 #include "globals.h"
 #include "texts.h"
 
 namespace {
 template<const char *Ttext>
-class RebootMenuItem final : public MenuItem<Ttext>
+class RebootMenuItem final : public MenuItem, StaticTitle<Ttext>
 {
 public:
     void triggered() override;

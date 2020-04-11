@@ -3,7 +3,7 @@
 #include <WString.h>
 
 namespace {
-class MenuDisplayInterface;
+class MenuDisplay;
 class ChangeValueDisplayInterface;
 }
 
@@ -20,8 +20,8 @@ public:
     virtual void rotate(int offset) {}
     virtual void button(bool pressed) {}
 
-    virtual MenuDisplayInterface *asMenuDisplayInterface() { return nullptr; }
-    virtual const MenuDisplayInterface *asMenuDisplayInterface() const { return nullptr; }
+    virtual MenuDisplay *asMenuDisplay() { return nullptr; }
+    virtual const MenuDisplay *asMenuDisplay() const { return nullptr; }
 
     virtual ChangeValueDisplayInterface *asChangeValueDisplayInterface() { return nullptr; }
     virtual const ChangeValueDisplayInterface *asChangeValueDisplayInterface() const { return nullptr; }

@@ -3,7 +3,11 @@
 namespace {
 //BluetoothSettingsMenu
 constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
-constexpr char TEXT_BLUETOOTHSTATUS[] = "Bluetooth status";
+constexpr char TEXT_BLUETOOTHBEGIN[] = "begin()";
+constexpr char TEXT_BLUETOOTHBEGINMASTER[] = "begin() Master";
+constexpr char TEXT_BLUETOOTHFLUSH[] = "flush()";
+constexpr char TEXT_BLUETOOTHEND[] = "end()";
+constexpr char TEXT_BLUETOOTHDISCONNECT[] = "disconnect()";
 constexpr char TEXT_BACK[] = "Back";
 
 

@@ -12,7 +12,7 @@
 #include "titleinterface.h"
 
 namespace {
-class MenuDisplayInterface : public Display, public virtual TitleInterface
+class MenuDisplay : public Display, public virtual TitleInterface
 {
 public:
     void start() override;
@@ -23,11 +23,11 @@ public:
     void rotate(int offset) override;
     void button(bool pressed) override;
 
-    virtual const std::reference_wrapper<MenuItemInterface> *begin() const = 0;
-    virtual const std::reference_wrapper<MenuItemInterface> *end() const = 0;
+    virtual const std::reference_wrapper<MenuItem> *begin() const = 0;
+    virtual const std::reference_wrapper<MenuItem> *end() const = 0;
 
-    MenuDisplayInterface *asMenuDisplayInterface() override { return this; }
-    const MenuDisplayInterface *asMenuDisplayInterface() const override { return this; }
+    MenuDisplay *asMenuDisplay() override { return this; }
+    const MenuDisplay *asMenuDisplay() const override { return this; }
 
     int selectedIndex() const { return m_selectedIndex; }
 
@@ -35,8 +35,6 @@ protected:
     void setSelectedIndex(int selectedIndex) { m_selectedIndex = selectedIndex; }
 
 private:
-    int m_rotateOffset;
-
     Label<5, 5, 230, 25> m_titleLabel;
 
     Label<10, 45+(0*27), 220, 25> m_label0;
@@ -69,334 +67,18 @@ private:
     int m_selectedIndex;
     int m_scrollOffset;
     int m_highlightedIndex;
-    bool m_pressed{};
+
+    int m_rotateOffset;
+    bool m_pressed;
 };
 
-template<const char *Ttext, typename ...T>
-class MenuDisplay;
-
-template<const char *Ttext, typename T0>
-class MenuDisplay<Ttext, T0> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 1> arr{{
-        std::ref<MenuItemInterface>(item0)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1>
-class MenuDisplay<Ttext, T0, T1> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 2> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2>
-class MenuDisplay<Ttext, T0, T1, T2> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 3> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3>
-class MenuDisplay<Ttext, T0, T1, T2, T3> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 4> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, typename T4>
-class MenuDisplay<Ttext, T0, T1, T2, T3, T4> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-    T4 item4;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 5> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3),
-        std::ref<MenuItemInterface>(item4)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
-class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-    T4 item4;
-    T5 item5;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 6> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3),
-        std::ref<MenuItemInterface>(item4),
-        std::ref<MenuItemInterface>(item5)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-    T4 item4;
-    T5 item5;
-    T6 item6;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 7> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3),
-        std::ref<MenuItemInterface>(item4),
-        std::ref<MenuItemInterface>(item5),
-        std::ref<MenuItemInterface>(item6)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-    T4 item4;
-    T5 item5;
-    T6 item6;
-    T7 item7;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 8> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3),
-        std::ref<MenuItemInterface>(item4),
-        std::ref<MenuItemInterface>(item5),
-        std::ref<MenuItemInterface>(item6),
-        std::ref<MenuItemInterface>(item7)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7, T8> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-    T4 item4;
-    T5 item5;
-    T6 item6;
-    T7 item7;
-    T8 item8;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 9> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3),
-        std::ref<MenuItemInterface>(item4),
-        std::ref<MenuItemInterface>(item5),
-        std::ref<MenuItemInterface>(item6),
-        std::ref<MenuItemInterface>(item7),
-        std::ref<MenuItemInterface>(item8)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-    T4 item4;
-    T5 item5;
-    T6 item6;
-    T7 item7;
-    T8 item8;
-    T9 item9;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 10> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3),
-        std::ref<MenuItemInterface>(item4),
-        std::ref<MenuItemInterface>(item5),
-        std::ref<MenuItemInterface>(item6),
-        std::ref<MenuItemInterface>(item7),
-        std::ref<MenuItemInterface>(item8),
-        std::ref<MenuItemInterface>(item9)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
-class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-    T4 item4;
-    T5 item5;
-    T6 item6;
-    T7 item7;
-    T8 item8;
-    T9 item9;
-    T10 item10;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 11> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3),
-        std::ref<MenuItemInterface>(item4),
-        std::ref<MenuItemInterface>(item5),
-        std::ref<MenuItemInterface>(item6),
-        std::ref<MenuItemInterface>(item7),
-        std::ref<MenuItemInterface>(item8),
-        std::ref<MenuItemInterface>(item9),
-        std::ref<MenuItemInterface>(item10)
-    }};
-};
-
-template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11>
-class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : public MenuDisplay<Ttext>
-{
-public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
-
-private:
-    T0 item0;
-    T1 item1;
-    T2 item2;
-    T3 item3;
-    T4 item4;
-    T5 item5;
-    T6 item6;
-    T7 item7;
-    T8 item8;
-    T9 item9;
-    T10 item10;
-    T11 item11;
-
-    const std::array<std::reference_wrapper<MenuItemInterface>, 12> arr{{
-        std::ref<MenuItemInterface>(item0),
-        std::ref<MenuItemInterface>(item1),
-        std::ref<MenuItemInterface>(item2),
-        std::ref<MenuItemInterface>(item3),
-        std::ref<MenuItemInterface>(item4),
-        std::ref<MenuItemInterface>(item5),
-        std::ref<MenuItemInterface>(item6),
-        std::ref<MenuItemInterface>(item7),
-        std::ref<MenuItemInterface>(item8),
-        std::ref<MenuItemInterface>(item9),
-        std::ref<MenuItemInterface>(item10),
-        std::ref<MenuItemInterface>(item11)
-    }};
-};
-
-template<const char *Ttext>
-class MenuDisplay<Ttext> : public MenuDisplayInterface, public TitleImpl<Ttext>
-{
-};
-
-void MenuDisplayInterface::start()
+void MenuDisplay::start()
 {
     m_selectedIndex = 0;
     m_scrollOffset = 0;
     m_highlightedIndex = -1;
+
+    m_rotateOffset = 0;
     m_pressed = false;
 
     tft.setRotation(0);
@@ -409,7 +91,7 @@ void MenuDisplayInterface::start()
         iter->get().start();
 }
 
-void MenuDisplayInterface::update()
+void MenuDisplay::update()
 {
     if (!m_pressed)
     {
@@ -450,12 +132,10 @@ void MenuDisplayInterface::update()
     }
 }
 
-void MenuDisplayInterface::redraw()
+void MenuDisplay::redraw()
 {
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
     m_titleLabel.redraw(title());
-
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
     const auto menuBegin = begin();
     const auto menuEnd = end();
@@ -492,6 +172,7 @@ void MenuDisplayInterface::redraw()
             forceLabelRedraw = true;
         }
 
+        tft.setTextColor(menuIter->get().color(), TFT_BLACK);
         const auto labelDrawn = labelsIter->get().redraw(menuIter->get().title(), forceLabelRedraw);
 
         if (selected && (labelDrawn || relativeIndex != m_highlightedIndex))
@@ -513,18 +194,18 @@ void MenuDisplayInterface::redraw()
     m_highlightedIndex = newHighlightedIndex;
 }
 
-void MenuDisplayInterface::stop()
+void MenuDisplay::stop()
 {
     for (auto iter = begin(); iter != end(); iter++)
         iter->get().stop();
 }
 
-void MenuDisplayInterface::rotate(int offset)
+void MenuDisplay::rotate(int offset)
 {
     m_rotateOffset += offset;
 }
 
-void MenuDisplayInterface::button(bool pressed)
+void MenuDisplay::button(bool pressed)
 {
     if (!pressed)
         m_pressed = true;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "displays/menus/commonsettingsmenu.h"
 #include "displays/menus/wifisettingsmenu.h"
 #include "displays/menus/bluetoothsettingsmenu.h"
@@ -15,18 +15,19 @@
 
 namespace {
 template<typename Tscreen>
-class SettingsMenu final : public MenuDisplay<
-    TEXT_SETTINGS,
-    SwitchScreenMenuItem<CommonSettingsMenu<SettingsMenu<Tscreen>>, TEXT_COMMONSETTINGS>,
-    SwitchScreenMenuItem<WifiSettingsMenu<SettingsMenu<Tscreen>>, TEXT_WIFISETTINGS>,
-    SwitchScreenMenuItem<BluetoothSettingsMenu<SettingsMenu<Tscreen>>, TEXT_BLUETOOTHSETTINGS>,
-    SwitchScreenMenuItem<DefaultModeSettingsMenu<SettingsMenu<Tscreen>>, TEXT_DEFAULTMODESETTIGNS>,
-    SwitchScreenMenuItem<TempomatModeSettingsMenu<SettingsMenu<Tscreen>>, TEXT_TEMPOMATMODESETTINGS>,
-    SwitchScreenMenuItem<BluetoothModeSettingsMenu<SettingsMenu<Tscreen>>, TEXT_BLUETOOTHMODESETTINGS>,
-    SwitchScreenMenuItem<PotiSettingsMenu<SettingsMenu<Tscreen>>, TEXT_POTISETTINGS>,
-    RebootMenuItem<TEXT_REBOOT>,
-    SwitchScreenMenuItem<VersionDisplay<SettingsMenu<Tscreen>>, TEXT_VERSION>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class SettingsMenu final :
+    public StaticTitle<TEXT_SETTINGS>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<CommonSettingsMenu<SettingsMenu<Tscreen>>, TEXT_COMMONSETTINGS>,
+        StaticSwitchScreenMenuItem<WifiSettingsMenu<SettingsMenu<Tscreen>>, TEXT_WIFISETTINGS>,
+        StaticSwitchScreenMenuItem<BluetoothSettingsMenu<SettingsMenu<Tscreen>>, TEXT_BLUETOOTHSETTINGS>,
+        StaticSwitchScreenMenuItem<DefaultModeSettingsMenu<SettingsMenu<Tscreen>>, TEXT_DEFAULTMODESETTIGNS>,
+        StaticSwitchScreenMenuItem<TempomatModeSettingsMenu<SettingsMenu<Tscreen>>, TEXT_TEMPOMATMODESETTINGS>,
+        StaticSwitchScreenMenuItem<BluetoothModeSettingsMenu<SettingsMenu<Tscreen>>, TEXT_BLUETOOTHMODESETTINGS>,
+        StaticSwitchScreenMenuItem<PotiSettingsMenu<SettingsMenu<Tscreen>>, TEXT_POTISETTINGS>,
+        RebootMenuItem<TEXT_REBOOT>,
+        StaticSwitchScreenMenuItem<VersionDisplay<SettingsMenu<Tscreen>>, TEXT_VERSION>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "menudisplay.h"
-#include "menuitems/switchscreenmenuitem.h"
-#include "displays/bluetoothstatusdisplay.h"
+#include "staticmenudisplay.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
 #include "displays/menus/buzzermenu.h"
 #include "displays/menus/dynamicdebugmenu.h"
 #include "changevaluedisplay.h"
@@ -19,13 +18,14 @@ template<typename Tscreen>
 using BackLedChangeScreen = ChangeValueDisplay<bool, BackLedAccessor, Tscreen, TEXT_SETBACKLED>;
 
 template<typename Tscreen>
-class DebugMenu final : public MenuDisplay<
-    TEXT_DEBUG,
-    SwitchScreenMenuItem<BuzzerMenu<DebugMenu<Tscreen>>, TEXT_BUZZER>,
-    SwitchScreenMenuItem<FrontLedChangeScreen<DebugMenu<Tscreen>>, TEXT_SETFRONTLED>,
-    SwitchScreenMenuItem<BackLedChangeScreen<DebugMenu<Tscreen>>, TEXT_SETBACKLED>,
-    SwitchScreenMenuItem<DynamicDebugMenu<DebugMenu<Tscreen>>, TEXT_DYNAMICMENU>,
-    SwitchScreenMenuItem<Tscreen, TEXT_BACK>
->
+class DebugMenu final :
+    public StaticTitle<TEXT_DEBUG>,
+    public StaticMenuDisplay<
+        StaticSwitchScreenMenuItem<BuzzerMenu<DebugMenu<Tscreen>>, TEXT_BUZZER>,
+        StaticSwitchScreenMenuItem<FrontLedChangeScreen<DebugMenu<Tscreen>>, TEXT_SETFRONTLED>,
+        StaticSwitchScreenMenuItem<BackLedChangeScreen<DebugMenu<Tscreen>>, TEXT_SETBACKLED>,
+        StaticSwitchScreenMenuItem<DynamicDebugMenu<DebugMenu<Tscreen>>, TEXT_DYNAMICMENU>,
+        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+    >
 {};
 }
