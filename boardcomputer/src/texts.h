@@ -131,11 +131,16 @@ constexpr char TEXT_INVERTBACKLEFT[] = "Invert back left";
 constexpr char TEXT_INVERTBACKRIGHT[] = "Invert back right";
 //constexpr char TEXT_BACK[] = "Back";
 
+//LarsmModeSettingsMenu
+constexpr char TEXT_LARSMMODESETTINGS[] = "Larsm mode settings";
+constexpr char TEXT_LARSMMODECHANGEMODE[] = "Change mode";
+//constexpr char TEXT_BACK[] = "Back";
+
 //ModesSettingsMenu
 //constexpr char TEXT_MODESSETTINGS[] = "Modes settings";
 constexpr char TEXT_DEFAULTMODESETTIGNS[] = "Default mode settings";
 constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
-constexpr char TEXT_LARSMMODESETTINGS[] = "Larsm mode settings";
+//constexpr char TEXT_LARSMMODESETTINGS[] = "Larsm mode settings";
 //constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
 constexpr char TEXT_WEBSOCKETMODESETTINGS[] = "Websocket mode settings";
 //constexpr char TEXT_BACK[] = "Back";
@@ -192,6 +197,13 @@ constexpr char TEXT_TORQUE[] = "Torque";
 constexpr char TEXT_COMMUTATION[] = "Commutation";
 constexpr char TEXT_SINUSOIDAL[] = "Sinusoidal";
 constexpr char TEXT_FIELDORIENTEDCONTROL[] = "Field oriented control";
+//constexpr char TEXT_BACK[] = "Back";
+
+//ChangeValueDisplay<LarsmMode::Mode>
+constexpr char TEXT_LARSMMODE1[] = "Mode1";
+constexpr char TEXT_LARSMMODE2[] = "Mode2";
+constexpr char TEXT_LARSMMODE3[] = "Mode3";
+constexpr char TEXT_LARSMMODE4[] = "Mode4";
 //constexpr char TEXT_BACK[] = "Back";
 
 //ChangeValueDisplay<wifi_mode_t>

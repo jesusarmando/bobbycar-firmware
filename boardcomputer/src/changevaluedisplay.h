@@ -5,9 +5,6 @@
 #include "globals.h"
 #include "utils.h"
 #include "texts.h"
-#include "staticmenudisplay.h"
-#include "menuitems/setvaluemenuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
 
 namespace {
 class ChangeValueDisplayInterface : public Display
@@ -135,5 +132,6 @@ void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::confirm()
 #include "changevaluedisplay_bool.h"
 #include "changevaluedisplay_controlmode.h"
 #include "changevaluedisplay_controltype.h"
+#include "changevaluedisplay_larsmmode_mode.h"
 #include "changevaluedisplay_wifi_mode_t.h"
 #include "changevaluedisplay_wifi_power_t.h"

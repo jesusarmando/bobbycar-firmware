@@ -3,6 +3,10 @@
 #include <WiFiGeneric.h>
 
 #include "changevaluedisplay.h"
+#include "staticmenudisplay.h"
+#include "menuitems/setvaluemenuitem.h"
+#include "menuitems/staticswitchscreenmenuitem.h"
+#include "texts.h"
 
 namespace {
 template<typename Taccessor, typename Tdisplay, const char *Ttext>

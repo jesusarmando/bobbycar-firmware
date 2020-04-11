@@ -118,6 +118,8 @@ union X {
     TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlTyp;
     TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlMod;
 
+    LarsmModeModeChangeDisplay<LarsmModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> larsmModeModeChangeDisplay;
+
     GasMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMin;
     GasMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMax;
     BremsMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeBremsMin;
@@ -210,6 +212,8 @@ template<> decltype(displays.changeBackLed)                                    &
 
 template<> decltype(displays.changeManualModeCtrlTyp)                          &getRefByType<decltype(displays.changeManualModeCtrlTyp)>()                          { return displays.changeManualModeCtrlTyp; }
 template<> decltype(displays.changeManualModeCtrlMod)                          &getRefByType<decltype(displays.changeManualModeCtrlMod)>()                          { return displays.changeManualModeCtrlMod; }
+
+template<> decltype(displays.larsmModeModeChangeDisplay)                       &getRefByType<decltype(displays.larsmModeModeChangeDisplay)>()                       { return displays.larsmModeModeChangeDisplay; }
 
 template<> decltype(displays.changeGasMin)                                     &getRefByType<decltype(displays.changeGasMin)>()                                     { return displays.changeGasMin; }
 template<> decltype(displays.changeGasMax)                                     &getRefByType<decltype(displays.changeGasMax)>()                                     { return displays.changeGasMax; }

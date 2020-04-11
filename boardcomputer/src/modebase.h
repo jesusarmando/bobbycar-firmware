@@ -12,5 +12,7 @@ public:
     virtual void stop() {};
 
     virtual const char *displayName() const = 0;
+
+    virtual int framerate() const { return 50; }
 };
 }
