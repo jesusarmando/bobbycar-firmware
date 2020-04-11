@@ -15,6 +15,10 @@ public:
 template<const char *Ttext>
 void BluetoothBeginMenuItem<Ttext>::triggered()
 {
-    bluetoothSerial.begin("bobbyquad");
+    if (!bluetoothSerial.begin("bobbyquad"))
+    {
+        Serial.println("Could not begin bluetooth");
+        // TODO: better error handling
+    }
 }
 }

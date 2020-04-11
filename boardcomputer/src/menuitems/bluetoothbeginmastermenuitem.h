@@ -1,5 +1,7 @@
 #pragma once
 
+#include <HardwareSerial.h>
+
 #include "menuitem.h"
 #include "titleinterface.h"
 #include "globals.h"
@@ -15,6 +17,10 @@ public:
 template<const char *Ttext>
 void BluetoothBeginMasterMenuItem<Ttext>::triggered()
 {
-    bluetoothSerial.begin("bobbyquad", true);
+    if (!bluetoothSerial.begin("bobbyquad", true))
+    {
+        Serial.println("Could not begin bluetooth master");
+        // TODO: better error handling
+    }
 }
 }

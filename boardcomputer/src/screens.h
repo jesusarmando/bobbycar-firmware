@@ -120,6 +120,9 @@ union X {
     WifiModeChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiModeChangeScreen;
     WifiSleepChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiSleepChangeScreen;
     WifiTxPowerChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiTxPowerChangeScreen;
+
+    WifiAutoConnectChangeScreen<StationWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiAutoConnectChangeScreen;
+    WifiAutoReconnectChangeScreen<StationWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiAutoReconnectChangeScreen;
 } displays;
 
 using DefaultScreen = decltype(displays.statusDisplay);
@@ -207,6 +210,8 @@ template<> decltype(displays.changeBremsMax)                                   &
 template<> decltype(displays.wifiModeChangeScreen)                             &getRefByType<decltype(displays.wifiModeChangeScreen)>()                             { return displays.wifiModeChangeScreen; }
 template<> decltype(displays.wifiSleepChangeScreen)                            &getRefByType<decltype(displays.wifiSleepChangeScreen)>()                            { return displays.wifiSleepChangeScreen; }
 template<> decltype(displays.wifiTxPowerChangeScreen)                          &getRefByType<decltype(displays.wifiTxPowerChangeScreen)>()                          { return displays.wifiTxPowerChangeScreen; }
+template<> decltype(displays.wifiAutoConnectChangeScreen)                      &getRefByType<decltype(displays.wifiAutoConnectChangeScreen)>()                      { return displays.wifiAutoConnectChangeScreen; }
+template<> decltype(displays.wifiAutoReconnectChangeScreen)                    &getRefByType<decltype(displays.wifiAutoReconnectChangeScreen)>()                    { return displays.wifiAutoReconnectChangeScreen; }
 
 void deconstructScreen()
 {

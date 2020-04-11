@@ -134,6 +134,7 @@ void MenuDisplay::update()
 
 void MenuDisplay::redraw()
 {
+    tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
     m_titleLabel.redraw(title());
 
@@ -172,6 +173,7 @@ void MenuDisplay::redraw()
             forceLabelRedraw = true;
         }
 
+        tft.setTextFont(menuIter->get().font());
         tft.setTextColor(menuIter->get().color(), TFT_BLACK);
         const auto labelDrawn = labelsIter->get().redraw(menuIter->get().title(), forceLabelRedraw);
 

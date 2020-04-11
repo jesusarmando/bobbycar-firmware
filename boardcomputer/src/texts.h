@@ -3,6 +3,7 @@
 namespace {
 //AccessPointWifiSettingsMenu
 constexpr char TEXT_ACCESSPOINTWIFISETTINGS[] = "Access Point WiFi settings";
+constexpr char TEXT_WIFISOFTAPENABLEIPV6[] = "softAPenableIpV6()";
 //constexpr char TEXT_BACK[] = "Back";
 
 //BluetoothSettingsMenu
@@ -45,6 +46,11 @@ constexpr char TEXT_VERSION[] = "Version";
 
 //StationWifiSettingsMenu
 constexpr char TEXT_STATIONWIFISETTINGS[] = "Station WiFi settings";
+constexpr char TEXT_WIFIRECONNECT[] = "reconnect()";
+constexpr char TEXT_WIFIDISCONNECT[] = "disconnect()";
+constexpr char TEXT_WIFICHANGEAUTOCONNECT[] = "Change auto connect";
+constexpr char TEXT_WIFICHANGEAUTORECONNECT[] = "Change auto reconnect";
+constexpr char TEXT_WIFIENABLEIPV6[] = "enableIpV6()";
 //constexpr char TEXT_BACK[] = "Back";
 
 //DemosMenu

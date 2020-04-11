@@ -36,6 +36,7 @@ void CalibrateDisplay<Tscreen>::start()
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
+    tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);
 
     tft.drawString(TEXT_CALIBRATE, 5, 5, 4);

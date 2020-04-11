@@ -26,7 +26,7 @@ public:
     virtual void confirm() = 0;
 
 protected:
-    Label<26, 81, 188, 53, 7> m_label;
+    Label<26, 81, 188, 53> m_label;
 };
 
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
@@ -58,9 +58,10 @@ void ChangeValueDisplayInterface::start()
 {
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
+    tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);
 
-    tft.drawString(title(), 5, 5, 4);
+    tft.drawString(title(), 5, 5);
 
     tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
 
@@ -68,12 +69,13 @@ void ChangeValueDisplayInterface::start()
     m_label.start();
 
     tft.setTextColor(TFT_WHITE);
-    tft.drawString("Change value and", 10, 160, 4);
-    tft.drawString("press button to", 10, 185, 4);
-    tft.drawString("confirm and go", 10, 210, 4);
-    tft.drawString("back.", 10, 235, 4);
+    tft.drawString("Change value and", 10, 160);
+    tft.drawString("press button to", 10, 185);
+    tft.drawString("confirm and go", 10, 210);
+    tft.drawString("back.", 10, 235);
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextFont(7);
 }
 
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>

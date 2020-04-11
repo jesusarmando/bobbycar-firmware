@@ -18,7 +18,7 @@ public:
     virtual void clear() = 0;
 };
 
-template<int x, int y, int width, int height, int font=4>
+template<int x, int y, int width, int height>
 class Label : public LabelInterface
 {
 public:
@@ -41,20 +41,20 @@ private:
     String m_lastStr;
 };
 
-template<int x, int y, int width, int height, int font>
-void Label<x, y, width, height, font>::start()
+template<int x, int y, int width, int height>
+void Label<x, y, width, height>::start()
 {
     m_lastX = x;
     m_lastStr.clear();
 }
 
-template<int x, int y, int width, int height, int font>
-bool Label<x, y, width, height, font>::redraw(const String &str, bool forceRedraw)
+template<int x, int y, int width, int height>
+bool Label<x, y, width, height>::redraw(const String &str, bool forceRedraw)
 {
     if (m_lastStr == str && !forceRedraw)
         return false;
 
-    const auto renderedX = tft.drawString(str, x, y, font) + x;
+    const auto renderedX = tft.drawString(str, x, y) + x;
 
     if (renderedX < m_lastX)
         tft.fillRect(renderedX, y, m_lastX - renderedX, height, TFT_BLACK);
@@ -65,8 +65,8 @@ bool Label<x, y, width, height, font>::redraw(const String &str, bool forceRedra
     return true;
 }
 
-template<int x, int y, int width, int height, int font>
-void Label<x, y, width, height, font>::clear()
+template<int x, int y, int width, int height>
+void Label<x, y, width, height>::clear()
 {
     m_lastStr.clear();
 

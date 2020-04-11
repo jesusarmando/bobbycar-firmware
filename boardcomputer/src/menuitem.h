@@ -14,6 +14,7 @@ public:
 
     virtual void triggered() = 0;
 
+    virtual int font() const { return 4; }
     virtual int color() const { return TFT_WHITE; }
 };
 }

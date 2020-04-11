@@ -27,10 +27,10 @@ private:
     template<int offset, uint32_t color>
     void drawRect(int index) const;
 
-    Label<spacing, 100, boxWidth, boxHeight, 7> m_digit0;
-    Label<spacing*2+boxWidth, 100, boxWidth, boxHeight, 7> m_digit1;
-    Label<spacing*3+boxWidth*2, 100, boxWidth, boxHeight, 7> m_digit2;
-    Label<spacing*4+boxWidth*3, 100, boxWidth, boxHeight, 7> m_digit3;
+    Label<spacing, 100, boxWidth, boxHeight> m_digit0;
+    Label<spacing*2+boxWidth, 100, boxWidth, boxHeight> m_digit1;
+    Label<spacing*3+boxWidth*2, 100, boxWidth, boxHeight> m_digit2;
+    Label<spacing*4+boxWidth*3, 100, boxWidth, boxHeight> m_digit3;
 
     std::array<int8_t, 4> m_numbers;
 
@@ -56,14 +56,15 @@ void Lockscreen<Tscreen>::start()
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
+    tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);
 
-    tft.drawString(TEXT_LOCKVEHICLE, 5, 5, 4);
+    tft.drawString(TEXT_LOCKVEHICLE, 5, 5);
 
     tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
 
     tft.setTextColor(TFT_WHITE);
-    tft.drawString("Enter code to unlock:", 0, 50, 4);
+    tft.drawString("Enter code to unlock:", 0, 50);
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
@@ -77,6 +78,8 @@ void Lockscreen<Tscreen>::start()
     m_digit1.start();
     m_digit2.start();
     m_digit3.start();
+
+    tft.setTextFont(7);
 
     drawRect<1, TFT_YELLOW>(0);
     drawRect<2, TFT_YELLOW>(0);

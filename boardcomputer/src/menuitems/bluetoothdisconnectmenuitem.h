@@ -15,6 +15,10 @@ public:
 template<const char *Ttext>
 void BluetoothDisconnectMenuItem<Ttext>::triggered()
 {
-    bluetoothSerial.disconnect();
+    if (!bluetoothSerial.disconnect())
+    {
+        Serial.println("Could not disconnect bluetooth");
+        // TODO: better error handling
+    }
 }
 }

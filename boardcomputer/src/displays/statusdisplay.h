@@ -24,10 +24,10 @@ public:
     void redraw(const MotorFeedback &motor);
 
 private:
-    Label<18, y, 18, 22, 4> m_labelError;
-    Label<40, y, 85, 22, 4> m_labelCurrent;
-    Label<135, y, 75, 22, 4> m_labelSpeed;
-    Label<210, y, 30, 15, 2> m_labelHallSensors;
+    Label<18, y, 18, 22> m_labelError;
+    Label<40, y, 85, 22> m_labelCurrent;
+    Label<135, y, 75, 22> m_labelSpeed;
+    Label<210, y, 30, 15> m_labelHallSensors;
 };
 
 template<int y>
@@ -42,11 +42,11 @@ private:
 
     bool m_lastFeedbackValid{};
 
-    Label<65, y, 80, 22, 4> m_labelLeftPwm;
-    Label<155, y, 80, 22, 4> m_labelRightPwm;
+    Label<65, y, 80, 22> m_labelLeftPwm;
+    Label<155, y, 80, 22> m_labelRightPwm;
 
-    Label<30, y+25, 85, 22, 4> m_labelVoltage;
-    Label<150, y+25, 85, 22, 4> m_labelTemperature;
+    Label<30, y+25, 85, 22> m_labelVoltage;
+    Label<150, y+25, 85, 22> m_labelTemperature;
 
     MotorStatus<y+50> m_leftMotor;
     MotorStatus<y+75> m_rightMotor;
@@ -62,23 +62,23 @@ public:
     void redraw() override;
 
 private:
-    Label<45, 0, 40, 15, 2> m_labelRawGas;
-    Label<90, 0, 60, 15, 2> m_labelGas;
+    Label<45, 0, 40, 15> m_labelRawGas;
+    Label<90, 0, 60, 15> m_labelGas;
     ProgressBar<150, 0, 90, 15, 0, 1000> m_progressBarGas;
 
-    Label<45, 15, 40, 15, 2> m_labelRawBrems;
-    Label<90, 15, 60, 15, 2> m_labelBrems;
+    Label<45, 15, 40, 15> m_labelRawBrems;
+    Label<90, 15, 60, 15> m_labelBrems;
     ProgressBar<150, 15, 90, 15, 0, 1000> m_progressBarBrems;
 
     BoardStatus<42> m_frontStatus;
     BoardStatus<142> m_backStatus;
 
-    Label<35, 266, 120, 15, 2> m_labelWifiStatus;
-    Label<205, 266, 35, 15, 2> m_labelLimit0;
-    Label<25, 281, 130, 15, 2> m_labelIpAddress;
-    Label<205, 281, 35, 15, 2> m_labelLimit1;
-    Label<85, 296, 40, 15, 2> m_labelPerformance;
-    Label<165, 296, 75, 15, 2> m_labelMode;
+    Label<35, 266, 120, 15> m_labelWifiStatus;
+    Label<205, 266, 35, 15> m_labelLimit0;
+    Label<25, 281, 130, 15> m_labelIpAddress;
+    Label<205, 281, 35, 15> m_labelLimit1;
+    Label<85, 296, 40, 15> m_labelPerformance;
+    Label<165, 296, 75, 15> m_labelMode;
 };
 
 template<typename Tscreen>
@@ -88,13 +88,14 @@ void StatusDisplay<Tscreen>::start()
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
+    tft.setTextFont(2);
     tft.setTextColor(TFT_WHITE);
 
-    tft.drawString("gas", 0, 0, 2);
+    tft.drawString("gas", 0, 0);
     m_labelRawGas.start();
     m_labelGas.start();
     m_progressBarGas.start();
-    tft.drawString("brems", 0, 15, 2);
+    tft.drawString("brems", 0, 15);
     m_labelRawBrems.start();
     m_labelBrems.start();
     m_progressBarBrems.start();
@@ -102,17 +103,18 @@ void StatusDisplay<Tscreen>::start()
     m_frontStatus.start();
     m_backStatus.start();
 
-    tft.drawString("WiFi:", 0, 266, 2);
+    tft.setTextFont(2);
+    tft.drawString("WiFi:", 0, 266);
     m_labelWifiStatus.start();
-    tft.drawString("Limit0:", 160, 266, 2);
+    tft.drawString("Limit0:", 160, 266);
     m_labelLimit0.start();
-    tft.drawString("IP:", 0, 281, 2);
+    tft.drawString("IP:", 0, 281);
     m_labelIpAddress.start();
-    tft.drawString("Limit1:", 160, 281, 2);
+    tft.drawString("Limit1:", 160, 281);
     m_labelLimit1.start();
-    tft.drawString("Performance:", 0, 296, 2);
+    tft.drawString("Performance:", 0, 296);
     m_labelPerformance.start();
-    tft.drawString("Mode:", 125, 296, 2);
+    tft.drawString("Mode:", 125, 296);
     m_labelMode.start();
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -121,6 +123,7 @@ void StatusDisplay<Tscreen>::start()
 template<typename Tscreen>
 void StatusDisplay<Tscreen>::redraw()
 {
+    tft.setTextFont(2);
     m_labelRawGas.redraw(String{raw_gas});
     m_labelGas.redraw(String{gas});
     m_progressBarGas.redraw(gas);
@@ -131,6 +134,7 @@ void StatusDisplay<Tscreen>::redraw()
     m_frontStatus.redraw(front);
     m_backStatus.redraw(back);
 
+    tft.setTextFont(2);
     m_labelWifiStatus.redraw(toString(WiFi.status()));
     m_labelLimit0.redraw(String{front.command.left.iMotMax} + "A");
     m_labelIpAddress.redraw(WiFi.localIP().toString());
@@ -142,7 +146,8 @@ void StatusDisplay<Tscreen>::redraw()
 template<int y>
 void BoardStatus<y>::start()
 {
-    tft.drawString("pwm:", 0, y, 4);
+    tft.setTextFont(4);
+    tft.drawString("pwm:", 0, y);
     m_labelLeftPwm.start();
     m_labelRightPwm.start();
     drawWarning();
@@ -151,6 +156,8 @@ void BoardStatus<y>::start()
 template<int y>
 void BoardStatus<y>::redraw(const Controller &controller)
 {
+    tft.setTextFont(4);
+
     m_labelLeftPwm.redraw(String{controller.command.left.pwm});
     m_labelRightPwm.redraw(String{controller.command.right.pwm});
 
@@ -212,6 +219,7 @@ void MotorStatus<y>::start()
 template<int y>
 void MotorStatus<y>::redraw(const MotorFeedback &motor)
 {
+    tft.setTextFont(4);
     tft.setTextColor(motor.error?TFT_RED:TFT_GREEN, TFT_BLACK);
     m_labelError.redraw(String{motor.error});
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
