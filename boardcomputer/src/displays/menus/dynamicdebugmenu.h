@@ -6,6 +6,7 @@
 #include <WString.h>
 
 #include "menudisplay.h"
+#include "menuitems/dummymenuitem.h"
 #include "menuitems/switchscreenmenuitem.h"
 #include "texts.h"
 #include "globals.h"
@@ -25,21 +26,18 @@ public:
     void triggered() override {}
 };
 
-class DynamicMenuRandomItem final : public MenuItemInterface
+class DynamicMenuRandomItem final : public DummyMenuItem
 {
     using Base = MenuItemInterface;
 
 public:
-    String title() const override { return m_title; }
     void start() override { MenuItemInterface::start(); updateTitle(); }
     void update() override;
-    void triggered() override {}
 
 private:
     void updateTitle();
 
     unsigned long m_lastUpdate;
-    String m_title;
 };
 
 template<typename Tscreen>
@@ -85,7 +83,7 @@ void DynamicMenuRandomItem::update()
 
 void DynamicMenuRandomItem::updateTitle()
 {
-    m_title = String{"random: "} + random(0, 100);
+    setTitle(String{"random: "} + random(0, 100));
     m_lastUpdate = millis();
 }
 

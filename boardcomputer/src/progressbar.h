@@ -9,7 +9,7 @@ class ProgressBar
 {
 public:
     void start();
-    void repaint(int value);
+    void redraw(int value);
 
 private:
     int m_lastValue{x+1};
@@ -22,7 +22,7 @@ void ProgressBar<x, y, width, height, min, max, color>::start()
 }
 
 template<int x, int y, int width, int height, int min, int max, uint32_t color>
-void ProgressBar<x, y, width, height, min, max, color>::repaint(int value)
+void ProgressBar<x, y, width, height, min, max, color>::redraw(int value)
 {
     value = scaleBetween(value, min, max, x+1, x+width-1);
 

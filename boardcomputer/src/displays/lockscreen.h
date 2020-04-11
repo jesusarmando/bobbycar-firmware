@@ -80,7 +80,7 @@ void Lockscreen<Tscreen>::start()
 
     drawRect<1, TFT_YELLOW>(0);
     drawRect<2, TFT_YELLOW>(0);
-    m_digit0.repaint(String(m_numbers[0]));
+    m_digit0.redraw(String(m_numbers[0]));
 }
 
 template<typename Tscreen>
@@ -103,17 +103,17 @@ void Lockscreen<Tscreen>::redraw()
 
             m_numbers = {0,0,0,0};
             m_currentIndex = 0;
-            m_digit1.repaint(String{});
-            m_digit2.repaint(String{});
-            m_digit3.repaint(String{});
+            m_digit1.redraw(String{});
+            m_digit2.redraw(String{});
+            m_digit3.redraw(String{});
         }
 
         switch (m_currentIndex)
         {
-        case 0: m_digit0.repaint(String{m_numbers[0]}); break;
-        case 1: m_digit1.repaint(String{m_numbers[1]}); break;
-        case 2: m_digit2.repaint(String{m_numbers[2]}); break;
-        case 3: m_digit3.repaint(String{m_numbers[3]}); break;
+        case 0: m_digit0.redraw(String{m_numbers[0]}); break;
+        case 1: m_digit1.redraw(String{m_numbers[1]}); break;
+        case 2: m_digit2.redraw(String{m_numbers[2]}); break;
+        case 3: m_digit3.redraw(String{m_numbers[3]}); break;
         }
 
         drawRect<1, TFT_YELLOW>(m_currentIndex);
@@ -133,10 +133,10 @@ void Lockscreen<Tscreen>::redraw()
 
         switch (m_currentIndex)
         {
-        case 0: m_digit0.repaint(String(m_numbers[0])); break;
-        case 1: m_digit1.repaint(String(m_numbers[1])); break;
-        case 2: m_digit2.repaint(String(m_numbers[2])); break;
-        case 3: m_digit3.repaint(String(m_numbers[3])); break;
+        case 0: m_digit0.redraw(String(m_numbers[0])); break;
+        case 1: m_digit1.redraw(String(m_numbers[1])); break;
+        case 2: m_digit2.redraw(String(m_numbers[2])); break;
+        case 3: m_digit3.redraw(String(m_numbers[3])); break;
         }
 
         m_rotated = 0;

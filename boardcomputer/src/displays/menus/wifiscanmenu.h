@@ -75,7 +75,10 @@ void WifiScanMenu<Tscreen>::update()
             }
 
             while (n < vec.size())
+            {
+                vec.back().stop();
                 vec.pop_back();
+            }
 
             refVec.clear();
             for (auto &item : vec)

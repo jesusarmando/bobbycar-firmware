@@ -51,9 +51,9 @@ void BluetoothStatusDisplay<Tscreen>::start()
 template<typename Tscreen>
 void BluetoothStatusDisplay<Tscreen>::redraw()
 {
-    m_label0.repaint(String{bluetoothSerial.available()});
-    m_label1.repaint(bluetoothSerial.hasClient() ? "true" : "false");
-    m_label2.repaint(bluetoothSerial.connected() ? "true" : "false");
-    m_label3.repaint(bluetoothSerial.isReady() ? "true" : "false");
+    m_label0.redraw(String{bluetoothSerial.available()});
+    m_label1.redraw(bluetoothSerial.hasClient() ? "true" : "false");
+    m_label2.redraw(bluetoothSerial.connected() ? "true" : "false");
+    m_label3.redraw(bluetoothSerial.isReady() ? "true" : "false");
 }
 }

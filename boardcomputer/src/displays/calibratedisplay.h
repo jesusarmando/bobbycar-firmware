@@ -56,13 +56,13 @@ void CalibrateDisplay<Tscreen>::start()
 template<typename Tscreen>
 void CalibrateDisplay<Tscreen>::redraw()
 {
-    m_label0.repaint(String{gas});
-    m_label1.repaint(String{raw_gas});
+    m_label0.redraw(String{gas});
+    m_label1.redraw(String{raw_gas});
 
-    m_label2.repaint(String{brems});
-    m_label3.repaint(String{raw_brems});
+    m_label2.redraw(String{brems});
+    m_label3.redraw(String{raw_brems});
 
-    m_progressBar0.repaint(gas);
-    m_progressBar1.repaint(brems);
+    m_progressBar0.redraw(gas);
+    m_progressBar1.redraw(brems);
 }
 }

@@ -38,9 +38,37 @@ private:
     int m_rotateOffset;
 
     Label<5, 5, 230, 25> m_titleLabel;
-    int m_lastY;
+
+    Label<10, 45+(0*27), 220, 25> m_label0;
+    Label<10, 45+(1*27), 220, 25> m_label1;
+    Label<10, 45+(2*27), 220, 25> m_label2;
+    Label<10, 45+(3*27), 220, 25> m_label3;
+    Label<10, 45+(4*27), 220, 25> m_label4;
+    Label<10, 45+(5*27), 220, 25> m_label5;
+    Label<10, 45+(6*27), 220, 25> m_label6;
+    Label<10, 45+(7*27), 220, 25> m_label7;
+    Label<10, 45+(8*27), 220, 25> m_label8;
+    Label<10, 45+(9*27), 220, 25> m_label9;
+
+    std::array<std::reference_wrapper<LabelInterface>, 10> getLabels()
+    {
+        return {
+            std::ref<LabelInterface>(m_label0),
+            std::ref<LabelInterface>(m_label1),
+            std::ref<LabelInterface>(m_label2),
+            std::ref<LabelInterface>(m_label3),
+            std::ref<LabelInterface>(m_label4),
+            std::ref<LabelInterface>(m_label5),
+            std::ref<LabelInterface>(m_label6),
+            std::ref<LabelInterface>(m_label7),
+            std::ref<LabelInterface>(m_label8),
+            std::ref<LabelInterface>(m_label9)
+        };
+    }
 
     int m_selectedIndex;
+    int m_scrollOffset;
+    int m_highlightedIndex;
     bool m_pressed{};
 };
 
@@ -367,8 +395,9 @@ class MenuDisplay<Ttext> : public MenuDisplayInterface, public TitleImpl<Ttext>
 void MenuDisplayInterface::start()
 {
     m_selectedIndex = 0;
+    m_scrollOffset = 0;
+    m_highlightedIndex = -1;
     m_pressed = false;
-    m_lastY = 0;
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
@@ -399,9 +428,17 @@ void MenuDisplayInterface::update()
                 m_selectedIndex = 0;
             if (m_selectedIndex >= itemCount)
                 m_selectedIndex = itemCount - 1;
+
+            if (m_selectedIndex < m_scrollOffset)
+                m_scrollOffset = m_selectedIndex;
+            if (m_selectedIndex >= m_scrollOffset + getLabels().size())
+                m_scrollOffset = m_selectedIndex - getLabels().size() + 1;
         }
         else
+        {
             m_selectedIndex = -1;
+            m_scrollOffset = 0;
+        }
 
         for (auto iter = begin(); iter != end(); iter++)
             iter->get().update();
@@ -416,20 +453,64 @@ void MenuDisplayInterface::update()
 void MenuDisplayInterface::redraw()
 {
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-    m_titleLabel.repaint(title());
+    m_titleLabel.redraw(title());
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
-    int y = 45;
     const auto menuBegin = begin();
     const auto menuEnd = end();
-    for (auto iter = menuBegin; iter != menuEnd; iter++)
-        iter->get().redraw(y, std::distance(menuBegin, iter) == m_selectedIndex);
 
-    if (y < m_lastY)
-        tft.fillRect(0, y, tft.width(), m_lastY - y, TFT_BLACK);
+    auto menuIter = menuBegin + m_scrollOffset;
 
-    m_lastY = y;
+    const auto labels = getLabels();
+
+    auto labelsIter = std::begin(labels);
+
+    int newHighlightedIndex{-1};
+
+    const auto drawItemRect = [](const LabelInterface &label, const auto color){
+        tft.drawRect(label.getX()-5,
+                     label.getY()-2,
+                     label.getWidth()+10,
+                     label.getHeight()+2,
+                     color);
+    };
+
+    for (; menuIter != menuEnd && labelsIter != std::end(labels); menuIter++, labelsIter++)
+    {
+        const auto index = std::distance(menuBegin, menuIter);
+        const auto relativeIndex = index - m_scrollOffset;
+        const auto selected = index == m_selectedIndex;
+
+        bool forceLabelRedraw{};
+
+        if (selected)
+            newHighlightedIndex = relativeIndex;
+        else if (relativeIndex == m_highlightedIndex)
+        {
+            drawItemRect(labelsIter->get(), TFT_BLACK);
+            forceLabelRedraw = true;
+        }
+
+        const auto labelDrawn = labelsIter->get().redraw(menuIter->get().title(), forceLabelRedraw);
+
+        if (selected && (labelDrawn || relativeIndex != m_highlightedIndex))
+        {
+            drawItemRect(labelsIter->get(), TFT_WHITE);
+        }
+    }
+
+    for (; labelsIter != std::end(labels); labelsIter++)
+    {
+        const auto relativeIndex = std::distance(std::begin(labels), labelsIter);
+
+        if (relativeIndex == m_highlightedIndex)
+            drawItemRect(labelsIter->get(), TFT_BLACK);
+
+        labelsIter->get().clear();
+    }
+
+    m_highlightedIndex = newHighlightedIndex;
 }
 
 void MenuDisplayInterface::stop()
