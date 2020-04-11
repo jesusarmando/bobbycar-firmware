@@ -8,6 +8,7 @@
 #include "texts.h"
 #include "label.h"
 #include "progressbar.h"
+#include "modes/ignoreinputmode.h"
 
 namespace {
 template<typename Tscreen>
@@ -18,8 +19,11 @@ class CalibrateDisplay final : public DemoDisplay<Tscreen>
 public:
     void start() override;
     void redraw() override;
+    void stop() override;
 
 private:
+    ModeBase *m_oldMode;
+    IgnoreInputMode m_mode{0, ControlType::FieldOrientedControl, ControlMode::Torque};
 
     Label<25, 50, 100, 23> m_label0;
     Label<25, 75, 100, 23> m_label1;
@@ -33,6 +37,9 @@ template<typename Tscreen>
 void CalibrateDisplay<Tscreen>::start()
 {
     Base::start();
+
+    m_oldMode = currentMode;
+    currentMode = &m_mode;
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
@@ -65,5 +72,14 @@ void CalibrateDisplay<Tscreen>::redraw()
 
     m_progressBar0.redraw(gas);
     m_progressBar1.redraw(brems);
+}
+
+template<typename Tscreen>
+void CalibrateDisplay<Tscreen>::stop()
+{
+    Base::stop();
+
+    if (currentMode == &m_mode)
+        currentMode = m_oldMode;
 }
 }

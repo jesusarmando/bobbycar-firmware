@@ -5,12 +5,14 @@
 #include "globals.h"
 #include "utils.h"
 #include "texts.h"
-#include "modes/lockscreenmode.h"
+#include "modes/ignoreinputmode.h"
 
 namespace {
 template<typename Tscreen>
 class Lockscreen : public Display
 {
+    using Base = Display;
+
     static constexpr auto boxWidth = 35;
     static constexpr auto boxHeight = 50;
     static constexpr auto spacing = 20;
@@ -19,6 +21,7 @@ public:
     void start() override;
     void update() override {}
     void redraw() override;
+    void stop() override;
 
     void button(bool pressed) override;
     void rotate(int offset) override;
@@ -36,11 +39,11 @@ private:
 
     uint8_t m_currentIndex{};
 
-    bool m_pressed{};
-    int m_rotated{};
+    bool m_pressed;
+    int m_rotated;
 
-    ModeBase *m_oldMode{};
-    LockscreenMode m_mode;
+    ModeBase *m_oldMode;
+    IgnoreInputMode m_mode{0, ControlType::FieldOrientedControl, ControlMode::Speed};
 };
 
 template<typename Tscreen>
@@ -98,8 +101,6 @@ void Lockscreen<Tscreen>::redraw()
         {
             if (m_numbers == decltype(m_numbers){1,2,3,4})
             {
-                if (currentMode == &m_mode)
-                    currentMode = m_oldMode;
                 switchScreen<Tscreen>();
                 return;
             }
@@ -144,6 +145,15 @@ void Lockscreen<Tscreen>::redraw()
 
         m_rotated = 0;
     }
+}
+
+template<typename Tscreen>
+void Lockscreen<Tscreen>::stop()
+{
+    Base::stop();
+
+    if (currentMode == &m_mode)
+        currentMode = m_oldMode;
 }
 
 template<typename Tscreen>

@@ -14,7 +14,7 @@ public:
     void button(bool pressed) override;
 
 private:
-    bool m_pressed{};
+    bool m_pressed;
 };
 
 template<typename Tscreen>

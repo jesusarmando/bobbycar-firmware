@@ -36,9 +36,7 @@ constexpr char TEXT_POWEROFF[] = "Poweroff";
 constexpr char TEXT_COMMONSETTINGS[] = "Common settings";
 constexpr char TEXT_WIFISETTINGS[] = "WiFi settings";
 //constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
-constexpr char TEXT_DEFAULTMODESETTIGNS[] = "Default mode settings";
-constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
-//constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
+constexpr char TEXT_MODESSETTINGS[] = "Modes settings";
 constexpr char TEXT_POTISETTINGS[] = "Poti settings";
 constexpr char TEXT_REBOOT[] = "Reboot";
 constexpr char TEXT_VERSION[] = "Version";
@@ -133,6 +131,14 @@ constexpr char TEXT_INVERTBACKLEFT[] = "Invert back left";
 constexpr char TEXT_INVERTBACKRIGHT[] = "Invert back right";
 //constexpr char TEXT_BACK[] = "Back";
 
+//ModesSettingsMenu
+//constexpr char TEXT_MODESSETTINGS[] = "Modes settings";
+constexpr char TEXT_DEFAULTMODESETTIGNS[] = "Default mode settings";
+constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
+//constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
+constexpr char TEXT_WEBSOCKETMODESETTINGS[] = "Websocket mode settings";
+//constexpr char TEXT_BACK[] = "Back";
+
 //TempomatModeSettingsMenu
 //constexpr char TEXT_TEMPOMATMODESETTINGS[] = "Tempomat mode settings";
 //constexpr char TEXT_SETCONTROLTYPE[] = "Set control type";
@@ -165,6 +171,7 @@ constexpr char TEXT_RACE[] = "Race";
 constexpr char TEXT_DEFAULT[] = "Default";
 constexpr char TEXT_TEMPOMAT[] = "Tempomat";
 constexpr char TEXT_BLUETOOTH[] = "Bluetooth";
+constexpr char TEXT_WEBSOCKET[] = "Websocket";
 //constexpr char TEXT_BACK[] = "Back";
 
 //ChangeValueDisplay<bool>
@@ -190,7 +197,6 @@ constexpr char TEXT_WIFI_MODE_NULL[] = "WIFI_MODE_NULL";
 constexpr char TEXT_WIFI_MODE_STA[] = "WIFI_MODE_STA";
 constexpr char TEXT_WIFI_MODE_AP[] = "WIFI_MODE_AP";
 constexpr char TEXT_WIFI_MODE_APSTA[] = "WIFI_MODE_APSTA";
-constexpr char TEXT_WIFI_MODE_MAX[] = "WIFI_MODE_MAX";
 //constexpr char TEXT_BACK[] = "Back";
 
 //ChangeValueDisplay<wifi_power_t>

@@ -14,10 +14,12 @@
 #include "displays/menus/invertmenu.h"
 #include "displays/menus/mainmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
+#include "displays/menus/modessettingsmenu.h"
 #include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/selectmodemenu.h"
 #include "displays/menus/settingsmenu.h"
 #include "displays/menus/stationwifisettingsmenu.h"
+#include "displays/menus/websocketmodesettingsmenu.h"
 #include "displays/menus/wifiscanmenu.h"
 #include "displays/menus/wifisettingsmenu.h"
 #include "displays/calibratedisplay.h"
@@ -42,22 +44,24 @@ union X {
     MainMenu mainMenu;
     AccessPointWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> accessPointWifiSettingsMenu;
     BluetoothSettingsMenu<SettingsMenu<MainMenu>> bluetoothSettingsMenu;
-    BluetoothModeSettingsMenu<SettingsMenu<MainMenu>> bluetoothModeSettingsMenu;
+    BluetoothModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> bluetoothModeSettingsMenu;
     BuzzerMenu<DebugMenu<MainMenu>> buzzerMenu;
     CommonSettingsMenu<SettingsMenu<MainMenu>> commonSettingsMenu;
     DebugMenu<MainMenu> debugMenu;
-    DefaultModeSettingsMenu<SettingsMenu<MainMenu>> defaultModeSettingsMenu;
+    DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> defaultModeSettingsMenu;
     DemosMenu<MainMenu> demosMenu;
     DynamicDebugMenu<DebugMenu<MainMenu>> dynamicDebugMenu;
     EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> enableMenu;
     GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> genericWifiSettingsMenu;
     InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> invertMenu;
-    TempomatModeSettingsMenu<SettingsMenu<MainMenu>> tempomatModeSettingsMenu;
+    TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> tempomatModeSettingsMenu;
+    ModesSettingsMenu<SettingsMenu<MainMenu>> modesSettingsMenu;
     PotiSettingsMenu<SettingsMenu<MainMenu>> potiSettingsMenu;
     PresetsMenu<MainMenu> presetsMenu;
     SelectModeMenu<MainMenu> selectModeMenu;
     SettingsMenu<MainMenu> settingsMenu;
     StationWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> stationWifiSettingsMenu;
+    WebsocketModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> websocketModeSettingsMenu;
     WifiScanMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> wifiScanMenu;
     WifiSettingsMenu<SettingsMenu<MainMenu>> wifiSettingsMenu;
 
@@ -84,17 +88,17 @@ union X {
     FieldWeakMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeFieldWeakMax;
     PhaseAdvMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changePhaseAdvMax;
 
-    DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeCtrlTyp;
-    DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeCtrlMod;
-    DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeEnableFieldWeakeningSmoothening;
-    DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeWeakeningSmoothening;
-    DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeFrontPercentage;
-    DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeBackPercentage;
-    DefaultModeAddSchwelleChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeAddSchwelle;
-    DefaultModeGas1WertChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeGas1Wert;
-    DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeGas2Wert;
-    DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeBrems1Wert;
-    DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<SettingsMenu<MainMenu>>> changeDefaultModeBrems2Wert;
+    DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeCtrlTyp;
+    DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeCtrlMod;
+    DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeEnableFieldWeakeningSmoothening;
+    DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeWeakeningSmoothening;
+    DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeFrontPercentage;
+    DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBackPercentage;
+    DefaultModeAddSchwelleChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeAddSchwelle;
+    DefaultModeGas1WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeGas1Wert;
+    DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeGas2Wert;
+    DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBrems1Wert;
+    DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBrems2Wert;
 
     FrontLeftEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontLeftEnabled;
     FrontRightEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontRightEnabled;
@@ -109,8 +113,8 @@ union X {
     FrontLedChangeScreen<DebugMenu<MainMenu>> changeFrontLed;
     BackLedChangeScreen<DebugMenu<MainMenu>> changeBackLed;
 
-    TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlTyp;
-    TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<SettingsMenu<MainMenu>>> changeManualModeCtrlMod;
+    TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlTyp;
+    TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlMod;
 
     GasMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMin;
     GasMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMax;
@@ -143,11 +147,13 @@ template<> decltype(displays.genericWifiSettingsMenu)                          &
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
 template<> decltype(displays.mainMenu)                                         &getRefByType<decltype(displays.mainMenu)>()                                         { return displays.mainMenu; }
 template<> decltype(displays.tempomatModeSettingsMenu)                         &getRefByType<decltype(displays.tempomatModeSettingsMenu)>()                         { return displays.tempomatModeSettingsMenu; }
+template<> decltype(displays.modesSettingsMenu)                                &getRefByType<decltype(displays.modesSettingsMenu)>()                                { return displays.modesSettingsMenu; }
 template<> decltype(displays.potiSettingsMenu)                                 &getRefByType<decltype(displays.potiSettingsMenu)>()                                 { return displays.potiSettingsMenu; }
 template<> decltype(displays.presetsMenu)                                      &getRefByType<decltype(displays.presetsMenu)>()                                      { return displays.presetsMenu; }
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }
 template<> decltype(displays.settingsMenu)                                     &getRefByType<decltype(displays.settingsMenu)>()                                     { return displays.settingsMenu; }
 template<> decltype(displays.stationWifiSettingsMenu)                          &getRefByType<decltype(displays.stationWifiSettingsMenu)>()                          { return displays.stationWifiSettingsMenu; }
+template<> decltype(displays.websocketModeSettingsMenu)                        &getRefByType<decltype(displays.websocketModeSettingsMenu)>()                        { return displays.websocketModeSettingsMenu; }
 template<> decltype(displays.wifiScanMenu)                                     &getRefByType<decltype(displays.wifiScanMenu)>()                                     { return displays.wifiScanMenu; }
 template<> decltype(displays.wifiSettingsMenu)                                 &getRefByType<decltype(displays.wifiSettingsMenu)>()                                 { return displays.wifiSettingsMenu; }
 

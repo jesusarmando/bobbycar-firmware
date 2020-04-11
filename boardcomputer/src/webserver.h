@@ -14,6 +14,7 @@
 #include "modes/defaultmode.h"
 #include "modes/tempomatmode.h"
 #include "modes/bluetoothmode.h"
+#include "modes/websocketmode.h"
 
 namespace {
 class WebHandler : public AsyncWebHandler
@@ -404,6 +405,7 @@ void WebHandler::handleCommonParams(AsyncWebServerRequest *request)
                     selectOption(response, "defaultMode", modes::defaultMode.displayName(), currentMode==&modes::defaultMode);
                     selectOption(response, "tempomatMode", modes::tempomatMode.displayName(), currentMode==&modes::tempomatMode);
                     selectOption(response, "bluetoothMode", modes::bluetoothMode.displayName(), currentMode==&modes::bluetoothMode);
+                    selectOption(response, "websocketMode", modes::websocketMode.displayName(), currentMode==&modes::websocketMode);
                 }
 
                 breakLine(response);

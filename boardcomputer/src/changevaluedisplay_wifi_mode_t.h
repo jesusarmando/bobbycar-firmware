@@ -13,7 +13,6 @@ class ChangeValueDisplay<wifi_mode_t, Taccessor, Tdisplay, Ttext> final :
         SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_STA, Tdisplay, TEXT_WIFI_MODE_STA>,
         SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_AP, Tdisplay, TEXT_WIFI_MODE_AP>,
         SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_APSTA, Tdisplay, TEXT_WIFI_MODE_APSTA>,
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_MAX, Tdisplay, TEXT_WIFI_MODE_MAX>,
         StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
     >
 {
@@ -22,7 +21,6 @@ class ChangeValueDisplay<wifi_mode_t, Taccessor, Tdisplay, Ttext> final :
         SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_STA, Tdisplay, TEXT_WIFI_MODE_STA>,
         SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_AP, Tdisplay, TEXT_WIFI_MODE_AP>,
         SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_APSTA, Tdisplay, TEXT_WIFI_MODE_APSTA>,
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_MAX, Tdisplay, TEXT_WIFI_MODE_MAX>,
         StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
     >;
 
@@ -43,12 +41,10 @@ void ChangeValueDisplay<wifi_mode_t, Taccessor, Tdisplay, Ttext>::start()
         Base::setSelectedIndex(2);
     else if (Taccessor::getValue() == WIFI_MODE_APSTA)
         Base::setSelectedIndex(3);
-    else if (Taccessor::getValue() == WIFI_MODE_MAX)
-        Base::setSelectedIndex(4);
     else
     {
         Serial.printf("Unknown wifi_mode_t: %i", int(Taccessor::getValue()));
-        Base::setSelectedIndex(5);
+        Base::setSelectedIndex(4);
     }
 }
 }
