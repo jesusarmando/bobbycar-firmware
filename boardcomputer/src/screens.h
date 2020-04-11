@@ -12,6 +12,7 @@
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/genericwifisettingsmenu.h"
 #include "displays/menus/invertmenu.h"
+#include "displays/menus/larsmmodesettingsmenu.h"
 #include "displays/menus/mainmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
 #include "displays/menus/modessettingsmenu.h"
@@ -54,6 +55,7 @@ union X {
     EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> enableMenu;
     GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> genericWifiSettingsMenu;
     InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> invertMenu;
+    LarsmModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> larsmModeSettingsMenu;
     TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> tempomatModeSettingsMenu;
     ModesSettingsMenu<SettingsMenu<MainMenu>> modesSettingsMenu;
     PotiSettingsMenu<SettingsMenu<MainMenu>> potiSettingsMenu;
@@ -145,6 +147,7 @@ template<> decltype(displays.dynamicDebugMenu)                                 &
 template<> decltype(displays.enableMenu)                                       &getRefByType<decltype(displays.enableMenu)>()                                       { return displays.enableMenu; }
 template<> decltype(displays.genericWifiSettingsMenu)                          &getRefByType<decltype(displays.genericWifiSettingsMenu)>()                          { return displays.genericWifiSettingsMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
+template<> decltype(displays.larsmModeSettingsMenu)                            &getRefByType<decltype(displays.larsmModeSettingsMenu)>()                            { return displays.larsmModeSettingsMenu; }
 template<> decltype(displays.mainMenu)                                         &getRefByType<decltype(displays.mainMenu)>()                                         { return displays.mainMenu; }
 template<> decltype(displays.tempomatModeSettingsMenu)                         &getRefByType<decltype(displays.tempomatModeSettingsMenu)>()                         { return displays.tempomatModeSettingsMenu; }
 template<> decltype(displays.modesSettingsMenu)                                &getRefByType<decltype(displays.modesSettingsMenu)>()                                { return displays.modesSettingsMenu; }

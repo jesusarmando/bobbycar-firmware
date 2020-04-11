@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "modes/defaultmode.h"
 #include "modes/tempomatmode.h"
+#include "modes/larsmmode.h"
 #include "modes/bluetoothmode.h"
 #include "modes/websocketmode.h"
 
@@ -15,6 +16,7 @@ namespace {
 struct ModeAccessor { static auto &getRef() { return currentMode; } };
 struct DefaultModeAccessor { static auto getValue() { return &modes::defaultMode; } };
 struct TempomatModeAccessor { static auto getValue() { return &modes::tempomatMode; } };
+struct LarsmModeAccessor { static auto getValue() { return &modes::larsmMode; } };
 struct BluetoothModeAccessor { static auto getValue() { return &modes::bluetoothMode; } };
 struct WebsocketModeAccessor { static auto getValue() { return &modes::websocketMode; } };
 
@@ -24,6 +26,7 @@ class SelectModeMenu final :
     public StaticMenuDisplay<
         SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, DefaultModeAccessor, Tscreen, TEXT_DEFAULT>,
         SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, TempomatModeAccessor, Tscreen, TEXT_TEMPOMAT>,
+        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, LarsmModeAccessor, Tscreen, TEXT_LARSM>,
         SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, BluetoothModeAccessor, Tscreen, TEXT_BLUETOOTH>,
         SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, WebsocketModeAccessor, Tscreen, TEXT_WEBSOCKET>,
         StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
@@ -32,6 +35,7 @@ class SelectModeMenu final :
     using Base = StaticMenuDisplay<
         SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, DefaultModeAccessor, Tscreen, TEXT_DEFAULT>,
         SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, TempomatModeAccessor, Tscreen, TEXT_TEMPOMAT>,
+    SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, LarsmModeAccessor, Tscreen, TEXT_LARSM>,
         SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, BluetoothModeAccessor, Tscreen, TEXT_BLUETOOTH>,
     SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, WebsocketModeAccessor, Tscreen, TEXT_WEBSOCKET>,
         StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
@@ -50,14 +54,16 @@ void SelectModeMenu<Tscreen>::start()
         Base::setSelectedIndex(0);
     else if (AccessorHelper<ModeAccessor>::getValue() == TempomatModeAccessor::getValue())
         Base::setSelectedIndex(1);
-    else if (AccessorHelper<ModeAccessor>::getValue() == BluetoothModeAccessor::getValue())
+    else if (AccessorHelper<ModeAccessor>::getValue() == LarsmModeAccessor::getValue())
         Base::setSelectedIndex(2);
-    else if (AccessorHelper<ModeAccessor>::getValue() == WebsocketModeAccessor::getValue())
+    else if (AccessorHelper<ModeAccessor>::getValue() == BluetoothModeAccessor::getValue())
         Base::setSelectedIndex(3);
+    else if (AccessorHelper<ModeAccessor>::getValue() == WebsocketModeAccessor::getValue())
+        Base::setSelectedIndex(4);
     else
     {
         Serial.printf("Unknown mode: %s", AccessorHelper<ModeAccessor>::getValue()->displayName());
-        Base::setSelectedIndex(4);
+        Base::setSelectedIndex(5);
     }
 }
 }

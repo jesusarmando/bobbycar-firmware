@@ -13,6 +13,7 @@
 
 #include "modes/defaultmode.h"
 #include "modes/tempomatmode.h"
+#include "modes/larsmmode.h"
 #include "modes/bluetoothmode.h"
 #include "modes/websocketmode.h"
 
@@ -404,6 +405,7 @@ void WebHandler::handleCommonParams(AsyncWebServerRequest *request)
                     HtmlTag select(response, "select", " id=\"mode\" name=\"mode\" required");
                     selectOption(response, "defaultMode", modes::defaultMode.displayName(), currentMode==&modes::defaultMode);
                     selectOption(response, "tempomatMode", modes::tempomatMode.displayName(), currentMode==&modes::tempomatMode);
+                    selectOption(response, "larsmMode", modes::larsmMode.displayName(), currentMode==&modes::larsmMode);
                     selectOption(response, "bluetoothMode", modes::bluetoothMode.displayName(), currentMode==&modes::bluetoothMode);
                     selectOption(response, "websocketMode", modes::websocketMode.displayName(), currentMode==&modes::websocketMode);
                 }
@@ -808,8 +810,12 @@ void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
             currentMode = &modes::defaultMode;
         else if (p->value() == "tempomatMode")
             currentMode = &modes::tempomatMode;
+        else if (p->value() == "larsmMode")
+            currentMode = &modes::larsmMode;
         else if (p->value() == "bluetoothMode")
             currentMode = &modes::bluetoothMode;
+        else if (p->value() == "websocketMode")
+            currentMode = &modes::websocketMode;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
