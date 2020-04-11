@@ -15,11 +15,9 @@ class SpiroDisplay final : public DemoDisplay<Tscreen>
 
 public:
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
-
     constexpr static auto DEG2RAD = 0.0174532925;
 
     static unsigned int rainbow(int value);
@@ -38,14 +36,6 @@ void SpiroDisplay<Tscreen>::start()
 
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(3);
-}
-
-template<typename Tscreen>
-void SpiroDisplay<Tscreen>::update()
-{
-    redraw();
-
-    Base::update();
 }
 
 template<typename Tscreen>

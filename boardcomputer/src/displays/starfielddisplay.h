@@ -17,11 +17,9 @@ public:
     StarfieldDisplay();
 
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
-
     // Fast 0-255 random number generator from http://eternityforest.com/Projects/rng.php:
     uint8_t rng();
 
@@ -55,13 +53,6 @@ void StarfieldDisplay<Tscreen>::start()
     // It must be called after any other graphics drawing function call if fastPixel()
     // is to be called again
     //tft.fastSetup(); // Prepare plot window range for fast pixel plotting
-}
-
-template<typename Tscreen>
-void StarfieldDisplay<Tscreen>::update()
-{
-    redraw();
-    Base::update();
 }
 
 template<typename Tscreen>

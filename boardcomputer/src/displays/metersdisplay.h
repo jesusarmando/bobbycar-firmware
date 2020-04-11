@@ -16,11 +16,9 @@ class MetersDisplay final : public DemoDisplay<Tscreen>
 
 public:
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
-
     //  Draw the analogue meter on the screen
     void analogMeter();
 
@@ -65,13 +63,6 @@ void MetersDisplay<Tscreen>::start()
     plotLinear("A3", 3 * d, 160);
     plotLinear("A4", 4 * d, 160);
     plotLinear("A5", 5 * d, 160);
-}
-
-template<typename Tscreen>
-void MetersDisplay<Tscreen>::update()
-{
-    redraw();
-    Base::update();
 }
 
 template<typename Tscreen>

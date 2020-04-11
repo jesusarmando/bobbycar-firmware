@@ -16,6 +16,7 @@ class MenuDisplayInterface : public Display, public virtual TitleInterface
 public:
     void start() override;
     void update() override;
+    void redraw() override;
     void stop() override;
 
     void rotate(int offset) override;
@@ -33,9 +34,8 @@ protected:
     void setSelectedItem(const std::reference_wrapper<MenuItemInterface> *item);
 
 private:
-    void redraw();
-
     Label<5, 5, 230, 25> m_titleLabel;
+    int m_lastY;
 
     const std::reference_wrapper<MenuItemInterface> *m_selected{};
     bool m_pressed{};
@@ -48,13 +48,13 @@ template<const char *Ttext, typename T0>
 class MenuDisplay<Ttext, T0> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 1> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 1> arr{{
         std::ref<MenuItemInterface>(item0)
     }};
 };
@@ -63,14 +63,14 @@ template<const char *Ttext, typename T0, typename T1>
 class MenuDisplay<Ttext, T0, T1> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
     T1 item1;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 2> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 2> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1)
     }};
@@ -80,15 +80,15 @@ template<const char *Ttext, typename T0, typename T1, typename T2>
 class MenuDisplay<Ttext, T0, T1, T2> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
     T1 item1;
     T2 item2;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 3> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 3> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2)
@@ -99,8 +99,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3>
 class MenuDisplay<Ttext, T0, T1, T2, T3> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -108,7 +108,7 @@ private:
     T2 item2;
     T3 item3;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 4> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 4> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -120,8 +120,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, 
 class MenuDisplay<Ttext, T0, T1, T2, T3, T4> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -130,7 +130,7 @@ private:
     T3 item3;
     T4 item4;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 5> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 5> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -143,8 +143,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, 
 class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -154,7 +154,7 @@ private:
     T4 item4;
     T5 item5;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 6> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 6> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -168,8 +168,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, 
 class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -180,7 +180,7 @@ private:
     T5 item5;
     T6 item6;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 7> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 7> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -195,8 +195,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, 
 class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -208,7 +208,7 @@ private:
     T6 item6;
     T7 item7;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 8> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 8> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -224,8 +224,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, 
 class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7, T8> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -238,7 +238,7 @@ private:
     T7 item7;
     T8 item8;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 9> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 9> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -255,8 +255,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, 
 class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -270,7 +270,7 @@ private:
     T8 item8;
     T9 item9;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 10> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 10> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -288,8 +288,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, 
 class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -304,7 +304,7 @@ private:
     T9 item9;
     T10 item10;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 11> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 11> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -323,8 +323,8 @@ template<const char *Ttext, typename T0, typename T1, typename T2, typename T3, 
 class MenuDisplay<Ttext, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : public MenuDisplay<Ttext>
 {
 public:
-    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(carr); };
-    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(carr); };
+    const std::reference_wrapper<MenuItemInterface> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItemInterface> *end() const override { return std::end(arr); };
 
 private:
     T0 item0;
@@ -340,7 +340,7 @@ private:
     T10 item10;
     T11 item11;
 
-    const std::array<std::reference_wrapper<MenuItemInterface>, 12> carr{{
+    const std::array<std::reference_wrapper<MenuItemInterface>, 12> arr{{
         std::ref<MenuItemInterface>(item0),
         std::ref<MenuItemInterface>(item1),
         std::ref<MenuItemInterface>(item2),
@@ -365,6 +365,7 @@ void MenuDisplayInterface::start()
 {
     m_selected = begin();
     m_pressed = false;
+    m_lastY = 0;
 
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
@@ -374,19 +375,39 @@ void MenuDisplayInterface::start()
 
     for (auto iter = begin(); iter != end(); iter++)
         iter->get().start();
-
-    redraw();
 }
 
 void MenuDisplayInterface::update()
 {
-    redraw();
-
-    if (m_pressed)
+    if (!m_pressed)
     {
-        m_selected->get().triggered();
-        m_pressed = false;
+        for (auto iter = begin(); iter != end(); iter++)
+            iter->get().update();
     }
+    else
+    {
+        m_pressed = false;
+        m_selected->get().triggered();
+    }
+}
+
+void MenuDisplayInterface::redraw()
+{
+    tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+    m_titleLabel.repaint(title());
+
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+    const auto * const selected = m_selected;
+
+    int y = 45;
+    for (auto iter = begin(); iter != end(); iter++)
+        iter->get().redraw(y, iter == selected);
+
+    if (y < m_lastY)
+        tft.fillRect(0, y, tft.width(), m_lastY - y, TFT_BLACK);
+
+    m_lastY = y;
 }
 
 void MenuDisplayInterface::stop()
@@ -414,19 +435,5 @@ void MenuDisplayInterface::button(bool pressed)
 void MenuDisplayInterface::setSelectedItem(const std::reference_wrapper<MenuItemInterface> *item)
 {
     m_selected = item;
-}
-
-void MenuDisplayInterface::redraw()
-{
-    tft.setTextColor(TFT_YELLOW);
-    m_titleLabel.repaint(title());
-
-    tft.setTextColor(TFT_WHITE);
-
-    const auto * const selected = m_selected;
-
-    int y = 45;
-    for (auto iter = begin(); iter != end(); iter++)
-        iter->get().redraw(y, iter == selected);
 }
 }

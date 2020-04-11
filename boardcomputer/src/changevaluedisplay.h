@@ -30,7 +30,8 @@ class ChangeValueDisplay final : public ChangeValueDisplayInterface
 {
 public:
     void start() override;
-    void update() override final;
+    void update() override;
+    void redraw() override;
 
     void rotate(int offset) override;
     void button(bool pressed) override;
@@ -43,7 +44,6 @@ public:
     void confirm() override;
 
 private:
-    void redraw() const;
 
     Tvalue m_value{};
     bool m_needsRedraw{};
@@ -142,16 +142,20 @@ void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::start()
 template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
 void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::update()
 {
-    if (m_needsRedraw)
-    {
-        redraw();
-        m_needsRedraw = false;
-    }
-
     if (m_pressed)
     {
         Taccessor::getRef() = m_value;
         switchScreen<Tdisplay>();
+    }
+}
+
+template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
+void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::redraw()
+{
+    if (m_needsRedraw)
+    {
+        m_needsRedraw = false;
+        tft.drawCentreString(String() + ' ' + m_value + ' ', tft.width()/2, 80, 7);
     }
 }
 
@@ -173,12 +177,6 @@ template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Tte
 void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::confirm()
 {
     m_pressed = true;
-}
-
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::redraw() const
-{
-    tft.drawCentreString(String() + ' ' + m_value + ' ', tft.width()/2, 80, 7);
 }
 
 template<typename Taccessor, typename Tdisplay, const char *Ttext>

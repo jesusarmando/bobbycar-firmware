@@ -10,11 +10,11 @@ class SwitchScreenMenuItem : public MenuItem<Ttext>
 public:
     using MenuItem<Ttext>::MenuItem;
 
-    void triggered() const override;
+    void triggered() override;
 };
 
 template<typename Tscreen, const char *Ttext>
-void SwitchScreenMenuItem<Tscreen, Ttext>::triggered() const
+void SwitchScreenMenuItem<Tscreen, Ttext>::triggered()
 {
     switchScreen<Tscreen>();
 }

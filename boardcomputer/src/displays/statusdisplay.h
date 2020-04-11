@@ -59,11 +59,9 @@ class StatusDisplay final : public DemoDisplay<Tscreen>
 
 public:
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
-
     Label<45, 0, 40, 15, 2> m_labelRawGas;
     Label<90, 0, 60, 15, 2> m_labelGas;
     ProgressBar<150, 0, 90, 15, 0, 1000> m_progressBarGas;
@@ -116,21 +114,13 @@ void StatusDisplay<Tscreen>::start()
     m_labelPerformance.start();
     tft.drawString("Mode:", 125, 296, 2);
     m_labelMode.start();
-}
 
-template<typename Tscreen>
-void StatusDisplay<Tscreen>::update()
-{
-    redraw();
-
-    Base::update();
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
 template<typename Tscreen>
 void StatusDisplay<Tscreen>::redraw()
 {
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-
     m_labelRawGas.repaint(String{raw_gas});
     m_labelGas.repaint(String{gas});
     m_progressBarGas.repaint(gas);

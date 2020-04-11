@@ -13,10 +13,9 @@ class BluetoothStatusDisplay final : public DemoDisplay<Tscreen>
 
 public:
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
 
     Label<150, 50, 100, 23> m_label0;
     Label<150, 75, 100, 23> m_label1;
@@ -47,14 +46,6 @@ void BluetoothStatusDisplay<Tscreen>::start()
     m_label2.start();
     tft.drawString("isReady", 0, 125, 4);
     m_label3.start();
-}
-
-template<typename Tscreen>
-void BluetoothStatusDisplay<Tscreen>::update()
-{
-    redraw();
-
-    Base::update();
 }
 
 template<typename Tscreen>

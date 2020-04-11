@@ -48,7 +48,7 @@ void Rotary<HANDLER, CLK, DT, SW>::updateRotate()
     const bool currentClk = digitalRead(ClkPin);
     if (currentClk != m_lastClk)
     {
-        HANDLER::rotate(digitalRead(DtPin) != currentClk ? -1 : 1);
+        HANDLER::rotate(digitalRead(DtPin) != currentClk ? 1 : -1);
         m_lastClk = currentClk;
     }
 }

@@ -68,6 +68,7 @@ constexpr char TEXT_SETINVERTED[] = "Set inverted";
 constexpr char TEXT_BUZZER[] = "Buzzer";
 constexpr char TEXT_SETFRONTLED[] = "Set front LED";
 constexpr char TEXT_SETBACKLED[] = "Set back LED";
+constexpr char TEXT_DYNAMICMENU[] = "Dynamic menu";
 //constexpr char TEXT_BACK[] = "Back";
 
 //DefaultModeSettingsMenu
@@ -83,6 +84,10 @@ constexpr char TEXT_SETGAS1WERT[] = "Set Gas 1 Wert";
 constexpr char TEXT_SETGAS2WERT[] = "Set Gas 2 Wert";
 constexpr char TEXT_SETBREMS1WERT[] = "Set Brems 1 Wert";
 constexpr char TEXT_SETBREMS2WERT[] = "Set Brems 2 Wert";
+//constexpr char TEXT_BACK[] = "Back";
+
+//DynamicDebugMenu
+//constexpr char TEXT_DYNAMICMENU[] = "Dynamic menu";
 //constexpr char TEXT_BACK[] = "Back";
 
 //EnableMenu

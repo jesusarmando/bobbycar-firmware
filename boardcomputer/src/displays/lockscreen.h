@@ -17,7 +17,8 @@ class Lockscreen : public Display
 
 public:
     void start() override;
-    void update() override;
+    void update() override {}
+    void redraw() override;
 
     void button(bool pressed) override;
     void rotate(int offset) override;
@@ -83,7 +84,7 @@ void Lockscreen<Tscreen>::start()
 }
 
 template<typename Tscreen>
-void Lockscreen<Tscreen>::update()
+void Lockscreen<Tscreen>::redraw()
 {
     if (m_pressed)
     {

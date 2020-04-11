@@ -14,6 +14,7 @@ class PoweroffDisplay final : public Display
 public:
     void start() override;
     void update() override;
+    void redraw() override {};
 
 private:
     unsigned int m_startTime{};

@@ -4,6 +4,7 @@
 #include "menuitems/switchscreenmenuitem.h"
 #include "displays/bluetoothstatusdisplay.h"
 #include "displays/menus/buzzermenu.h"
+#include "displays/menus/dynamicdebugmenu.h"
 #include "changevaluedisplay.h"
 #include "texts.h"
 #include "globals.h"
@@ -23,6 +24,7 @@ class DebugMenu final : public MenuDisplay<
     SwitchScreenMenuItem<BuzzerMenu<DebugMenu<Tscreen>>, TEXT_BUZZER>,
     SwitchScreenMenuItem<FrontLedChangeScreen<DebugMenu<Tscreen>>, TEXT_SETFRONTLED>,
     SwitchScreenMenuItem<BackLedChangeScreen<DebugMenu<Tscreen>>, TEXT_SETBACKLED>,
+    SwitchScreenMenuItem<DynamicDebugMenu<DebugMenu<Tscreen>>, TEXT_DYNAMICMENU>,
     SwitchScreenMenuItem<Tscreen, TEXT_BACK>
 >
 {};

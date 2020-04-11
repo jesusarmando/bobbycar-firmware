@@ -16,7 +16,7 @@
 namespace {
 ModeBase *lastMode{};
 unsigned long lastModeUpdate{};
-unsigned long lastDisplayUpdate{};
+unsigned long lastDisplayRedraw{};
 }
 
 void setup()
@@ -98,11 +98,13 @@ void loop()
         performance.current++;
     }
 
-    if (!lastDisplayUpdate || now - lastDisplayUpdate >= 1000/60)
-    {
-        updateDisplay();
+    updateDisplay();
 
-        lastDisplayUpdate = now;
+    if (!lastDisplayRedraw || now - lastDisplayRedraw >= 1000/60)
+    {
+        redrawDisplay();
+
+        lastDisplayRedraw = now;
     }
 
     if (now - performance.lastTime >= 1000)

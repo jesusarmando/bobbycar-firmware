@@ -17,10 +17,9 @@ class CalibrateDisplay final : public DemoDisplay<Tscreen>
 
 public:
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
 
     Label<25, 50, 100, 23> m_label0;
     Label<25, 75, 100, 23> m_label1;
@@ -52,14 +51,6 @@ void CalibrateDisplay<Tscreen>::start()
 
     m_progressBar0.start();
     m_progressBar1.start();
-}
-
-template<typename Tscreen>
-void CalibrateDisplay<Tscreen>::update()
-{
-    redraw();
-
-    Base::update();
 }
 
 template<typename Tscreen>

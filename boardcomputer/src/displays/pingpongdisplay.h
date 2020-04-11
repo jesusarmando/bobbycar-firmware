@@ -17,11 +17,9 @@ public:
     PingPongDisplay();
 
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
-
     void midline();
     void lpaddle();
     void rpaddle();
@@ -94,13 +92,6 @@ void PingPongDisplay<Tscreen>::start()
     tft.setRotation(1);
 
     midline();
-}
-
-template<typename Tscreen>
-void PingPongDisplay<Tscreen>::update()
-{
-    redraw();
-    Base::update();
 }
 
 template<typename Tscreen>

@@ -7,11 +7,12 @@ namespace {
 class MenuItemInterface : public virtual TitleInterface
 {
 public:
-    void start();
-    void redraw(int &y, bool selected);
-    void stop() {}
+    virtual void start();
+    virtual void update() {}
+    virtual void redraw(int &y, bool selected);
+    virtual void stop() {}
 
-    virtual void triggered() const = 0;
+    virtual void triggered() = 0;
 
 private:
     DynamicLabel<10, 220> m_label;

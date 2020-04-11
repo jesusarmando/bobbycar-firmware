@@ -12,6 +12,7 @@ class VersionDisplay final : public DemoDisplay<Tscreen>
 
 public:
     void start() override;
+    void redraw() override {}
 };
 
 template<typename Tscreen>

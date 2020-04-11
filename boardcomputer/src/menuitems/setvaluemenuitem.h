@@ -7,11 +7,11 @@ template<typename Tvalue, typename Taccessor, Tvalue Tset, typename Tscreen, con
 class SetValueMenuItem : public SwitchScreenMenuItem<Tscreen, Ttext>
 {
 public:
-    void triggered() const override;
+    void triggered() override;
 };
 
 template<typename Tvalue, typename Taccessor, Tvalue Tset, typename Tscreen, const char *Ttext>
-void SetValueMenuItem<Tvalue, Taccessor, Tset, Tscreen, Ttext>::triggered() const
+void SetValueMenuItem<Tvalue, Taccessor, Tset, Tscreen, Ttext>::triggered()
 {
     Taccessor::getRef() = Tset;
 

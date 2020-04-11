@@ -7,11 +7,11 @@ template<typename Tvalue, typename Tsetter, typename Tgetter, typename Tscreen, 
 class SetDynamicValueMenuItem : public SwitchScreenMenuItem<Tscreen, Ttext>
 {
 public:
-    void triggered() const override;
+    void triggered() override;
 };
 
 template<typename Tvalue, typename Tsetter, typename Tgetter, typename Tscreen, const char *Ttext>
-void SetDynamicValueMenuItem<Tvalue, Tsetter, Tgetter, Tscreen, Ttext>::triggered() const
+void SetDynamicValueMenuItem<Tvalue, Tsetter, Tgetter, Tscreen, Ttext>::triggered()
 {
     Tsetter::getRef() = Tgetter::getValue();
 

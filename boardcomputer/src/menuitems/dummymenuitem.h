@@ -7,6 +7,6 @@ template<const char *Ttext>
 class DummyMenuItem final : public MenuItem<Ttext>
 {
 public:
-    void triggered() const override {}
+    void triggered() override {}
 };
 }

@@ -15,10 +15,9 @@ class GameOfLifeDisplay final : public DemoDisplay<Tscreen>
 
 public:
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
 
     //Draws the grid on the display
     void drawGrid();
@@ -69,14 +68,6 @@ void GameOfLifeDisplay<Tscreen>::start()
 
     tft.setRotation(3);
     tft.fillScreen(TFT_BLACK);
-}
-
-template<typename Tscreen>
-void GameOfLifeDisplay<Tscreen>::update()
-{
-    redraw();
-
-    Base::update();
 }
 
 template<typename Tscreen>

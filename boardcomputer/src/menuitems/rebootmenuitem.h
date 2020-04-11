@@ -11,11 +11,11 @@ template<const char *Ttext>
 class RebootMenuItem final : public MenuItem<Ttext>
 {
 public:
-    void triggered() const override;
+    void triggered() override;
 };
 
 template<const char *Ttext>
-void RebootMenuItem<Ttext>::triggered() const
+void RebootMenuItem<Ttext>::triggered()
 {
     tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);

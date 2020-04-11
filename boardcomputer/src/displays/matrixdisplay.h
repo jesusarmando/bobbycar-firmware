@@ -13,10 +13,9 @@ class MatrixDisplay : public DemoDisplay<Tscreen>
 
 public:
     void start() override;
-    void update() override;
+    void redraw() override;
 
 private:
-    void redraw();
     int scroll_slow(int lines, int wait);
 
     static constexpr auto TEXT_HEIGHT = 8;     // Height of text to be printed and scrolled
@@ -63,13 +62,6 @@ void MatrixDisplay<Tscreen>::start()
         yDraw = scroll_slow(TEXT_HEIGHT, 14); // Scroll, 14ms per pixel line
         xPos = 0;
     }
-}
-
-template<typename Tscreen>
-void MatrixDisplay<Tscreen>::update()
-{
-    redraw();
-    Base::update();
 }
 
 template<typename Tscreen>

@@ -7,9 +7,10 @@
 #include "displays/menus/bluetoothmodesettingsmenu.h"
 #include "displays/menus/buzzermenu.h"
 #include "displays/menus/commonsettingsmenu.h"
-#include "displays/menus/defaultmodesettingsmenu.h"
 #include "displays/menus/debugmenu.h"
+#include "displays/menus/defaultmodesettingsmenu.h"
 #include "displays/menus/demosmenu.h"
+#include "displays/menus/dynamicdebugmenu.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/invertmenu.h"
 #include "displays/menus/mainmenu.h"
@@ -42,9 +43,10 @@ union X {
     BluetoothModeSettingsMenu<SettingsMenu<MainMenu>> bluetoothModeSettingsMenu;
     BuzzerMenu<DebugMenu<MainMenu>> buzzerMenu;
     CommonSettingsMenu<SettingsMenu<MainMenu>> commonSettingsMenu;
-    DefaultModeSettingsMenu<SettingsMenu<MainMenu>> defaultModeSettingsMenu;
     DebugMenu<MainMenu> debugMenu;
+    DefaultModeSettingsMenu<SettingsMenu<MainMenu>> defaultModeSettingsMenu;
     DemosMenu<MainMenu> demosMenu;
+    DynamicDebugMenu<DebugMenu<MainMenu>> dynamicDebugMenu;
     EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> enableMenu;
     InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> invertMenu;
     TempomatModeSettingsMenu<SettingsMenu<MainMenu>> tempomatModeSettingsMenu;
@@ -119,9 +121,10 @@ template<> decltype(displays.bluetoothSettingsMenu)                            &
 template<> decltype(displays.bluetoothModeSettingsMenu)                        &getRefByType<decltype(displays.bluetoothModeSettingsMenu)>()                        { return displays.bluetoothModeSettingsMenu; }
 template<> decltype(displays.buzzerMenu)                                       &getRefByType<decltype(displays.buzzerMenu)>()                                       { return displays.buzzerMenu; }
 template<> decltype(displays.commonSettingsMenu)                               &getRefByType<decltype(displays.commonSettingsMenu)>()                               { return displays.commonSettingsMenu; }
-template<> decltype(displays.defaultModeSettingsMenu)                          &getRefByType<decltype(displays.defaultModeSettingsMenu)>()                          { return displays.defaultModeSettingsMenu; }
 template<> decltype(displays.debugMenu)                                        &getRefByType<decltype(displays.debugMenu)>()                                        { return displays.debugMenu; }
+template<> decltype(displays.defaultModeSettingsMenu)                          &getRefByType<decltype(displays.defaultModeSettingsMenu)>()                          { return displays.defaultModeSettingsMenu; }
 template<> decltype(displays.demosMenu)                                        &getRefByType<decltype(displays.demosMenu)>()                                        { return displays.demosMenu; }
+template<> decltype(displays.dynamicDebugMenu)                                 &getRefByType<decltype(displays.dynamicDebugMenu)>()                                 { return displays.dynamicDebugMenu; }
 template<> decltype(displays.enableMenu)                                       &getRefByType<decltype(displays.enableMenu)>()                                       { return displays.enableMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
 template<> decltype(displays.mainMenu)                                         &getRefByType<decltype(displays.mainMenu)>()                                         { return displays.mainMenu; }
@@ -198,16 +201,27 @@ void deconstructScreen()
     }
 }
 
-template<typename T, typename... Args>
-void switchScreen(Args&&... args)
+template<typename T>
+void switchScreenImpl()
 {
     deconstructScreen();
 
     T &ref = getRefByType<T>();
-    new (&ref) T{std::forward<Args>(args)...};
+    new (&ref) T;
     currentDisplay = &ref;
     ref.start();
-    ref.update();
+    ref.redraw();
+}
+
+std::function<void()> changeScreenCallback;
+
+template<typename T>
+void switchScreen()
+{
+    if (currentDisplay)
+        changeScreenCallback = switchScreenImpl<T>;
+    else
+        switchScreenImpl<T>();
 }
 
 void initScreen()
@@ -222,6 +236,16 @@ void initScreen()
 void updateDisplay()
 {
     currentDisplay->update();
+    if (changeScreenCallback)
+    {
+        changeScreenCallback();
+        changeScreenCallback = {};
+    }
+}
+
+void redrawDisplay()
+{
+    currentDisplay->redraw();
 }
 
 void printMemoryUsage(){
@@ -232,9 +256,10 @@ void printMemoryUsage(){
     test[sizeof(displays.bluetoothModeSettingsMenu)].insert("displays.bluetoothModeSettingsMenu");
     test[sizeof(displays.buzzerMenu)].insert("displays.buzzerMenu");
     test[sizeof(displays.commonSettingsMenu)].insert("displays.commonSettingsMenu");
-    test[sizeof(displays.defaultModeSettingsMenu)].insert("displays.defaultModeSettingsMenu");
     test[sizeof(displays.debugMenu)].insert("displays.debugMenu");
+    test[sizeof(displays.defaultModeSettingsMenu)].insert("displays.defaultModeSettingsMenu");
     test[sizeof(displays.demosMenu)].insert("displays.demosMenu");
+    test[sizeof(displays.dynamicDebugMenu)].insert("displays.dynamicDebugMenu");
     test[sizeof(displays.enableMenu)].insert("displays.enableMenu");
     test[sizeof(displays.invertMenu)].insert("displays.invertMenu");
     test[sizeof(displays.mainMenu)].insert("displays.mainMenu");
