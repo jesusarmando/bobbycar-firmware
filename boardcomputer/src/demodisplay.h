@@ -9,7 +9,7 @@ class DemoDisplay : public Display
 {
 public:
     void start() override;
-    void update() override final;
+    void update() override;
 
     void button(bool pressed) override;
 

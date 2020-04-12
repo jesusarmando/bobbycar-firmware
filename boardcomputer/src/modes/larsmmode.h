@@ -1,13 +1,13 @@
 #pragma once
 
-#include "modes/modeinterface.h"
+#include "modeinterface.h"
 #include "globals.h"
 #include "utils.h"
 
 #include "../../common.h"
 
 namespace {
-class LarsmMode final : public ModeInterface
+class LarsmMode : public ModeInterface
 {
 public:
     using ModeInterface::ModeInterface;

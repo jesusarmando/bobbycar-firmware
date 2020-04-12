@@ -4,13 +4,13 @@
 
 #include <Arduino.h>
 
-#include "modes/modeinterface.h"
+#include "modeinterface.h"
 #include "../../common.h"
 #include "globals.h"
 #include "utils.h"
 
 namespace {
-class DefaultMode final : public ModeInterface
+class DefaultMode : public ModeInterface
 {
 public:
     using ModeInterface::ModeInterface;

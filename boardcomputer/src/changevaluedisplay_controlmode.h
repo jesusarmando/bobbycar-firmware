@@ -2,27 +2,28 @@
 
 #include "changevaluedisplay.h"
 #include "staticmenudisplay.h"
-#include "menuitems/staticdummymenuitem.h"
+#include "utils.h"
+#include "actions/dummyaction.h"
 #include "texts.h"
 
 namespace {
 template<>
 class ChangeValueDisplay<ControlMode> :
     public StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_OPENMODE>,
-        StaticDummyMenuItem<TEXT_VOLTAGE>,
-        StaticDummyMenuItem<TEXT_SPEED>,
-        StaticDummyMenuItem<TEXT_TORQUE>,
-        StaticDummyMenuItem<TEXT_BACK>
+        makeComponent<MenuItem, StaticText<TEXT_OPENMODE>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_VOLTAGE>,  DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_SPEED>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_TORQUE>,   DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor, DummyAction>
     >,
     public virtual AccessorInterface<ControlMode>
 {
     using Base = StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_OPENMODE>,
-        StaticDummyMenuItem<TEXT_VOLTAGE>,
-        StaticDummyMenuItem<TEXT_SPEED>,
-        StaticDummyMenuItem<TEXT_TORQUE>,
-        StaticDummyMenuItem<TEXT_BACK>
+        makeComponent<MenuItem, StaticText<TEXT_OPENMODE>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_VOLTAGE>,  DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_SPEED>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_TORQUE>,   DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor, DummyAction>
     >;
 
 public:
@@ -36,17 +37,17 @@ void ChangeValueDisplay<ControlMode>::start()
     Base::start();
 
     if (getValue() == ControlMode::OpenMode)
-        Base::setSelectedIndex(0);
+        setSelectedIndex(0);
     else if (getValue() == ControlMode::Voltage)
-        Base::setSelectedIndex(1);
+        setSelectedIndex(1);
     else if (getValue() == ControlMode::Speed)
-        Base::setSelectedIndex(2);
+        setSelectedIndex(2);
     else if (getValue() == ControlMode::Torque)
-        Base::setSelectedIndex(3);
+        setSelectedIndex(3);
     else
     {
         Serial.printf("Unknown ControlMode: %i", int(getValue()));
-        Base::setSelectedIndex(4);
+        setSelectedIndex(4);
     }
 }
 
@@ -54,7 +55,7 @@ void ChangeValueDisplay<ControlMode>::triggered()
 {
     Base::triggered();
 
-    switch (Base::selectedIndex())
+    switch (selectedIndex())
     {
     case 0: setValue(ControlMode::OpenMode); break;
     case 1: setValue(ControlMode::Voltage); break;

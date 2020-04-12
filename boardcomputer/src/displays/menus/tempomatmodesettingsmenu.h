@@ -1,9 +1,10 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
 #include "changevaluedisplay.h"
+#include "menuitem.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 #include "modes/tempomatmode.h"
 
@@ -11,7 +12,7 @@ namespace {
 struct TempomatModeCtrlTypAccessor : public RefAccessor<ControlType> { ControlType &getRef() const override { return modes::tempomatMode.ctrlTyp; } };
 template<typename Tscreen>
 class TempomatModeCtrlTypChangeScreen :
-    public StaticTitle<TEXT_SETCONTROLMODE>,
+    public StaticText<TEXT_SETCONTROLMODE>,
     public ChangeValueDisplay<ControlType>,
     public TempomatModeCtrlTypAccessor
 {
@@ -24,7 +25,7 @@ public:
 struct TempomatModeCtrlModAccessor : public RefAccessor<ControlMode> { ControlMode &getRef() const override { return modes::tempomatMode.ctrlMod; } };
 template<typename Tscreen>
 class TempomatModeCtrlModChangeScreen :
-    public StaticTitle<TEXT_SETCONTROLMODE>,
+    public StaticText<TEXT_SETCONTROLMODE>,
     public ChangeValueDisplay<ControlMode>,
     public TempomatModeCtrlModAccessor
 {
@@ -35,12 +36,12 @@ public:
 };
 
 template<typename Tscreen>
-class TempomatModeSettingsMenu final :
-    public StaticTitle<TEXT_TEMPOMATMODESETTINGS>,
+class TempomatModeSettingsMenu :
+    public StaticText<TEXT_TEMPOMATMODESETTINGS>,
     public StaticMenuDisplay<
-        StaticSwitchScreenMenuItem<TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLTYPE>,
-        StaticSwitchScreenMenuItem<TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLMODE>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_SETCONTROLTYPE>, DefaultFont, DefaultColor, SwitchScreenAction<TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETCONTROLMODE>, DefaultFont, DefaultColor, SwitchScreenAction<TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,           DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

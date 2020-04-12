@@ -1,24 +1,25 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
+#include "actions/switchscreenaction.h"
+#include "texts.h"
+
 #include "displays/menus/genericwifisettingsmenu.h"
 #include "displays/menus/stationwifisettingsmenu.h"
 #include "displays/menus/wifiscanmenu.h"
 #include "displays/menus/accesspointwifisettingsmenu.h"
-#include "texts.h"
 
 namespace {
 template<typename Tscreen>
-class WifiSettingsMenu final :
-    public StaticTitle<TEXT_WIFISETTINGS>,
+class WifiSettingsMenu :
+    public StaticText<TEXT_WIFISETTINGS>,
     public StaticMenuDisplay<
-        StaticSwitchScreenMenuItem<GenericWifiSettingsMenu<WifiSettingsMenu<Tscreen>>, TEXT_GENERICWIFISETTINGS>,
-        StaticSwitchScreenMenuItem<StationWifiSettingsMenu<WifiSettingsMenu<Tscreen>>, TEXT_STATIONWIFISETTINGS>,
-        StaticSwitchScreenMenuItem<WifiScanMenu<WifiSettingsMenu<Tscreen>>, TEXT_WIFISCAN>,
-        StaticSwitchScreenMenuItem<AccessPointWifiSettingsMenu<WifiSettingsMenu<Tscreen>>, TEXT_ACCESSPOINTWIFISETTINGS>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_GENERICWIFISETTINGS>,     DefaultFont,  DefaultColor, SwitchScreenAction<GenericWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_STATIONWIFISETTINGS>,     DefaultFont,  DefaultColor, SwitchScreenAction<StationWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFISCAN>,                DefaultFont,  DefaultColor, SwitchScreenAction<WifiScanMenu<WifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ACCESSPOINTWIFISETTINGS>, DefaultFont,  DefaultColor, SwitchScreenAction<AccessPointWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    DefaultFont,  DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

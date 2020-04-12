@@ -1,66 +1,52 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/livestatusmenuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
 #include "changevaluedisplay.h"
+#include "actions/dummyaction.h"
+#include "actions/switchscreenaction.h"
 #include "displays/calibratedisplay.h"
 #include "texts.h"
 #include "globals.h"
 
 namespace {
-struct GasLiveStatus { static String getText() { return String{"gas: "} + raw_gas + ": " + gas; } };
-struct BremsLiveStatus { static String getText() { return String{"brems: "} + raw_brems + ": " + brems; } };
+struct GasText : public virtual TextInterface {
+public:
+    String text() const override { return String{"gas: "} + raw_gas + ": " + gas; }
+};
+struct BremsText : public virtual TextInterface {
+public:
+    String text() const override { return String{"brems: "} + raw_brems + ": " + brems; }
+};
 
 struct GasMinAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return gasMin; } };
 template<typename Tscreen>
-class GasMinChangeScreen :
-    public StaticTitle<TEXT_SETGASMIN>,
-    public ChangeValueDisplay<int16_t>,
-    public GasMinAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using GasMinChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETGASMIN>, GasMinAccessor, SwitchScreenAction<Tscreen>>;
 
 struct GasMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return gasMax; } };
 template<typename Tscreen>
-class GasMaxChangeScreen :
-    public StaticTitle<TEXT_SETGASMAX>,
-    public ChangeValueDisplay<int16_t>,
-    public GasMaxAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using GasMaxChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETGASMAX>, GasMaxAccessor, SwitchScreenAction<Tscreen>>;
 
 struct BremsMinAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return bremsMin; } };
 template<typename Tscreen>
-class BremsMinChangeScreen :
-    public StaticTitle<TEXT_SETBREMSMIN>,
-    public ChangeValueDisplay<int16_t>,
-    public BremsMinAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using BremsMinChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETBREMSMIN>, BremsMinAccessor, SwitchScreenAction<Tscreen>>;
 
 struct BremsMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return bremsMax; } };
 template<typename Tscreen>
-class BremsMaxChangeScreen :
-    public StaticTitle<TEXT_SETBREMSMAX>,
-    public ChangeValueDisplay<int16_t>,
-    public BremsMaxAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using BremsMaxChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETBREMSMAX>, BremsMaxAccessor, SwitchScreenAction<Tscreen>>;
 
 template<typename Tscreen>
-class PotiSettingsMenu final :
-    public StaticTitle<TEXT_POTISETTINGS>,
+class PotiSettingsMenu :
+    public StaticText<TEXT_POTISETTINGS>,
     public StaticMenuDisplay<
-        LiveStatusMenuItem<GasLiveStatus>,
-        LiveStatusMenuItem<BremsLiveStatus>,
-        StaticSwitchScreenMenuItem<GasMinChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETGASMIN>,
-        StaticSwitchScreenMenuItem<GasMaxChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETGASMAX>,
-        StaticSwitchScreenMenuItem<BremsMinChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETBREMSMIN>,
-        StaticSwitchScreenMenuItem<BremsMaxChangeScreen<PotiSettingsMenu<Tscreen>>, TEXT_SETBREMSMAX>,
-        StaticSwitchScreenMenuItem<CalibrateDisplay<PotiSettingsMenu<Tscreen>>, TEXT_CALIBRATE>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, GasText,                      DefaultFont, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, BremsText,                    DefaultFont, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_CALIBRATE>,   DefaultFont, DefaultColor,    SwitchScreenAction<CalibrateDisplay<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETGASMIN>,   DefaultFont, DefaultColor,    SwitchScreenAction<GasMinChangeScreen<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETGASMAX>,   DefaultFont, DefaultColor,    SwitchScreenAction<GasMaxChangeScreen<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBREMSMIN>, DefaultFont, DefaultColor,    SwitchScreenAction<BremsMinChangeScreen<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBREMSMAX>, DefaultFont, DefaultColor,    SwitchScreenAction<BremsMaxChangeScreen<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,        DefaultFont, DefaultColor,    SwitchScreenAction<Tscreen>>
     >
 {};
 }

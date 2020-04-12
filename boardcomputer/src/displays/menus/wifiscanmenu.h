@@ -4,24 +4,23 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WString.h>
 
 #include "menudisplay.h"
-#include "menuitems/endwifiscanmenuitem.h"
-#include "menuitems/dynamicdummymenuitem.h"
+#include "utils.h"
+#include "actions/switchscreenaction.h"
+#include "actions/dummyaction.h"
 #include "texts.h"
-#include "globals.h"
 
 namespace {
 template<typename Tscreen>
-class WifiScanMenu final : public MenuDisplay
+class WifiScanMenu : public MenuDisplay
 {
     using Base = MenuDisplay;
 
 public:
     using Base::Base;
 
-    String title() const override { return String{TEXT_WIFISCAN} + ": " + WiFi.scanComplete(); }
+    String text() const override { return String{"Found "} + vec.size() + ((WiFi.scanComplete()==-1)?" (Scanning...)":""); }
 
     void start() override;
     void update() override;
@@ -30,9 +29,9 @@ public:
     const std::reference_wrapper<MenuItem> *end() const override { return &(*std::end(refVec)); };
 
 private:
-    EndWifiScanMenuItem<Tscreen> m_backItem;
+    makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>> m_backItem;
 
-    std::vector<DynamicDummyMenuItem> vec;
+    std::vector<makeComponent<MenuItem, ChangeableText, DefaultFont, DefaultColor, DummyAction>> vec;
 
     std::vector<std::reference_wrapper<MenuItem>> refVec{{
         std::ref<MenuItem>(m_backItem)

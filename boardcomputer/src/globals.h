@@ -9,7 +9,7 @@
 
 #include "controller.h"
 #include "display.h"
-#include "modes/modeinterface.h"
+#include "modeinterface.h"
 #include "settings.h"
 
 namespace {
@@ -21,7 +21,7 @@ int16_t gasMin, gasMax, bremsMin, bremsMax;
 
 struct {
     int16_t iMotMax;      // [A] Maximum motor current limit
-    int16_t iDcMax;       // [A] Maximum DC Link current limit (This is the final current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
+    int16_t iDcMax;       // [A] Maximum DC Link current limit (This is the current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
     int16_t nMotMax;      // [rpm] Maximum motor speed limit
     int16_t fieldWeakMax; // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed.
     int16_t phaseAdvMax;  // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.

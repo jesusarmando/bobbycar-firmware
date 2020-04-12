@@ -1252,7 +1252,7 @@ void WebHandler::handleDisplay(AsyncWebServerRequest *request)
             {
                 {
                     HtmlTag h2(response, "h2");
-                    response.print(menuDisplay->title());
+                    response.print(menuDisplay->text());
                 }
 
                 HtmlTag ul(response, "ul");
@@ -1264,14 +1264,14 @@ void WebHandler::handleDisplay(AsyncWebServerRequest *request)
                 {
                     HtmlTag li(response, "li", std::distance(menuBegin, iter)==selectedIndex?" style=\"border: 1px solid black;\"":"");
                     HtmlTag a(response, "a", String(" href=\"/displayAction?action=triggerItem&index=") + std::distance(menuDisplay->begin(), iter) + "\"");
-                    response.print(iter->get().title());
+                    response.print(iter->get().text());
                 }
             }
             else if (auto changeValueDisplay = currentDisplay->asChangeValueDisplayInterface())
             {
                 {
                     HtmlTag h2(response, "h2");
-                    response.print(changeValueDisplay->title());
+                    response.print(changeValueDisplay->text());
                 }
 
                 HtmlTag form(response, "form", " method=\"GET\" action=\"displayAction\"");

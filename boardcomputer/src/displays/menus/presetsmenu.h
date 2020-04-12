@@ -1,20 +1,21 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/backmenuitem.h"
-#include "menuitems/staticdummymenuitem.h"
+#include "utils.h"
+#include "actions/dummyaction.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 
 namespace {
 template<typename Tscreen>
 class PresetsMenu :
-    public StaticTitle<TEXT_PRESETS>,
+    public StaticText<TEXT_PRESETS>,
     public StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_STREET>,
-        StaticDummyMenuItem<TEXT_SIDEWALK>,
-        StaticDummyMenuItem<TEXT_POLICE>,
-        StaticDummyMenuItem<TEXT_RACE>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_STREET>,   DefaultFont, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_SIDEWALK>, DefaultFont, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_POLICE>,   DefaultFont, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_RACE>,     DefaultFont, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>>
     >
 {};
 }

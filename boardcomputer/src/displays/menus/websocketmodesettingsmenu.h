@@ -1,15 +1,16 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 
 namespace {
 template<typename Tscreen>
-class WebsocketModeSettingsMenu final :
-    public StaticTitle<TEXT_WEBSOCKETMODESETTINGS>,
+class WebsocketModeSettingsMenu :
+    public StaticText<TEXT_WEBSOCKETMODESETTINGS>,
     public StaticMenuDisplay<
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

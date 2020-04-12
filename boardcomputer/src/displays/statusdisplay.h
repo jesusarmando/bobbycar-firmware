@@ -5,12 +5,12 @@
 
 #include "demodisplay.h"
 
-#include "modes/modeinterface.h"
+#include "modeinterface.h"
 #include "globals.h"
 #include "utils.h"
 #include "label.h"
 #include "progressbar.h"
-#include "sprites/alert.h"
+#include "icons/alert.h"
 
 namespace {
 template<int y>
@@ -50,7 +50,7 @@ private:
 };
 
 template<typename Tscreen>
-class StatusDisplay final : public DemoDisplay<Tscreen>
+class StatusDisplay : public DemoDisplay<Tscreen>
 {
     using Base = DemoDisplay<Tscreen>;
 
@@ -199,7 +199,7 @@ void BoardStatus<y>::drawWarning()
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
     tft.setSwapBytes(true);
-    tft.pushImage(10, y+40, sprites::alert.width, sprites::alert.height, sprites::alert.buffer);
+    tft.pushImage(10, y+40, icons::alert.WIDTH, icons::alert.HEIGHT, icons::alert.buffer);
     tft.setSwapBytes(false);
 }
 

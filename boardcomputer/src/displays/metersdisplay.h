@@ -10,7 +10,7 @@
 
 namespace {
 template<typename Tscreen>
-class MetersDisplay final : public DemoDisplay<Tscreen>
+class MetersDisplay : public DemoDisplay<Tscreen>
 {
     using Base = DemoDisplay<Tscreen>;
 

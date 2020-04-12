@@ -6,21 +6,18 @@
 #include <WString.h>
 
 #include "staticmenudisplay.h"
-#include "menuitems/livestatusmenuitem.h"
-#include "menuitems/staticdummymenuitem.h"
-#include "menuitems/backmenuitem.h"
-#include "sprites/lock.h"
+#include "utils.h"
+#include "menuitem.h"
+#include "actions/dummyaction.h"
+#include "actions/switchscreenaction.h"
+#include "icons/lock.h"
 #include "texts.h"
-#include "globals.h"
 
 namespace {
-class RandomTitle : public virtual TitleInterface
+class RandomText : public virtual TextInterface
 {
 public:
-    String title() const override { return m_title; }
-
-protected:
-    void updateTitle()
+    String text() const override
     {
         const auto now = millis();
         if (!m_nextUpdate || now >= m_nextUpdate)
@@ -28,30 +25,20 @@ protected:
             m_title = String{"Dynamic text: "} + random(0, 100);
             m_nextUpdate = now + random(0, 1000);
         }
+
+        return m_title;
     }
 
 private:
-    unsigned long m_nextUpdate{};
-    String m_title;
+    mutable unsigned long m_nextUpdate{};
+    mutable String m_title;
 };
 
-class DynamicTextMenuItem : public DummyMenuItem, public RandomTitle
+class RandomColor : public virtual ColorInterface
 {
-    using Base = DummyMenuItem;
-
 public:
-    void update() override { Base::update(); updateTitle(); }
-};
-
-constexpr char TEXT_DYNAMICCOLOR[] = "Dynamic color";
-class DynamicColorMenuItem : public DummyMenuItem, public StaticTitle<TEXT_DYNAMICCOLOR>
-{
-    using Base = DummyMenuItem;
-
-public:
-    void update() override
+    int color() const override
     {
-        Base::update();
         const auto now = millis();
         if (!m_nextUpdate || now >= m_nextUpdate)
         {
@@ -59,92 +46,73 @@ public:
             m_color = default_4bit_palette[random(0, count)];
             m_nextUpdate = now + random(0, 1000);
         }
+
+        return m_color;
     }
 
-    int color() const override { return m_color; }
-
 private:
-    unsigned long m_nextUpdate{};
-    int m_color;
+    mutable unsigned long m_nextUpdate{};
+    mutable int m_color;
 };
 
-constexpr char TEXT_DYNAMICFONT[] = "Dynamic font";
-class DynamicFontMenuItem : public DummyMenuItem, public StaticTitle<TEXT_DYNAMICFONT>
+class RandomFont : public virtual FontInterface
 {
-    using Base = DummyMenuItem;
-
 public:
-    void update() override
+    int font() const override
     {
-        Base::update();
         const auto now = millis();
         if (!m_nextUpdate || now >= m_nextUpdate)
         {
             m_font = random(1, 5);
             m_nextUpdate = now + random(0, 1000);
         }
+
+        return m_font;
     }
 
-    int font() const override { return m_font; }
-
 private:
-    unsigned long m_nextUpdate{};
-    int m_font;
+    mutable unsigned long m_nextUpdate{};
+    mutable int m_font;
 };
 
-constexpr char TEXT_ITEMWITHICON[] = "Item with icon";
-class IconMenuItem : public DummyMenuItem, public StaticTitle<TEXT_ITEMWITHICON>
+class StaticLockIcon : public virtual IconInterface<24, 24>
 {
 public:
-    const SpriteDefinition *icon() const override { return &sprites::lock; }
+    const Icon<24, 24> *icon() const override { return &icons::lock; }
 };
 
 constexpr char TEXT_DUMMYITEM[] = "Dummy item";
+constexpr char TEXT_DYNAMICCOLOR[] = "Dynamic color";
+constexpr char TEXT_DYNAMICFONT[] = "Dynamic font";
+constexpr char TEXT_ITEMWITHICON[] = "Item with icon";
 
 template<typename Tscreen>
-class DynamicDebugMenu final :
+class DynamicDebugMenu :
     public StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        DynamicTextMenuItem,
-        DynamicColorMenuItem,
-        DynamicFontMenuItem,
-        IconMenuItem,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        BackMenuItem<Tscreen>
-    >,
-    public RandomTitle
-{
-    using Base = StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        DynamicTextMenuItem,
-        DynamicColorMenuItem,
-        DynamicFontMenuItem,
-        IconMenuItem,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        BackMenuItem<Tscreen>
-    >;
+        // some padding to allow for scrolling
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
 
-public:
-    void update() override { Base::update(); updateTitle(); }
-};
+        // now the interesting bits
+        makeComponent<MenuItem, RandomText,                    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, DefaultFont, RandomColor,  DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont,  DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_ITEMWITHICON>, DefaultFont, DefaultColor, DummyAction, StaticLockIcon>,
+
+        // more padding
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,         DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+    >,
+    public RandomText
+{};
 }

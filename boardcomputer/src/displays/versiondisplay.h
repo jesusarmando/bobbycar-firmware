@@ -6,7 +6,7 @@
 
 namespace {
 template<typename Tscreen>
-class VersionDisplay final : public DemoDisplay<Tscreen>
+class VersionDisplay : public DemoDisplay<Tscreen>
 {
     using Base = DemoDisplay<Tscreen>;
 

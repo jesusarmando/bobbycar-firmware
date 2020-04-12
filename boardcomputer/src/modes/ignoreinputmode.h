@@ -1,6 +1,6 @@
 #pragma once
 
-#include "modes/modeinterface.h"
+#include "modeinterface.h"
 #include "globals.h"
 #include "utils.h"
 

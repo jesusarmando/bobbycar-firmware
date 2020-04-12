@@ -1,9 +1,10 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
 #include "changevaluedisplay.h"
+#include "menuitem.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 #include "modes/defaultmode.h"
 
@@ -11,7 +12,7 @@ namespace {
 struct DefaultModeCtrlTypAccessor : public RefAccessor<ControlType> { ControlType &getRef() const override { return modes::defaultMode.ctrlTyp; } };
 template<typename Tscreen>
 class DefaultModeCtrlTypChangeDisplay :
-    public StaticTitle<TEXT_SETCONTROLTYPE>,
+    public StaticText<TEXT_SETCONTROLTYPE>,
     public ChangeValueDisplay<ControlType>,
     public DefaultModeCtrlTypAccessor
 {
@@ -24,7 +25,7 @@ public:
 struct DefaultModeCtrlModAccessor : public RefAccessor<ControlMode> { ControlMode &getRef() const override { return modes::defaultMode.ctrlMod; } };
 template<typename Tscreen>
 class DefaultModeCtrlModChangeDisplay :
-    public StaticTitle<TEXT_SETCONTROLMODE>,
+    public StaticText<TEXT_SETCONTROLMODE>,
     public ChangeValueDisplay<ControlMode>,
     public DefaultModeCtrlModAccessor
 {
@@ -37,7 +38,7 @@ public:
 struct DefaultModeEnableFieldWeakeningSmootheningAccessor : public RefAccessor<bool> { bool &getRef() const override { return modes::defaultMode.enableWeakeningSmoothening; } };
 template<typename Tscreen>
 class DefaultModeEnableFieldWeakeningSmootheningChangeDisplay :
-    public StaticTitle<TEXT_ENABLEWEAKENINGSMOOTHENING>,
+    public StaticText<TEXT_ENABLEWEAKENINGSMOOTHENING>,
     public ChangeValueDisplay<bool>,
     public DefaultModeEnableFieldWeakeningSmootheningAccessor
 {
@@ -49,92 +50,52 @@ public:
 
 struct DefaultModeWeakeningSmootheningAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.weakeningSmoothening; } };
 template<typename Tscreen>
-class DefaultModeWeakeningSmootheningChangeDisplay :
-    public StaticTitle<TEXT_SETWEAKINGSMOOTHENING>,
-    public ChangeValueDisplay<int16_t>,
-    public DefaultModeWeakeningSmootheningAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using DefaultModeWeakeningSmootheningChangeDisplay = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETWEAKINGSMOOTHENING>, DefaultModeWeakeningSmootheningAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeFrontPercentageAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.frontPercentage; } };
 template<typename Tscreen>
-class DefaultModeFrontPercentageChangeDisplay :
-    public StaticTitle<TEXT_SETFRONTPERCENTAGE>,
-    public ChangeValueDisplay<int16_t>,
-    public DefaultModeFrontPercentageAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using DefaultModeFrontPercentageChangeDisplay = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETFRONTPERCENTAGE>, DefaultModeFrontPercentageAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeBackPercentageAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.backPercentage; } };
 template<typename Tscreen>
-class DefaultModeBackPercentageChangeDisplay :
-    public StaticTitle<TEXT_SETBACKPERCENTAGE>,
-    public ChangeValueDisplay<int16_t>,
-    public DefaultModeBackPercentageAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using DefaultModeBackPercentageChangeDisplay = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETBACKPERCENTAGE>, DefaultModeBackPercentageAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeAddSchwelleAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.add_schwelle; } };
 template<typename Tscreen>
-class DefaultModeAddSchwelleChangeDisplay :
-    public StaticTitle<TEXT_SETADDSCHWELLE>,
-    public ChangeValueDisplay<int16_t>,
-    public DefaultModeAddSchwelleAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using DefaultModeAddSchwelleChangeDisplay = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETADDSCHWELLE>, DefaultModeAddSchwelleAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeGas1WertAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.gas1_wert; } };
 template<typename Tscreen>
-class DefaultModeGas1WertChangeDisplay :
-    public StaticTitle<TEXT_SETGAS1WERT>,
-    public ChangeValueDisplay<int16_t>,
-    public DefaultModeGas1WertAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using DefaultModeGas1WertChangeDisplay = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETGAS1WERT>, DefaultModeGas1WertAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeGas2WertAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.gas2_wert; } };
 template<typename Tscreen>
-class DefaultModeGas2WertChangeDisplay :
-    public StaticTitle<TEXT_SETGAS2WERT>,
-    public ChangeValueDisplay<int16_t>,
-    public DefaultModeGas2WertAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using DefaultModeGas2WertChangeDisplay = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETGAS2WERT>, DefaultModeGas2WertAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeBrems1WertAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.brems1_wert; } };
 template<typename Tscreen>
-class DefaultModeBrems1WertChangeDisplay :
-    public StaticTitle<TEXT_SETBREMS1WERT>,
-    public ChangeValueDisplay<int16_t>,
-    public DefaultModeBrems1WertAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using DefaultModeBrems1WertChangeDisplay = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETBREMS1WERT>, DefaultModeBrems1WertAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeBrems2WertAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.brems2_wert; } };
 template<typename Tscreen>
-class DefaultModeBrems2WertChangeDisplay :
-    public StaticTitle<TEXT_SETBREMS2WERT>,
-    public ChangeValueDisplay<int16_t>,
-    public DefaultModeBrems2WertAccessor,
-    public SwitchScreenAction<Tscreen>
-{};
+using DefaultModeBrems2WertChangeDisplay = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETBREMS2WERT>, DefaultModeBrems2WertAccessor, SwitchScreenAction<Tscreen>>;
 
 template<typename Tscreen>
-class DefaultModeSettingsMenu final :
-    public StaticTitle<TEXT_DEFAULTMODESETTIGNS>,
+class DefaultModeSettingsMenu :
+    public StaticText<TEXT_DEFAULTMODESETTIGNS>,
     public StaticMenuDisplay<
-        StaticSwitchScreenMenuItem<DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLTYPE>,
-        StaticSwitchScreenMenuItem<DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLMODE>,
-        StaticSwitchScreenMenuItem<DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_ENABLEWEAKENINGSMOOTHENING>,
-        StaticSwitchScreenMenuItem<DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETWEAKINGSMOOTHENING>,
-        StaticSwitchScreenMenuItem<DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETFRONTPERCENTAGE>,
-        StaticSwitchScreenMenuItem<DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBACKPERCENTAGE>,
-        StaticSwitchScreenMenuItem<DefaultModeAddSchwelleChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETADDSCHWELLE>,
-        StaticSwitchScreenMenuItem<DefaultModeGas1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETGAS1WERT>,
-        StaticSwitchScreenMenuItem<DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETGAS2WERT>,
-        StaticSwitchScreenMenuItem<DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBREMS1WERT>,
-        StaticSwitchScreenMenuItem<DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBREMS2WERT>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_SETCONTROLTYPE>,             DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETCONTROLMODE>,             DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEWEAKENINGSMOOTHENING>, DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETWEAKINGSMOOTHENING>,      DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETFRONTPERCENTAGE>,         DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBACKPERCENTAGE>,          DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETADDSCHWELLE>,             DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeAddSchwelleChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETGAS1WERT>,                DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeGas1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETGAS2WERT>,                DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBREMS1WERT>,              DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBREMS2WERT>,              DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                       DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

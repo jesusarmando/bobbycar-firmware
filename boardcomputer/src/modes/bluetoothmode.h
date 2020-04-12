@@ -5,12 +5,12 @@
 
 #include <ArduinoJson.h>
 
-#include "modes/modeinterface.h"
+#include "modeinterface.h"
 #include "globals.h"
 #include "utils.h"
 
 namespace {
-class BluetoothMode final : public ModeInterface
+class BluetoothMode : public ModeInterface
 {
 public:
     using ModeInterface::ModeInterface;

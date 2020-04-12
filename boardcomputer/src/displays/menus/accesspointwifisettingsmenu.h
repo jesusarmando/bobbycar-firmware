@@ -1,35 +1,60 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/smalllivestatusmenuitem.h"
-#include "menuitems/wifisoftapenableipv6menuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "menuitem.h"
+#include "actions/dummyaction.h"
+#include "actions/wifisoftapenableipv6action.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 
 namespace {
-struct WifiSoftApGetStationNumLiveStatus { static String getText() { return String{"softAPgetStationNum: "} + WiFi.softAPgetStationNum(); } };
-struct WifiSoftApIpLiveStatus { static String getText() { return String{"softAPIP: "} + WiFi.softAPIP().toString(); } };
-struct WifiSoftApBroadcastIpLiveStatus { static String getText() { return String{"softAPBroadcastIP: "} + WiFi.softAPBroadcastIP().toString(); } };
-struct WifiSoftApNetworkIdLiveStatus { static String getText() { return String{"softAPNetworkID: "} + WiFi.softAPNetworkID().toString(); } };
-struct WifiSoftApSubnetCidrLiveStatus { static String getText() { return String{"softAPSubnetCIDR: "} + WiFi.softAPSubnetCIDR(); } };
-struct WifiSoftApIpV6LiveStatus { static String getText() { return String{"softAPIPv6: "} + WiFi.softAPIPv6().toString(); } };
-struct WifiSoftApHostnameLiveStatus { static String getText() { return String{"softAPgetHostname: "} + WiFi.softAPgetHostname(); } };
-struct WifiSoftApMacAddressLiveStatus { static String getText() { return String{"softAPmacAddress: "} + WiFi.softAPmacAddress(); } };
+class WifiSoftApGetStationNumText : public virtual TextInterface {
+public:
+    String text() const override { return String{"softAPgetStationNum: "} + WiFi.softAPgetStationNum(); }
+};
+class WifiSoftApIpText : public virtual TextInterface {
+public:
+    String text() const override { return String{"softAPIP: "} + WiFi.softAPIP().toString(); }
+};
+class WifiSoftApBroadcastIpText : public virtual TextInterface {
+public:
+    String text() const override { return String{"softAPBroadcastIP: "} + WiFi.softAPBroadcastIP().toString(); }
+};
+class WifiSoftApNetworkIdText : public virtual TextInterface {
+public:
+    String text() const override { return String{"softAPNetworkID: "} + WiFi.softAPNetworkID().toString(); }
+};
+class WifiSoftApSubnetCidrText : public virtual TextInterface {
+public:
+    String text() const override { return String{"softAPSubnetCIDR: "} + WiFi.softAPSubnetCIDR(); }
+};
+class WifiSoftApIpV6Text : public virtual TextInterface {
+public:
+    String text() const override { return String{"softAPIPv6: "} + WiFi.softAPIPv6().toString(); }
+};
+class WifiSoftApHostnameText : public virtual TextInterface {
+public:
+    String text() const override { return String{"softAPgetHostname: "} + WiFi.softAPgetHostname(); }
+};
+class WifiSoftApMacAddressText : public virtual TextInterface {
+public:
+    String text() const override { return String{"softAPmacAddress: "} + WiFi.softAPmacAddress(); }
+};
 
 template<typename Tscreen>
-class AccessPointWifiSettingsMenu final :
-    public StaticTitle<TEXT_ACCESSPOINTWIFISETTINGS>,
+class AccessPointWifiSettingsMenu :
+    public StaticText<TEXT_ACCESSPOINTWIFISETTINGS>,
     public StaticMenuDisplay<
-        SmallLiveStatusMenuItem<WifiSoftApGetStationNumLiveStatus>,
-        SmallLiveStatusMenuItem<WifiSoftApIpLiveStatus>,
-        SmallLiveStatusMenuItem<WifiSoftApBroadcastIpLiveStatus>,
-        SmallLiveStatusMenuItem<WifiSoftApNetworkIdLiveStatus>,
-        SmallLiveStatusMenuItem<WifiSoftApSubnetCidrLiveStatus>,
-        WifiSoftApEnableIpV6MenuItem<TEXT_WIFISOFTAPENABLEIPV6>,
-        SmallLiveStatusMenuItem<WifiSoftApIpV6LiveStatus>,
-        SmallLiveStatusMenuItem<WifiSoftApHostnameLiveStatus>,
-        SmallLiveStatusMenuItem<WifiSoftApMacAddressLiveStatus>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, WifiSoftApGetStationNumText,           StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSoftApIpText,                      StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSoftApBroadcastIpText,             StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSoftApNetworkIdText,               StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSoftApSubnetCidrText,              StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFISOFTAPENABLEIPV6>, DefaultFont,   DefaultColor,              WifiSoftApEnableIpV6Action>,
+        makeComponent<MenuItem, WifiSoftApIpV6Text,                    StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSoftApHostnameText,                StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSoftApMacAddressText,              StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont,   DefaultColor,              SwitchScreenAction<Tscreen>>
     >
 {};
 }

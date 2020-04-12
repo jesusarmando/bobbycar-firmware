@@ -1,9 +1,10 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
 #include "changevaluedisplay.h"
+#include "menuitem.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -11,7 +12,7 @@ namespace {
 struct FrontLeftInvertedAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.invertLeft; } };
 template<typename Tscreen>
 class FrontLeftInvertedChangeScreen :
-    public StaticTitle<TEXT_INVERTFRONTLEFT>,
+    public StaticText<TEXT_INVERTFRONTLEFT>,
     public ChangeValueDisplay<bool>,
     public FrontLeftInvertedAccessor
 {
@@ -24,7 +25,7 @@ public:
 struct FrontRightInvertedAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.invertRight; } };
 template<typename Tscreen>
 class FrontRightInvertedChangeScreen :
-    public StaticTitle<TEXT_INVERTFRONTRIGHT>,
+    public StaticText<TEXT_INVERTFRONTRIGHT>,
     public ChangeValueDisplay<bool>,
     public FrontRightInvertedAccessor
 {
@@ -37,7 +38,7 @@ public:
 struct BackLeftInvertedAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.command.left.enable; } };
 template<typename Tscreen>
 class BackLeftInvertedChangeScreen :
-    public StaticTitle<TEXT_INVERTBACKLEFT>,
+    public StaticText<TEXT_INVERTBACKLEFT>,
     public ChangeValueDisplay<bool>,
     public BackLeftInvertedAccessor
 {
@@ -50,7 +51,7 @@ public:
 struct BackRightInvertedAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.invertRight; } };
 template<typename Tscreen>
 class BackRightInvertedChangeScreen :
-    public StaticTitle<TEXT_INVERTBACKRIGHT>,
+    public StaticText<TEXT_INVERTBACKRIGHT>,
     public ChangeValueDisplay<bool>,
     public BackRightInvertedAccessor
 {
@@ -61,14 +62,14 @@ public:
 };
 
 template<typename Tscreen>
-class InvertMenu final :
-    public StaticTitle<TEXT_SETINVERTED>,
+class InvertMenu :
+    public StaticText<TEXT_SETINVERTED>,
     public StaticMenuDisplay<
-        StaticSwitchScreenMenuItem<FrontLeftInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTFRONTLEFT>,
-        StaticSwitchScreenMenuItem<FrontRightInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTFRONTRIGHT>,
-        StaticSwitchScreenMenuItem<BackLeftInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTBACKLEFT>,
-        StaticSwitchScreenMenuItem<BackRightInvertedChangeScreen<InvertMenu<Tscreen>>, TEXT_INVERTBACKRIGHT>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_INVERTFRONTLEFT>,  DefaultFont, DefaultColor, SwitchScreenAction<FrontLeftInvertedChangeScreen<InvertMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_INVERTFRONTRIGHT>, DefaultFont, DefaultColor, SwitchScreenAction<FrontRightInvertedChangeScreen<InvertMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_INVERTBACKLEFT>,   DefaultFont, DefaultColor, SwitchScreenAction<BackLeftInvertedChangeScreen<InvertMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_INVERTBACKRIGHT>,  DefaultFont, DefaultColor, SwitchScreenAction<BackRightInvertedChangeScreen<InvertMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,             DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

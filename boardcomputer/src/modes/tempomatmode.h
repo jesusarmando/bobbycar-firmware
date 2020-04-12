@@ -4,12 +4,12 @@
 
 #include "../../common.h"
 
-#include "modes/modeinterface.h"
+#include "modeinterface.h"
 #include "utils.h"
 #include "defaultmode.h"
 
 namespace {
-class TempomatMode final : public ModeInterface
+class TempomatMode : public ModeInterface
 {
 public:
     using ModeInterface::ModeInterface;

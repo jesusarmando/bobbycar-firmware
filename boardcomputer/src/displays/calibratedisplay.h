@@ -14,7 +14,7 @@
 
 namespace {
 template<typename Tscreen>
-class CalibrateDisplay final : public DemoDisplay<Tscreen>
+class CalibrateDisplay : public DemoDisplay<Tscreen>
 {
     using Base = DemoDisplay<Tscreen>;
 

@@ -90,4 +90,8 @@ void scrollAddress(uint16_t VSP) {
   tft.writedata(VSP >> 8);
   tft.writedata(VSP);
 }
+
+template<typename ...T>
+class makeComponent : public T...
+{};
 }

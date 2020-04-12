@@ -6,14 +6,14 @@
 #include <utility>
 
 #include "display.h"
-#include "titleinterface.h"
-#include "actions/actioninterface.h"
+#include "textinterface.h"
+#include "actioninterface.h"
 #include "label.h"
 #include "globals.h"
-#include "menuitems/menuitem.h"
+#include "menuitem.h"
 
 namespace {
-class MenuDisplay : public Display, public virtual TitleInterface, public virtual ActionInterface
+class MenuDisplay : public Display, public virtual TextInterface, public virtual ActionInterface
 {
 public:
     void start() override;
@@ -59,7 +59,7 @@ private:
         Label{horizontalSpacing + iconWidth, topMargin+(9*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
     }};
 
-    std::array<const SpriteDefinition *, 10> m_icons {{
+    std::array<const Icon<24, 24> *, 10> m_icons {{
         nullptr,
         nullptr,
         nullptr,
@@ -146,7 +146,7 @@ void MenuDisplay::redraw()
 {
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-    m_titleLabel.redraw(title());
+    m_titleLabel.redraw(text());
 
     const auto menuBegin = begin();
     const auto menuEnd = end();
@@ -160,9 +160,9 @@ void MenuDisplay::redraw()
     int newHighlightedIndex{-1};
 
     const auto drawItemRect = [](const auto &label, const auto color){
-        tft.drawRect(label.x()-5,
+        tft.drawRect(5,
                      label.y()-2,
-                     label.width()+10,
+                     240 - 10,
                      label.height()+2,
                      color);
     };
@@ -185,7 +185,7 @@ void MenuDisplay::redraw()
 
         tft.setTextFont(menuIter->get().font());
         tft.setTextColor(menuIter->get().color(), TFT_BLACK);
-        const auto labelDrawn = labelsIter->redraw(menuIter->get().title(), forceLabelRedraw);
+        const auto labelDrawn = labelsIter->redraw(menuIter->get().text(), forceLabelRedraw);
 
         if (menuIter->get().icon() != *iconsIter)
         {
@@ -193,7 +193,7 @@ void MenuDisplay::redraw()
             if (icon)
             {
                 tft.setSwapBytes(true);
-                tft.pushImage(5, labelsIter->y()+1, icon->width, icon->height, icon->buffer);
+                tft.pushImage(5, labelsIter->y()+1, icon->WIDTH, icon->HEIGHT, icon->buffer);
                 tft.setSwapBytes(false);
             }
             else

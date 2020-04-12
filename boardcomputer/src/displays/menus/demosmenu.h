@@ -1,8 +1,10 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
+#include "changevaluedisplay.h"
+#include "menuitem.h"
+#include "actions/switchscreenaction.h"
 #include "displays/starfielddisplay.h"
 #include "displays/pingpongdisplay.h"
 #include "displays/spirodisplay.h"
@@ -13,16 +15,16 @@
 
 namespace {
 template<typename Tscreen>
-class DemosMenu final :
-    public StaticTitle<TEXT_DEMOS>,
+class DemosMenu :
+    public StaticText<TEXT_DEMOS>,
     public StaticMenuDisplay<
-        StaticSwitchScreenMenuItem<StarfieldDisplay<DemosMenu<Tscreen>>, TEXT_STARFIELD>,
-        StaticSwitchScreenMenuItem<PingPongDisplay<DemosMenu<Tscreen>>, TEXT_PINGPONG>,
-        StaticSwitchScreenMenuItem<SpiroDisplay<DemosMenu<Tscreen>>, TEXT_SPIRO>,
-        StaticSwitchScreenMenuItem<GameOfLifeDisplay<DemosMenu<Tscreen>>, TEXT_GAMEOFLIFE>,
-        StaticSwitchScreenMenuItem<MetersDisplay<DemosMenu<Tscreen>>, TEXT_METERS>,
-        StaticSwitchScreenMenuItem<MatrixDisplay<DemosMenu<Tscreen>>, TEXT_MATRIX>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_STARFIELD>,  DefaultFont, DefaultColor, SwitchScreenAction<StarfieldDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_PINGPONG>,   DefaultFont, DefaultColor, SwitchScreenAction<PingPongDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SPIRO>,      DefaultFont, DefaultColor, SwitchScreenAction<SpiroDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_GAMEOFLIFE>, DefaultFont, DefaultColor, SwitchScreenAction<GameOfLifeDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_METERS>,     DefaultFont, DefaultColor, SwitchScreenAction<MetersDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_MATRIX>,     DefaultFont, DefaultColor, SwitchScreenAction<MatrixDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,       DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "display.h"
-#include "titleinterface.h"
-#include "actions/actioninterface.h"
+#include "textinterface.h"
+#include "actioninterface.h"
 #include "label.h"
 #include "globals.h"
 #include "utils.h"
@@ -25,7 +25,7 @@ struct RefAccessor : public virtual AccessorInterface<T>
     void setValue(T value) override { getRef() = value; };
 };
 
-class ChangeValueDisplayInterface : public Display, public virtual TitleInterface, public virtual ActionInterface
+class ChangeValueDisplayInterface : public Display, public virtual TextInterface, public virtual ActionInterface
 {
 public:
     void start() override;
@@ -120,7 +120,7 @@ void ChangeValueDisplay<Tvalue>::redraw()
 {
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);
-    m_titleLabel.redraw(title());
+    m_titleLabel.redraw(text());
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.setTextFont(7);

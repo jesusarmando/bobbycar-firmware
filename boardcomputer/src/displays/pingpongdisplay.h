@@ -9,7 +9,7 @@
 
 namespace {
 template<typename Tscreen>
-class PingPongDisplay final : public DemoDisplay<Tscreen>
+class PingPongDisplay : public DemoDisplay<Tscreen>
 {
     using Base = DemoDisplay<Tscreen>;
 

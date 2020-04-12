@@ -9,7 +9,7 @@
 
 namespace {
 template<typename Tscreen>
-class PoweroffDisplay final : public Display
+class PoweroffDisplay : public Display
 {
 public:
     void start() override;

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "modes/modeinterface.h"
+#include "modeinterface.h"
 
 namespace {
-class WebsocketMode final : public ModeInterface
+class WebsocketMode : public ModeInterface
 {
 public:
     using ModeInterface::ModeInterface;

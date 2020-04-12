@@ -1,11 +1,12 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
+#include "changevaluedisplay.h"
+#include "menuitem.h"
+#include "actions/switchscreenaction.h"
 #include "displays/menus/buzzermenu.h"
 #include "displays/menus/dynamicdebugmenu.h"
-#include "changevaluedisplay.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -13,8 +14,8 @@ namespace {
 struct FrontLedAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.command.led; } };
 template<typename Tscreen>
 class FrontLedChangeScreen :
-    public StaticTitle<TEXT_SETFRONTLED>,
     public ChangeValueDisplay<bool>,
+    public StaticText<TEXT_SETFRONTLED>,
     public FrontLedAccessor
 {
     using Base = ChangeValueDisplay<bool>;
@@ -26,8 +27,8 @@ public:
 struct BackLedAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.command.led; } };
 template<typename Tscreen>
 class BackLedChangeScreen :
-    public StaticTitle<TEXT_SETBACKLED>,
     public ChangeValueDisplay<bool>,
+    public StaticText<TEXT_SETBACKLED>,
     public BackLedAccessor
 {
     using Base = ChangeValueDisplay<bool>;
@@ -37,14 +38,14 @@ public:
 };
 
 template<typename Tscreen>
-class DebugMenu final :
-    public StaticTitle<TEXT_DEBUG>,
+class DebugMenu :
+    public StaticText<TEXT_DEBUG>,
     public StaticMenuDisplay<
-        StaticSwitchScreenMenuItem<BuzzerMenu<DebugMenu<Tscreen>>, TEXT_BUZZER>,
-        StaticSwitchScreenMenuItem<FrontLedChangeScreen<DebugMenu<Tscreen>>, TEXT_SETFRONTLED>,
-        StaticSwitchScreenMenuItem<BackLedChangeScreen<DebugMenu<Tscreen>>, TEXT_SETBACKLED>,
-        StaticSwitchScreenMenuItem<DynamicDebugMenu<DebugMenu<Tscreen>>, TEXT_DYNAMICMENU>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_BUZZER>,      DefaultFont, DefaultColor, SwitchScreenAction<BuzzerMenu<DebugMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>, DefaultFont, DefaultColor, SwitchScreenAction<FrontLedChangeScreen<DebugMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,  DefaultFont, DefaultColor, SwitchScreenAction<BackLedChangeScreen<DebugMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICMENU>, DefaultFont, DefaultColor, SwitchScreenAction<DynamicDebugMenu<DebugMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,        DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

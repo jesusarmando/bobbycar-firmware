@@ -2,25 +2,26 @@
 
 #include "changevaluedisplay.h"
 #include "staticmenudisplay.h"
-#include "menuitems/staticdummymenuitem.h"
+#include "utils.h"
+#include "actions/dummyaction.h"
 #include "texts.h"
 
 namespace {
 template<>
 class ChangeValueDisplay<ControlType> :
     public StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_COMMUTATION>,
-        StaticDummyMenuItem<TEXT_SINUSOIDAL>,
-        StaticDummyMenuItem<TEXT_FIELDORIENTEDCONTROL>,
-        StaticDummyMenuItem<TEXT_BACK>
+        makeComponent<MenuItem, StaticText<TEXT_COMMUTATION>,          DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_SINUSOIDAL>,           DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_FIELDORIENTEDCONTROL>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont, DefaultColor, DummyAction>
     >,
     public virtual AccessorInterface<ControlType>
 {
     using Base = StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_COMMUTATION>,
-        StaticDummyMenuItem<TEXT_SINUSOIDAL>,
-        StaticDummyMenuItem<TEXT_FIELDORIENTEDCONTROL>,
-        StaticDummyMenuItem<TEXT_BACK>
+        makeComponent<MenuItem, StaticText<TEXT_COMMUTATION>,          DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_SINUSOIDAL>,           DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_FIELDORIENTEDCONTROL>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont, DefaultColor, DummyAction>
     >;
 
 public:
@@ -34,15 +35,15 @@ void ChangeValueDisplay<ControlType>::start()
     Base::start();
 
     if (getValue() == ControlType::Commutation)
-        Base::setSelectedIndex(0);
+        setSelectedIndex(0);
     else if (getValue() == ControlType::Sinusoidal)
-        Base::setSelectedIndex(1);
+        setSelectedIndex(1);
     else if (getValue() == ControlType::FieldOrientedControl)
-        Base::setSelectedIndex(2);
+        setSelectedIndex(2);
     else
     {
         Serial.printf("Unknown ControlType: %i", int(getValue()));
-        Base::setSelectedIndex(3);
+        setSelectedIndex(3);
     }
 }
 
@@ -50,7 +51,7 @@ void ChangeValueDisplay<ControlType>::triggered()
 {
     Base::triggered();
 
-    switch (Base::selectedIndex())
+    switch (selectedIndex())
     {
     case 0: setValue(ControlType::Commutation); break;
     case 1: setValue(ControlType::Sinusoidal); break;

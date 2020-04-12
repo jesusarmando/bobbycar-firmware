@@ -1,17 +1,18 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
 #include "changevaluedisplay.h"
+#include "menuitem.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
-#include "modes/larsmmode.h"
+#include "globals.h"
 
 namespace {
 struct LarsmModeModeAccessor : public RefAccessor<LarsmMode::Mode> { LarsmMode::Mode &getRef() const override { return modes::larsmMode.mode; } };
 template<typename Tscreen>
 class LarsmModeModeChangeDisplay :
-    public StaticTitle<TEXT_LARSMMODECHANGEMODE>,
+    public StaticText<TEXT_LARSMMODECHANGEMODE>,
     public ChangeValueDisplay<LarsmMode::Mode>,
     public LarsmModeModeAccessor
 {
@@ -22,11 +23,11 @@ public:
 };
 
 template<typename Tscreen>
-class LarsmModeSettingsMenu final :
-    public StaticTitle<TEXT_LARSMMODESETTINGS>,
+class LarsmModeSettingsMenu :
+    public StaticText<TEXT_LARSMMODESETTINGS>,
     public StaticMenuDisplay<
-        StaticSwitchScreenMenuItem<LarsmModeModeChangeDisplay<LarsmModeSettingsMenu<Tscreen>>, TEXT_LARSMMODECHANGEMODE>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_LARSMMODECHANGEMODE>, DefaultFont, DefaultColor, SwitchScreenAction<LarsmModeModeChangeDisplay<LarsmModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

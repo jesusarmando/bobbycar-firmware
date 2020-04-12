@@ -4,27 +4,29 @@
 
 #include "changevaluedisplay.h"
 #include "staticmenudisplay.h"
-#include "menuitems/staticdummymenuitem.h"
+#include "utils.h"
+#include "actions/dummyaction.h"
 #include "texts.h"
+#include "modes/larsmmode.h"
 
 namespace {
 template<>
 class ChangeValueDisplay<wifi_mode_t> :
     public StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_WIFI_MODE_NULL>,
-        StaticDummyMenuItem<TEXT_WIFI_MODE_STA>,
-        StaticDummyMenuItem<TEXT_WIFI_MODE_AP>,
-        StaticDummyMenuItem<TEXT_WIFI_MODE_APSTA>,
-        StaticDummyMenuItem<TEXT_BACK>
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_NULL>,  DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_STA>,   DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_AP>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_APSTA>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, DummyAction>
     >,
     public virtual AccessorInterface<wifi_mode_t>
 {
     using Base = StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_WIFI_MODE_NULL>,
-        StaticDummyMenuItem<TEXT_WIFI_MODE_STA>,
-        StaticDummyMenuItem<TEXT_WIFI_MODE_AP>,
-        StaticDummyMenuItem<TEXT_WIFI_MODE_APSTA>,
-        StaticDummyMenuItem<TEXT_BACK>
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_NULL>,  DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_STA>,   DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_AP>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_APSTA>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, DummyAction>
     >;
 
 public:
@@ -38,17 +40,17 @@ void ChangeValueDisplay<wifi_mode_t>::start()
     Base::start();
 
     if (getValue() == WIFI_MODE_NULL)
-        Base::setSelectedIndex(0);
+        setSelectedIndex(0);
     else if (getValue() == WIFI_MODE_STA)
-        Base::setSelectedIndex(1);
+        setSelectedIndex(1);
     else if (getValue() == WIFI_MODE_AP)
-        Base::setSelectedIndex(2);
+        setSelectedIndex(2);
     else if (getValue() == WIFI_MODE_APSTA)
-        Base::setSelectedIndex(3);
+        setSelectedIndex(3);
     else
     {
         Serial.printf("Unknown wifi_mode_t: %i", int(getValue()));
-        Base::setSelectedIndex(4);
+        setSelectedIndex(4);
     }
 }
 
@@ -56,7 +58,7 @@ void ChangeValueDisplay<wifi_mode_t>::triggered()
 {
     Base::triggered();
 
-    switch (Base::selectedIndex())
+    switch (selectedIndex())
     {
     case 0: setValue(WIFI_MODE_NULL); break;
     case 1: setValue(WIFI_MODE_STA); break;

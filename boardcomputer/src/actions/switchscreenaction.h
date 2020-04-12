@@ -1,6 +1,6 @@
 #pragma once
 
-#include "actions/actioninterface.h"
+#include "actioninterface.h"
 #include "utils.h"
 
 namespace {

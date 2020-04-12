@@ -3,18 +3,21 @@
 #include <WiFi.h>
 
 #include "staticmenudisplay.h"
-#include "menuitems/wifireconnectmenuitem.h"
-#include "menuitems/wifidisconnectmenuitem.h"
-#include "menuitems/smalllivestatusmenuitem.h"
-#include "menuitems/wifienableipv6menuitem.h"
-#include "changevaluedisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
 #include "utils.h"
+#include "changevaluedisplay.h"
+#include "menuitem.h"
+#include "actions/dummyaction.h"
+#include "actions/switchscreenaction.h"
+#include "actions/wifireconnectaction.h"
+#include "actions/wifidisconnectaction.h"
+#include "actions/wifienableipv6action.h"
 #include "texts.h"
 
 namespace {
-struct WifiIsConnectedLiveStatus { static String getText() { return String{"isConnected: "} + (WiFi.isConnected() ? "true" : "false"); } };
+struct WifiIsConnectedText : public virtual TextInterface {
+public:
+    String text() const override { return String{"isConnected: "} + (WiFi.isConnected() ? "true" : "false"); }
+};
 
 struct WifiAutoConnectAccessor : public virtual AccessorInterface<bool>
 {
@@ -28,7 +31,7 @@ struct WifiAutoConnectAccessor : public virtual AccessorInterface<bool>
 };
 template<typename Tscreen>
 class WifiAutoConnectChangeScreen :
-    public virtual StaticTitle<TEXT_WIFICHANGEAUTOCONNECT>,
+    public virtual StaticText<TEXT_WIFICHANGEAUTOCONNECT>,
     public ChangeValueDisplay<bool>,
     public virtual WifiAutoConnectAccessor
 {
@@ -50,7 +53,7 @@ struct WifiAutoReconnectAccessor : public virtual AccessorInterface<bool>
 };
 template<typename Tscreen>
 class WifiAutoReconnectChangeScreen :
-    public StaticTitle<TEXT_WIFICHANGEAUTORECONNECT>,
+    public StaticText<TEXT_WIFICHANGEAUTORECONNECT>,
     public ChangeValueDisplay<bool>,
     public virtual WifiAutoReconnectAccessor
 {
@@ -60,48 +63,93 @@ public:
     void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
 };
 
-struct WifiLocalIpLiveStatus { static String getText() { return String{"localIP: "} + WiFi.localIP().toString(); } };
-struct WifiMacAddressLiveStatus { static String getText() { return String{"macAddress: "} + WiFi.macAddress(); } };
-struct WifiSubnetMaskLiveStatus { static String getText() { return String{"subnetMask: "} + WiFi.subnetMask().toString(); } };
-struct WifiGatewayIpLiveStatus { static String getText() { return String{"gatewayIP: "} + WiFi.gatewayIP().toString(); } };
-struct WifiDnsIpLiveStatus { static String getText() { return String{"dnsIP: "} + WiFi.dnsIP().toString(); } };
-struct WifiBroadcastIpLiveStatus { static String getText() { return String{"broadcastIP: "} + WiFi.broadcastIP().toString(); } };
-struct WifiNetworkIdLiveStatus { static String getText() { return String{"networkID: "} + WiFi.networkID().toString(); } };
-struct WifiSubnetCIDRLiveStatus { static String getText() { return String{"subnetCIDR: "} + WiFi.subnetCIDR(); } };
-struct WifiLocalIpV6LiveStatus { static String getText() { return String{"localIPv6: "} + WiFi.localIPv6().toString(); } };
-struct WifiHostnameLiveStatus { static String getText() { return String{"hostname: "} + WiFi.getHostname(); } };
-struct WifiStatusLiveStatus { static String getText() { return String{"status: "} + toString(WiFi.status()); } };
-struct WifiSsidLiveStatus { static String getText() { return String{"SSID: "} + WiFi.SSID(); } };
-struct WifiPskLiveStatus { static String getText() { return String{"psk: "} + WiFi.psk(); } };
-struct WifiBssidLiveStatus { static String getText() { return String{"BSSID: "} + WiFi.BSSIDstr(); } };
-struct WifiRssiLiveStatus { static String getText() { return String{"RSSI: "} + WiFi.RSSI(); } };
+struct WifiLocalIpText : public virtual TextInterface {
+public:
+    String text() const override { return String{"localIP: "} + WiFi.localIP().toString(); }
+};
+struct WifiMacAddressText : public virtual TextInterface {
+public:
+    String text() const override { return String{"macAddress: "} + WiFi.macAddress(); }
+};
+struct WifiSubnetMaskText : public virtual TextInterface {
+public:
+    String text() const override { return String{"subnetMask: "} + WiFi.subnetMask().toString(); }
+};
+struct WifiGatewayIpText : public virtual TextInterface {
+public:
+    String text() const override { return String{"gatewayIP: "} + WiFi.gatewayIP().toString(); }
+};
+struct WifiDnsIpText : public virtual TextInterface {
+public:
+    String text() const override { return String{"dnsIP: "} + WiFi.dnsIP().toString(); }
+};
+struct WifiBroadcastIpText : public virtual TextInterface {
+public:
+    String text() const override { return String{"broadcastIP: "} + WiFi.broadcastIP().toString(); }
+};
+struct WifiNetworkIdText : public virtual TextInterface {
+public:
+    String text() const override { return String{"networkID: "} + WiFi.networkID().toString(); }
+};
+struct WifiSubnetCIDRText : public virtual TextInterface {
+public:
+    String text() const override { return String{"subnetCIDR: "} + WiFi.subnetCIDR(); }
+};
+struct WifiLocalIpV6Text : public virtual TextInterface {
+public:
+    String text() const override { return String{"localIPv6: "} + WiFi.localIPv6().toString(); }
+};
+struct WifiHostnameText : public virtual TextInterface {
+public:
+    String text() const override { return String{"hostname: "} + WiFi.getHostname(); }
+};
+struct WifiStatusText : public virtual TextInterface {
+public:
+    String text() const override { return String{"status: "} + toString(WiFi.status()); }
+};
+struct WifiSsidText : public virtual TextInterface {
+public:
+    String text() const override { return String{"SSID: "} + WiFi.SSID(); }
+};
+struct WifiPskText : public virtual TextInterface {
+public:
+    String text() const override { return String{"psk: "} + WiFi.psk(); }
+};
+struct WifiBssidText : public virtual TextInterface {
+public:
+    String text() const override { return String{"BSSID: "} + WiFi.BSSIDstr(); }
+};
+struct WifiRssiText : public virtual TextInterface {
+public:
+    String text() const override { return String{"RSSI: "} + WiFi.RSSI(); }
+};
 
 template<typename Tscreen>
-class StationWifiSettingsMenu final :
-    public StaticTitle<TEXT_STATIONWIFISETTINGS>,
+class StationWifiSettingsMenu :
+    public StaticText<TEXT_STATIONWIFISETTINGS>,
     public StaticMenuDisplay<
-        WifiReconnectMenuItem<TEXT_WIFIRECONNECT>,
-        WifiDisconnectMenuItem<TEXT_WIFIDISCONNECT>,
-        SmallLiveStatusMenuItem<WifiIsConnectedLiveStatus>,
-        StaticSwitchScreenMenuItem<WifiAutoConnectChangeScreen<StationWifiSettingsMenu<Tscreen>>, TEXT_WIFICHANGEAUTOCONNECT>,
-        StaticSwitchScreenMenuItem<WifiAutoReconnectChangeScreen<StationWifiSettingsMenu<Tscreen>>, TEXT_WIFICHANGEAUTORECONNECT>,
-        SmallLiveStatusMenuItem<WifiLocalIpLiveStatus>,
-        SmallLiveStatusMenuItem<WifiMacAddressLiveStatus>,
-        SmallLiveStatusMenuItem<WifiSubnetMaskLiveStatus>,
-        SmallLiveStatusMenuItem<WifiGatewayIpLiveStatus>,
-        SmallLiveStatusMenuItem<WifiDnsIpLiveStatus>,
-        SmallLiveStatusMenuItem<WifiBroadcastIpLiveStatus>,
-        SmallLiveStatusMenuItem<WifiNetworkIdLiveStatus>,
-        SmallLiveStatusMenuItem<WifiSubnetCIDRLiveStatus>,
-        WifiEnableIpV6MenuItem<TEXT_WIFIENABLEIPV6>,
-        SmallLiveStatusMenuItem<WifiLocalIpV6LiveStatus>,
-        SmallLiveStatusMenuItem<WifiHostnameLiveStatus>,
-        SmallLiveStatusMenuItem<WifiStatusLiveStatus>,
-        SmallLiveStatusMenuItem<WifiSsidLiveStatus>,
-        SmallLiveStatusMenuItem<WifiPskLiveStatus>,
-        SmallLiveStatusMenuItem<WifiBssidLiveStatus>,
-        SmallLiveStatusMenuItem<WifiRssiLiveStatus>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_WIFIRECONNECT>,           DefaultFont,   DefaultColor,  WifiReconnectAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFIDISCONNECT>,          DefaultFont,   DefaultColor,  WifiDisconnectAction>,
+        makeComponent<MenuItem, WifiIsConnectedText,                      StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTOCONNECT>,   DefaultFont,   DefaultColor,  SwitchScreenAction<WifiAutoConnectChangeScreen<StationWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTORECONNECT>, DefaultFont,   DefaultColor,  SwitchScreenAction<WifiAutoReconnectChangeScreen<StationWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, WifiLocalIpText,                          StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiMacAddressText,                       StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSubnetMaskText,                       StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiGatewayIpText,                        StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiDnsIpText,                            StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiBroadcastIpText,                      StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiNetworkIdText,                        StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSubnetCIDRText,                       StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFIENABLEIPV6>,          DefaultFont,   DefaultColor,  WifiEnableIpV6Action>,
+        makeComponent<MenuItem, WifiLocalIpV6Text,                        StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiHostnameText,                         StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiStatusText,                           StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiSsidText,                             StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiPskText,                              StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiBssidText,                            StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiRssiText,                             StaticFont<2>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    DefaultFont,   DefaultColor,  SwitchScreenAction<Tscreen>>
     >
 {};
 }

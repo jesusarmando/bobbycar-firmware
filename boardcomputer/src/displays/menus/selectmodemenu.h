@@ -1,10 +1,12 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "changevaluedisplay.h"
-#include "menuitems/staticdummymenuitem.h"
+#include "utils.h"
+#include "actions/dummyaction.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 #include "globals.h"
+
 #include "modes/defaultmode.h"
 #include "modes/tempomatmode.h"
 #include "modes/larsmmode.h"
@@ -20,25 +22,25 @@ struct BluetoothModeAccessor { static auto getValue() { return &modes::bluetooth
 struct WebsocketModeAccessor { static auto getValue() { return &modes::websocketMode; } };
 
 template<typename Tscreen>
-class SelectModeMenu final :
-    public StaticTitle<TEXT_SELECTMODE>,
+class SelectModeMenu :
+    public StaticText<TEXT_SELECTMODE>,
     public StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_DEFAULT>,
-        StaticDummyMenuItem<TEXT_TEMPOMAT>,
-        StaticDummyMenuItem<TEXT_LARSM>,
-        StaticDummyMenuItem<TEXT_BLUETOOTH>,
-        StaticDummyMenuItem<TEXT_WEBSOCKET>,
-        StaticDummyMenuItem<TEXT_BACK>
+        makeComponent<MenuItem, StaticText<TEXT_DEFAULT>,   DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_TEMPOMAT>,  DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSM>,     DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTH>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKET>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,      DefaultFont, DefaultColor, DummyAction>
     >,
     public ModeAccessor
 {
     using Base = StaticMenuDisplay<
-        StaticDummyMenuItem<TEXT_DEFAULT>,
-        StaticDummyMenuItem<TEXT_TEMPOMAT>,
-        StaticDummyMenuItem<TEXT_LARSM>,
-        StaticDummyMenuItem<TEXT_BLUETOOTH>,
-        StaticDummyMenuItem<TEXT_WEBSOCKET>,
-        StaticDummyMenuItem<TEXT_BACK>
+        makeComponent<MenuItem, StaticText<TEXT_DEFAULT>,   DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_TEMPOMAT>,  DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSM>,     DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTH>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKET>, DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,      DefaultFont, DefaultColor, DummyAction>
     >;
 
 public:
@@ -53,19 +55,19 @@ void SelectModeMenu<Tscreen>::start()
     Base::start();
 
     if (getValue() == DefaultModeAccessor::getValue())
-        Base::setSelectedIndex(0);
+        setSelectedIndex(0);
     else if (getValue() == TempomatModeAccessor::getValue())
-        Base::setSelectedIndex(1);
+        setSelectedIndex(1);
     else if (getValue() == LarsmModeAccessor::getValue())
-        Base::setSelectedIndex(2);
+        setSelectedIndex(2);
     else if (getValue() == BluetoothModeAccessor::getValue())
-        Base::setSelectedIndex(3);
+        setSelectedIndex(3);
     else if (getValue() == WebsocketModeAccessor::getValue())
-        Base::setSelectedIndex(4);
+        setSelectedIndex(4);
     else
     {
         Serial.printf("Unknown mode: %s", getValue()->displayName());
-        Base::setSelectedIndex(5);
+        setSelectedIndex(5);
     }
 }
 
@@ -74,7 +76,7 @@ void SelectModeMenu<Tscreen>::triggered()
 {
     Base::triggered();
 
-    switch (Base::selectedIndex())
+    switch (selectedIndex())
     {
     case 0: setValue(DefaultModeAccessor::getValue()); break;
     case 1: setValue(TempomatModeAccessor::getValue()); break;

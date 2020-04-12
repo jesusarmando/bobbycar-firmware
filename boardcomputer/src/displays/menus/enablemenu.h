@@ -1,9 +1,10 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
-#include "menuitems/backmenuitem.h"
+#include "utils.h"
 #include "changevaluedisplay.h"
+#include "menuitem.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -11,7 +12,7 @@ namespace {
 struct FrontLeftEnabledAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.command.left.enable; } };
 template<typename Tscreen>
 class FrontLeftEnabledChangeScreen :
-    public StaticTitle<TEXT_ENABLEFRONTLEFT>,
+    public StaticText<TEXT_ENABLEFRONTLEFT>,
     public ChangeValueDisplay<bool>,
     public FrontLeftEnabledAccessor
 {
@@ -24,7 +25,7 @@ public:
 struct FrontRightEnabledAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.command.right.enable; } };
 template<typename Tscreen>
 class FrontRightEnabledChangeScreen :
-    public StaticTitle<TEXT_ENABLEFRONTRIGHT>,
+    public StaticText<TEXT_ENABLEFRONTRIGHT>,
     public ChangeValueDisplay<bool>,
     public FrontRightEnabledAccessor
 {
@@ -37,7 +38,7 @@ public:
 struct BackLeftEnabledAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.command.left.enable; } };
 template<typename Tscreen>
 class BackLeftEnabledChangeScreen :
-    public StaticTitle<TEXT_ENABLEBACKLEFT>,
+    public StaticText<TEXT_ENABLEBACKLEFT>,
     public ChangeValueDisplay<bool>,
     public BackLeftEnabledAccessor
 {
@@ -50,7 +51,7 @@ public:
 struct BackRightEnabledAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.command.right.enable; } };
 template<typename Tscreen>
 class BackRightEnabledChangeScreen :
-    public StaticTitle<TEXT_ENABLEBACKRIGHT>,
+    public StaticText<TEXT_ENABLEBACKRIGHT>,
     public ChangeValueDisplay<bool>,
     public BackRightEnabledAccessor
 {
@@ -61,14 +62,14 @@ public:
 };
 
 template<typename Tscreen>
-class EnableMenu final :
-    public StaticTitle<TEXT_SETENABLED>,
+class EnableMenu :
+    public StaticText<TEXT_SETENABLED>,
     public StaticMenuDisplay<
-        StaticSwitchScreenMenuItem<FrontLeftEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEFRONTLEFT>,
-        StaticSwitchScreenMenuItem<FrontRightEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEFRONTRIGHT>,
-        StaticSwitchScreenMenuItem<BackLeftEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEBACKLEFT>,
-        StaticSwitchScreenMenuItem<BackRightEnabledChangeScreen<EnableMenu<Tscreen>>, TEXT_ENABLEBACKRIGHT>,
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTLEFT>,  DefaultFont, DefaultColor, SwitchScreenAction<FrontLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTRIGHT>, DefaultFont, DefaultColor, SwitchScreenAction<FrontRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKLEFT>,   DefaultFont, DefaultColor, SwitchScreenAction<BackLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKRIGHT>,  DefaultFont, DefaultColor, SwitchScreenAction<BackRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,             DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }

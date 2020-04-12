@@ -1,15 +1,16 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/backmenuitem.h"
+#include "menuitem.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 
 namespace {
 template<typename Tscreen>
-class BluetoothModeSettingsMenu final :
-    public StaticTitle<TEXT_BLUETOOTHMODESETTINGS>,
+class BluetoothModeSettingsMenu :
+    public StaticText<TEXT_BLUETOOTHMODESETTINGS>,
     public StaticMenuDisplay<
-        BackMenuItem<Tscreen>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
     >
 {};
 }
