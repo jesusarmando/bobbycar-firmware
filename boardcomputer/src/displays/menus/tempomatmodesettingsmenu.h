@@ -5,6 +5,7 @@
 #include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 #include "modes/tempomatmode.h"
 
@@ -41,7 +42,7 @@ class TempomatModeSettingsMenu :
     public StaticMenuDisplay<
         makeComponent<MenuItem, StaticText<TEXT_SETCONTROLTYPE>, DefaultFont, DefaultColor, SwitchScreenAction<TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETCONTROLMODE>, DefaultFont, DefaultColor, SwitchScreenAction<TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,           DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,           DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

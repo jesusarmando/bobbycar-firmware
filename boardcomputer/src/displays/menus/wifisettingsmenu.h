@@ -3,6 +3,7 @@
 #include "staticmenudisplay.h"
 #include "utils.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 #include "displays/menus/genericwifisettingsmenu.h"
@@ -19,7 +20,7 @@ class WifiSettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_STATIONWIFISETTINGS>,     DefaultFont,  DefaultColor, SwitchScreenAction<StationWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_WIFISCAN>,                DefaultFont,  DefaultColor, SwitchScreenAction<WifiScanMenu<WifiSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_ACCESSPOINTWIFISETTINGS>, DefaultFont,  DefaultColor, SwitchScreenAction<AccessPointWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    DefaultFont,  DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    DefaultFont,  DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

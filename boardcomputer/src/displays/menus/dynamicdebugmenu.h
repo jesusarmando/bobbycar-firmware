@@ -10,6 +10,7 @@
 #include "menuitem.h"
 #include "actions/dummyaction.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "icons/lock.h"
 #include "texts.h"
 
@@ -75,16 +76,33 @@ private:
     mutable int m_font;
 };
 
-class StaticLockIcon : public virtual IconInterface<24, 24>
+class RandomIcon : public virtual IconInterface<24, 24>
 {
 public:
-    const Icon<24, 24> *icon() const override { return &icons::lock; }
+    const Icon<24, 24> *icon() const override
+    {
+        const auto now = millis();
+        if (!m_nextUpdate || now >= m_nextUpdate)
+        {
+            if (m_icon)
+                m_icon = nullptr;
+            else
+                m_icon = &icons::lock;
+            m_nextUpdate = now + random(0, 1000);
+        }
+
+        return m_icon;
+    }
+
+private:
+    mutable unsigned long m_nextUpdate{};
+    mutable const Icon<24, 24> *m_icon;
 };
 
 constexpr char TEXT_DUMMYITEM[] = "Dummy item";
 constexpr char TEXT_DYNAMICCOLOR[] = "Dynamic color";
 constexpr char TEXT_DYNAMICFONT[] = "Dynamic font";
-constexpr char TEXT_ITEMWITHICON[] = "Item with icon";
+constexpr char TEXT_DYNAMICICON[] = "Dynamic icon";
 
 template<typename Tscreen>
 class DynamicDebugMenu :
@@ -101,7 +119,7 @@ class DynamicDebugMenu :
         makeComponent<MenuItem, RandomText,                    DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, DefaultFont, RandomColor,  DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont,  DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_ITEMWITHICON>, DefaultFont, DefaultColor, DummyAction, StaticLockIcon>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICICON>,  DefaultFont, DefaultColor, DummyAction, RandomIcon>,
 
         // more padding
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
@@ -111,7 +129,7 @@ class DynamicDebugMenu :
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
 
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,         DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,         DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >,
     public RandomText
 {};

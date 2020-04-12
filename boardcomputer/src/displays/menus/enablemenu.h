@@ -5,6 +5,7 @@
 #include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -69,7 +70,7 @@ class EnableMenu :
         makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTRIGHT>, DefaultFont, DefaultColor, SwitchScreenAction<FrontRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKLEFT>,   DefaultFont, DefaultColor, SwitchScreenAction<BackLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKRIGHT>,  DefaultFont, DefaultColor, SwitchScreenAction<BackRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,             DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,             DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

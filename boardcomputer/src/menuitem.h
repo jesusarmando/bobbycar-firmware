@@ -7,6 +7,11 @@
 #include "actioninterface.h"
 
 namespace {
+using MenuItemIcon = Icon<24, 24>;
+
+template<const MenuItemIcon *T>
+using StaticMenuItemIcon = StaticIcon<24, 24, T>;
+
 class MenuItem :
     public virtual ActionInterface,
     public virtual TextInterface,

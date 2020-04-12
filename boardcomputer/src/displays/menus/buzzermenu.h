@@ -5,6 +5,7 @@
 #include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -33,7 +34,7 @@ class BuzzerMenu :
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTPATTERN>, DefaultFont, DefaultColor, SwitchScreenAction<FrontPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKFREQ>,     DefaultFont, DefaultColor, SwitchScreenAction<BackFreqChangeScreen<BuzzerMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKPATTERN>,  DefaultFont, DefaultColor, SwitchScreenAction<BackPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

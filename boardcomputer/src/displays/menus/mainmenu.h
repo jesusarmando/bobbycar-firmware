@@ -4,6 +4,7 @@
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
 #include "texts.h"
+#include "icons/back.h"
 
 #include "displays/statusdisplay.h"
 #include "displays/menus/selectmodemenu.h"
@@ -18,7 +19,7 @@ namespace {
 class MainMenu :
     public StaticText<TEXT_MAINMENU>,
     public StaticMenuDisplay<
-        makeComponent<MenuItem, StaticText<TEXT_STATUS>,      DefaultFont, DefaultColor, SwitchScreenAction<StatusDisplay<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_STATUS>,      DefaultFont, DefaultColor, SwitchScreenAction<StatusDisplay<MainMenu>>, StaticMenuItemIcon<&icons::back>>,
         makeComponent<MenuItem, StaticText<TEXT_SELECTMODE>,  DefaultFont, DefaultColor, SwitchScreenAction<SelectModeMenu<MainMenu>>>,
         makeComponent<MenuItem, StaticText<TEXT_PRESETS>,     DefaultFont, DefaultColor, SwitchScreenAction<PresetsMenu<MainMenu>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETTINGS>,    DefaultFont, DefaultColor, SwitchScreenAction<SettingsMenu<MainMenu>>>,

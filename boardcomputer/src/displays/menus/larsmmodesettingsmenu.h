@@ -5,6 +5,7 @@
 #include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -27,7 +28,7 @@ class LarsmModeSettingsMenu :
     public StaticText<TEXT_LARSMMODESETTINGS>,
     public StaticMenuDisplay<
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODECHANGEMODE>, DefaultFont, DefaultColor, SwitchScreenAction<LarsmModeModeChangeDisplay<LarsmModeSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

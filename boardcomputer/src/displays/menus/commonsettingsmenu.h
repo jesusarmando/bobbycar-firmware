@@ -7,6 +7,7 @@
 #include "actions/switchscreenaction.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/invertmenu.h"
+#include "icons/back.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -42,7 +43,7 @@ class CommonSettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_SETPHASEADVMAX>,  DefaultFont, DefaultColor, SwitchScreenAction<PhaseAdvMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETENABLED>,      DefaultFont, DefaultColor, SwitchScreenAction<EnableMenu<CommonSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETINVERTED>,     DefaultFont, DefaultColor, SwitchScreenAction<InvertMenu<CommonSettingsMenu<Tscreen>>>>   ,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

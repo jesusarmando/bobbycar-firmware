@@ -7,6 +7,7 @@
 #include "actions/switchscreenaction.h"
 #include "displays/menus/buzzermenu.h"
 #include "displays/menus/dynamicdebugmenu.h"
+#include "icons/back.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -45,7 +46,7 @@ class DebugMenu :
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>, DefaultFont, DefaultColor, SwitchScreenAction<FrontLedChangeScreen<DebugMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,  DefaultFont, DefaultColor, SwitchScreenAction<BackLedChangeScreen<DebugMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_DYNAMICMENU>, DefaultFont, DefaultColor, SwitchScreenAction<DynamicDebugMenu<DebugMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,        DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,        DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

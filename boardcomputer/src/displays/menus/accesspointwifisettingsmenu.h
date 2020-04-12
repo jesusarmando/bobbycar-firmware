@@ -5,6 +5,7 @@
 #include "actions/dummyaction.h"
 #include "actions/wifisoftapenableipv6action.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -50,11 +51,11 @@ class AccessPointWifiSettingsMenu :
         makeComponent<MenuItem, WifiSoftApBroadcastIpText,             StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSoftApNetworkIdText,               StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSoftApSubnetCidrText,              StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFISOFTAPENABLEIPV6>, DefaultFont,   DefaultColor,              WifiSoftApEnableIpV6Action>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFISOFTAPENABLEIPV6>, DefaultFont,   DefaultColor,  WifiSoftApEnableIpV6Action>,
         makeComponent<MenuItem, WifiSoftApIpV6Text,                    StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSoftApHostnameText,                StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSoftApMacAddressText,              StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont,   DefaultColor,              SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont,   DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

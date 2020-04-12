@@ -4,6 +4,7 @@
 #include "staticmenudisplay.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
+#include "icons/back.h"
 #include "texts.h"
 #include "modes/larsmmode.h"
 
@@ -15,7 +16,7 @@ class ChangeValueDisplay<LarsmMode::Mode> :
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODE2>, DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODE3>, DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODE4>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,       DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,       DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
     public virtual AccessorInterface<LarsmMode::Mode>
 {
@@ -24,7 +25,7 @@ class ChangeValueDisplay<LarsmMode::Mode> :
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODE2>, DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODE3>, DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODE4>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,       DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,       DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >;
 
 public:

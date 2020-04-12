@@ -3,6 +3,7 @@
 #include "staticmenudisplay.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 #include "displays/menus/defaultmodesettingsmenu.h"
@@ -21,7 +22,7 @@ class ModesSettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODESETTINGS>,     DefaultFont, DefaultColor, SwitchScreenAction<LarsmModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHMODESETTINGS>, DefaultFont, DefaultColor, SwitchScreenAction<BluetoothModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_WEBSOCKETMODESETTINGS>, DefaultFont, DefaultColor, SwitchScreenAction<WebsocketModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

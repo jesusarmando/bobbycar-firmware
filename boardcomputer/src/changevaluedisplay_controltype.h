@@ -4,6 +4,7 @@
 #include "staticmenudisplay.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -13,7 +14,7 @@ class ChangeValueDisplay<ControlType> :
         makeComponent<MenuItem, StaticText<TEXT_COMMUTATION>,          DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_SINUSOIDAL>,           DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_FIELDORIENTEDCONTROL>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
     public virtual AccessorInterface<ControlType>
 {
@@ -21,7 +22,7 @@ class ChangeValueDisplay<ControlType> :
         makeComponent<MenuItem, StaticText<TEXT_COMMUTATION>,          DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_SINUSOIDAL>,           DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_FIELDORIENTEDCONTROL>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >;
 
 public:

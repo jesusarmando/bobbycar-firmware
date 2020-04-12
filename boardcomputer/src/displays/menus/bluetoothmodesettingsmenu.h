@@ -3,6 +3,7 @@
 #include "staticmenudisplay.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -10,7 +11,7 @@ template<typename Tscreen>
 class BluetoothModeSettingsMenu :
     public StaticText<TEXT_BLUETOOTHMODESETTINGS>,
     public StaticMenuDisplay<
-        makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

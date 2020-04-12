@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "actions/dummyaction.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -15,7 +16,7 @@ class PresetsMenu :
         makeComponent<MenuItem, StaticText<TEXT_SIDEWALK>, DefaultFont, DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_POLICE>,   DefaultFont, DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_RACE>,     DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

@@ -5,6 +5,7 @@
 #include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 #include "modes/defaultmode.h"
 
@@ -95,7 +96,7 @@ class DefaultModeSettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_SETGAS2WERT>,                DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETBREMS1WERT>,              DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETBREMS2WERT>,              DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                       DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                       DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

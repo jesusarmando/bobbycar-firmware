@@ -4,6 +4,7 @@
 #include "staticmenudisplay.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -14,7 +15,7 @@ class ChangeValueDisplay<ControlMode> :
         makeComponent<MenuItem, StaticText<TEXT_VOLTAGE>,  DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_SPEED>,    DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_TORQUE>,   DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
     public virtual AccessorInterface<ControlMode>
 {
@@ -23,7 +24,7 @@ class ChangeValueDisplay<ControlMode> :
         makeComponent<MenuItem, StaticText<TEXT_VOLTAGE>,  DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_SPEED>,    DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_TORQUE>,   DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >;
 
 public:

@@ -11,6 +11,7 @@
 #include "actions/wifireconnectaction.h"
 #include "actions/wifidisconnectaction.h"
 #include "actions/wifienableipv6action.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -149,7 +150,7 @@ class StationWifiSettingsMenu :
         makeComponent<MenuItem, WifiPskText,                              StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiBssidText,                            StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiRssiText,                             StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    DefaultFont,   DefaultColor,  SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    DefaultFont,   DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

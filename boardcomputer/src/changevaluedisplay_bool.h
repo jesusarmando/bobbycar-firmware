@@ -4,6 +4,7 @@
 #include "staticmenudisplay.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -12,14 +13,14 @@ class ChangeValueDisplay<bool> :
     public StaticMenuDisplay<
         makeComponent<MenuItem, StaticText<TEXT_TRUE>,  DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_FALSE>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,  DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,  DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
     public virtual AccessorInterface<bool>
 {
     using Base = StaticMenuDisplay<
         makeComponent<MenuItem, StaticText<TEXT_TRUE>,  DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_FALSE>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,  DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,  DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >;
 
 public:

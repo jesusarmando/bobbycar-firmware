@@ -8,6 +8,7 @@
 #include "menuitem.h"
 #include "actions/dummyaction.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -92,10 +93,10 @@ class GenericWifiSettingsMenu :
     public StaticMenuDisplay<
         makeComponent<MenuItem, WifiStatusBitsText,                 DefaultFont, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiChannelText,                    DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEMODE>,    DefaultFont, DefaultColor,              SwitchScreenAction<WifiModeChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGESLEEP>,   DefaultFont, DefaultColor,              SwitchScreenAction<WifiSleepChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGETXPOWER>, DefaultFont, DefaultColor,              SwitchScreenAction<WifiTxPowerChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,              DefaultFont, DefaultColor,              SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEMODE>,    DefaultFont, DefaultColor,  SwitchScreenAction<WifiModeChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGESLEEP>,   DefaultFont, DefaultColor,  SwitchScreenAction<WifiSleepChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGETXPOWER>, DefaultFont, DefaultColor,  SwitchScreenAction<WifiTxPowerChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,              DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

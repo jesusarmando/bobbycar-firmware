@@ -9,6 +9,7 @@
 #include "actions/bluetoothendaction.h"
 #include "actions/bluetoothdisconnectaction.h"
 #include "actions/switchscreenaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
@@ -47,7 +48,7 @@ class BluetoothSettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHFLUSH>,        DefaultFont, DisabledColor, BluetoothFlushAction>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHEND>,          DefaultFont, DisabledColor, BluetoothEndAction>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHDISCONNECT>,   DefaultFont, DisabledColor, BluetoothDisconnectAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  DefaultFont, DefaultColor,              SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

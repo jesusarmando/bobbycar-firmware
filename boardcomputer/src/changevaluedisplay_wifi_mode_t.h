@@ -6,8 +6,8 @@
 #include "staticmenudisplay.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
+#include "icons/back.h"
 #include "texts.h"
-#include "modes/larsmmode.h"
 
 namespace {
 template<>
@@ -17,7 +17,7 @@ class ChangeValueDisplay<wifi_mode_t> :
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_STA>,   DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_AP>,    DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_APSTA>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
     public virtual AccessorInterface<wifi_mode_t>
 {
@@ -26,7 +26,7 @@ class ChangeValueDisplay<wifi_mode_t> :
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_STA>,   DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_AP>,    DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_APSTA>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, DummyAction>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >;
 
 public:

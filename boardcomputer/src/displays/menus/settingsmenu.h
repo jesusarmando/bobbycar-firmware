@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "actions/switchscreenaction.h"
 #include "actions/rebootaction.h"
+#include "icons/back.h"
 #include "texts.h"
 
 #include "displays/menus/commonsettingsmenu.h"
@@ -25,7 +26,7 @@ class SettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_POTISETTINGS>,      DefaultFont, DefaultColor, SwitchScreenAction<PotiSettingsMenu<SettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_REBOOT>,            DefaultFont, DefaultColor, RebootAction>,
         makeComponent<MenuItem, StaticText<TEXT_VERSION>,           DefaultFont, DefaultColor, SwitchScreenAction<VersionDisplay<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,              DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,              DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }
