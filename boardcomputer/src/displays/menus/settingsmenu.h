@@ -2,6 +2,7 @@
 
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "displays/menus/commonsettingsmenu.h"
 #include "displays/menus/wifisettingsmenu.h"
 #include "displays/menus/bluetoothsettingsmenu.h"
@@ -23,7 +24,7 @@ class SettingsMenu final :
         StaticSwitchScreenMenuItem<PotiSettingsMenu<SettingsMenu<Tscreen>>, TEXT_POTISETTINGS>,
         RebootMenuItem<TEXT_REBOOT>,
         StaticSwitchScreenMenuItem<VersionDisplay<SettingsMenu<Tscreen>>, TEXT_VERSION>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

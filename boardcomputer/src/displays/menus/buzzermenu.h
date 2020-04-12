@@ -2,27 +2,48 @@
 
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "changevaluedisplay.h"
-#include "accessorhelper.h"
+#include "actions/switchscreenaction.h"
 #include "texts.h"
 #include "globals.h"
 
 namespace {
-struct FrontFreqAccessor { static auto &getRef() { return front.command.buzzer.freq; } };
+struct FrontFreqAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return front.command.buzzer.freq; } };
 template<typename Tscreen>
-using FrontFreqChangeScreen = ChangeValueDisplay<uint8_t, AccessorHelper<FrontFreqAccessor>, Tscreen, TEXT_SETFRONTFREQ>;
+class FrontFreqChangeScreen :
+    public StaticTitle<TEXT_SETFRONTFREQ>,
+    public ChangeValueDisplay<uint8_t>,
+    public FrontFreqAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct FrontPatternAccessor { static auto &getRef() { return front.command.buzzer.pattern; } };
+struct FrontPatternAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return front.command.buzzer.pattern; } };
 template<typename Tscreen>
-using FrontPatternChangeScreen = ChangeValueDisplay<uint8_t, AccessorHelper<FrontPatternAccessor>, Tscreen, TEXT_SETFRONTPATTERN>;
+class FrontPatternChangeScreen :
+    public StaticTitle<TEXT_SETFRONTPATTERN>,
+    public ChangeValueDisplay<uint8_t>,
+    public FrontPatternAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct BackFreqAccessor { static auto &getRef() { return back.command.buzzer.freq; } };
+struct BackFreqAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return back.command.buzzer.freq; } };
 template<typename Tscreen>
-using BackFreqChangeScreen = ChangeValueDisplay<uint8_t, AccessorHelper<BackFreqAccessor>, Tscreen, TEXT_SETBACKFREQ>;
+class BackFreqChangeScreen :
+    public StaticTitle<TEXT_SETBACKFREQ>,
+    public ChangeValueDisplay<uint8_t>,
+    public BackFreqAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct BackPatternAccessor { static auto &getRef() { return back.command.buzzer.pattern; } };
+struct BackPatternAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return back.command.buzzer.pattern; } };
 template<typename Tscreen>
-using BackPatternChangeScreen = ChangeValueDisplay<uint8_t, AccessorHelper<BackPatternAccessor>, Tscreen, TEXT_SETBACKPATTERN>;
+class BackPatternChangeScreen :
+    public StaticTitle<TEXT_SETBACKPATTERN>,
+    public ChangeValueDisplay<uint8_t>,
+    public BackPatternAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
 template<typename Tscreen>
 class BuzzerMenu final :
@@ -32,7 +53,7 @@ class BuzzerMenu final :
         StaticSwitchScreenMenuItem<FrontPatternChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETFRONTPATTERN>,
         StaticSwitchScreenMenuItem<BackFreqChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETBACKFREQ>,
         StaticSwitchScreenMenuItem<BackPatternChangeScreen<BuzzerMenu<Tscreen>>, TEXT_SETBACKPATTERN>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

@@ -14,6 +14,7 @@ class MatrixDisplay : public DemoDisplay<Tscreen>
 public:
     void start() override;
     void redraw() override;
+    void stop() override;
 
 private:
     int scroll_slow(int lines, int wait);
@@ -68,6 +69,14 @@ template<typename Tscreen>
 void MatrixDisplay<Tscreen>::redraw()
 {
     yDraw = scroll_slow(320,5);
+}
+
+template<typename Tscreen>
+void MatrixDisplay<Tscreen>::stop()
+{
+    Base::stop();
+    scrollAddress(0);
+    tft.setRotation(0);
 }
 
 template<typename Tscreen>

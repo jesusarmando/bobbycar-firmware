@@ -18,6 +18,7 @@ public:
 
     void start() override;
     void redraw() override;
+    void stop() override;
 
 private:
     // Fast 0-255 random number generator from http://eternityforest.com/Projects/rng.php:
@@ -93,6 +94,13 @@ void StarfieldDisplay<Tscreen>::redraw()
         }
       }
     }
+}
+
+template<typename Tscreen>
+void StarfieldDisplay<Tscreen>::stop()
+{
+    Base::stop();
+    tft.setRotation(0);
 }
 
 template<typename Tscreen>

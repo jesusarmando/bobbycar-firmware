@@ -3,7 +3,7 @@
 #include "staticmenudisplay.h"
 #include "menuitems/smalllivestatusmenuitem.h"
 #include "menuitems/wifisoftapenableipv6menuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "texts.h"
 
 namespace {
@@ -29,7 +29,7 @@ class AccessPointWifiSettingsMenu final :
         SmallLiveStatusMenuItem<WifiSoftApIpV6LiveStatus>,
         SmallLiveStatusMenuItem<WifiSoftApHostnameLiveStatus>,
         SmallLiveStatusMenuItem<WifiSoftApMacAddressLiveStatus>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

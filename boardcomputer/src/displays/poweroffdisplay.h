@@ -28,7 +28,6 @@ void PoweroffDisplay<Tscreen>::start()
     for (auto &controller : controllers)
         controller.command.poweroff = true;
 
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_YELLOW);
 

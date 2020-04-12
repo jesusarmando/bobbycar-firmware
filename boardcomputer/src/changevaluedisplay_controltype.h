@@ -2,47 +2,59 @@
 
 #include "changevaluedisplay.h"
 #include "staticmenudisplay.h"
-#include "menuitems/setvaluemenuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/staticdummymenuitem.h"
 #include "texts.h"
 
 namespace {
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay<ControlType, Taccessor, Tdisplay, Ttext> final :
-    public StaticTitle<Ttext>,
+template<>
+class ChangeValueDisplay<ControlType> :
     public StaticMenuDisplay<
-        SetValueMenuItem<ControlType, Taccessor, ControlType::Commutation, Tdisplay, TEXT_COMMUTATION>,
-        SetValueMenuItem<ControlType, Taccessor, ControlType::Sinusoidal, Tdisplay, TEXT_SINUSOIDAL>,
-        SetValueMenuItem<ControlType, Taccessor, ControlType::FieldOrientedControl, Tdisplay, TEXT_FIELDORIENTEDCONTROL>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >
+        StaticDummyMenuItem<TEXT_COMMUTATION>,
+        StaticDummyMenuItem<TEXT_SINUSOIDAL>,
+        StaticDummyMenuItem<TEXT_FIELDORIENTEDCONTROL>,
+        StaticDummyMenuItem<TEXT_BACK>
+    >,
+    public virtual AccessorInterface<ControlType>
 {
     using Base = StaticMenuDisplay<
-        SetValueMenuItem<ControlType, Taccessor, ControlType::Commutation, Tdisplay, TEXT_COMMUTATION>,
-        SetValueMenuItem<ControlType, Taccessor, ControlType::Sinusoidal, Tdisplay, TEXT_SINUSOIDAL>,
-        SetValueMenuItem<ControlType, Taccessor, ControlType::FieldOrientedControl, Tdisplay, TEXT_FIELDORIENTEDCONTROL>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
+        StaticDummyMenuItem<TEXT_COMMUTATION>,
+        StaticDummyMenuItem<TEXT_SINUSOIDAL>,
+        StaticDummyMenuItem<TEXT_FIELDORIENTEDCONTROL>,
+        StaticDummyMenuItem<TEXT_BACK>
     >;
 
 public:
     void start() override;
+
+    void triggered() override;
 };
 
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<ControlType, Taccessor, Tdisplay, Ttext>::start()
+void ChangeValueDisplay<ControlType>::start()
 {
     Base::start();
 
-    if (Taccessor::getValue() == ControlType::Commutation)
+    if (getValue() == ControlType::Commutation)
         Base::setSelectedIndex(0);
-    else if (Taccessor::getValue() == ControlType::Sinusoidal)
+    else if (getValue() == ControlType::Sinusoidal)
         Base::setSelectedIndex(1);
-    else if (Taccessor::getValue() == ControlType::FieldOrientedControl)
+    else if (getValue() == ControlType::FieldOrientedControl)
         Base::setSelectedIndex(2);
     else
     {
-        Serial.printf("Unknown ControlType: %i", int(Taccessor::getValue()));
+        Serial.printf("Unknown ControlType: %i", int(getValue()));
         Base::setSelectedIndex(3);
+    }
+}
+
+void ChangeValueDisplay<ControlType>::triggered()
+{
+    Base::triggered();
+
+    switch (Base::selectedIndex())
+    {
+    case 0: setValue(ControlType::Commutation); break;
+    case 1: setValue(ControlType::Sinusoidal); break;
+    case 2: setValue(ControlType::FieldOrientedControl); break;
     }
 }
 }

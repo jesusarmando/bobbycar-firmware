@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "display.h"
 #include "label.h"
 #include "globals.h"
@@ -27,13 +29,14 @@ public:
     void rotate(int offset) override;
 
 private:
-    template<int offset, uint32_t color>
-    void drawRect(int index) const;
+    void drawRect(int index, int offset, uint32_t color) const;
 
-    Label<spacing, 100, boxWidth, boxHeight> m_digit0;
-    Label<spacing*2+boxWidth, 100, boxWidth, boxHeight> m_digit1;
-    Label<spacing*3+boxWidth*2, 100, boxWidth, boxHeight> m_digit2;
-    Label<spacing*4+boxWidth*3, 100, boxWidth, boxHeight> m_digit3;
+    std::array<Label, 4> m_labels {{
+        Label{spacing, 100, boxWidth, boxHeight},
+        Label{spacing*2+boxWidth, 100, boxWidth, boxHeight},
+        Label{spacing*3+boxWidth*2, 100, boxWidth, boxHeight},
+        Label{spacing*4+boxWidth*3, 100, boxWidth, boxHeight}
+    }};
 
     std::array<int8_t, 4> m_numbers;
 
@@ -42,7 +45,7 @@ private:
     bool m_pressed;
     int m_rotated;
 
-    ModeBase *m_oldMode;
+    ModeInterface *m_oldMode;
     IgnoreInputMode m_mode{0, ControlType::FieldOrientedControl, ControlMode::Speed};
 };
 
@@ -57,7 +60,6 @@ void Lockscreen<Tscreen>::start()
     m_oldMode = currentMode;
     currentMode = &m_mode;
 
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);
@@ -73,20 +75,18 @@ void Lockscreen<Tscreen>::start()
 
     for(int i = 0; i <= 3; i++)
     {
-        drawRect<3, TFT_WHITE>(i);
-        drawRect<4, TFT_WHITE>(i);
+        drawRect(i, 3, TFT_WHITE);
+        drawRect(i, 4, TFT_WHITE);
     }
 
-    m_digit0.start();
-    m_digit1.start();
-    m_digit2.start();
-    m_digit3.start();
+    for (auto &label : m_labels)
+        label.start();
 
     tft.setTextFont(7);
 
-    drawRect<1, TFT_YELLOW>(0);
-    drawRect<2, TFT_YELLOW>(0);
-    m_digit0.redraw(String(m_numbers[0]));
+    drawRect(0, 1, TFT_YELLOW);
+    drawRect(0, 2, TFT_YELLOW);
+    m_labels[0].redraw(String(m_numbers[0]));
 }
 
 template<typename Tscreen>
@@ -94,8 +94,8 @@ void Lockscreen<Tscreen>::redraw()
 {
     if (m_pressed)
     {
-        drawRect<1, TFT_BLACK>(m_currentIndex);
-        drawRect<2, TFT_BLACK>(m_currentIndex);
+        drawRect(m_currentIndex, 1, TFT_BLACK);
+        drawRect(m_currentIndex, 2, TFT_BLACK);
 
         if (++m_currentIndex>=4)
         {
@@ -107,21 +107,13 @@ void Lockscreen<Tscreen>::redraw()
 
             m_numbers = {0,0,0,0};
             m_currentIndex = 0;
-            m_digit1.redraw(String{});
-            m_digit2.redraw(String{});
-            m_digit3.redraw(String{});
+            std::for_each(std::begin(m_labels) + 1, std::end(m_labels), [](auto &label){ label.redraw({}); });
         }
 
-        switch (m_currentIndex)
-        {
-        case 0: m_digit0.redraw(String{m_numbers[0]}); break;
-        case 1: m_digit1.redraw(String{m_numbers[1]}); break;
-        case 2: m_digit2.redraw(String{m_numbers[2]}); break;
-        case 3: m_digit3.redraw(String{m_numbers[3]}); break;
-        }
+        m_labels[m_currentIndex].redraw(String{m_numbers[m_currentIndex]});
 
-        drawRect<1, TFT_YELLOW>(m_currentIndex);
-        drawRect<2, TFT_YELLOW>(m_currentIndex);
+        drawRect(m_currentIndex, 1, TFT_YELLOW);
+        drawRect(m_currentIndex, 2, TFT_YELLOW);
 
         m_pressed = false;
     }
@@ -135,13 +127,7 @@ void Lockscreen<Tscreen>::redraw()
         else if (m_numbers[m_currentIndex] > 9)
             m_numbers[m_currentIndex]-=10;
 
-        switch (m_currentIndex)
-        {
-        case 0: m_digit0.redraw(String(m_numbers[0])); break;
-        case 1: m_digit1.redraw(String(m_numbers[1])); break;
-        case 2: m_digit2.redraw(String(m_numbers[2])); break;
-        case 3: m_digit3.redraw(String(m_numbers[3])); break;
-        }
+        m_labels[m_currentIndex].redraw(String(m_numbers[m_currentIndex]));
 
         m_rotated = 0;
     }
@@ -169,22 +155,9 @@ void Lockscreen<Tscreen>::rotate(int offset)
     m_rotated += offset;
 }
 
-template<typename Tscreen> template<int offset, uint32_t color>
-void Lockscreen<Tscreen>::drawRect(int index) const
+template<typename Tscreen>
+void Lockscreen<Tscreen>::drawRect(int index, int offset, uint32_t color) const
 {
-    switch (index) {
-    case 0:
-        tft.drawRect(m_digit0.X-offset, m_digit0.Y-offset, m_digit0.WIDTH+(offset*2), m_digit0.HEIGHT+(offset*2), color);
-        break;
-    case 1:
-        tft.drawRect(m_digit1.X-offset, m_digit1.Y-offset, m_digit1.WIDTH+(offset*2), m_digit1.HEIGHT+(offset*2), color);
-        break;
-    case 2:
-        tft.drawRect(m_digit2.X-offset, m_digit2.Y-offset, m_digit2.WIDTH+(offset*2), m_digit2.HEIGHT+(offset*2), color);
-        break;
-    case 3:
-        tft.drawRect(m_digit3.X-offset, m_digit3.Y-offset, m_digit3.WIDTH+(offset*2), m_digit3.HEIGHT+(offset*2), color);
-        break;
-    }
+    tft.drawRect(m_labels[index].x()-offset, m_labels[index].y()-offset, m_labels[index].width()+(offset*2), m_labels[index].height()+(offset*2), color);
 }
 }

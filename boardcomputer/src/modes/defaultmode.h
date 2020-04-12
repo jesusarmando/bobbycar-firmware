@@ -4,16 +4,16 @@
 
 #include <Arduino.h>
 
-#include "modebase.h"
+#include "modes/modeinterface.h"
 #include "../../common.h"
 #include "globals.h"
 #include "utils.h"
 
 namespace {
-class DefaultMode final : public ModeBase
+class DefaultMode final : public ModeInterface
 {
 public:
-    using ModeBase::ModeBase;
+    using ModeInterface::ModeInterface;
 
     void update() override;
 

@@ -2,6 +2,7 @@
 
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "displays/starfielddisplay.h"
 #include "displays/pingpongdisplay.h"
 #include "displays/spirodisplay.h"
@@ -21,7 +22,7 @@ class DemosMenu final :
         StaticSwitchScreenMenuItem<GameOfLifeDisplay<DemosMenu<Tscreen>>, TEXT_GAMEOFLIFE>,
         StaticSwitchScreenMenuItem<MetersDisplay<DemosMenu<Tscreen>>, TEXT_METERS>,
         StaticSwitchScreenMenuItem<MatrixDisplay<DemosMenu<Tscreen>>, TEXT_MATRIX>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

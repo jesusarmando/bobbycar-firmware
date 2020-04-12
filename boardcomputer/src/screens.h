@@ -245,6 +245,7 @@ void switchScreenImpl(Args&&... args)
     new (&ref) T{std::forward<Args>(args)...};
     currentDisplay = &ref;
     ref.start();
+    ref.update();
     ref.redraw();
 }
 

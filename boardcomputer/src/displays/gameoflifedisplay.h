@@ -16,6 +16,7 @@ class GameOfLifeDisplay final : public DemoDisplay<Tscreen>
 public:
     void start() override;
     void redraw() override;
+    void stop() override;
 
 private:
 
@@ -91,6 +92,13 @@ void GameOfLifeDisplay<Tscreen>::redraw()
 
     if (++gen == 200)
         gen = 0;
+}
+
+template<typename Tscreen>
+void GameOfLifeDisplay<Tscreen>::stop()
+{
+    Base::stop();
+    tft.setRotation(0);
 }
 
 template<typename Tscreen>

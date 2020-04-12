@@ -16,6 +16,7 @@ class SpiroDisplay final : public DemoDisplay<Tscreen>
 public:
     void start() override;
     void redraw() override;
+    void stop() override;
 
 private:
     constexpr static auto DEG2RAD = 0.0174532925;
@@ -92,6 +93,13 @@ void SpiroDisplay<Tscreen>::redraw()
         if (i == 2* (360 * n))
             i = 0;
     }
+}
+
+template<typename Tscreen>
+void SpiroDisplay<Tscreen>::stop()
+{
+    Base::stop();
+    tft.setRotation(0);
 }
 
 template<typename Tscreen>

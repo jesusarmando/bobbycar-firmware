@@ -2,20 +2,19 @@
 
 #include <HardwareSerial.h>
 
-#include "menuitem.h"
+#include "menuitems/menuitem.h"
 #include "titleinterface.h"
+#include "texts.h"
 #include "globals.h"
 
 namespace {
-template<const char *Ttext>
-class BluetoothBeginMasterMenuItem final : public MenuItem, public StaticTitle<Ttext>
+class BluetoothBeginMasterMenuItem final : public MenuItem, public StaticTitle<TEXT_BLUETOOTHBEGINMASTER>
 {
 public:
     void triggered() override;
 };
 
-template<const char *Ttext>
-void BluetoothBeginMasterMenuItem<Ttext>::triggered()
+void BluetoothBeginMasterMenuItem::triggered()
 {
     if (!bluetoothSerial.begin("bobbyquad", true))
     {

@@ -14,7 +14,7 @@
 #include "serialhandler.h"
 
 namespace {
-ModeBase *lastMode{};
+ModeInterface *lastMode{};
 unsigned long lastModeUpdate{};
 unsigned long lastDisplayRedraw{};
 }
@@ -62,7 +62,7 @@ void loop()
 
     if (!lastModeUpdate)
         lastModeUpdate = now;
-    else if (now - lastModeUpdate >= 1000/(currentMode?currentMode->framerate():50))
+    else if (now - lastModeUpdate >= 1000/50)
     {
         constexpr auto times = 100;
         const auto read_n_times = [](int pin){

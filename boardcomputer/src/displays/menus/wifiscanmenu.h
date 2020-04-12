@@ -30,7 +30,7 @@ public:
     const std::reference_wrapper<MenuItem> *end() const override { return &(*std::end(refVec)); };
 
 private:
-    EndWifiScanMenuItem<Tscreen, TEXT_BACK> m_backItem;
+    EndWifiScanMenuItem<Tscreen> m_backItem;
 
     std::vector<DynamicDummyMenuItem> vec;
 

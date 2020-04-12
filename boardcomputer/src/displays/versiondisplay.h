@@ -20,7 +20,6 @@ void VersionDisplay<Tscreen>::start()
 {
     Base::start();
 
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);

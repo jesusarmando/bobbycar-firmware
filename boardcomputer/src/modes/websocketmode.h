@@ -1,12 +1,12 @@
 #pragma once
 
-#include "modebase.h"
+#include "modes/modeinterface.h"
 
 namespace {
-class WebsocketMode final : public ModeBase
+class WebsocketMode final : public ModeInterface
 {
 public:
-    using ModeBase::ModeBase;
+    using ModeInterface::ModeInterface;
 
     void update() override {};
 

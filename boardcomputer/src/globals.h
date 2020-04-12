@@ -9,7 +9,7 @@
 
 #include "controller.h"
 #include "display.h"
-#include "modebase.h"
+#include "modes/modeinterface.h"
 #include "settings.h"
 
 namespace {
@@ -40,7 +40,7 @@ BluetoothSerial bluetoothSerial;
 
 TFT_eSPI tft = TFT_eSPI();
 
-ModeBase *currentMode{};
+ModeInterface *currentMode{};
 
 Display *currentDisplay{};
 

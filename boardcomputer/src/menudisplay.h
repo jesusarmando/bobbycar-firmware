@@ -6,13 +6,14 @@
 #include <utility>
 
 #include "display.h"
+#include "titleinterface.h"
+#include "actions/actioninterface.h"
 #include "label.h"
 #include "globals.h"
-#include "menuitem.h"
-#include "titleinterface.h"
+#include "menuitems/menuitem.h"
 
 namespace {
-class MenuDisplay : public Display, public virtual TitleInterface
+class MenuDisplay : public Display, public virtual TitleInterface, public virtual ActionInterface
 {
 public:
     void start() override;
@@ -22,6 +23,8 @@ public:
 
     void rotate(int offset) override;
     void button(bool pressed) override;
+
+    void triggered() override { (begin()+m_selectedIndex)->get().triggered(); }
 
     virtual const std::reference_wrapper<MenuItem> *begin() const = 0;
     virtual const std::reference_wrapper<MenuItem> *end() const = 0;
@@ -35,34 +38,25 @@ protected:
     void setSelectedIndex(int selectedIndex) { m_selectedIndex = selectedIndex; }
 
 private:
-    Label<5, 5, 230, 25> m_titleLabel;
+    Label m_titleLabel{5, 5, 230, 25};
 
-    Label<10, 45+(0*27), 220, 25> m_label0;
-    Label<10, 45+(1*27), 220, 25> m_label1;
-    Label<10, 45+(2*27), 220, 25> m_label2;
-    Label<10, 45+(3*27), 220, 25> m_label3;
-    Label<10, 45+(4*27), 220, 25> m_label4;
-    Label<10, 45+(5*27), 220, 25> m_label5;
-    Label<10, 45+(6*27), 220, 25> m_label6;
-    Label<10, 45+(7*27), 220, 25> m_label7;
-    Label<10, 45+(8*27), 220, 25> m_label8;
-    Label<10, 45+(9*27), 220, 25> m_label9;
+    static constexpr auto horizontalSpacing = 10;
+    static constexpr auto topMargin = 40;
+    static constexpr auto lineHeight = 25;
+    static constexpr auto verticalSpacing = 3;
 
-    std::array<std::reference_wrapper<LabelInterface>, 10> getLabels()
-    {
-        return {
-            std::ref<LabelInterface>(m_label0),
-            std::ref<LabelInterface>(m_label1),
-            std::ref<LabelInterface>(m_label2),
-            std::ref<LabelInterface>(m_label3),
-            std::ref<LabelInterface>(m_label4),
-            std::ref<LabelInterface>(m_label5),
-            std::ref<LabelInterface>(m_label6),
-            std::ref<LabelInterface>(m_label7),
-            std::ref<LabelInterface>(m_label8),
-            std::ref<LabelInterface>(m_label9)
-        };
-    }
+    std::array<Label, 10> m_labels {{
+        Label{horizontalSpacing, topMargin+(0*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(1*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(2*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(3*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(4*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(5*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(6*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(7*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(8*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing, topMargin+(9*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+    }};
 
     int m_selectedIndex;
     int m_scrollOffset;
@@ -81,11 +75,13 @@ void MenuDisplay::start()
     m_rotateOffset = 0;
     m_pressed = false;
 
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
 
     m_titleLabel.start();
     tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
+
+    for (auto &label : m_labels)
+        label.start();
 
     for (auto iter = begin(); iter != end(); iter++)
         iter->get().start();
@@ -113,8 +109,8 @@ void MenuDisplay::update()
 
             if (m_selectedIndex < m_scrollOffset)
                 m_scrollOffset = m_selectedIndex;
-            if (m_selectedIndex >= m_scrollOffset + getLabels().size())
-                m_scrollOffset = m_selectedIndex - getLabels().size() + 1;
+            if (m_selectedIndex >= m_scrollOffset + m_labels.size())
+                m_scrollOffset = m_selectedIndex - m_labels.size() + 1;
         }
         else
         {
@@ -128,7 +124,7 @@ void MenuDisplay::update()
     else if (m_selectedIndex >= 0)
     {
         m_pressed = false;
-        (begin()+m_selectedIndex)->get().triggered();
+        triggered();
     }
 }
 
@@ -143,21 +139,19 @@ void MenuDisplay::redraw()
 
     auto menuIter = menuBegin + m_scrollOffset;
 
-    const auto labels = getLabels();
-
-    auto labelsIter = std::begin(labels);
+    auto labelsIter = std::begin(m_labels);
 
     int newHighlightedIndex{-1};
 
-    const auto drawItemRect = [](const LabelInterface &label, const auto color){
-        tft.drawRect(label.getX()-5,
-                     label.getY()-2,
-                     label.getWidth()+10,
-                     label.getHeight()+2,
+    const auto drawItemRect = [](const auto &label, const auto color){
+        tft.drawRect(label.x()-5,
+                     label.y()-2,
+                     label.width()+10,
+                     label.height()+2,
                      color);
     };
 
-    for (; menuIter != menuEnd && labelsIter != std::end(labels); menuIter++, labelsIter++)
+    for (; menuIter != menuEnd && labelsIter != std::end(m_labels); menuIter++, labelsIter++)
     {
         const auto index = std::distance(menuBegin, menuIter);
         const auto relativeIndex = index - m_scrollOffset;
@@ -169,28 +163,28 @@ void MenuDisplay::redraw()
             newHighlightedIndex = relativeIndex;
         else if (relativeIndex == m_highlightedIndex)
         {
-            drawItemRect(labelsIter->get(), TFT_BLACK);
+            drawItemRect(*labelsIter, TFT_BLACK);
             forceLabelRedraw = true;
         }
 
         tft.setTextFont(menuIter->get().font());
         tft.setTextColor(menuIter->get().color(), TFT_BLACK);
-        const auto labelDrawn = labelsIter->get().redraw(menuIter->get().title(), forceLabelRedraw);
+        const auto labelDrawn = labelsIter->redraw(menuIter->get().title(), forceLabelRedraw);
 
         if (selected && (labelDrawn || relativeIndex != m_highlightedIndex))
         {
-            drawItemRect(labelsIter->get(), TFT_WHITE);
+            drawItemRect(*labelsIter, TFT_WHITE);
         }
     }
 
-    for (; labelsIter != std::end(labels); labelsIter++)
+    for (; labelsIter != std::end(m_labels); labelsIter++)
     {
-        const auto relativeIndex = std::distance(std::begin(labels), labelsIter);
+        const auto relativeIndex = std::distance(std::begin(m_labels), labelsIter);
 
         if (relativeIndex == m_highlightedIndex)
-            drawItemRect(labelsIter->get(), TFT_BLACK);
+            drawItemRect(*labelsIter, TFT_BLACK);
 
-        labelsIter->get().clear();
+        labelsIter->clear();
     }
 
     m_highlightedIndex = newHighlightedIndex;

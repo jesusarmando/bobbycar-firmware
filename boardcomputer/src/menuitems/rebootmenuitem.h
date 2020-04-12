@@ -2,7 +2,7 @@
 
 #include <Esp.h>
 
-#include "menuitem.h"
+#include "menuitems/menuitem.h"
 #include "titleinterface.h"
 #include "globals.h"
 #include "texts.h"
@@ -18,7 +18,6 @@ public:
 template<const char *Ttext>
 void RebootMenuItem<Ttext>::triggered()
 {
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_YELLOW);
 

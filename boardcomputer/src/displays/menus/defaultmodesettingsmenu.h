@@ -2,55 +2,122 @@
 
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "changevaluedisplay.h"
-#include "accessorhelper.h"
 #include "texts.h"
 #include "modes/defaultmode.h"
 
 namespace {
-struct DefaultModeCtrlTypAccessor { static auto &getRef() { return modes::defaultMode.ctrlTyp; } };
+struct DefaultModeCtrlTypAccessor : public RefAccessor<ControlType> { ControlType &getRef() const override { return modes::defaultMode.ctrlTyp; } };
 template<typename Tscreen>
-using DefaultModeCtrlTypChangeDisplay = ChangeValueDisplay<ControlType, AccessorHelper<DefaultModeCtrlTypAccessor>, Tscreen, TEXT_SETCONTROLTYPE>;
+class DefaultModeCtrlTypChangeDisplay :
+    public StaticTitle<TEXT_SETCONTROLTYPE>,
+    public ChangeValueDisplay<ControlType>,
+    public DefaultModeCtrlTypAccessor
+{
+    using Base = ChangeValueDisplay<ControlType>;
 
-struct DefaultModeCtrlModAccessor { static auto &getRef() { return modes::defaultMode.ctrlMod; } };
-template<typename Tscreen>
-using DefaultModeCtrlModChangeDisplay = ChangeValueDisplay<ControlMode, AccessorHelper<DefaultModeCtrlModAccessor>, Tscreen, TEXT_SETCONTROLMODE>;
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
 
-struct DefaultModeEnableFieldWeakeningSmootheningAccessor { static auto &getRef() { return modes::defaultMode.enableWeakeningSmoothening; } };
+struct DefaultModeCtrlModAccessor : public RefAccessor<ControlMode> { ControlMode &getRef() const override { return modes::defaultMode.ctrlMod; } };
 template<typename Tscreen>
-using DefaultModeEnableFieldWeakeningSmootheningChangeDisplay = ChangeValueDisplay<bool, AccessorHelper<DefaultModeEnableFieldWeakeningSmootheningAccessor>, Tscreen, TEXT_ENABLEWEAKENINGSMOOTHENING>;
+class DefaultModeCtrlModChangeDisplay :
+    public StaticTitle<TEXT_SETCONTROLMODE>,
+    public ChangeValueDisplay<ControlMode>,
+    public DefaultModeCtrlModAccessor
+{
+    using Base = ChangeValueDisplay<ControlMode>;
 
-struct DefaultModeWeakeningSmootheningAccessor { static auto &getRef() { return modes::defaultMode.weakeningSmoothening; } };
-template<typename Tscreen>
-using DefaultModeWeakeningSmootheningChangeDisplay = ChangeValueDisplay<int16_t, AccessorHelper<DefaultModeWeakeningSmootheningAccessor>, Tscreen, TEXT_SETWEAKINGSMOOTHENING>;
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
 
-struct DefaultModeFrontPercentageAccessor { static auto &getRef() { return modes::defaultMode.frontPercentage; } };
+struct DefaultModeEnableFieldWeakeningSmootheningAccessor : public RefAccessor<bool> { bool &getRef() const override { return modes::defaultMode.enableWeakeningSmoothening; } };
 template<typename Tscreen>
-using DefaultModeFrontPercentageChangeDisplay = ChangeValueDisplay<int16_t, AccessorHelper<DefaultModeFrontPercentageAccessor>, Tscreen, TEXT_SETFRONTPERCENTAGE>;
+class DefaultModeEnableFieldWeakeningSmootheningChangeDisplay :
+    public StaticTitle<TEXT_ENABLEWEAKENINGSMOOTHENING>,
+    public ChangeValueDisplay<bool>,
+    public DefaultModeEnableFieldWeakeningSmootheningAccessor
+{
+    using Base = ChangeValueDisplay<bool>;
 
-struct DefaultModeBackPercentageAccessor { static auto &getRef() { return modes::defaultMode.backPercentage; } };
-template<typename Tscreen>
-using DefaultModeBackPercentageChangeDisplay = ChangeValueDisplay<int16_t, AccessorHelper<DefaultModeBackPercentageAccessor>, Tscreen, TEXT_SETBACKPERCENTAGE>;
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
 
-struct DefaultModeAddSchwelleAccessor { static auto &getRef() { return modes::defaultMode.add_schwelle; } };
+struct DefaultModeWeakeningSmootheningAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.weakeningSmoothening; } };
 template<typename Tscreen>
-using DefaultModeAddSchwelleChangeDisplay = ChangeValueDisplay<int16_t, AccessorHelper<DefaultModeAddSchwelleAccessor>, Tscreen, TEXT_SETADDSCHWELLE>;
+class DefaultModeWeakeningSmootheningChangeDisplay :
+    public StaticTitle<TEXT_SETWEAKINGSMOOTHENING>,
+    public ChangeValueDisplay<int16_t>,
+    public DefaultModeWeakeningSmootheningAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct DefaultModeGas1WertAccessor { static auto &getRef() { return modes::defaultMode.gas1_wert; } };
+struct DefaultModeFrontPercentageAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.frontPercentage; } };
 template<typename Tscreen>
-using DefaultModeGas1WertChangeDisplay = ChangeValueDisplay<int16_t, AccessorHelper<DefaultModeGas1WertAccessor>, Tscreen, TEXT_SETGAS1WERT>;
+class DefaultModeFrontPercentageChangeDisplay :
+    public StaticTitle<TEXT_SETFRONTPERCENTAGE>,
+    public ChangeValueDisplay<int16_t>,
+    public DefaultModeFrontPercentageAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct DefaultModeGas2WertAccessor { static auto &getRef() { return modes::defaultMode.gas2_wert; } };
+struct DefaultModeBackPercentageAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.backPercentage; } };
 template<typename Tscreen>
-using DefaultModeGas2WertChangeDisplay = ChangeValueDisplay<int16_t, AccessorHelper<DefaultModeGas2WertAccessor>, Tscreen, TEXT_SETGAS2WERT>;
+class DefaultModeBackPercentageChangeDisplay :
+    public StaticTitle<TEXT_SETBACKPERCENTAGE>,
+    public ChangeValueDisplay<int16_t>,
+    public DefaultModeBackPercentageAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct DefaultModeBrems1WertAccessor { static auto &getRef() { return modes::defaultMode.brems1_wert; } };
+struct DefaultModeAddSchwelleAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.add_schwelle; } };
 template<typename Tscreen>
-using DefaultModeBrems1WertChangeDisplay = ChangeValueDisplay<int16_t, AccessorHelper<DefaultModeBrems1WertAccessor>, Tscreen, TEXT_SETBREMS1WERT>;
+class DefaultModeAddSchwelleChangeDisplay :
+    public StaticTitle<TEXT_SETADDSCHWELLE>,
+    public ChangeValueDisplay<int16_t>,
+    public DefaultModeAddSchwelleAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct DefaultModeBrems2WertAccessor { static auto &getRef() { return modes::defaultMode.brems2_wert; } };
+struct DefaultModeGas1WertAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.gas1_wert; } };
 template<typename Tscreen>
-using DefaultModeBrems2WertChangeDisplay = ChangeValueDisplay<int16_t, AccessorHelper<DefaultModeBrems2WertAccessor>, Tscreen, TEXT_SETBREMS2WERT>;
+class DefaultModeGas1WertChangeDisplay :
+    public StaticTitle<TEXT_SETGAS1WERT>,
+    public ChangeValueDisplay<int16_t>,
+    public DefaultModeGas1WertAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
+
+struct DefaultModeGas2WertAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.gas2_wert; } };
+template<typename Tscreen>
+class DefaultModeGas2WertChangeDisplay :
+    public StaticTitle<TEXT_SETGAS2WERT>,
+    public ChangeValueDisplay<int16_t>,
+    public DefaultModeGas2WertAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
+
+struct DefaultModeBrems1WertAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.brems1_wert; } };
+template<typename Tscreen>
+class DefaultModeBrems1WertChangeDisplay :
+    public StaticTitle<TEXT_SETBREMS1WERT>,
+    public ChangeValueDisplay<int16_t>,
+    public DefaultModeBrems1WertAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
+
+struct DefaultModeBrems2WertAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.brems2_wert; } };
+template<typename Tscreen>
+class DefaultModeBrems2WertChangeDisplay :
+    public StaticTitle<TEXT_SETBREMS2WERT>,
+    public ChangeValueDisplay<int16_t>,
+    public DefaultModeBrems2WertAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
 template<typename Tscreen>
 class DefaultModeSettingsMenu final :
@@ -67,7 +134,7 @@ class DefaultModeSettingsMenu final :
         StaticSwitchScreenMenuItem<DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETGAS2WERT>,
         StaticSwitchScreenMenuItem<DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBREMS1WERT>,
         StaticSwitchScreenMenuItem<DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<Tscreen>>, TEXT_SETBREMS2WERT>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

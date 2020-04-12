@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <WString.h>
 
 #include "demodisplay.h"
@@ -22,13 +24,16 @@ public:
     void stop() override;
 
 private:
-    ModeBase *m_oldMode;
+    ModeInterface *m_oldMode;
     IgnoreInputMode m_mode{0, ControlType::FieldOrientedControl, ControlMode::Torque};
 
-    Label<25, 50, 100, 23> m_label0;
-    Label<25, 75, 100, 23> m_label1;
-    Label<25, 100, 100, 23> m_label2;
-    Label<25, 125, 100, 23> m_label3;
+    std::array<Label, 4> m_labels {{
+        Label{25, 50, 100, 23},
+        Label{25, 75, 100, 23},
+        Label{25, 100, 100, 23},
+        Label{25, 125, 100, 23}
+    }};
+
     ProgressBar<20, 200, 200, 10, 0, 1000> m_progressBar0;
     ProgressBar<20, 230, 200, 10, 0, 1000> m_progressBar1;
 };
@@ -41,7 +46,6 @@ void CalibrateDisplay<Tscreen>::start()
     m_oldMode = currentMode;
     currentMode = &m_mode;
 
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);
@@ -52,10 +56,8 @@ void CalibrateDisplay<Tscreen>::start()
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
-    m_label0.start();
-    m_label1.start();
-    m_label2.start();
-    m_label3.start();
+    for (auto &label : m_labels)
+        label.start();
 
     m_progressBar0.start();
     m_progressBar1.start();
@@ -64,11 +66,11 @@ void CalibrateDisplay<Tscreen>::start()
 template<typename Tscreen>
 void CalibrateDisplay<Tscreen>::redraw()
 {
-    m_label0.redraw(String{gas});
-    m_label1.redraw(String{raw_gas});
+    m_labels[0].redraw(String{gas});
+    m_labels[1].redraw(String{raw_gas});
 
-    m_label2.redraw(String{brems});
-    m_label3.redraw(String{raw_brems});
+    m_labels[2].redraw(String{brems});
+    m_labels[3].redraw(String{raw_brems});
 
     m_progressBar0.redraw(gas);
     m_progressBar1.redraw(brems);

@@ -1,34 +1,53 @@
 #pragma once
 
 #include "display.h"
+#include "titleinterface.h"
+#include "actions/actioninterface.h"
 #include "label.h"
 #include "globals.h"
 #include "utils.h"
 #include "texts.h"
 
 namespace {
-class ChangeValueDisplayInterface : public Display
+template<typename T>
+struct AccessorInterface
+{
+    virtual T getValue() const = 0;
+    virtual void setValue(T value) = 0;
+};
+
+template<typename T>
+struct RefAccessor : public virtual AccessorInterface<T>
+{
+    virtual T& getRef() const = 0;
+
+    T getValue() const override { return getRef(); };
+    void setValue(T value) override { getRef() = value; };
+};
+
+class ChangeValueDisplayInterface : public Display, public virtual TitleInterface, public virtual ActionInterface
 {
 public:
     void start() override;
 
-    virtual const char *title() const = 0;
-
     ChangeValueDisplayInterface *asChangeValueDisplayInterface() override { return this; }
     const ChangeValueDisplayInterface *asChangeValueDisplayInterface() const override { return this; }
 
-    virtual int value() const = 0;
-    virtual void setValue(int value) = 0;
+    //virtual int value() const = 0;
+    //virtual void setValue(int value) = 0;
 
     virtual void confirm() = 0;
 
 protected:
-    Label<26, 81, 188, 53> m_label;
+    Label m_titleLabel{5, 5, 230, 25};
+    Label m_valueLabel{26, 81, 188, 53};
 };
 
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay final : public ChangeValueDisplayInterface
+template<typename Tvalue>
+class ChangeValueDisplay : public ChangeValueDisplayInterface, public virtual AccessorInterface<Tvalue>
 {
+    using Base = ChangeValueDisplayInterface;
+
 public:
     void start() override;
     void update() override;
@@ -37,10 +56,8 @@ public:
     void rotate(int offset) override;
     void button(bool pressed) override;
 
-    const char *title() const override { return Ttext; }
-
-    int value() const { return m_value; }
-    void setValue(int value) { m_value = value; }
+    //int value() const { return m_value; }
+    //void setValue(int value) { m_value = value; }
 
     void confirm() override;
 
@@ -53,41 +70,36 @@ private:
 
 void ChangeValueDisplayInterface::start()
 {
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
-    tft.setTextFont(4);
-    tft.setTextColor(TFT_YELLOW);
 
-    tft.drawString(title(), 5, 5);
+    m_titleLabel.start();
 
     tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
 
     tft.drawRect(25, 75, 190, 65, TFT_WHITE);
-    m_label.start();
+    m_valueLabel.start();
 
+    tft.setTextFont(4);
     tft.setTextColor(TFT_WHITE);
     tft.drawString("Change value and", 10, 160);
     tft.drawString("press button to", 10, 185);
     tft.drawString("confirm and go", 10, 210);
     tft.drawString("back.", 10, 235);
-
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextFont(7);
 }
 
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::start()
+template<typename Tvalue>
+void ChangeValueDisplay<Tvalue>::start()
 {
-    m_value = Taccessor::getValue();
+    Base::start();
+
+    m_value = static_cast<AccessorInterface<Tvalue>*>(this)->getValue();
 
     m_rotateOffset = 0;
     m_pressed = false;
-
-    ChangeValueDisplayInterface::start();
 }
 
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::update()
+template<typename Tvalue>
+void ChangeValueDisplay<Tvalue>::update()
 {
     if (!m_pressed)
     {
@@ -98,32 +110,38 @@ void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::update()
     }
     else
     {
-        Taccessor::setValue(m_value);
-        switchScreen<Tdisplay>();
+        static_cast<AccessorInterface<Tvalue>*>(this)->setValue(m_value);
+        triggered();
     }
 }
 
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::redraw()
+template<typename Tvalue>
+void ChangeValueDisplay<Tvalue>::redraw()
 {
-    m_label.redraw(String{m_value});
+    tft.setTextFont(4);
+    tft.setTextColor(TFT_YELLOW);
+    m_titleLabel.redraw(title());
+
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextFont(7);
+    m_valueLabel.redraw(String{m_value});
 }
 
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::rotate(int offset)
+template<typename Tvalue>
+void ChangeValueDisplay<Tvalue>::rotate(int offset)
 {
     m_rotateOffset += offset;
 }
 
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::button(bool pressed)
+template<typename Tvalue>
+void ChangeValueDisplay<Tvalue>::button(bool pressed)
 {
     if (!pressed)
         m_pressed = true;
 }
 
-template<typename Tvalue, typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<Tvalue, Taccessor, Tdisplay, Ttext>::confirm()
+template<typename Tvalue>
+void ChangeValueDisplay<Tvalue>::confirm()
 {
     m_pressed = true;
 }

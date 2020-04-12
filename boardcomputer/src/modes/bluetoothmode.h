@@ -5,15 +5,15 @@
 
 #include <ArduinoJson.h>
 
-#include "modebase.h"
+#include "modes/modeinterface.h"
 #include "globals.h"
 #include "utils.h"
 
 namespace {
-class BluetoothMode final : public ModeBase
+class BluetoothMode final : public ModeInterface
 {
 public:
-    using ModeBase::ModeBase;
+    using ModeInterface::ModeInterface;
 
     void start() override;
     void update() override;
@@ -31,7 +31,7 @@ BluetoothMode bluetoothMode;
 
 void BluetoothMode::start()
 {
-    ModeBase::start();
+    ModeInterface::start();
 
     // clear buffer
     while (bluetoothSerial.available())

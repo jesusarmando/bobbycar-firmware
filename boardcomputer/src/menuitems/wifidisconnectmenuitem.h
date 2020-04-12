@@ -2,7 +2,7 @@
 
 #include <WiFi.h>
 
-#include "menuitem.h"
+#include "menuitems/menuitem.h"
 
 namespace {
 template<const char *Ttext>

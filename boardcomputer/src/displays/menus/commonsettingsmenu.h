@@ -2,33 +2,58 @@
 
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "changevaluedisplay.h"
-#include "accessorhelper.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/invertmenu.h"
 #include "texts.h"
 #include "globals.h"
 
 namespace {
-struct IMotMaxAccessor { static auto &getRef() { return settings.iMotMax; } };
+struct IMotMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return settings.iMotMax; } };
 template<typename Tscreen>
-using IMotMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<IMotMaxAccessor>, Tscreen, TEXT_SETIMOTMAX>;
+class IMotMaxChangeScreen :
+    public StaticTitle<TEXT_SETIMOTMAX>,
+    public ChangeValueDisplay<int16_t>,
+    public IMotMaxAccessor,
+    public  SwitchScreenAction<Tscreen>
+{};
 
-struct IDcMaxAccessor { static auto &getRef() { return settings.iDcMax; } };
+struct IDcMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return settings.iDcMax; } };
 template<typename Tscreen>
-using IDcMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<IDcMaxAccessor>, Tscreen, TEXT_SETIDCMAX>;
+class IDcMaxChangeScreen :
+    public StaticTitle<TEXT_SETIDCMAX>,
+    public ChangeValueDisplay<int16_t>,
+    public IDcMaxAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct NMotMaxAccessor { static auto &getRef() { return settings.nMotMax; } };
+struct NMotMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return settings.nMotMax; } };
 template<typename Tscreen>
-using NMotMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<NMotMaxAccessor>, Tscreen, TEXT_SETNMOTMAX>;
+class NMotMaxChangeScreen :
+    public StaticTitle<TEXT_SETNMOTMAX>,
+    public ChangeValueDisplay<int16_t>,
+    public NMotMaxAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct FieldWeakMaxAccessor { static auto &getRef() { return settings.fieldWeakMax; } };
+struct FieldWeakMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return settings.fieldWeakMax; } };
 template<typename Tscreen>
-using FieldWeakMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<FieldWeakMaxAccessor>, Tscreen, TEXT_SETFIELDWEAKMAX>;
+class FieldWeakMaxChangeScreen :
+    public StaticTitle<TEXT_SETFIELDWEAKMAX>,
+    public ChangeValueDisplay<int16_t>,
+    public FieldWeakMaxAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
-struct PhaseAdvMaxAccessor { static auto &getRef() { return settings.phaseAdvMax; } };
+struct PhaseAdvMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return settings.phaseAdvMax; } };
 template<typename Tscreen>
-using PhaseAdvMaxChangeScreen = ChangeValueDisplay<int16_t, AccessorHelper<PhaseAdvMaxAccessor>, Tscreen, TEXT_SETPHASEADVMAX>;
+class PhaseAdvMaxChangeScreen :
+    public StaticTitle<TEXT_SETPHASEADVMAX>,
+    public ChangeValueDisplay<int16_t>,
+    public PhaseAdvMaxAccessor,
+    public SwitchScreenAction<Tscreen>
+{};
 
 template<typename Tscreen>
 class CommonSettingsMenu final :
@@ -41,7 +66,7 @@ class CommonSettingsMenu final :
         StaticSwitchScreenMenuItem<PhaseAdvMaxChangeScreen<CommonSettingsMenu<Tscreen>>, TEXT_SETPHASEADVMAX>,
         StaticSwitchScreenMenuItem<EnableMenu<CommonSettingsMenu<Tscreen>>, TEXT_SETENABLED>,
         StaticSwitchScreenMenuItem<InvertMenu<CommonSettingsMenu<Tscreen>>, TEXT_SETINVERTED>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

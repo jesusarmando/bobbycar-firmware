@@ -5,7 +5,7 @@
 
 #include "demodisplay.h"
 
-#include "modebase.h"
+#include "modes/modeinterface.h"
 #include "globals.h"
 #include "utils.h"
 #include "label.h"
@@ -24,10 +24,10 @@ public:
     void redraw(const MotorFeedback &motor);
 
 private:
-    Label<18, y, 18, 22> m_labelError;
-    Label<40, y, 85, 22> m_labelCurrent;
-    Label<135, y, 75, 22> m_labelSpeed;
-    Label<210, y, 30, 15> m_labelHallSensors;
+    Label m_labelError{18, y, 18, 22};
+    Label m_labelCurrent{40, y, 85, 22};
+    Label m_labelSpeed{135, y, 75, 22};
+    Label m_labelHallSensors{210, y, 30, 15};
 };
 
 template<int y>
@@ -42,11 +42,11 @@ private:
 
     bool m_lastFeedbackValid{};
 
-    Label<65, y, 80, 22> m_labelLeftPwm;
-    Label<155, y, 80, 22> m_labelRightPwm;
+    Label m_labelLeftPwm{65, y, 80, 22};
+    Label m_labelRightPwm{155, y, 80, 22};
 
-    Label<30, y+25, 85, 22> m_labelVoltage;
-    Label<150, y+25, 85, 22> m_labelTemperature;
+    Label m_labelVoltage{30, y+25, 85, 22};
+    Label m_labelTemperature{150, y+25, 85, 22};
 
     MotorStatus<y+50> m_leftMotor;
     MotorStatus<y+75> m_rightMotor;
@@ -62,23 +62,23 @@ public:
     void redraw() override;
 
 private:
-    Label<45, 0, 40, 15> m_labelRawGas;
-    Label<90, 0, 60, 15> m_labelGas;
+    Label m_labelRawGas{45, 0, 40, 15};
+    Label m_labelGas{90, 0, 60, 15};
     ProgressBar<150, 0, 90, 15, 0, 1000> m_progressBarGas;
 
-    Label<45, 15, 40, 15> m_labelRawBrems;
-    Label<90, 15, 60, 15> m_labelBrems;
+    Label m_labelRawBrems{45, 15, 40, 15};
+    Label m_labelBrems{90, 15, 60, 15};
     ProgressBar<150, 15, 90, 15, 0, 1000> m_progressBarBrems;
 
     BoardStatus<42> m_frontStatus;
     BoardStatus<142> m_backStatus;
 
-    Label<35, 266, 120, 15> m_labelWifiStatus;
-    Label<205, 266, 35, 15> m_labelLimit0;
-    Label<25, 281, 130, 15> m_labelIpAddress;
-    Label<205, 281, 35, 15> m_labelLimit1;
-    Label<85, 296, 40, 15> m_labelPerformance;
-    Label<165, 296, 75, 15> m_labelMode;
+    Label m_labelWifiStatus{35, 266, 120, 15};
+    Label m_labelLimit0{205, 266, 35, 15};
+    Label m_labelIpAddress{25, 281, 130, 15};
+    Label m_labelLimit1{205, 281, 35, 15};
+    Label m_labelPerformance{85, 296, 40, 15};
+    Label m_labelMode{165, 296, 75, 15};
 };
 
 template<typename Tscreen>
@@ -86,7 +86,6 @@ void StatusDisplay<Tscreen>::start()
 {
     Base::start();
 
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
     tft.setTextFont(2);
     tft.setTextColor(TFT_WHITE);

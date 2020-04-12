@@ -4,83 +4,105 @@
 
 #include "changevaluedisplay.h"
 #include "staticmenudisplay.h"
+#include "menuitems/backmenuitem.h"
 #include "menuitems/setvaluemenuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
 #include "texts.h"
 
 namespace {
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay<wifi_power_t, Taccessor, Tdisplay, Ttext> final :
-    public StaticTitle<Ttext>,
+template<>
+class ChangeValueDisplay<wifi_power_t> :
     public StaticMenuDisplay<
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_19_5dBm, Tdisplay, TEXT_WIFI_POWER_19_5dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_19dBm, Tdisplay, TEXT_WIFI_POWER_19dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_18_5dBm, Tdisplay, TEXT_WIFI_POWER_18_5dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_17dBm, Tdisplay, TEXT_WIFI_POWER_17dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_15dBm, Tdisplay, TEXT_WIFI_POWER_15dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_13dBm, Tdisplay, TEXT_WIFI_POWER_13dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_11dBm, Tdisplay, TEXT_WIFI_POWER_11dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_8_5dBm, Tdisplay, TEXT_WIFI_POWER_8_5dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_7dBm, Tdisplay, TEXT_WIFI_POWER_7dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_5dBm, Tdisplay, TEXT_WIFI_POWER_5dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_2dBm, Tdisplay, TEXT_WIFI_POWER_2dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_MINUS_1dBm, Tdisplay, TEXT_WIFI_POWER_MINUS_1dBm>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >
+        StaticDummyMenuItem<TEXT_WIFI_POWER_19_5dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_19dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_18_5dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_17dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_15dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_13dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_11dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_8_5dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_7dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_5dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_2dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_MINUS_1dBm>,
+        StaticDummyMenuItem<TEXT_BACK>
+    >,
+    public virtual AccessorInterface<wifi_power_t>
 {
     using Base = StaticMenuDisplay<
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_19_5dBm, Tdisplay, TEXT_WIFI_POWER_19_5dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_19dBm, Tdisplay, TEXT_WIFI_POWER_19dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_18_5dBm, Tdisplay, TEXT_WIFI_POWER_18_5dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_17dBm, Tdisplay, TEXT_WIFI_POWER_17dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_15dBm, Tdisplay, TEXT_WIFI_POWER_15dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_13dBm, Tdisplay, TEXT_WIFI_POWER_13dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_11dBm, Tdisplay, TEXT_WIFI_POWER_11dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_8_5dBm, Tdisplay, TEXT_WIFI_POWER_8_5dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_7dBm, Tdisplay, TEXT_WIFI_POWER_7dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_5dBm, Tdisplay, TEXT_WIFI_POWER_5dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_2dBm, Tdisplay, TEXT_WIFI_POWER_2dBm>,
-        SetValueMenuItem<wifi_power_t, Taccessor, WIFI_POWER_MINUS_1dBm, Tdisplay, TEXT_WIFI_POWER_MINUS_1dBm>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
+        StaticDummyMenuItem<TEXT_WIFI_POWER_19_5dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_19dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_18_5dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_17dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_15dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_13dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_11dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_8_5dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_7dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_5dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_2dBm>,
+        StaticDummyMenuItem<TEXT_WIFI_POWER_MINUS_1dBm>,
+        StaticDummyMenuItem<TEXT_BACK>
     >;
 
 public:
     void start() override;
+
+    void triggered() override;
 };
 
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<wifi_power_t, Taccessor, Tdisplay, Ttext>::start()
+void ChangeValueDisplay<wifi_power_t>::start()
 {
     Base::start();
 
-    if (Taccessor::getValue() == WIFI_POWER_19_5dBm)
+    if (getValue() == WIFI_POWER_19_5dBm)
         Base::setSelectedIndex(0);
-    else if (Taccessor::getValue() == WIFI_POWER_19dBm)
+    else if (getValue() == WIFI_POWER_19dBm)
         Base::setSelectedIndex(1);
-    else if (Taccessor::getValue() == WIFI_POWER_18_5dBm)
+    else if (getValue() == WIFI_POWER_18_5dBm)
         Base::setSelectedIndex(2);
-    else if (Taccessor::getValue() == WIFI_POWER_17dBm)
+    else if (getValue() == WIFI_POWER_17dBm)
         Base::setSelectedIndex(3);
-    else if (Taccessor::getValue() == WIFI_POWER_15dBm)
+    else if (getValue() == WIFI_POWER_15dBm)
         Base::setSelectedIndex(4);
-    else if (Taccessor::getValue() == WIFI_POWER_13dBm)
+    else if (getValue() == WIFI_POWER_13dBm)
         Base::setSelectedIndex(5);
-    else if (Taccessor::getValue() == WIFI_POWER_11dBm)
+    else if (getValue() == WIFI_POWER_11dBm)
         Base::setSelectedIndex(6);
-    else if (Taccessor::getValue() == WIFI_POWER_8_5dBm)
+    else if (getValue() == WIFI_POWER_8_5dBm)
         Base::setSelectedIndex(7);
-    else if (Taccessor::getValue() == WIFI_POWER_7dBm)
+    else if (getValue() == WIFI_POWER_7dBm)
         Base::setSelectedIndex(8);
-    else if (Taccessor::getValue() == WIFI_POWER_5dBm)
+    else if (getValue() == WIFI_POWER_5dBm)
         Base::setSelectedIndex(9);
-    else if (Taccessor::getValue() == WIFI_POWER_2dBm)
+    else if (getValue() == WIFI_POWER_2dBm)
         Base::setSelectedIndex(10);
-    else if (Taccessor::getValue() == WIFI_POWER_MINUS_1dBm)
+    else if (getValue() == WIFI_POWER_MINUS_1dBm)
         Base::setSelectedIndex(11);
     else
     {
-        Serial.printf("Unknown wifi_power_t: %i", int(Taccessor::getValue()));
+        Serial.printf("Unknown wifi_power_t: %i", int(getValue()));
         Base::setSelectedIndex(12);
+    }
+}
+
+void ChangeValueDisplay<wifi_power_t>::triggered()
+{
+    Base::triggered();
+
+    switch (Base::selectedIndex())
+    {
+    case 0: setValue(WIFI_POWER_19_5dBm); break;
+    case 1: setValue(WIFI_POWER_19dBm); break;
+    case 2: setValue(WIFI_POWER_18_5dBm); break;
+    case 3: setValue(WIFI_POWER_17dBm); break;
+    case 4: setValue(WIFI_POWER_15dBm); break;
+    case 5: setValue(WIFI_POWER_13dBm); break;
+    case 6: setValue(WIFI_POWER_11dBm); break;
+    case 7: setValue(WIFI_POWER_8_5dBm); break;
+    case 8: setValue(WIFI_POWER_7dBm); break;
+    case 9: setValue(WIFI_POWER_5dBm); break;
+    case 10: setValue(WIFI_POWER_2dBm); break;
+    case 11: setValue(WIFI_POWER_MINUS_1dBm); break;
     }
 }
 }

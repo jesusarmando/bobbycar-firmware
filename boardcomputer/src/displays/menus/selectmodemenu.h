@@ -1,9 +1,8 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "accessorhelper.h"
-#include "menuitems/setdynamicvaluemenuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
+#include "changevaluedisplay.h"
+#include "menuitems/staticdummymenuitem.h"
 #include "texts.h"
 #include "globals.h"
 #include "modes/defaultmode.h"
@@ -13,7 +12,7 @@
 #include "modes/websocketmode.h"
 
 namespace {
-struct ModeAccessor { static auto &getRef() { return currentMode; } };
+struct ModeAccessor : public RefAccessor<ModeInterface *> { ModeInterface * &getRef() const { return currentMode; } };
 struct DefaultModeAccessor { static auto getValue() { return &modes::defaultMode; } };
 struct TempomatModeAccessor { static auto getValue() { return &modes::tempomatMode; } };
 struct LarsmModeAccessor { static auto getValue() { return &modes::larsmMode; } };
@@ -24,25 +23,28 @@ template<typename Tscreen>
 class SelectModeMenu final :
     public StaticTitle<TEXT_SELECTMODE>,
     public StaticMenuDisplay<
-        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, DefaultModeAccessor, Tscreen, TEXT_DEFAULT>,
-        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, TempomatModeAccessor, Tscreen, TEXT_TEMPOMAT>,
-        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, LarsmModeAccessor, Tscreen, TEXT_LARSM>,
-        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, BluetoothModeAccessor, Tscreen, TEXT_BLUETOOTH>,
-        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, WebsocketModeAccessor, Tscreen, TEXT_WEBSOCKET>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
-    >
+        StaticDummyMenuItem<TEXT_DEFAULT>,
+        StaticDummyMenuItem<TEXT_TEMPOMAT>,
+        StaticDummyMenuItem<TEXT_LARSM>,
+        StaticDummyMenuItem<TEXT_BLUETOOTH>,
+        StaticDummyMenuItem<TEXT_WEBSOCKET>,
+        StaticDummyMenuItem<TEXT_BACK>
+    >,
+    public ModeAccessor
 {
     using Base = StaticMenuDisplay<
-        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, DefaultModeAccessor, Tscreen, TEXT_DEFAULT>,
-        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, TempomatModeAccessor, Tscreen, TEXT_TEMPOMAT>,
-    SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, LarsmModeAccessor, Tscreen, TEXT_LARSM>,
-        SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, BluetoothModeAccessor, Tscreen, TEXT_BLUETOOTH>,
-    SetDynamicValueMenuItem<ModeBase*, AccessorHelper<ModeAccessor>, WebsocketModeAccessor, Tscreen, TEXT_WEBSOCKET>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        StaticDummyMenuItem<TEXT_DEFAULT>,
+        StaticDummyMenuItem<TEXT_TEMPOMAT>,
+        StaticDummyMenuItem<TEXT_LARSM>,
+        StaticDummyMenuItem<TEXT_BLUETOOTH>,
+        StaticDummyMenuItem<TEXT_WEBSOCKET>,
+        StaticDummyMenuItem<TEXT_BACK>
     >;
 
 public:
     void start() override;
+
+    void triggered() override;
 };
 
 template<typename Tscreen>
@@ -50,20 +52,37 @@ void SelectModeMenu<Tscreen>::start()
 {
     Base::start();
 
-    if (AccessorHelper<ModeAccessor>::getValue() == DefaultModeAccessor::getValue())
+    if (getValue() == DefaultModeAccessor::getValue())
         Base::setSelectedIndex(0);
-    else if (AccessorHelper<ModeAccessor>::getValue() == TempomatModeAccessor::getValue())
+    else if (getValue() == TempomatModeAccessor::getValue())
         Base::setSelectedIndex(1);
-    else if (AccessorHelper<ModeAccessor>::getValue() == LarsmModeAccessor::getValue())
+    else if (getValue() == LarsmModeAccessor::getValue())
         Base::setSelectedIndex(2);
-    else if (AccessorHelper<ModeAccessor>::getValue() == BluetoothModeAccessor::getValue())
+    else if (getValue() == BluetoothModeAccessor::getValue())
         Base::setSelectedIndex(3);
-    else if (AccessorHelper<ModeAccessor>::getValue() == WebsocketModeAccessor::getValue())
+    else if (getValue() == WebsocketModeAccessor::getValue())
         Base::setSelectedIndex(4);
     else
     {
-        Serial.printf("Unknown mode: %s", AccessorHelper<ModeAccessor>::getValue()->displayName());
+        Serial.printf("Unknown mode: %s", getValue()->displayName());
         Base::setSelectedIndex(5);
     }
+}
+
+template<typename Tscreen>
+void SelectModeMenu<Tscreen>::triggered()
+{
+    Base::triggered();
+
+    switch (Base::selectedIndex())
+    {
+    case 0: setValue(DefaultModeAccessor::getValue()); break;
+    case 1: setValue(TempomatModeAccessor::getValue()); break;
+    case 2: setValue(LarsmModeAccessor::getValue()); break;
+    case 3: setValue(BluetoothModeAccessor::getValue()); break;
+    case 4: setValue(WebsocketModeAccessor::getValue()); break;
+    }
+
+    switchScreen<Tscreen>();
 }
 }

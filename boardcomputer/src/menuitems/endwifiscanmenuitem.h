@@ -1,12 +1,12 @@
 #pragma once
 
-#include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 
 namespace {
-template<typename Tscreen, const char *Ttext>
-class EndWifiScanMenuItem : public StaticSwitchScreenMenuItem<Tscreen, Ttext>
+template<typename Tscreen>
+class EndWifiScanMenuItem : public BackMenuItem<Tscreen>
 {
-    using Base = StaticSwitchScreenMenuItem<Tscreen, Ttext>;
+    using Base = BackMenuItem<Tscreen>;
 
 public:
     using Base::Base;
@@ -14,8 +14,8 @@ public:
     void triggered() override;
 };
 
-template<typename Tscreen, const char *Ttext>
-void EndWifiScanMenuItem<Tscreen, Ttext>::triggered()
+template<typename Tscreen>
+void EndWifiScanMenuItem<Tscreen>::triggered()
 {
     WiFi.scanDelete();
     Base::triggered();

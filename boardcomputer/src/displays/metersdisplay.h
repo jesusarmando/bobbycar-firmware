@@ -50,7 +50,6 @@ void MetersDisplay<Tscreen>::start()
 {
     Base::start();
 
-    tft.setRotation(0);
     tft.fillScreen(TFT_BLACK);
 
     analogMeter(); // Draw analogue meter

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "menuitem.h"
+#include "menuitems/menuitem.h"
 
 namespace {
 class DummyMenuItem : public MenuItem

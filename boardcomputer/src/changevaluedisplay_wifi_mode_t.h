@@ -4,51 +4,64 @@
 
 #include "changevaluedisplay.h"
 #include "staticmenudisplay.h"
-#include "menuitems/setvaluemenuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/staticdummymenuitem.h"
 #include "texts.h"
 
 namespace {
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay<wifi_mode_t, Taccessor, Tdisplay, Ttext> final :
-    public StaticTitle<Ttext>,
+template<>
+class ChangeValueDisplay<wifi_mode_t> :
     public StaticMenuDisplay<
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_NULL, Tdisplay, TEXT_WIFI_MODE_NULL>,
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_STA, Tdisplay, TEXT_WIFI_MODE_STA>,
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_AP, Tdisplay, TEXT_WIFI_MODE_AP>,
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_APSTA, Tdisplay, TEXT_WIFI_MODE_APSTA>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >
+        StaticDummyMenuItem<TEXT_WIFI_MODE_NULL>,
+        StaticDummyMenuItem<TEXT_WIFI_MODE_STA>,
+        StaticDummyMenuItem<TEXT_WIFI_MODE_AP>,
+        StaticDummyMenuItem<TEXT_WIFI_MODE_APSTA>,
+        StaticDummyMenuItem<TEXT_BACK>
+    >,
+    public virtual AccessorInterface<wifi_mode_t>
 {
     using Base = StaticMenuDisplay<
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_NULL, Tdisplay, TEXT_WIFI_MODE_NULL>,
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_STA, Tdisplay, TEXT_WIFI_MODE_STA>,
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_AP, Tdisplay, TEXT_WIFI_MODE_AP>,
-        SetValueMenuItem<wifi_mode_t, Taccessor, WIFI_MODE_APSTA, Tdisplay, TEXT_WIFI_MODE_APSTA>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
+        StaticDummyMenuItem<TEXT_WIFI_MODE_NULL>,
+        StaticDummyMenuItem<TEXT_WIFI_MODE_STA>,
+        StaticDummyMenuItem<TEXT_WIFI_MODE_AP>,
+        StaticDummyMenuItem<TEXT_WIFI_MODE_APSTA>,
+        StaticDummyMenuItem<TEXT_BACK>
     >;
 
 public:
     void start() override;
+
+    void triggered() override;
 };
 
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<wifi_mode_t, Taccessor, Tdisplay, Ttext>::start()
+void ChangeValueDisplay<wifi_mode_t>::start()
 {
     Base::start();
 
-    if (Taccessor::getValue() == WIFI_MODE_NULL)
+    if (getValue() == WIFI_MODE_NULL)
         Base::setSelectedIndex(0);
-    else if (Taccessor::getValue() == WIFI_MODE_STA)
+    else if (getValue() == WIFI_MODE_STA)
         Base::setSelectedIndex(1);
-    else if (Taccessor::getValue() == WIFI_MODE_AP)
+    else if (getValue() == WIFI_MODE_AP)
         Base::setSelectedIndex(2);
-    else if (Taccessor::getValue() == WIFI_MODE_APSTA)
+    else if (getValue() == WIFI_MODE_APSTA)
         Base::setSelectedIndex(3);
     else
     {
-        Serial.printf("Unknown wifi_mode_t: %i", int(Taccessor::getValue()));
+        Serial.printf("Unknown wifi_mode_t: %i", int(getValue()));
         Base::setSelectedIndex(4);
+    }
+}
+
+void ChangeValueDisplay<wifi_mode_t>::triggered()
+{
+    Base::triggered();
+
+    switch (Base::selectedIndex())
+    {
+    case 0: setValue(WIFI_MODE_NULL); break;
+    case 1: setValue(WIFI_MODE_STA); break;
+    case 2: setValue(WIFI_MODE_AP); break;
+    case 3: setValue(WIFI_MODE_APSTA); break;
     }
 }
 }

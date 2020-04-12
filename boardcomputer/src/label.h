@@ -5,75 +5,78 @@
 #include "globals.h"
 
 namespace {
-class LabelInterface
+class Label
 {
 public:
-    virtual int getX() const = 0;
-    virtual int getY() const = 0;
-    virtual int getWidth() const = 0;
-    virtual int getHeight() const = 0;
+    Label(int x, int y, int width, int height) : m_x{x}, m_y{y}, m_width{width}, m_height{height} {}
 
-    virtual void start() = 0;
-    virtual bool redraw(const String &str, bool forceRedraw = false) = 0;
-    virtual void clear() = 0;
-};
+    int x() const { return m_x; };
+    int y() const { return m_y; };
+    int width() const { return m_width; };
+    int height() const { return m_height; };
 
-template<int x, int y, int width, int height>
-class Label : public LabelInterface
-{
-public:
-    static constexpr auto X = x;
-    static constexpr auto Y = y;
-    static constexpr auto WIDTH = width;
-    static constexpr auto HEIGHT = height;
-
-    int getX() const { return x; };
-    int getY() const { return y; };
-    int getWidth() const { return width; };
-    int getHeight() const { return height; };
-
-    void start() override;
-    bool redraw(const String &str, bool forceRedraw = false) override;
-    void clear() override;
+    void start();
+    bool redraw(const String &str, bool forceRedraw = false);
+    void clear();
 
 private:
-    int m_lastX{x};
+    const int m_x;
+    const int m_y;
+    const int m_width;
+    const int m_height;
+
+    int m_lastX;
     String m_lastStr;
+    int m_lastFont;
+    int m_lastColor;
 };
 
-template<int x, int y, int width, int height>
-void Label<x, y, width, height>::start()
+void Label::start()
 {
-    m_lastX = x;
+    m_lastX = m_x;
     m_lastStr.clear();
+    m_lastFont = -1;
+    m_lastColor = -1;
 }
 
-template<int x, int y, int width, int height>
-bool Label<x, y, width, height>::redraw(const String &str, bool forceRedraw)
+bool Label::redraw(const String &str, bool forceRedraw)
 {
-    if (m_lastStr == str && !forceRedraw)
+    if (m_lastStr == str &&
+        m_lastFont == tft.textfont &&
+        m_lastColor == tft.textcolor &&
+        !forceRedraw)
         return false;
 
-    const auto renderedX = tft.drawString(str, x, y) + x;
+    const auto renderedX = tft.drawString(str, m_x, m_y) + m_x;
 
     if (renderedX < m_lastX)
-        tft.fillRect(renderedX, y, m_lastX - renderedX, height, TFT_BLACK);
+        tft.fillRect(renderedX, m_y, m_lastX - renderedX, m_height, tft.textbgcolor);
+
+    if (m_lastFont != -1 && m_lastFont != tft.textfont)
+    {
+        const auto newHeight = tft.fontHeight(tft.textfont);
+        const auto oldHeight = tft.fontHeight(m_lastFont);
+
+        if (newHeight < oldHeight)
+            tft.fillRect(m_x, m_y + newHeight, renderedX - m_x, oldHeight - newHeight, tft.textbgcolor);
+    }
 
     m_lastX = renderedX;
     m_lastStr = str;
+    m_lastFont = tft.textfont;
+    m_lastColor = tft.textcolor;
 
     return true;
 }
 
-template<int x, int y, int width, int height>
-void Label<x, y, width, height>::clear()
+void Label::clear()
 {
     m_lastStr.clear();
 
-    if (x < m_lastX)
+    if (m_x < m_lastX)
     {
-        tft.fillRect(x, y, m_lastX - x, height, TFT_BLACK);
-        m_lastX = x;
+        tft.fillRect(m_x, m_y, m_lastX - m_x, m_height, TFT_BLACK);
+        m_lastX = m_x;
     }
 }
 }

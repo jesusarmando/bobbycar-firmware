@@ -1,19 +1,18 @@
 #pragma once
 
-#include "menuitem.h"
+#include "menuitems/menuitem.h"
 #include "titleinterface.h"
+#include "texts.h"
 #include "globals.h"
 
 namespace {
-template<const char *Ttext>
-class BluetoothFlushMenuItem final : public MenuItem, public StaticTitle<Ttext>
+class BluetoothFlushMenuItem final : public MenuItem, public StaticTitle<TEXT_BLUETOOTHFLUSH>
 {
 public:
     void triggered() override;
 };
 
-template<const char *Ttext>
-void BluetoothFlushMenuItem<Ttext>::triggered()
+void BluetoothFlushMenuItem::triggered()
 {
     bluetoothSerial.flush();
 }

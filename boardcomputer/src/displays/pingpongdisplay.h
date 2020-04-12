@@ -18,6 +18,7 @@ public:
 
     void start() override;
     void redraw() override;
+    void stop() override;
 
 private:
     void midline();
@@ -103,6 +104,13 @@ void PingPongDisplay<Tscreen>::redraw()
     midline();
 
     ball();
+}
+
+template<typename Tscreen>
+void PingPongDisplay<Tscreen>::stop()
+{
+    Base::stop();
+    tft.setRotation(0);
 }
 
 template<typename Tscreen>

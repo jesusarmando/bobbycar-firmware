@@ -7,7 +7,7 @@
 #include "menuitems/bluetoothflushmenuitem.h"
 #include "menuitems/bluetoothendmenuitem.h"
 #include "menuitems/bluetoothdisconnectmenuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "globals.h"
 #include "texts.h"
 
@@ -27,12 +27,12 @@ class BluetoothSettingsMenu final :
 //        LiveStatusMenuItem<BluetoothConnectedLiveStatus>,
         LiveStatusMenuItem<BluetoothIsReadyLiveStatus>,
         LiveStatusMenuItem<BluetoothIsReadyMasterLiveStatus>,
-        BluetoothBeginMenuItem<TEXT_BLUETOOTHBEGIN>,
-        BluetoothBeginMasterMenuItem<TEXT_BLUETOOTHBEGINMASTER>,
-        BluetoothFlushMenuItem<TEXT_BLUETOOTHFLUSH>,
-        BluetoothEndMenuItem<TEXT_BLUETOOTHEND>,
-        BluetoothDisconnectMenuItem<TEXT_BLUETOOTHDISCONNECT>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BluetoothBeginMenuItem,
+        BluetoothBeginMasterMenuItem,
+        BluetoothFlushMenuItem,
+        BluetoothEndMenuItem,
+        BluetoothDisconnectMenuItem,
+        BackMenuItem<Tscreen>
     >
 {};
 }

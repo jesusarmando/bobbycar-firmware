@@ -1,7 +1,7 @@
 #pragma once
 
 #include "staticmenudisplay.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "menuitems/staticdummymenuitem.h"
 #include "texts.h"
 
@@ -14,7 +14,7 @@ class PresetsMenu :
         StaticDummyMenuItem<TEXT_SIDEWALK>,
         StaticDummyMenuItem<TEXT_POLICE>,
         StaticDummyMenuItem<TEXT_RACE>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

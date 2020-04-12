@@ -1,13 +1,13 @@
 #pragma once
 
-#include "modebase.h"
+#include "modes/modeinterface.h"
 #include "globals.h"
 #include "utils.h"
 
 #include "../../common.h"
 
 namespace {
-class IgnoreInputMode : public ModeBase
+class IgnoreInputMode : public ModeInterface
 {
 public:
     IgnoreInputMode(int16_t pwm, ControlType ctrlTyp, ControlMode ctrlMod) :

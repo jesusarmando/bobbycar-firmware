@@ -2,6 +2,7 @@
 
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "displays/menus/defaultmodesettingsmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
 #include "displays/menus/larsmmodesettingsmenu.h"
@@ -19,7 +20,7 @@ class ModesSettingsMenu final :
         StaticSwitchScreenMenuItem<LarsmModeSettingsMenu<ModesSettingsMenu<Tscreen>>, TEXT_LARSMMODESETTINGS>,
         StaticSwitchScreenMenuItem<BluetoothModeSettingsMenu<ModesSettingsMenu<Tscreen>>, TEXT_BLUETOOTHMODESETTINGS>,
         StaticSwitchScreenMenuItem<WebsocketModeSettingsMenu<ModesSettingsMenu<Tscreen>>, TEXT_WEBSOCKETMODESETTINGS>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

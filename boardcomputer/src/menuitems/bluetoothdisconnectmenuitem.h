@@ -1,19 +1,18 @@
 #pragma once
 
-#include "menuitem.h"
+#include "menuitems/menuitem.h"
 #include "titleinterface.h"
+#include "texts.h"
 #include "globals.h"
 
 namespace {
-template<const char *Ttext>
-class BluetoothDisconnectMenuItem final : public MenuItem, public StaticTitle<Ttext>
+class BluetoothDisconnectMenuItem final : public MenuItem, public StaticTitle<TEXT_BLUETOOTHDISCONNECT>
 {
 public:
     void triggered() override;
 };
 
-template<const char *Ttext>
-void BluetoothDisconnectMenuItem<Ttext>::triggered()
+void BluetoothDisconnectMenuItem::triggered()
 {
     if (!bluetoothSerial.disconnect())
     {

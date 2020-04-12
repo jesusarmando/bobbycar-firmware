@@ -8,11 +8,13 @@ public:
     virtual String title() const = 0;
 };
 
-template<const char *T>
+template<const char *Ttext>
 class StaticTitle : public virtual TitleInterface
 {
 public:
-    String title() const override { return T; }
+    static constexpr const char *STATIC_TEXT = Ttext;
+
+    String title() const override { return Ttext; }
 };
 
 class DynamicTitle : public virtual TitleInterface

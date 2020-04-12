@@ -2,38 +2,49 @@
 
 #include "changevaluedisplay.h"
 #include "staticmenudisplay.h"
-#include "menuitems/setvaluemenuitem.h"
-#include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/staticdummymenuitem.h"
 #include "texts.h"
 
 namespace {
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-class ChangeValueDisplay<bool, Taccessor, Tdisplay, Ttext> final :
-    public StaticTitle<Ttext>,
+template<>
+class ChangeValueDisplay<bool> :
     public StaticMenuDisplay<
-        SetValueMenuItem<bool, Taccessor, true, Tdisplay, TEXT_TRUE>,
-        SetValueMenuItem<bool, Taccessor, false, Tdisplay, TEXT_FALSE>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
-    >
+        StaticDummyMenuItem<TEXT_TRUE>,
+        StaticDummyMenuItem<TEXT_FALSE>,
+        StaticDummyMenuItem<TEXT_BACK>
+    >,
+    public virtual AccessorInterface<bool>
 {
     using Base = StaticMenuDisplay<
-        SetValueMenuItem<bool, Taccessor, true, Tdisplay, TEXT_TRUE>,
-        SetValueMenuItem<bool, Taccessor, false, Tdisplay, TEXT_FALSE>,
-        StaticSwitchScreenMenuItem<Tdisplay, TEXT_BACK>
+        StaticDummyMenuItem<TEXT_TRUE>,
+        StaticDummyMenuItem<TEXT_FALSE>,
+        StaticDummyMenuItem<TEXT_BACK>
     >;
 
 public:
     void start() override;
+
+    void triggered() override;
 };
 
-template<typename Taccessor, typename Tdisplay, const char *Ttext>
-void ChangeValueDisplay<bool, Taccessor, Tdisplay, Ttext>::start()
+void ChangeValueDisplay<bool>::start()
 {
     Base::start();
 
-    if (Taccessor::getValue() == true)
+    if (getValue() == true)
         Base::setSelectedIndex(0);
-    else if (Taccessor::getValue() == false)
+    else if (getValue() == false)
         Base::setSelectedIndex(1);
+}
+
+void ChangeValueDisplay<bool>::triggered()
+{
+    Base::triggered();
+
+    switch (Base::selectedIndex())
+    {
+    case 0: setValue(true); break;
+    case 1: setValue(false); break;
+    }
 }
 }

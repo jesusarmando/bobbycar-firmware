@@ -2,6 +2,7 @@
 
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "displays/menus/genericwifisettingsmenu.h"
 #include "displays/menus/stationwifisettingsmenu.h"
 #include "displays/menus/wifiscanmenu.h"
@@ -17,7 +18,7 @@ class WifiSettingsMenu final :
         StaticSwitchScreenMenuItem<StationWifiSettingsMenu<WifiSettingsMenu<Tscreen>>, TEXT_STATIONWIFISETTINGS>,
         StaticSwitchScreenMenuItem<WifiScanMenu<WifiSettingsMenu<Tscreen>>, TEXT_WIFISCAN>,
         StaticSwitchScreenMenuItem<AccessPointWifiSettingsMenu<WifiSettingsMenu<Tscreen>>, TEXT_ACCESSPOINTWIFISETTINGS>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

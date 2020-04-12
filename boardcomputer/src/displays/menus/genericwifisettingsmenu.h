@@ -6,6 +6,7 @@
 #include "staticmenudisplay.h"
 #include "menuitems/livestatusmenuitem.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "changevaluedisplay.h"
 #include "texts.h"
 
@@ -13,10 +14,10 @@ namespace {
 struct WifiStatusBitsLiveStatus { static String getText() { return String{"statusBits: "} + WiFi.getStatusBits(); } };
 struct WifiChannelLiveStatus { static String getText() { return String{"channel: "} + WiFi.channel(); } };
 
-struct WifiModeAccessor
+struct WifiModeAccessor : public virtual AccessorInterface<wifi_mode_t>
 {
-    static wifi_mode_t getValue() { return WiFi.getMode(); }
-    static void setValue(wifi_mode_t value)
+    wifi_mode_t getValue() const override { return WiFi.getMode(); }
+    void setValue(wifi_mode_t value) override
     {
         if (!WiFi.mode(value))
             Serial.println("Could not change WiFi mode!");
@@ -24,12 +25,21 @@ struct WifiModeAccessor
     }
 };
 template<typename Tscreen>
-using WifiModeChangeScreen = ChangeValueDisplay<wifi_mode_t, WifiModeAccessor, Tscreen, TEXT_WIFICHANGEMODE>;
-
-struct WifiSleepAccessor
+class WifiModeChangeScreen :
+    public virtual StaticTitle<TEXT_WIFICHANGEMODE>,
+    public ChangeValueDisplay<wifi_mode_t>,
+    public virtual WifiModeAccessor
 {
-    static bool getValue() { return WiFi.getSleep(); }
-    static void setValue(bool value)
+    using Base = ChangeValueDisplay<wifi_mode_t>;
+
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
+
+struct WifiSleepAccessor : public virtual AccessorInterface<bool>
+{
+    bool getValue() const override { return WiFi.getSleep(); }
+    void setValue(bool value) override
     {
         if (!WiFi.setSleep(value))
             Serial.println("Could not set WiFi sleep!");
@@ -37,12 +47,21 @@ struct WifiSleepAccessor
     }
 };
 template<typename Tscreen>
-using WifiSleepChangeScreen = ChangeValueDisplay<bool, WifiSleepAccessor, Tscreen, TEXT_WIFICHANGESLEEP>;
-
-struct WifiTxPowerAccessor
+class WifiSleepChangeScreen :
+    public virtual StaticTitle<TEXT_WIFICHANGESLEEP>,
+    public ChangeValueDisplay<bool>,
+    public virtual WifiSleepAccessor
 {
-    static wifi_power_t getValue() { return WiFi.getTxPower(); }
-    static void setValue(wifi_power_t value)
+    using Base = ChangeValueDisplay<bool>;
+
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
+
+struct WifiTxPowerAccessor : public virtual AccessorInterface<wifi_power_t>
+{
+    wifi_power_t getValue() const override { return WiFi.getTxPower(); }
+    void setValue(wifi_power_t value) override
     {
         if (!WiFi.setTxPower(value))
             Serial.println("Could not set WiFi tx power!");
@@ -50,7 +69,16 @@ struct WifiTxPowerAccessor
     }
 };
 template<typename Tscreen>
-using WifiTxPowerChangeScreen = ChangeValueDisplay<wifi_power_t, WifiTxPowerAccessor, Tscreen, TEXT_WIFICHANGETXPOWER>;
+class WifiTxPowerChangeScreen :
+    public virtual StaticTitle<TEXT_WIFICHANGETXPOWER>,
+    public ChangeValueDisplay<wifi_power_t>,
+    public virtual WifiTxPowerAccessor
+{
+    using Base = ChangeValueDisplay<wifi_power_t>;
+
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
 
 template<typename Tscreen>
 class GenericWifiSettingsMenu final :
@@ -61,7 +89,7 @@ class GenericWifiSettingsMenu final :
         StaticSwitchScreenMenuItem<WifiModeChangeScreen<GenericWifiSettingsMenu<Tscreen>>, TEXT_WIFICHANGEMODE>,
         StaticSwitchScreenMenuItem<WifiSleepChangeScreen<GenericWifiSettingsMenu<Tscreen>>, TEXT_WIFICHANGESLEEP>,
         StaticSwitchScreenMenuItem<WifiTxPowerChangeScreen<GenericWifiSettingsMenu<Tscreen>>, TEXT_WIFICHANGETXPOWER>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

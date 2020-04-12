@@ -2,19 +2,37 @@
 
 #include "staticmenudisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "changevaluedisplay.h"
-#include "accessorhelper.h"
 #include "texts.h"
 #include "modes/tempomatmode.h"
 
 namespace {
-struct TempomatModeCtrlTypAccessor { static auto &getRef() { return modes::tempomatMode.ctrlTyp; } };
+struct TempomatModeCtrlTypAccessor : public RefAccessor<ControlType> { ControlType &getRef() const override { return modes::tempomatMode.ctrlTyp; } };
 template<typename Tscreen>
-using TempomatModeCtrlTypChangeScreen = ChangeValueDisplay<ControlType, AccessorHelper<TempomatModeCtrlTypAccessor>, Tscreen, TEXT_SETCONTROLMODE>;
+class TempomatModeCtrlTypChangeScreen :
+    public StaticTitle<TEXT_SETCONTROLMODE>,
+    public ChangeValueDisplay<ControlType>,
+    public TempomatModeCtrlTypAccessor
+{
+    using Base = ChangeValueDisplay<ControlType>;
 
-struct TempomatModeCtrlModAccessor { static auto &getRef() { return modes::tempomatMode.ctrlMod; } };
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
+
+struct TempomatModeCtrlModAccessor : public RefAccessor<ControlMode> { ControlMode &getRef() const override { return modes::tempomatMode.ctrlMod; } };
 template<typename Tscreen>
-using TempomatModeCtrlModChangeScreen = ChangeValueDisplay<ControlMode, AccessorHelper<TempomatModeCtrlModAccessor>, Tscreen, TEXT_SETCONTROLMODE>;
+class TempomatModeCtrlModChangeScreen :
+    public StaticTitle<TEXT_SETCONTROLMODE>,
+    public ChangeValueDisplay<ControlMode>,
+    public TempomatModeCtrlModAccessor
+{
+    using Base = ChangeValueDisplay<ControlMode>;
+
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
 
 template<typename Tscreen>
 class TempomatModeSettingsMenu final :
@@ -22,7 +40,7 @@ class TempomatModeSettingsMenu final :
     public StaticMenuDisplay<
         StaticSwitchScreenMenuItem<TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLTYPE>,
         StaticSwitchScreenMenuItem<TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<Tscreen>>, TEXT_SETCONTROLMODE>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

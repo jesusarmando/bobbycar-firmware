@@ -9,16 +9,17 @@
 #include "menuitems/wifienableipv6menuitem.h"
 #include "changevaluedisplay.h"
 #include "menuitems/staticswitchscreenmenuitem.h"
+#include "menuitems/backmenuitem.h"
 #include "utils.h"
 #include "texts.h"
 
 namespace {
 struct WifiIsConnectedLiveStatus { static String getText() { return String{"isConnected: "} + (WiFi.isConnected() ? "true" : "false"); } };
 
-struct WifiAutoConnectAccessor
+struct WifiAutoConnectAccessor : public virtual AccessorInterface<bool>
 {
-    static bool getValue() { return WiFi.getAutoConnect(); }
-    static void setValue(bool value)
+    bool getValue() const override { return WiFi.getAutoConnect(); }
+    void setValue(bool value) override
     {
         if (!WiFi.setAutoConnect(value))
             Serial.println("Could not set WiFi autoConnect!");
@@ -26,12 +27,21 @@ struct WifiAutoConnectAccessor
     }
 };
 template<typename Tscreen>
-using WifiAutoConnectChangeScreen = ChangeValueDisplay<bool, WifiAutoConnectAccessor, Tscreen, TEXT_WIFICHANGEAUTOCONNECT>;
-
-struct WifiAutoReconnectAccessor
+class WifiAutoConnectChangeScreen :
+    public virtual StaticTitle<TEXT_WIFICHANGEAUTOCONNECT>,
+    public ChangeValueDisplay<bool>,
+    public virtual WifiAutoConnectAccessor
 {
-    static bool getValue() { return WiFi.getAutoReconnect(); }
-    static void setValue(bool value)
+    using Base = ChangeValueDisplay<bool>;
+
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
+
+struct WifiAutoReconnectAccessor : public virtual AccessorInterface<bool>
+{
+    bool getValue() const override { return WiFi.getAutoReconnect(); }
+    void setValue(bool value) override
     {
         if (!WiFi.setAutoReconnect(value))
             Serial.println("Could not set WiFi autoReconnect!");
@@ -39,7 +49,16 @@ struct WifiAutoReconnectAccessor
     }
 };
 template<typename Tscreen>
-using WifiAutoReconnectChangeScreen = ChangeValueDisplay<bool, WifiAutoReconnectAccessor, Tscreen, TEXT_WIFICHANGEAUTORECONNECT>;
+class WifiAutoReconnectChangeScreen :
+    public StaticTitle<TEXT_WIFICHANGEAUTORECONNECT>,
+    public ChangeValueDisplay<bool>,
+    public virtual WifiAutoReconnectAccessor
+{
+    using Base = ChangeValueDisplay<bool>;
+
+public:
+    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
+};
 
 struct WifiLocalIpLiveStatus { static String getText() { return String{"localIP: "} + WiFi.localIP().toString(); } };
 struct WifiMacAddressLiveStatus { static String getText() { return String{"macAddress: "} + WiFi.macAddress(); } };
@@ -82,7 +101,7 @@ class StationWifiSettingsMenu final :
         SmallLiveStatusMenuItem<WifiPskLiveStatus>,
         SmallLiveStatusMenuItem<WifiBssidLiveStatus>,
         SmallLiveStatusMenuItem<WifiRssiLiveStatus>,
-        StaticSwitchScreenMenuItem<Tscreen, TEXT_BACK>
+        BackMenuItem<Tscreen>
     >
 {};
 }

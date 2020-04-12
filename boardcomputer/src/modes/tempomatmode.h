@@ -4,15 +4,15 @@
 
 #include "../../common.h"
 
-#include "modebase.h"
+#include "modes/modeinterface.h"
 #include "utils.h"
 #include "defaultmode.h"
 
 namespace {
-class TempomatMode final : public ModeBase
+class TempomatMode final : public ModeInterface
 {
 public:
-    using ModeBase::ModeBase;
+    using ModeInterface::ModeInterface;
 
     void update() override;
 
