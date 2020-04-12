@@ -1,10 +1,10 @@
 #pragma once
 
 #include "menudisplay.h"
-#include "menudisplay.h"
+#include "changevaluedisplay.h"
 #include "staticmenudefinition.h"
 #include "utils.h"
-#include "actions/dummyaction.h"
+#include "actions/multiaction.h"
 #include "actions/switchscreenaction.h"
 #include "icons/back.h"
 #include "texts.h"
@@ -17,33 +17,35 @@
 #include "modes/websocketmode.h"
 
 namespace {
-struct ModeAccessor : public RefAccessor<ModeInterface *> { ModeInterface * &getRef() const { return currentMode; } };
-struct DefaultModeAccessor { static auto getValue() { return &modes::defaultMode; } };
-struct TempomatModeAccessor { static auto getValue() { return &modes::tempomatMode; } };
-struct LarsmModeAccessor { static auto getValue() { return &modes::larsmMode; } };
-struct BluetoothModeAccessor { static auto getValue() { return &modes::bluetoothMode; } };
-struct WebsocketModeAccessor { static auto getValue() { return &modes::websocketMode; } };
+template<typename T1, T1 &target, typename T2, T2 value>
+class SetterAction : public ActionInterface
+{
+public:
+    void triggered() override { target = value; }
+};
+using SetDefaultModeAction = SetterAction<ModeInterface*, currentMode, DefaultMode*, &modes::defaultMode>;
+using SetTempomatModeAction = SetterAction<ModeInterface*, currentMode, TempomatMode*, &modes::tempomatMode>;
+using SetLarsmModeAction = SetterAction<ModeInterface*, currentMode, LarsmMode*, &modes::larsmMode>;
+using SetBluetoothModeAction = SetterAction<ModeInterface*, currentMode, BluetoothMode*, &modes::bluetoothMode>;
+using SetWebsocketModeAction = SetterAction<ModeInterface*, currentMode, WebsocketMode*, &modes::websocketMode>;
 
 template<typename Tscreen>
 class SelectModeMenu :
     public MenuDisplay,
     public StaticText<TEXT_SELECTMODE>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_DEFAULT>,   DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_TEMPOMAT>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_LARSM>,     DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTH>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKET>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,      DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
-    >,
-    public ModeAccessor
+        makeComponent<MenuItem, StaticText<TEXT_DEFAULT>,   MultiAction<SetDefaultModeAction, SwitchScreenAction<Tscreen>>>,
+        makeComponent<MenuItem, StaticText<TEXT_TEMPOMAT>,  MultiAction<SetTempomatModeAction, SwitchScreenAction<Tscreen>>>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSM>,     MultiAction<SetLarsmModeAction, SwitchScreenAction<Tscreen>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTH>, MultiAction<SetBluetoothModeAction, SwitchScreenAction<Tscreen>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKET>, MultiAction<SetWebsocketModeAction, SwitchScreenAction<Tscreen>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,      SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+    >
 {
     using Base = MenuDisplay;
 
 public:
     void start() override;
-
-    void triggered() override;
 };
 
 template<typename Tscreen>
@@ -51,37 +53,20 @@ void SelectModeMenu<Tscreen>::start()
 {
     Base::start();
 
-    if (getValue() == DefaultModeAccessor::getValue())
+    if (currentMode == &modes::defaultMode)
         setSelectedIndex(0);
-    else if (getValue() == TempomatModeAccessor::getValue())
+    else if (currentMode == &modes::tempomatMode)
         setSelectedIndex(1);
-    else if (getValue() == LarsmModeAccessor::getValue())
+    else if (currentMode == &modes::larsmMode)
         setSelectedIndex(2);
-    else if (getValue() == BluetoothModeAccessor::getValue())
+    else if (currentMode == &modes::bluetoothMode)
         setSelectedIndex(3);
-    else if (getValue() == WebsocketModeAccessor::getValue())
+    else if (currentMode == &modes::websocketMode)
         setSelectedIndex(4);
     else
     {
-        Serial.printf("Unknown mode: %s", getValue()->displayName());
+        Serial.printf("Unknown mode: %s", currentMode?currentMode->displayName():"");
         setSelectedIndex(5);
     }
-}
-
-template<typename Tscreen>
-void SelectModeMenu<Tscreen>::triggered()
-{
-    Base::triggered();
-
-    switch (selectedIndex())
-    {
-    case 0: setValue(DefaultModeAccessor::getValue()); break;
-    case 1: setValue(TempomatModeAccessor::getValue()); break;
-    case 2: setValue(LarsmModeAccessor::getValue()); break;
-    case 3: setValue(BluetoothModeAccessor::getValue()); break;
-    case 4: setValue(WebsocketModeAccessor::getValue()); break;
-    }
-
-    switchScreen<Tscreen>();
 }
 }

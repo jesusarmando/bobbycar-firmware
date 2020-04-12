@@ -15,20 +15,21 @@ template<>
 class ChangeValueDisplay<wifi_mode_t> :
     public MenuDisplay,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_NULL>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_STA>,   DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_AP>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_APSTA>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_NULL>,  DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_STA>,   DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_AP>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_APSTA>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
-    public virtual AccessorInterface<wifi_mode_t>
+    public virtual AccessorInterface<wifi_mode_t>,
+    public virtual ActionInterface
 {
     using Base = MenuDisplay;
 
 public:
     void start() override;
 
-    void triggered() override;
+    void itemPressed(int index) override;
 };
 
 void ChangeValueDisplay<wifi_mode_t>::start()
@@ -50,16 +51,16 @@ void ChangeValueDisplay<wifi_mode_t>::start()
     }
 }
 
-void ChangeValueDisplay<wifi_mode_t>::triggered()
+void ChangeValueDisplay<wifi_mode_t>::itemPressed(int index)
 {
-    Base::triggered();
-
-    switch (selectedIndex())
+    switch (index)
     {
     case 0: setValue(WIFI_MODE_NULL); break;
     case 1: setValue(WIFI_MODE_STA); break;
     case 2: setValue(WIFI_MODE_AP); break;
     case 3: setValue(WIFI_MODE_APSTA); break;
     }
+
+    triggered();
 }
 }

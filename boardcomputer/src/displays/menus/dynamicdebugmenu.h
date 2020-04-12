@@ -111,28 +111,28 @@ class DynamicDebugMenu :
     public RandomText,
     public StaticMenuDefinition<
         // some padding to allow for scrolling
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
 
         // now the interesting bits
-        makeComponent<MenuItem, RandomText,                    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, DefaultFont, RandomColor,  DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont,  DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DYNAMICICON>,  DefaultFont, DefaultColor, DummyAction, RandomIcon>,
+        makeComponent<MenuItem, RandomText,                    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, RandomColor,  DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont,  DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICICON>,  DummyAction, RandomIcon>,
 
         // more padding
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
 
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,         DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,         SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

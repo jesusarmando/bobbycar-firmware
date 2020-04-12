@@ -13,7 +13,7 @@ class BluetoothModeSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_BLUETOOTHMODESETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

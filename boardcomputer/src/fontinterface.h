@@ -3,7 +3,7 @@
 namespace {
 class FontInterface {
 public:
-    virtual int font() const = 0;
+    virtual int font() const { return 4; };
 };
 
 template<int TFont>
@@ -14,8 +14,6 @@ public:
 
     int font() const override { return TFont; }
 };
-
-using DefaultFont = StaticFont<4>;
 
 class ChangeableFont : public virtual FontInterface
 {

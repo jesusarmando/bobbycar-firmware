@@ -13,8 +13,6 @@ namespace {
 class BluetoothMode : public ModeInterface
 {
 public:
-    using ModeInterface::ModeInterface;
-
     void start() override;
     void update() override;
 

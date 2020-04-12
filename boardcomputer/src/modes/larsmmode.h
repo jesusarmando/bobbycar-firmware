@@ -10,8 +10,6 @@ namespace {
 class LarsmMode : public ModeInterface
 {
 public:
-    using ModeInterface::ModeInterface;
-
     void start() override;
     void update() override;
 
@@ -95,7 +93,7 @@ void LarsmMode::update()
                   + (CLAMP(gas - ADC1_MIN, 0, ADC1_DELTA) / (ADC1_DELTA / 1000.0f)) * DRUECK_ACC1;  // 12s: 1000=22kmh
             weak = weak * 0.95;  // sanftes abschalten des turbos
           }
-          weak; // weak should never exceed 400 or 450 MAX!!
+          // weak should never exceed 400 or 450 MAX!!
         }
 
         speed = CLAMP(speed, -1000, 1000);  // clamp output

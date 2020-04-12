@@ -13,66 +13,30 @@
 namespace {
 struct FrontLeftEnabledAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.command.left.enable; } };
 template<typename Tscreen>
-class FrontLeftEnabledChangeScreen :
-    public StaticText<TEXT_ENABLEFRONTLEFT>,
-    public ChangeValueDisplay<bool>,
-    public FrontLeftEnabledAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using FrontLeftEnabledChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_ENABLEFRONTLEFT>, FrontLeftEnabledAccessor, SwitchScreenAction<Tscreen>>;
 
 struct FrontRightEnabledAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.command.right.enable; } };
 template<typename Tscreen>
-class FrontRightEnabledChangeScreen :
-    public StaticText<TEXT_ENABLEFRONTRIGHT>,
-    public ChangeValueDisplay<bool>,
-    public FrontRightEnabledAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using FrontRightEnabledChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_ENABLEFRONTRIGHT>, FrontRightEnabledAccessor, SwitchScreenAction<Tscreen>>;
 
 struct BackLeftEnabledAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.command.left.enable; } };
 template<typename Tscreen>
-class BackLeftEnabledChangeScreen :
-    public StaticText<TEXT_ENABLEBACKLEFT>,
-    public ChangeValueDisplay<bool>,
-    public BackLeftEnabledAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using BackLeftEnabledChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_ENABLEBACKLEFT>, BackLeftEnabledAccessor, SwitchScreenAction<Tscreen>>;
 
 struct BackRightEnabledAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.command.right.enable; } };
 template<typename Tscreen>
-class BackRightEnabledChangeScreen :
-    public StaticText<TEXT_ENABLEBACKRIGHT>,
-    public ChangeValueDisplay<bool>,
-    public BackRightEnabledAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using BackRightEnabledChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_ENABLEBACKRIGHT>, BackRightEnabledAccessor, SwitchScreenAction<Tscreen>>;
 
 template<typename Tscreen>
 class EnableMenu :
     public MenuDisplay,
     public StaticText<TEXT_SETENABLED>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTLEFT>,  DefaultFont, DefaultColor, SwitchScreenAction<FrontLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTRIGHT>, DefaultFont, DefaultColor, SwitchScreenAction<FrontRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKLEFT>,   DefaultFont, DefaultColor, SwitchScreenAction<BackLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKRIGHT>,  DefaultFont, DefaultColor, SwitchScreenAction<BackRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,             DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTLEFT>,  SwitchScreenAction<FrontLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTRIGHT>, SwitchScreenAction<FrontRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKLEFT>,   SwitchScreenAction<BackLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKRIGHT>,  SwitchScreenAction<BackRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,             SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

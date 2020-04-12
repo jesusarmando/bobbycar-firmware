@@ -32,16 +32,7 @@ struct WifiAutoConnectAccessor : public virtual AccessorInterface<bool>
     }
 };
 template<typename Tscreen>
-class WifiAutoConnectChangeScreen :
-    public virtual StaticText<TEXT_WIFICHANGEAUTOCONNECT>,
-    public ChangeValueDisplay<bool>,
-    public virtual WifiAutoConnectAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using WifiAutoConnectChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_WIFICHANGEAUTOCONNECT>, WifiAutoConnectAccessor, SwitchScreenAction<Tscreen>>;
 
 struct WifiAutoReconnectAccessor : public virtual AccessorInterface<bool>
 {
@@ -54,16 +45,7 @@ struct WifiAutoReconnectAccessor : public virtual AccessorInterface<bool>
     }
 };
 template<typename Tscreen>
-class WifiAutoReconnectChangeScreen :
-    public StaticText<TEXT_WIFICHANGEAUTORECONNECT>,
-    public ChangeValueDisplay<bool>,
-    public virtual WifiAutoReconnectAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using WifiAutoReconnectChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_WIFICHANGEAUTORECONNECT>, WifiAutoReconnectAccessor, SwitchScreenAction<Tscreen>>;
 
 struct WifiLocalIpText : public virtual TextInterface {
 public:
@@ -131,11 +113,11 @@ class StationWifiSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_STATIONWIFISETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_WIFIRECONNECT>,           DefaultFont,   DefaultColor,  WifiReconnectAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFIDISCONNECT>,          DefaultFont,   DefaultColor,  WifiDisconnectAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFIRECONNECT>,           WifiReconnectAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFIDISCONNECT>,          WifiDisconnectAction>,
         makeComponent<MenuItem, WifiIsConnectedText,                      StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTOCONNECT>,   DefaultFont,   DefaultColor,  SwitchScreenAction<WifiAutoConnectChangeScreen<StationWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTORECONNECT>, DefaultFont,   DefaultColor,  SwitchScreenAction<WifiAutoReconnectChangeScreen<StationWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTOCONNECT>,   SwitchScreenAction<WifiAutoConnectChangeScreen<StationWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTORECONNECT>, SwitchScreenAction<WifiAutoReconnectChangeScreen<StationWifiSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, WifiLocalIpText,                          StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiMacAddressText,                       StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSubnetMaskText,                       StaticFont<2>, DisabledColor, DummyAction>,
@@ -144,7 +126,7 @@ class StationWifiSettingsMenu :
         makeComponent<MenuItem, WifiBroadcastIpText,                      StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiNetworkIdText,                        StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSubnetCIDRText,                       StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFIENABLEIPV6>,          DefaultFont,   DefaultColor,  WifiEnableIpV6Action>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFIENABLEIPV6>,          WifiEnableIpV6Action>,
         makeComponent<MenuItem, WifiLocalIpV6Text,                        StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiHostnameText,                         StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiStatusText,                           StaticFont<2>, DisabledColor, DummyAction>,
@@ -152,7 +134,7 @@ class StationWifiSettingsMenu :
         makeComponent<MenuItem, WifiPskText,                              StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiBssidText,                            StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiRssiText,                             StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    DefaultFont,   DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

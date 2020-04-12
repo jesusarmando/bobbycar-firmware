@@ -24,6 +24,11 @@ float convertToKmh(float val)
     return val / 32.133;
 }
 
+float convertFromKmh(float val)
+{
+    return val * 32.133;
+}
+
 String toString(bool value)
 {
     return value ? "true" : "false";

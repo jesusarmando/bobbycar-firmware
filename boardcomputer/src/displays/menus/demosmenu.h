@@ -22,13 +22,13 @@ class DemosMenu :
     public MenuDisplay,
     public StaticText<TEXT_DEMOS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_STARFIELD>,  DefaultFont, DefaultColor, SwitchScreenAction<StarfieldDisplay<DemosMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_PINGPONG>,   DefaultFont, DefaultColor, SwitchScreenAction<PingPongDisplay<DemosMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SPIRO>,      DefaultFont, DefaultColor, SwitchScreenAction<SpiroDisplay<DemosMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_GAMEOFLIFE>, DefaultFont, DefaultColor, SwitchScreenAction<GameOfLifeDisplay<DemosMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_METERS>,     DefaultFont, DefaultColor, SwitchScreenAction<MetersDisplay<DemosMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_MATRIX>,     DefaultFont, DefaultColor, SwitchScreenAction<MatrixDisplay<DemosMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,       DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_STARFIELD>,  SwitchScreenAction<StarfieldDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_PINGPONG>,   SwitchScreenAction<PingPongDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SPIRO>,      SwitchScreenAction<SpiroDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_GAMEOFLIFE>, SwitchScreenAction<GameOfLifeDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_METERS>,     SwitchScreenAction<MetersDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_MATRIX>,     SwitchScreenAction<MatrixDisplay<DemosMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,       SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

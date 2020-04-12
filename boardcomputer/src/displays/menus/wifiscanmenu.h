@@ -21,8 +21,6 @@ class WifiScanMenu : public MenuDisplay
     using Base = MenuDisplay;
 
 public:
-    using Base::Base;
-
     String text() const override { return String{"Found "} + vec.size() + ((WiFi.scanComplete()==-1)?" (Scanning...)":""); }
 
     void start() override;
@@ -32,9 +30,9 @@ public:
     const std::reference_wrapper<MenuItem> *end() const override { return &(*std::end(refVec)); };
 
 private:
-    makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, MultiAction<EndWifiScanAction, SwitchScreenAction<Tscreen>>, StaticMenuItemIcon<&icons::back>> m_backItem;
+    makeComponent<MenuItem, StaticText<TEXT_BACK>, MultiAction<EndWifiScanAction, SwitchScreenAction<Tscreen>>, StaticMenuItemIcon<&icons::back>> m_backItem;
 
-    std::vector<makeComponent<MenuItem, ChangeableText, DefaultFont, DefaultColor, DummyAction>> vec;
+    std::vector<makeComponent<MenuItem, ChangeableText, DummyAction>> vec;
 
     std::vector<std::reference_wrapper<MenuItem>> refVec{{
         std::ref<MenuItem>(m_backItem)

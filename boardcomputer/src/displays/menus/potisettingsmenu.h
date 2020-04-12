@@ -42,14 +42,14 @@ class PotiSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_POTISETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, GasText,                      DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, BremsText,                    DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_CALIBRATE>,   DefaultFont, DefaultColor,  SwitchScreenAction<CalibrateDisplay<PotiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETGASMIN>,   DefaultFont, DefaultColor,  SwitchScreenAction<GasMinChangeScreen<PotiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETGASMAX>,   DefaultFont, DefaultColor,  SwitchScreenAction<GasMaxChangeScreen<PotiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETBREMSMIN>, DefaultFont, DefaultColor,  SwitchScreenAction<BremsMinChangeScreen<PotiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETBREMSMAX>, DefaultFont, DefaultColor,  SwitchScreenAction<BremsMaxChangeScreen<PotiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,        DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, GasText,                      DisabledColor, DummyAction>,
+        makeComponent<MenuItem, BremsText,                    DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_CALIBRATE>,   SwitchScreenAction<CalibrateDisplay<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETGASMIN>,   SwitchScreenAction<GasMinChangeScreen<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETGASMAX>,   SwitchScreenAction<GasMaxChangeScreen<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBREMSMIN>, SwitchScreenAction<BremsMinChangeScreen<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBREMSMAX>, SwitchScreenAction<BremsMaxChangeScreen<PotiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,        SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

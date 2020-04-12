@@ -19,12 +19,12 @@ class ModesSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_MODESSETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_DEFAULTMODESETTIGNS>,   DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_TEMPOMATMODESETTINGS>,  DefaultFont, DefaultColor, SwitchScreenAction<TempomatModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_LARSMMODESETTINGS>,     DefaultFont, DefaultColor, SwitchScreenAction<LarsmModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHMODESETTINGS>, DefaultFont, DefaultColor, SwitchScreenAction<BluetoothModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKETMODESETTINGS>, DefaultFont, DefaultColor, SwitchScreenAction<WebsocketModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_DEFAULTMODESETTIGNS>,   SwitchScreenAction<DefaultModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_TEMPOMATMODESETTINGS>,  SwitchScreenAction<TempomatModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSMMODESETTINGS>,     SwitchScreenAction<LarsmModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHMODESETTINGS>, SwitchScreenAction<BluetoothModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKETMODESETTINGS>, SwitchScreenAction<WebsocketModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

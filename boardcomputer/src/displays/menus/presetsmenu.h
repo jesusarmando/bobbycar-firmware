@@ -14,11 +14,11 @@ class PresetsMenu :
     public MenuDisplay,
     public StaticText<TEXT_PRESETS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_STREET>,   DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_SIDEWALK>, DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_POLICE>,   DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_RACE>,     DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_STREET>,   DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_SIDEWALK>, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_POLICE>,   DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_RACE>,     DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

@@ -14,20 +14,21 @@ template<>
 class ChangeValueDisplay<LarsmMode::Mode> :
     public MenuDisplay,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_LARSMMODE1>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_LARSMMODE2>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_LARSMMODE3>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_LARSMMODE4>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,       DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_LARSMMODE1>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSMMODE2>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSMMODE3>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSMMODE4>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,       DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
-    public virtual AccessorInterface<LarsmMode::Mode>
+    public virtual AccessorInterface<LarsmMode::Mode>,
+    public virtual ActionInterface
 {
     using Base = MenuDisplay;
 
 public:
     void start() override;
 
-    void triggered() override;
+    void itemPressed(int index) override;
 };
 
 void ChangeValueDisplay<LarsmMode::Mode>::start()
@@ -49,16 +50,16 @@ void ChangeValueDisplay<LarsmMode::Mode>::start()
     }
 }
 
-void ChangeValueDisplay<LarsmMode::Mode>::triggered()
+void ChangeValueDisplay<LarsmMode::Mode>::itemPressed(int index)
 {
-    Base::triggered();
-
-    switch (selectedIndex())
+    switch (index)
     {
     case 0: setValue(LarsmMode::Mode::Mode1); break;
     case 1: setValue(LarsmMode::Mode::Mode2); break;
     case 2: setValue(LarsmMode::Mode::Mode3); break;
     case 3: setValue(LarsmMode::Mode::Mode4); break;
     }
+
+    triggered();
 }
 }

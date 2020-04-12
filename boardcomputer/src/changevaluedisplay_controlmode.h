@@ -13,20 +13,21 @@ template<>
 class ChangeValueDisplay<ControlMode> :
     public MenuDisplay,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_OPENMODE>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_VOLTAGE>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_SPEED>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_TORQUE>,   DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_OPENMODE>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_VOLTAGE>,  DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_SPEED>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_TORQUE>,   DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
-    public virtual AccessorInterface<ControlMode>
+    public virtual AccessorInterface<ControlMode>,
+    public virtual ActionInterface
 {
     using Base = MenuDisplay;
 
 public:
     void start() override;
 
-    void triggered() override;
+    void itemPressed(int index) override;
 };
 
 void ChangeValueDisplay<ControlMode>::start()
@@ -48,16 +49,16 @@ void ChangeValueDisplay<ControlMode>::start()
     }
 }
 
-void ChangeValueDisplay<ControlMode>::triggered()
+void ChangeValueDisplay<ControlMode>::itemPressed(int index)
 {
-    Base::triggered();
-
-    switch (selectedIndex())
+    switch (index)
     {
     case 0: setValue(ControlMode::OpenMode); break;
     case 1: setValue(ControlMode::Voltage); break;
     case 2: setValue(ControlMode::Speed); break;
     case 3: setValue(ControlMode::Torque); break;
     }
+
+    triggered();
 }
 }

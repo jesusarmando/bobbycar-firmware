@@ -3,6 +3,7 @@
 #include "changevaluedisplay.h"
 #include "menudisplay.h"
 #include "staticmenudefinition.h"
+#include "actioninterface.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
 #include "icons/back.h"
@@ -13,18 +14,19 @@ template<>
 class ChangeValueDisplay<bool> :
     public MenuDisplay,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_TRUE>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_FALSE>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,  DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_TRUE>,  DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_FALSE>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,  DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
-    public virtual AccessorInterface<bool>
+    public virtual AccessorInterface<bool>,
+    public virtual ActionInterface
 {
     using Base = MenuDisplay;
 
 public:
     void start() override;
 
-    void triggered() override;
+    void itemPressed(int index) override;
 };
 
 void ChangeValueDisplay<bool>::start()
@@ -37,14 +39,14 @@ void ChangeValueDisplay<bool>::start()
         setSelectedIndex(1);
 }
 
-void ChangeValueDisplay<bool>::triggered()
+void ChangeValueDisplay<bool>::itemPressed(int index)
 {
-    Base::triggered();
-
-    switch (selectedIndex())
+    switch (index)
     {
     case 0: setValue(true); break;
     case 1: setValue(false); break;
     }
+
+    triggered();
 }
 }

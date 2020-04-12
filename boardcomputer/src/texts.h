@@ -73,6 +73,7 @@ constexpr char TEXT_SETBACKPATTERN[] = "Set back pattern";
 //constexpr char TEXT_COMMONSETTINGS[] = "Common settings";
 constexpr char TEXT_SETIMOTMAX[] = "Set iMotMax";
 constexpr char TEXT_SETIDCMAX[] = "Set iDcMax";
+constexpr char TEXT_SETNMOTMAXKMH[] = "Set nMotMax (kmh)";
 constexpr char TEXT_SETNMOTMAX[] = "Set nMotMax";
 constexpr char TEXT_SETFIELDWEAKMAX[] = "Set fieldWeakMax";
 constexpr char TEXT_SETPHASEADVMAX[] = "Set phaseAdvMax";

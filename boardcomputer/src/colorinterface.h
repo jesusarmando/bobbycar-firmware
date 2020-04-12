@@ -5,7 +5,7 @@
 namespace {
 class ColorInterface {
 public:
-    virtual int color() const = 0;
+    virtual int color() const { return TFT_WHITE; };
 };
 
 template<int TColor>
@@ -17,7 +17,6 @@ public:
     int color() const override { return TColor; }
 };
 
-using DefaultColor = StaticColor<TFT_WHITE>;
 using DisabledColor = StaticColor<TFT_DARKGREY>;
 
 class ChangeableColor : public virtual ColorInterface

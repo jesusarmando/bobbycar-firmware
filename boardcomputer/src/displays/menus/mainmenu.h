@@ -6,6 +6,7 @@
 #include "actions/switchscreenaction.h"
 #include "texts.h"
 #include "icons/back.h"
+#include "icons/lock.h"
 
 #include "displays/statusdisplay.h"
 #include "displays/menus/selectmodemenu.h"
@@ -21,14 +22,14 @@ class MainMenu :
     public MenuDisplay,
     public StaticText<TEXT_MAINMENU>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_STATUS>,      DefaultFont, DefaultColor, SwitchScreenAction<StatusDisplay<MainMenu>>, StaticMenuItemIcon<&icons::back>>,
-        makeComponent<MenuItem, StaticText<TEXT_SELECTMODE>,  DefaultFont, DefaultColor, SwitchScreenAction<SelectModeMenu<MainMenu>>>,
-        makeComponent<MenuItem, StaticText<TEXT_PRESETS>,     DefaultFont, DefaultColor, SwitchScreenAction<PresetsMenu<MainMenu>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETTINGS>,    DefaultFont, DefaultColor, SwitchScreenAction<SettingsMenu<MainMenu>>>,
-        makeComponent<MenuItem, StaticText<TEXT_LOCKVEHICLE>, DefaultFont, DefaultColor, SwitchScreenAction<Lockscreen<MainMenu>>>,
-        makeComponent<MenuItem, StaticText<TEXT_DEMOS>,       DefaultFont, DefaultColor, SwitchScreenAction<DemosMenu<MainMenu>>>,
-        makeComponent<MenuItem, StaticText<TEXT_POWEROFF>,    DefaultFont, DefaultColor, SwitchScreenAction<PoweroffDisplay<MainMenu>>>,
-        makeComponent<MenuItem, StaticText<TEXT_DEBUG>,       DefaultFont, DefaultColor, SwitchScreenAction<DebugMenu<MainMenu>>>
+        makeComponent<MenuItem, StaticText<TEXT_STATUS>,      SwitchScreenAction<StatusDisplay<MainMenu>>, StaticMenuItemIcon<&icons::back>>,
+        makeComponent<MenuItem, StaticText<TEXT_SELECTMODE>,  SwitchScreenAction<SelectModeMenu<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_PRESETS>,     SwitchScreenAction<PresetsMenu<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETTINGS>,    SwitchScreenAction<SettingsMenu<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_LOCKVEHICLE>, SwitchScreenAction<Lockscreen<MainMenu>>, StaticMenuItemIcon<&icons::lock>>,
+        makeComponent<MenuItem, StaticText<TEXT_DEMOS>,       SwitchScreenAction<DemosMenu<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_POWEROFF>,    SwitchScreenAction<PoweroffDisplay<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_DEBUG>,       SwitchScreenAction<DebugMenu<MainMenu>>>
     >
 {};
 };

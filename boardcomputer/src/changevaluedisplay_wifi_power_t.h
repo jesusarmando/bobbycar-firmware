@@ -15,28 +15,29 @@ template<>
 class ChangeValueDisplay<wifi_power_t> :
     public MenuDisplay,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_19_5dBm>,     DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_19dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_18_5dBm>,     DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_17dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_15dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_13dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_11dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_8_5dBm>,      DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_7dBm>,        DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_5dBm>,        DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_2dBm>,        DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_MINUS_1dBm>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                   DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_19_5dBm>,     DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_19dBm>,       DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_18_5dBm>,     DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_17dBm>,       DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_15dBm>,       DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_13dBm>,       DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_11dBm>,       DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_8_5dBm>,      DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_7dBm>,        DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_5dBm>,        DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_2dBm>,        DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_MINUS_1dBm>,  DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                   DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
-    public virtual AccessorInterface<wifi_power_t>
+    public virtual AccessorInterface<wifi_power_t>,
+    public virtual ActionInterface
 {
     using Base = MenuDisplay;
 
 public:
     void start() override;
 
-    void triggered() override;
+    void itemPressed(int index) override;
 };
 
 void ChangeValueDisplay<wifi_power_t>::start()
@@ -74,11 +75,9 @@ void ChangeValueDisplay<wifi_power_t>::start()
     }
 }
 
-void ChangeValueDisplay<wifi_power_t>::triggered()
+void ChangeValueDisplay<wifi_power_t>::itemPressed(int index)
 {
-    Base::triggered();
-
-    switch (selectedIndex())
+    switch (index)
     {
     case 0: setValue(WIFI_POWER_19_5dBm); break;
     case 1: setValue(WIFI_POWER_19dBm); break;
@@ -93,5 +92,7 @@ void ChangeValueDisplay<wifi_power_t>::triggered()
     case 10: setValue(WIFI_POWER_2dBm); break;
     case 11: setValue(WIFI_POWER_MINUS_1dBm); break;
     }
+
+    triggered();
 }
 }

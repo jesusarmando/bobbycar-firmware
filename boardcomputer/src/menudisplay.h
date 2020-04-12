@@ -6,14 +6,13 @@
 
 #include "display.h"
 #include "textinterface.h"
-#include "actioninterface.h"
 #include "label.h"
 #include "globals.h"
 #include "menudefinitioninterface.h"
 #include "menuitem.h"
 
 namespace {
-class MenuDisplay : public Display, public virtual TextInterface, public virtual MenuDefinitionInterface, public virtual ActionInterface
+class MenuDisplay : public Display, public virtual TextInterface, public virtual MenuDefinitionInterface
 {
 public:
     void start() override;
@@ -24,7 +23,7 @@ public:
     void rotate(int offset) override;
     void button(bool pressed) override;
 
-    void triggered() override { (begin()+m_selectedIndex)->get().triggered(); }
+    virtual void itemPressed(int index) { (begin()+index)->get().triggered(); }
 
     MenuDisplay *asMenuDisplay() override { return this; }
     const MenuDisplay *asMenuDisplay() const override { return this; }
@@ -132,10 +131,11 @@ void MenuDisplay::update()
         for (auto iter = begin(); iter != end(); iter++)
             iter->get().update();
     }
-    else if (m_selectedIndex >= 0)
+    else
     {
         m_pressed = false;
-        triggered();
+        if (m_selectedIndex >= 0)
+            itemPressed(m_selectedIndex);
     }
 }
 

@@ -18,11 +18,11 @@ class WifiSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_WIFISETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_GENERICWIFISETTINGS>,     DefaultFont,  DefaultColor, SwitchScreenAction<GenericWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_STATIONWIFISETTINGS>,     DefaultFont,  DefaultColor, SwitchScreenAction<StationWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFISCAN>,                DefaultFont,  DefaultColor, SwitchScreenAction<WifiScanMenu<WifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_ACCESSPOINTWIFISETTINGS>, DefaultFont,  DefaultColor, SwitchScreenAction<AccessPointWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    DefaultFont,  DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_GENERICWIFISETTINGS>,     SwitchScreenAction<GenericWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_STATIONWIFISETTINGS>,     SwitchScreenAction<StationWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFISCAN>,                SwitchScreenAction<WifiScanMenu<WifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ACCESSPOINTWIFISETTINGS>, SwitchScreenAction<AccessPointWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

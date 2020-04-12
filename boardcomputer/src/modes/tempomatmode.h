@@ -12,8 +12,6 @@ namespace {
 class TempomatMode : public ModeInterface
 {
 public:
-    using ModeInterface::ModeInterface;
-
     void update() override;
 
     const char *displayName() const override { return "Tempomat"; }

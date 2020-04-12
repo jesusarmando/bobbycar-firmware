@@ -32,11 +32,11 @@ class BuzzerMenu :
     public MenuDisplay,
     public StaticText<TEXT_BUZZER>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_SETFRONTFREQ>,    DefaultFont, DefaultColor, SwitchScreenAction<FrontFreqChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETFRONTPATTERN>, DefaultFont, DefaultColor, SwitchScreenAction<FrontPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETBACKFREQ>,     DefaultFont, DefaultColor, SwitchScreenAction<BackFreqChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETBACKPATTERN>,  DefaultFont, DefaultColor, SwitchScreenAction<BackPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_SETFRONTFREQ>,    SwitchScreenAction<FrontFreqChangeScreen<BuzzerMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETFRONTPATTERN>, SwitchScreenAction<FrontPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBACKFREQ>,     SwitchScreenAction<BackFreqChangeScreen<BuzzerMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBACKPATTERN>,  SwitchScreenAction<BackPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

@@ -20,45 +20,27 @@
 namespace {
 struct FrontLedAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.command.led; } };
 template<typename Tscreen>
-class FrontLedChangeScreen :
-    public ChangeValueDisplay<bool>,
-    public StaticText<TEXT_SETFRONTLED>,
-    public FrontLedAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using FrontLedChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_SETFRONTLED>, FrontLedAccessor, SwitchScreenAction<Tscreen>>;
 
 struct BackLedAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.command.led; } };
 template<typename Tscreen>
-class BackLedChangeScreen :
-    public ChangeValueDisplay<bool>,
-    public StaticText<TEXT_SETBACKLED>,
-    public BackLedAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using BackLedChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_SETBACKLED>, BackLedAccessor, SwitchScreenAction<Tscreen>>;
 
 template<typename Tscreen>
 class SettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_SETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_COMMONSETTINGS>,    DefaultFont, DefaultColor, SwitchScreenAction<CommonSettingsMenu<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFISETTINGS>,      DefaultFont, DefaultColor, SwitchScreenAction<WifiSettingsMenu<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHSETTINGS>, DefaultFont, DefaultColor, SwitchScreenAction<BluetoothSettingsMenu<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_MODESSETTINGS>,     DefaultFont, DefaultColor, SwitchScreenAction<ModesSettingsMenu<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_POTISETTINGS>,      DefaultFont, DefaultColor, SwitchScreenAction<PotiSettingsMenu<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BUZZER>,            DefaultFont, DefaultColor, SwitchScreenAction<BuzzerMenu<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>,       DefaultFont, DefaultColor, SwitchScreenAction<FrontLedChangeScreen<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,        DefaultFont, DefaultColor, SwitchScreenAction<BackLedChangeScreen<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_VERSION>,           DefaultFont, DefaultColor, SwitchScreenAction<VersionDisplay<SettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,              DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_COMMONSETTINGS>,    SwitchScreenAction<CommonSettingsMenu<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFISETTINGS>,      SwitchScreenAction<WifiSettingsMenu<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHSETTINGS>, SwitchScreenAction<BluetoothSettingsMenu<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_MODESSETTINGS>,     SwitchScreenAction<ModesSettingsMenu<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_POTISETTINGS>,      SwitchScreenAction<PotiSettingsMenu<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BUZZER>,            SwitchScreenAction<BuzzerMenu<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>,       SwitchScreenAction<FrontLedChangeScreen<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,        SwitchScreenAction<BackLedChangeScreen<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_VERSION>,           SwitchScreenAction<VersionDisplay<SettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,              SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

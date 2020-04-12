@@ -21,17 +21,17 @@ class BluetoothSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_BLUETOOTHSETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, BluetoothAvailableText,                 DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, BluetoothHasClientText,                 DefaultFont, DisabledColor, DummyAction>,
-//        makeComponent<MenuItem, BluetoothConnectedText,                 DefaultFont, DisabledColor, DummyAction>, // crashes
-        makeComponent<MenuItem, BluetoothIsReadyText,                   DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, BluetoothIsReadyMasterText,             DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHBEGIN>,        DefaultFont, DisabledColor, BluetoothBeginAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHBEGINMASTER>,  DefaultFont, DisabledColor, BluetoothBeginMasterAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHFLUSH>,        DefaultFont, DisabledColor, BluetoothFlushAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHEND>,          DefaultFont, DisabledColor, BluetoothEndAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHDISCONNECT>,   DefaultFont, DisabledColor, BluetoothDisconnectAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, BluetoothAvailableText,                 DisabledColor, DummyAction>,
+        makeComponent<MenuItem, BluetoothHasClientText,                 DisabledColor, DummyAction>,
+//        makeComponent<MenuItem, BluetoothConnectedText,                 DisabledColor, DummyAction>, // crashes
+        makeComponent<MenuItem, BluetoothIsReadyText,                   DisabledColor, DummyAction>,
+        makeComponent<MenuItem, BluetoothIsReadyMasterText,             DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHBEGIN>,        DisabledColor, BluetoothBeginAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHBEGINMASTER>,  DisabledColor, BluetoothBeginMasterAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHFLUSH>,        DisabledColor, BluetoothFlushAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHEND>,          DisabledColor, BluetoothEndAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHDISCONNECT>,   DisabledColor, BluetoothDisconnectAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

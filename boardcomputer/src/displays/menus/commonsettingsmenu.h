@@ -21,6 +21,14 @@ struct IDcMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const ov
 template<typename Tscreen>
 using IDcMaxChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETIDCMAX>, IDcMaxAccessor, SwitchScreenAction<Tscreen>>;
 
+struct NMotMaxKmhAccessor : public virtual AccessorInterface<int16_t>
+{
+    int16_t getValue() const override { return convertToKmh(settings.nMotMax); }
+    void setValue(int16_t value) override { settings.nMotMax = convertFromKmh(value); }
+};
+template<typename Tscreen>
+using NMotMaxKmhChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETNMOTMAXKMH>, NMotMaxKmhAccessor, SwitchScreenAction<Tscreen>>;
+
 struct NMotMaxAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return settings.nMotMax; } };
 template<typename Tscreen>
 using NMotMaxChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, StaticText<TEXT_SETNMOTMAX>, NMotMaxAccessor, SwitchScreenAction<Tscreen>>;
@@ -38,14 +46,15 @@ class CommonSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_COMMONSETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_SETIMOTMAX>,      DefaultFont, DefaultColor, SwitchScreenAction<IMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETIDCMAX>,       DefaultFont, DefaultColor, SwitchScreenAction<IDcMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETNMOTMAX>,      DefaultFont, DefaultColor, SwitchScreenAction<NMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETFIELDWEAKMAX>, DefaultFont, DefaultColor, SwitchScreenAction<FieldWeakMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETPHASEADVMAX>,  DefaultFont, DefaultColor, SwitchScreenAction<PhaseAdvMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETENABLED>,      DefaultFont, DefaultColor, SwitchScreenAction<EnableMenu<CommonSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETINVERTED>,     DefaultFont, DefaultColor, SwitchScreenAction<InvertMenu<CommonSettingsMenu<Tscreen>>>>   ,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_SETIMOTMAX>,      SwitchScreenAction<IMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETIDCMAX>,       SwitchScreenAction<IDcMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETNMOTMAXKMH>,   SwitchScreenAction<NMotMaxKmhChangeScreen<CommonSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETNMOTMAX>,      SwitchScreenAction<NMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETFIELDWEAKMAX>, SwitchScreenAction<FieldWeakMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETPHASEADVMAX>,  SwitchScreenAction<PhaseAdvMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETENABLED>,      SwitchScreenAction<EnableMenu<CommonSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETINVERTED>,     SwitchScreenAction<InvertMenu<CommonSettingsMenu<Tscreen>>>>   ,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

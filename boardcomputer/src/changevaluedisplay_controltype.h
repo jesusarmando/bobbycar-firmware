@@ -13,19 +13,20 @@ template<>
 class ChangeValueDisplay<ControlType> :
     public MenuDisplay,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_COMMUTATION>,          DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_SINUSOIDAL>,           DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_FIELDORIENTEDCONTROL>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_COMMUTATION>,          DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_SINUSOIDAL>,           DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_FIELDORIENTEDCONTROL>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
-    public virtual AccessorInterface<ControlType>
+    public virtual AccessorInterface<ControlType>,
+    public virtual ActionInterface
 {
     using Base = MenuDisplay;
 
 public:
     void start() override;
 
-    void triggered() override;
+    void itemPressed(int index) override;
 };
 
 void ChangeValueDisplay<ControlType>::start()
@@ -45,15 +46,15 @@ void ChangeValueDisplay<ControlType>::start()
     }
 }
 
-void ChangeValueDisplay<ControlType>::triggered()
+void ChangeValueDisplay<ControlType>::itemPressed(int index)
 {
-    Base::triggered();
-
-    switch (selectedIndex())
+    switch (index)
     {
     case 0: setValue(ControlType::Commutation); break;
     case 1: setValue(ControlType::Sinusoidal); break;
     case 2: setValue(ControlType::FieldOrientedControl); break;
     }
+
+    triggered();
 }
 }

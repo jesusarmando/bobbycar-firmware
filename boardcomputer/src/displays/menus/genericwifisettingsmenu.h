@@ -33,16 +33,7 @@ struct WifiModeAccessor : public virtual AccessorInterface<wifi_mode_t>
     }
 };
 template<typename Tscreen>
-class WifiModeChangeScreen :
-    public virtual StaticText<TEXT_WIFICHANGEMODE>,
-    public ChangeValueDisplay<wifi_mode_t>,
-    public virtual WifiModeAccessor
-{
-    using Base = ChangeValueDisplay<wifi_mode_t>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using WifiModeChangeScreen = makeComponent<ChangeValueDisplay<wifi_mode_t>, StaticText<TEXT_WIFICHANGEMODE>, WifiModeAccessor, SwitchScreenAction<Tscreen>>;
 
 struct WifiSleepAccessor : public virtual AccessorInterface<bool>
 {
@@ -55,16 +46,7 @@ struct WifiSleepAccessor : public virtual AccessorInterface<bool>
     }
 };
 template<typename Tscreen>
-class WifiSleepChangeScreen :
-    public virtual StaticText<TEXT_WIFICHANGESLEEP>,
-    public ChangeValueDisplay<bool>,
-    public virtual WifiSleepAccessor
-{
-    using Base = ChangeValueDisplay<bool>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using WifiSleepChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_WIFICHANGESLEEP>, WifiSleepAccessor, SwitchScreenAction<Tscreen>>;
 
 struct WifiTxPowerAccessor : public virtual AccessorInterface<wifi_power_t>
 {
@@ -77,28 +59,19 @@ struct WifiTxPowerAccessor : public virtual AccessorInterface<wifi_power_t>
     }
 };
 template<typename Tscreen>
-class WifiTxPowerChangeScreen :
-    public virtual StaticText<TEXT_WIFICHANGETXPOWER>,
-    public ChangeValueDisplay<wifi_power_t>,
-    public virtual WifiTxPowerAccessor
-{
-    using Base = ChangeValueDisplay<wifi_power_t>;
-
-public:
-    void triggered() override { Base::triggered(); switchScreen<Tscreen>(); }
-};
+using WifiTxPowerChangeScreen = makeComponent<ChangeValueDisplay<wifi_power_t>, StaticText<TEXT_WIFICHANGETXPOWER>, WifiTxPowerAccessor, SwitchScreenAction<Tscreen>>;
 
 template<typename Tscreen>
 class GenericWifiSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_GENERICWIFISETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, WifiStatusBitsText,                 DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, WifiChannelText,                    DefaultFont, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEMODE>,    DefaultFont, DefaultColor,  SwitchScreenAction<WifiModeChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGESLEEP>,   DefaultFont, DefaultColor,  SwitchScreenAction<WifiSleepChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGETXPOWER>, DefaultFont, DefaultColor,  SwitchScreenAction<WifiTxPowerChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,              DefaultFont, DefaultColor,  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, WifiStatusBitsText,                 DisabledColor, DummyAction>,
+        makeComponent<MenuItem, WifiChannelText,                    DisabledColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEMODE>,    SwitchScreenAction<WifiModeChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGESLEEP>,   SwitchScreenAction<WifiSleepChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGETXPOWER>, SwitchScreenAction<WifiTxPowerChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,              SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }
