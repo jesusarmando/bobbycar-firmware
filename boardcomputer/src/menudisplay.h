@@ -40,22 +40,36 @@ protected:
 private:
     Label m_titleLabel{5, 5, 230, 25};
 
+    static constexpr auto iconWidth = 25;
     static constexpr auto horizontalSpacing = 10;
     static constexpr auto topMargin = 40;
     static constexpr auto lineHeight = 25;
     static constexpr auto verticalSpacing = 3;
 
     std::array<Label, 10> m_labels {{
-        Label{horizontalSpacing, topMargin+(0*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(1*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(2*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(3*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(4*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(5*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(6*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(7*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(8*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
-        Label{horizontalSpacing, topMargin+(9*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2), lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(0*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(1*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(2*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(3*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(4*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(5*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(6*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(7*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(8*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(9*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+    }};
+
+    std::array<const SpriteDefinition *, 10> m_icons {{
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     }};
 
     int m_selectedIndex;
@@ -141,6 +155,8 @@ void MenuDisplay::redraw()
 
     auto labelsIter = std::begin(m_labels);
 
+    auto iconsIter = std::begin(m_icons);
+
     int newHighlightedIndex{-1};
 
     const auto drawItemRect = [](const auto &label, const auto color){
@@ -151,7 +167,7 @@ void MenuDisplay::redraw()
                      color);
     };
 
-    for (; menuIter != menuEnd && labelsIter != std::end(m_labels); menuIter++, labelsIter++)
+    for (; menuIter != menuEnd && labelsIter != std::end(m_labels); menuIter++, labelsIter++, iconsIter++)
     {
         const auto index = std::distance(menuBegin, menuIter);
         const auto relativeIndex = index - m_scrollOffset;
@@ -171,13 +187,27 @@ void MenuDisplay::redraw()
         tft.setTextColor(menuIter->get().color(), TFT_BLACK);
         const auto labelDrawn = labelsIter->redraw(menuIter->get().title(), forceLabelRedraw);
 
+        if (menuIter->get().icon() != *iconsIter)
+        {
+            auto icon = menuIter->get().icon();
+            if (icon)
+            {
+                tft.setSwapBytes(true);
+                tft.pushImage(5, labelsIter->y()+1, icon->width, icon->height, icon->buffer);
+                tft.setSwapBytes(false);
+            }
+            else
+                tft.fillRect(5, labelsIter->y()+1, 24, 24, TFT_BLACK);
+            *iconsIter = icon;
+        }
+
         if (selected && (labelDrawn || relativeIndex != m_highlightedIndex))
         {
             drawItemRect(*labelsIter, TFT_WHITE);
         }
     }
 
-    for (; labelsIter != std::end(m_labels); labelsIter++)
+    for (; labelsIter != std::end(m_labels); labelsIter++, iconsIter++)
     {
         const auto relativeIndex = std::distance(std::begin(m_labels), labelsIter);
 
@@ -185,6 +215,12 @@ void MenuDisplay::redraw()
             drawItemRect(*labelsIter, TFT_BLACK);
 
         labelsIter->clear();
+
+        if (*iconsIter)
+        {
+            tft.fillRect(5, labelsIter->y()+1, 24, 24, TFT_BLACK);
+            *iconsIter = nullptr;
+        }
     }
 
     m_highlightedIndex = newHighlightedIndex;

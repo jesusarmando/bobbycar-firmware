@@ -33,8 +33,8 @@ public:
     ChangeValueDisplayInterface *asChangeValueDisplayInterface() override { return this; }
     const ChangeValueDisplayInterface *asChangeValueDisplayInterface() const override { return this; }
 
-    //virtual int value() const = 0;
-    //virtual void setValue(int value) = 0;
+    virtual int shownValue() const = 0;
+    virtual void setShownValue(int value) = 0;
 
     virtual void confirm() = 0;
 
@@ -56,8 +56,8 @@ public:
     void rotate(int offset) override;
     void button(bool pressed) override;
 
-    //int value() const { return m_value; }
-    //void setValue(int value) { m_value = value; }
+    int shownValue() const { return m_value; }
+    void setShownValue(int value) { m_value = value; }
 
     void confirm() override;
 

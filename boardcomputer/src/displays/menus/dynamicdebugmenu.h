@@ -9,6 +9,7 @@
 #include "menuitems/livestatusmenuitem.h"
 #include "menuitems/staticdummymenuitem.h"
 #include "menuitems/backmenuitem.h"
+#include "sprites/lock.h"
 #include "texts.h"
 #include "globals.h"
 
@@ -91,20 +92,28 @@ private:
     int m_font;
 };
 
+constexpr char TEXT_ITEMWITHICON[] = "Item with icon";
+class IconMenuItem : public DummyMenuItem, public StaticTitle<TEXT_ITEMWITHICON>
+{
+public:
+    const SpriteDefinition *icon() const override { return &sprites::lock; }
+};
+
 constexpr char TEXT_DUMMYITEM[] = "Dummy item";
 
 template<typename Tscreen>
 class DynamicDebugMenu final :
     public StaticMenuDisplay<
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
         DynamicTextMenuItem,
         DynamicColorMenuItem,
         DynamicFontMenuItem,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        IconMenuItem,
         StaticDummyMenuItem<TEXT_DUMMYITEM>,
         StaticDummyMenuItem<TEXT_DUMMYITEM>,
         StaticDummyMenuItem<TEXT_DUMMYITEM>,
@@ -116,15 +125,16 @@ class DynamicDebugMenu final :
     public RandomTitle
 {
     using Base = StaticMenuDisplay<
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        StaticDummyMenuItem<TEXT_DUMMYITEM>,
         DynamicTextMenuItem,
         DynamicColorMenuItem,
         DynamicFontMenuItem,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
-        StaticDummyMenuItem<TEXT_DUMMYITEM>,
+        IconMenuItem,
         StaticDummyMenuItem<TEXT_DUMMYITEM>,
         StaticDummyMenuItem<TEXT_DUMMYITEM>,
         StaticDummyMenuItem<TEXT_DUMMYITEM>,

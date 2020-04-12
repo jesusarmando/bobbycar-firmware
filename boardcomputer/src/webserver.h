@@ -1278,7 +1278,7 @@ void WebHandler::handleDisplay(AsyncWebServerRequest *request)
 
                 hiddenInput(response, "changeValue", "action");
 
-                numberInput(response, 0/*changeValueDisplay->value()*/, "value", "Value:");
+                numberInput(response, changeValueDisplay->shownValue(), "value", "Value:");
 
                 {
                     HtmlTag button(response, "button", " type=\"submit\" name=\"subAction\" value=\"update\"");
@@ -1412,7 +1412,7 @@ void WebHandler::handleDisplayAction(AsyncWebServerRequest *request)
             AsyncWebParameter* p = request->getParam("value");
             const auto value = strtol(p->value().c_str(), nullptr, 10);
 
-            /*changeDisplay->setValue(value);*/
+            changeDisplay->setShownValue(value);
 
             if (confirm)
                 changeDisplay->confirm();

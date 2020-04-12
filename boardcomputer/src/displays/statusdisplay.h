@@ -10,10 +10,7 @@
 #include "utils.h"
 #include "label.h"
 #include "progressbar.h"
-
-namespace {
 #include "sprites/alert.h"
-}
 
 namespace {
 template<int y>
@@ -202,7 +199,7 @@ void BoardStatus<y>::drawWarning()
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
     tft.setSwapBytes(true);
-    tft.pushImage(10, y+40, alertWidth, alertHeight, alert);
+    tft.pushImage(10, y+40, sprites::alert.width, sprites::alert.height, sprites::alert.buffer);
     tft.setSwapBytes(false);
 }
 
