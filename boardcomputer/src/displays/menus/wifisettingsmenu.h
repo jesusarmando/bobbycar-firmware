@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "actions/switchscreenaction.h"
 #include "icons/back.h"
@@ -14,8 +15,9 @@
 namespace {
 template<typename Tscreen>
 class WifiSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_WIFISETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_GENERICWIFISETTINGS>,     DefaultFont,  DefaultColor, SwitchScreenAction<GenericWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_STATIONWIFISETTINGS>,     DefaultFont,  DefaultColor, SwitchScreenAction<StationWifiSettingsMenu<WifiSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_WIFISCAN>,                DefaultFont,  DefaultColor, SwitchScreenAction<WifiScanMenu<WifiSettingsMenu<Tscreen>>>>,

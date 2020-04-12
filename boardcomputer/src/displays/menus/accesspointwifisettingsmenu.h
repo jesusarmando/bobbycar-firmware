@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "menuitem.h"
 #include "actions/dummyaction.h"
 #include "actions/wifisoftapenableipv6action.h"
@@ -44,8 +45,9 @@ public:
 
 template<typename Tscreen>
 class AccessPointWifiSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_ACCESSPOINTWIFISETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, WifiSoftApGetStationNumText,           StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSoftApIpText,                      StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSoftApBroadcastIpText,             StaticFont<2>, DisabledColor, DummyAction>,

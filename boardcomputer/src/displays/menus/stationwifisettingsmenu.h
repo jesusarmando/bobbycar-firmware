@@ -2,7 +2,8 @@
 
 #include <WiFi.h>
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -127,8 +128,9 @@ public:
 
 template<typename Tscreen>
 class StationWifiSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_STATIONWIFISETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_WIFIRECONNECT>,           DefaultFont,   DefaultColor,  WifiReconnectAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFIDISCONNECT>,          DefaultFont,   DefaultColor,  WifiDisconnectAction>,
         makeComponent<MenuItem, WifiIsConnectedText,                      StaticFont<2>, DisabledColor, DummyAction>,

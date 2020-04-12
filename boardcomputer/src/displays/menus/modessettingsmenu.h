@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
 #include "icons/back.h"
@@ -15,8 +16,9 @@
 namespace {
 template<typename Tscreen>
 class ModesSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_MODESSETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_DEFAULTMODESETTIGNS>,   DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_TEMPOMATMODESETTINGS>,  DefaultFont, DefaultColor, SwitchScreenAction<TempomatModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODESETTINGS>,     DefaultFont, DefaultColor, SwitchScreenAction<LarsmModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,

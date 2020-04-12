@@ -1,6 +1,8 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
 #include "actions/switchscreenaction.h"
@@ -24,8 +26,9 @@ struct WebsocketModeAccessor { static auto getValue() { return &modes::websocket
 
 template<typename Tscreen>
 class SelectModeMenu :
+    public MenuDisplay,
     public StaticText<TEXT_SELECTMODE>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_DEFAULT>,   DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_TEMPOMAT>,  DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_LARSM>,     DefaultFont, DefaultColor, DummyAction>,
@@ -35,14 +38,7 @@ class SelectModeMenu :
     >,
     public ModeAccessor
 {
-    using Base = StaticMenuDisplay<
-        makeComponent<MenuItem, StaticText<TEXT_DEFAULT>,   DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_TEMPOMAT>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_LARSM>,     DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTH>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKET>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,      DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
-    >;
+    using Base = MenuDisplay;
 
 public:
     void start() override;

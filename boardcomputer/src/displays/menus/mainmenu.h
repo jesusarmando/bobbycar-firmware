@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
 #include "texts.h"
@@ -17,8 +18,9 @@
 
 namespace {
 class MainMenu :
+    public MenuDisplay,
     public StaticText<TEXT_MAINMENU>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_STATUS>,      DefaultFont, DefaultColor, SwitchScreenAction<StatusDisplay<MainMenu>>, StaticMenuItemIcon<&icons::back>>,
         makeComponent<MenuItem, StaticText<TEXT_SELECTMODE>,  DefaultFont, DefaultColor, SwitchScreenAction<SelectModeMenu<MainMenu>>>,
         makeComponent<MenuItem, StaticText<TEXT_PRESETS>,     DefaultFont, DefaultColor, SwitchScreenAction<PresetsMenu<MainMenu>>>,

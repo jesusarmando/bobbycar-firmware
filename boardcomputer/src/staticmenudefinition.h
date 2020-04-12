@@ -1,13 +1,13 @@
 #pragma once
 
-#include "menudisplay.h"
+#include "menudefinitioninterface.h"
 
 namespace {
 template<typename ...T>
-class StaticMenuDisplay;
+class StaticMenuDefinition;
 
 template<typename T0>
-class StaticMenuDisplay<T0> : public MenuDisplay
+class StaticMenuDefinition<T0> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -22,7 +22,7 @@ private:
 };
 
 template<typename T0, typename T1>
-class StaticMenuDisplay<T0, T1> : public MenuDisplay
+class StaticMenuDefinition<T0, T1> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -39,7 +39,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2>
-class StaticMenuDisplay<T0, T1, T2> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -58,7 +58,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3>
-class StaticMenuDisplay<T0, T1, T2, T3> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -79,7 +79,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4>
-class StaticMenuDisplay<T0, T1, T2, T3, T4> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -102,7 +102,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -127,7 +127,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -154,7 +154,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -183,7 +183,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -214,7 +214,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -247,7 +247,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -282,7 +282,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -319,7 +319,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -358,7 +358,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -399,7 +399,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -442,7 +442,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -487,7 +487,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15, typename T16>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -534,7 +534,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15, typename T16, typename T17>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -583,7 +583,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15, typename T16, typename T17, typename T18>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -634,7 +634,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15, typename T16, typename T17, typename T18, typename T19>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -687,7 +687,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15, typename T16, typename T17, typename T18, typename T19, typename T20>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
@@ -742,7 +742,7 @@ private:
 };
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15, typename T16, typename T17, typename T18, typename T19, typename T20, typename T21>
-class StaticMenuDisplay<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21> : public MenuDisplay
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21> : public virtual MenuDefinitionInterface
 {
 public:
     const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };

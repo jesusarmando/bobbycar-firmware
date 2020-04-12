@@ -7,6 +7,8 @@
 
 #include "menudisplay.h"
 #include "utils.h"
+#include "actions/multiaction.h"
+#include "actions/endwifiscanaction.h"
 #include "actions/switchscreenaction.h"
 #include "actions/dummyaction.h"
 #include "icons/back.h"
@@ -30,7 +32,7 @@ public:
     const std::reference_wrapper<MenuItem> *end() const override { return &(*std::end(refVec)); };
 
 private:
-    makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>> m_backItem;
+    makeComponent<MenuItem, StaticText<TEXT_BACK>, DefaultFont, DefaultColor, MultiAction<EndWifiScanAction, SwitchScreenAction<Tscreen>>, StaticMenuItemIcon<&icons::back>> m_backItem;
 
     std::vector<makeComponent<MenuItem, ChangeableText, DefaultFont, DefaultColor, DummyAction>> vec;
 

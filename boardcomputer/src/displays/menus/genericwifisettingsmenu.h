@@ -3,7 +3,8 @@
 #include <HardwareSerial.h>
 #include <WiFi.h>
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/dummyaction.h"
@@ -89,8 +90,9 @@ public:
 
 template<typename Tscreen>
 class GenericWifiSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_GENERICWIFISETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, WifiStatusBitsText,                 DefaultFont, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiChannelText,                    DefaultFont, DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEMODE>,    DefaultFont, DefaultColor,  SwitchScreenAction<WifiModeChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,

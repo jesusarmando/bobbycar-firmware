@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -64,8 +65,9 @@ public:
 
 template<typename Tscreen>
 class EnableMenu :
+    public MenuDisplay,
     public StaticText<TEXT_SETENABLED>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTLEFT>,  DefaultFont, DefaultColor, SwitchScreenAction<FrontLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_ENABLEFRONTRIGHT>, DefaultFont, DefaultColor, SwitchScreenAction<FrontRightEnabledChangeScreen<EnableMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_ENABLEBACKLEFT>,   DefaultFont, DefaultColor, SwitchScreenAction<BackLeftEnabledChangeScreen<EnableMenu<Tscreen>>>>,

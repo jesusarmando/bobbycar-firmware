@@ -3,7 +3,8 @@
 #include <WiFiGeneric.h>
 
 #include "changevaluedisplay.h"
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
 #include "icons/back.h"
@@ -12,7 +13,8 @@
 namespace {
 template<>
 class ChangeValueDisplay<wifi_power_t> :
-    public StaticMenuDisplay<
+    public MenuDisplay,
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_19_5dBm>,     DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_19dBm>,       DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_18_5dBm>,     DefaultFont, DefaultColor, DummyAction>,
@@ -29,21 +31,7 @@ class ChangeValueDisplay<wifi_power_t> :
     >,
     public virtual AccessorInterface<wifi_power_t>
 {
-    using Base = StaticMenuDisplay<
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_19_5dBm>,     DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_19dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_18_5dBm>,     DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_17dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_15dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_13dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_11dBm>,       DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_8_5dBm>,      DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_7dBm>,        DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_5dBm>,        DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_2dBm>,        DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_POWER_MINUS_1dBm>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                   DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
-    >;
+    using Base = MenuDisplay;
 
 public:
     void start() override;

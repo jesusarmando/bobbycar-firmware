@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -28,8 +29,9 @@ using BackPatternChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, Stati
 
 template<typename Tscreen>
 class BuzzerMenu :
+    public MenuDisplay,
     public StaticText<TEXT_BUZZER>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTFREQ>,    DefaultFont, DefaultColor, SwitchScreenAction<FrontFreqChangeScreen<BuzzerMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTPATTERN>, DefaultFont, DefaultColor, SwitchScreenAction<FrontPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKFREQ>,     DefaultFont, DefaultColor, SwitchScreenAction<BackFreqChangeScreen<BuzzerMenu<Tscreen>>>>,

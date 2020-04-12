@@ -3,7 +3,8 @@
 #include <esp_wifi_types.h>
 
 #include "changevaluedisplay.h"
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
 #include "icons/back.h"
@@ -12,7 +13,8 @@
 namespace {
 template<>
 class ChangeValueDisplay<wifi_mode_t> :
-    public StaticMenuDisplay<
+    public MenuDisplay,
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_NULL>,  DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_STA>,   DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_AP>,    DefaultFont, DefaultColor, DummyAction>,
@@ -21,13 +23,7 @@ class ChangeValueDisplay<wifi_mode_t> :
     >,
     public virtual AccessorInterface<wifi_mode_t>
 {
-    using Base = StaticMenuDisplay<
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_NULL>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_STA>,   DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_AP>,    DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFI_MODE_APSTA>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
-    >;
+    using Base = MenuDisplay;
 
 public:
     void start() override;

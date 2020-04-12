@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -18,8 +19,9 @@
 namespace {
 template<typename Tscreen>
 class DemosMenu :
+    public MenuDisplay,
     public StaticText<TEXT_DEMOS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_STARFIELD>,  DefaultFont, DefaultColor, SwitchScreenAction<StarfieldDisplay<DemosMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_PINGPONG>,   DefaultFont, DefaultColor, SwitchScreenAction<PingPongDisplay<DemosMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SPIRO>,      DefaultFont, DefaultColor, SwitchScreenAction<SpiroDisplay<DemosMenu<Tscreen>>>>,

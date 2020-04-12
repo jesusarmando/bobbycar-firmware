@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "actions/dummyaction.h"
@@ -38,8 +39,9 @@ using BremsMaxChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, StaticTe
 
 template<typename Tscreen>
 class PotiSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_POTISETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, GasText,                      DefaultFont, DisabledColor, DummyAction>,
         makeComponent<MenuItem, BremsText,                    DefaultFont, DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_CALIBRATE>,   DefaultFont, DefaultColor,  SwitchScreenAction<CalibrateDisplay<PotiSettingsMenu<Tscreen>>>>,

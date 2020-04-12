@@ -1,7 +1,8 @@
 #pragma once
 
 #include "changevaluedisplay.h"
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "actions/dummyaction.h"
 #include "icons/back.h"
@@ -10,18 +11,15 @@
 namespace {
 template<>
 class ChangeValueDisplay<bool> :
-    public StaticMenuDisplay<
+    public MenuDisplay,
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_TRUE>,  DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_FALSE>, DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,  DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
     >,
     public virtual AccessorInterface<bool>
 {
-    using Base = StaticMenuDisplay<
-        makeComponent<MenuItem, StaticText<TEXT_TRUE>,  DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_FALSE>, DefaultFont, DefaultColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,  DefaultFont, DefaultColor, DummyAction, StaticMenuItemIcon<&icons::back>>
-    >;
+    using Base = MenuDisplay;
 
 public:
     void start() override;

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -83,8 +84,9 @@ using DefaultModeBrems2WertChangeDisplay = makeComponent<ChangeValueDisplay<int1
 
 template<typename Tscreen>
 class DefaultModeSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_DEFAULTMODESETTIGNS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_SETCONTROLTYPE>,             DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETCONTROLMODE>,             DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_ENABLEWEAKENINGSMOOTHENING>, DefaultFont, DefaultColor, SwitchScreenAction<DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,

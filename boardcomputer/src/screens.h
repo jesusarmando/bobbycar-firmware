@@ -46,7 +46,7 @@ union X {
     AccessPointWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> accessPointWifiSettingsMenu;
     BluetoothSettingsMenu<SettingsMenu<MainMenu>> bluetoothSettingsMenu;
     BluetoothModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> bluetoothModeSettingsMenu;
-    BuzzerMenu<DebugMenu<MainMenu>> buzzerMenu;
+    BuzzerMenu<SettingsMenu<MainMenu>> buzzerMenu;
     CommonSettingsMenu<SettingsMenu<MainMenu>> commonSettingsMenu;
     DebugMenu<MainMenu> debugMenu;
     DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> defaultModeSettingsMenu;
@@ -79,10 +79,10 @@ union X {
     StatusDisplay<MainMenu> statusDisplay;
     VersionDisplay<SettingsMenu<MainMenu>> versionDisplay;
 
-    FrontFreqChangeScreen<BuzzerMenu<DebugMenu<MainMenu>>> changeFrontFreq;
-    FrontPatternChangeScreen<BuzzerMenu<DebugMenu<MainMenu>>> changeFrontPattern;
-    BackFreqChangeScreen<BuzzerMenu<DebugMenu<MainMenu>>> changeBackFreq;
-    BackPatternChangeScreen<BuzzerMenu<DebugMenu<MainMenu>>> changeBackPattern;
+    FrontFreqChangeScreen<BuzzerMenu<SettingsMenu<MainMenu>>> changeFrontFreq;
+    FrontPatternChangeScreen<BuzzerMenu<SettingsMenu<MainMenu>>> changeFrontPattern;
+    BackFreqChangeScreen<BuzzerMenu<SettingsMenu<MainMenu>>> changeBackFreq;
+    BackPatternChangeScreen<BuzzerMenu<SettingsMenu<MainMenu>>> changeBackPattern;
 
     IMotMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeIMotMax;
     IDcMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeIDcMax;
@@ -112,8 +112,8 @@ union X {
     BackLeftInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackLeftInverted;
     BackRightInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackRightInverted;
 
-    FrontLedChangeScreen<DebugMenu<MainMenu>> changeFrontLed;
-    BackLedChangeScreen<DebugMenu<MainMenu>> changeBackLed;
+    FrontLedChangeScreen<SettingsMenu<MainMenu>> changeFrontLed;
+    BackLedChangeScreen<SettingsMenu<MainMenu>> changeBackLed;
 
     TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlTyp;
     TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlMod;

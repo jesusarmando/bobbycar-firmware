@@ -5,7 +5,8 @@
 #include <Arduino.h>
 #include <WString.h>
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "menuitem.h"
 #include "actions/dummyaction.h"
@@ -106,7 +107,9 @@ constexpr char TEXT_DYNAMICICON[] = "Dynamic icon";
 
 template<typename Tscreen>
 class DynamicDebugMenu :
-    public StaticMenuDisplay<
+    public MenuDisplay,
+    public RandomText,
+    public StaticMenuDefinition<
         // some padding to allow for scrolling
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
@@ -130,7 +133,6 @@ class DynamicDebugMenu :
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DefaultFont, DefaultColor, DummyAction>,
 
         makeComponent<MenuItem, StaticText<TEXT_BACK>,         DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
-    >,
-    public RandomText
+    >
 {};
 }

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -34,8 +35,9 @@ using PhaseAdvMaxChangeScreen = makeComponent<ChangeValueDisplay<int16_t>, Stati
 
 template<typename Tscreen>
 class CommonSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_COMMONSETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_SETIMOTMAX>,      DefaultFont, DefaultColor, SwitchScreenAction<IMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETIDCMAX>,       DefaultFont, DefaultColor, SwitchScreenAction<IDcMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETNMOTMAX>,      DefaultFont, DefaultColor, SwitchScreenAction<NMotMaxChangeScreen<CommonSettingsMenu<Tscreen>>>>,

@@ -3,7 +3,7 @@
 #include "actioninterface.h"
 
 namespace {
-class EndWifiScanMenuItem : public virtual ActionInterface
+class EndWifiScanAction : public virtual ActionInterface
 {
 public:
     void triggered() override

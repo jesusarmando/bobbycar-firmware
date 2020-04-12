@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -25,8 +26,9 @@ public:
 
 template<typename Tscreen>
 class LarsmModeSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_LARSMMODESETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_LARSMMODECHANGEMODE>, DefaultFont, DefaultColor, SwitchScreenAction<LarsmModeModeChangeDisplay<LarsmModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,                DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >

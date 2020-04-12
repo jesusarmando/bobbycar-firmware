@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -38,8 +39,9 @@ public:
 
 template<typename Tscreen>
 class TempomatModeSettingsMenu :
+    public MenuDisplay,
     public StaticText<TEXT_TEMPOMATMODESETTINGS>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_SETCONTROLTYPE>, DefaultFont, DefaultColor, SwitchScreenAction<TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETCONTROLMODE>, DefaultFont, DefaultColor, SwitchScreenAction<TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,           DefaultFont, DefaultColor, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "staticmenudisplay.h"
+#include "menudisplay.h"
+#include "staticmenudefinition.h"
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
@@ -64,8 +65,9 @@ public:
 
 template<typename Tscreen>
 class InvertMenu :
+    public MenuDisplay,
     public StaticText<TEXT_SETINVERTED>,
-    public StaticMenuDisplay<
+    public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_INVERTFRONTLEFT>,  DefaultFont, DefaultColor, SwitchScreenAction<FrontLeftInvertedChangeScreen<InvertMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_INVERTFRONTRIGHT>, DefaultFont, DefaultColor, SwitchScreenAction<FrontRightInvertedChangeScreen<InvertMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_INVERTBACKLEFT>,   DefaultFont, DefaultColor, SwitchScreenAction<BackLeftInvertedChangeScreen<InvertMenu<Tscreen>>>>,
