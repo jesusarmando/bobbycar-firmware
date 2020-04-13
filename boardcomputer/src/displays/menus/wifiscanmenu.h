@@ -14,7 +14,10 @@
 #include "texts.h"
 
 namespace {
-template<typename Tscreen>
+class WifiSettingsMenu;
+}
+
+namespace {
 class WifiScanMenu : public MenuDisplay
 {
     using Base = MenuDisplay;
@@ -30,7 +33,7 @@ public:
     const std::reference_wrapper<MenuItem> *end() const override { return &(*std::end(refVec)); };
 
 private:
-    makeComponent<MenuItem, StaticText<TEXT_BACK>, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>> m_backItem;
+    makeComponent<MenuItem, StaticText<TEXT_BACK>, SwitchScreenAction<WifiSettingsMenu>, StaticMenuItemIcon<&icons::back>> m_backItem;
 
     std::vector<makeComponent<MenuItem, ChangeableText, DummyAction>> vec;
 
@@ -41,8 +44,7 @@ private:
     unsigned long m_lastScanComplete;
 };
 
-template<typename Tscreen>
-String WifiScanMenu<Tscreen>::text() const
+String WifiScanMenu::text() const
 {
     auto text = String{vec.size()} + " found";
     switch (WiFi.scanComplete())
@@ -53,8 +55,7 @@ String WifiScanMenu<Tscreen>::text() const
     return text;
 }
 
-template<typename Tscreen>
-void WifiScanMenu<Tscreen>::start()
+void WifiScanMenu::start()
 {
     Base::start();
 
@@ -63,8 +64,7 @@ void WifiScanMenu<Tscreen>::start()
     WiFi.scanNetworks(true);
 }
 
-template<typename Tscreen>
-void WifiScanMenu<Tscreen>::update()
+void WifiScanMenu::update()
 {
     const auto n = WiFi.scanComplete();
     if (n >= 0)
@@ -107,8 +107,7 @@ void WifiScanMenu<Tscreen>::update()
     Base::update();
 }
 
-template<typename Tscreen>
-void WifiScanMenu<Tscreen>::stop()
+void WifiScanMenu::stop()
 {
     WiFi.scanDelete();
 }

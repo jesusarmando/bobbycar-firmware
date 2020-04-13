@@ -90,7 +90,7 @@ void ChangeValueDisplay<Tvalue>::update()
         const auto rotateOffset = m_rotateOffset;
         m_rotateOffset = 0;
 
-        m_value += rotateOffset;
+        m_value -= rotateOffset;
     }
     else
     {

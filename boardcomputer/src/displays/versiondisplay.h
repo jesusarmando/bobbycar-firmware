@@ -1,22 +1,25 @@
 #pragma once
 
 #include "demodisplay.h"
+#include "actions/switchscreenaction.h"
 #include "globals.h"
 #include "texts.h"
 
 namespace {
-template<typename Tscreen>
-class VersionDisplay : public DemoDisplay<Tscreen>
+class SettingsMenu;
+}
+
+namespace {
+class VersionDisplay : public DemoDisplay, public SwitchScreenAction<SettingsMenu>
 {
-    using Base = DemoDisplay<Tscreen>;
+    using Base = DemoDisplay;
 
 public:
     void start() override;
     void redraw() override {}
 };
 
-template<typename Tscreen>
-void VersionDisplay<Tscreen>::start()
+void VersionDisplay::start()
 {
     Base::start();
 

@@ -16,6 +16,7 @@
 #include "displays/menus/mainmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
 #include "displays/menus/modessettingsmenu.h"
+#include "displays/menus/presetsmenu.h"
 #include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/selectmodemenu.h"
 #include "displays/menus/settingsmenu.h"
@@ -25,6 +26,7 @@
 #include "displays/menus/wifisettingsmenu.h"
 #include "displays/calibratedisplay.h"
 #include "displays/gameoflifedisplay.h"
+#include "displays/lockscreen.h"
 #include "displays/matrixdisplay.h"
 #include "displays/metersdisplay.h"
 #include "displays/pingpongdisplay.h"
@@ -43,82 +45,81 @@ union X {
     ~X() { ((Display&)statusDisplay).~Display(); }
 
     MainMenu mainMenu;
-    AccessPointWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> accessPointWifiSettingsMenu;
-    BluetoothSettingsMenu<SettingsMenu<MainMenu>> bluetoothSettingsMenu;
-    BluetoothModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> bluetoothModeSettingsMenu;
-    BuzzerMenu<SettingsMenu<MainMenu>> buzzerMenu;
-    CommonSettingsMenu<SettingsMenu<MainMenu>> commonSettingsMenu;
-    DebugMenu<MainMenu> debugMenu;
-    DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> defaultModeSettingsMenu;
-    DemosMenu<MainMenu> demosMenu;
-    DynamicDebugMenu<DebugMenu<MainMenu>> dynamicDebugMenu;
-    EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> enableMenu;
-    GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> genericWifiSettingsMenu;
-    InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>> invertMenu;
-    LarsmModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> larsmModeSettingsMenu;
-    TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> tempomatModeSettingsMenu;
-    ModesSettingsMenu<SettingsMenu<MainMenu>> modesSettingsMenu;
-    PotiSettingsMenu<SettingsMenu<MainMenu>> potiSettingsMenu;
-    PresetsMenu<MainMenu> presetsMenu;
-    SelectModeMenu<MainMenu> selectModeMenu;
-    SettingsMenu<MainMenu> settingsMenu;
-    StationWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> stationWifiSettingsMenu;
-    WebsocketModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>> websocketModeSettingsMenu;
-    WifiScanMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>> wifiScanMenu;
-    WifiSettingsMenu<SettingsMenu<MainMenu>> wifiSettingsMenu;
+    AccessPointWifiSettingsMenu accessPointWifiSettingsMenu;
+    BluetoothSettingsMenu bluetoothSettingsMenu;
+    BluetoothModeSettingsMenu bluetoothModeSettingsMenu;
+    BuzzerMenu buzzerMenu;
+    CommonSettingsMenu commonSettingsMenu;
+    DebugMenu debugMenu;
+    DefaultModeSettingsMenu defaultModeSettingsMenu;
+    DemosMenu demosMenu;
+    DynamicDebugMenu dynamicDebugMenu;
+    EnableMenu enableMenu;
+    GenericWifiSettingsMenu genericWifiSettingsMenu;
+    InvertMenu invertMenu;
+    LarsmModeSettingsMenu larsmModeSettingsMenu;
+    TempomatModeSettingsMenu tempomatModeSettingsMenu;
+    ModesSettingsMenu modesSettingsMenu;
+    PotiSettingsMenu potiSettingsMenu;
+    PresetsMenu presetsMenu;
+    SelectModeMenu selectModeMenu;
+    SettingsMenu settingsMenu;
+    StationWifiSettingsMenu stationWifiSettingsMenu;
+    WebsocketModeSettingsMenu websocketModeSettingsMenu;
+    WifiScanMenu wifiScanMenu;
+    WifiSettingsMenu wifiSettingsMenu;
 
-    CalibrateDisplay<PotiSettingsMenu<SettingsMenu<MainMenu>>> calibrateDisplay;
-    GameOfLifeDisplay<DemosMenu<MainMenu>> gameOfLifeDisplay;
-    Lockscreen<MainMenu> lockScreen;
-    MatrixDisplay<DemosMenu<MainMenu>> matrixDisplay;
-    MetersDisplay<DemosMenu<MainMenu>> metersDisplay;
-    PingPongDisplay<DemosMenu<MainMenu>> pingPongDisplay;
-    PoweroffDisplay<MainMenu> poweroffDisplay;
-    SpiroDisplay<DemosMenu<MainMenu>> spiroDisplay;
-    StarfieldDisplay<DemosMenu<MainMenu>> starFieldDisplay;
-    StatusDisplay<MainMenu> statusDisplay;
-    VersionDisplay<SettingsMenu<MainMenu>> versionDisplay;
+    CalibrateDisplay calibrateDisplay;
+    GameOfLifeDisplay gameOfLifeDisplay;
+    Lockscreen lockScreen;
+    MatrixDisplay matrixDisplay;
+    MetersDisplay metersDisplay;
+    PingPongDisplay pingPongDisplay;
+    PoweroffDisplay poweroffDisplay;
+    SpiroDisplay spiroDisplay;
+    StarfieldDisplay starFieldDisplay;
+    StatusDisplay statusDisplay;
+    VersionDisplay versionDisplay;
 
-    FrontFreqChangeScreen<BuzzerMenu<SettingsMenu<MainMenu>>> changeFrontFreq;
-    FrontPatternChangeScreen<BuzzerMenu<SettingsMenu<MainMenu>>> changeFrontPattern;
-    BackFreqChangeScreen<BuzzerMenu<SettingsMenu<MainMenu>>> changeBackFreq;
-    BackPatternChangeScreen<BuzzerMenu<SettingsMenu<MainMenu>>> changeBackPattern;
+    FrontFreqChangeScreen changeFrontFreq;
+    FrontPatternChangeScreen changeFrontPattern;
+    BackFreqChangeScreen changeBackFreq;
+    BackPatternChangeScreen changeBackPattern;
 
-    IMotMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeIMotMax;
-    IDcMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeIDcMax;
-    NMotMaxKmhChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeNMotMaxKmh;
-    NMotMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeNMotMax;
-    FieldWeakMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changeFieldWeakMax;
-    PhaseAdvMaxChangeScreen<CommonSettingsMenu<SettingsMenu<MainMenu>>> changePhaseAdvMax;
+    IMotMaxChangeScreen changeIMotMax;
+    IDcMaxChangeScreen changeIDcMax;
+    NMotMaxKmhChangeScreen changeNMotMaxKmh;
+    NMotMaxChangeScreen changeNMotMax;
+    FieldWeakMaxChangeScreen changeFieldWeakMax;
+    PhaseAdvMaxChangeScreen changePhaseAdvMax;
 
-    DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeCtrlTyp;
-    DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeCtrlMod;
-    DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeWeakeningSmoothening;
-    DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeFrontPercentage;
-    DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBackPercentage;
-    DefaultModeAddSchwelleChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeAddSchwelle;
-    DefaultModeGas1WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeGas1Wert;
-    DefaultModeGas2WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeGas2Wert;
-    DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBrems1Wert;
-    DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBrems2Wert;
+    DefaultModeCtrlTypChangeDisplay changeDefaultModeCtrlTyp;
+    DefaultModeCtrlModChangeDisplay changeDefaultModeCtrlMod;
+    DefaultModeWeakeningSmootheningChangeDisplay changeDefaultModeWeakeningSmoothening;
+    DefaultModeFrontPercentageChangeDisplay changeDefaultModeFrontPercentage;
+    DefaultModeBackPercentageChangeDisplay changeDefaultModeBackPercentage;
+    DefaultModeAddSchwelleChangeDisplay changeDefaultModeAddSchwelle;
+    DefaultModeGas1WertChangeDisplay changeDefaultModeGas1Wert;
+    DefaultModeGas2WertChangeDisplay changeDefaultModeGas2Wert;
+    DefaultModeBrems1WertChangeDisplay changeDefaultModeBrems1Wert;
+    DefaultModeBrems2WertChangeDisplay changeDefaultModeBrems2Wert;
 
-    TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlTyp;
-    TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlMod;
+    TempomatModeCtrlTypChangeScreen changeManualModeCtrlTyp;
+    TempomatModeCtrlModChangeScreen changeManualModeCtrlMod;
 
-    LarsmModeModeChangeDisplay<LarsmModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> larsmModeModeChangeDisplay;
-    LarsmModeIterationsChangeDisplay<LarsmModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> larsmModeIterationsChangeDisplay;
+    LarsmModeModeChangeDisplay larsmModeModeChangeDisplay;
+    LarsmModeIterationsChangeDisplay larsmModeIterationsChangeDisplay;
 
-    GasMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMin;
-    GasMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMax;
-    BremsMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeBremsMin;
-    BremsMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeBremsMax;
+    GasMinChangeScreen changeGasMin;
+    GasMaxChangeScreen changeGasMax;
+    BremsMinChangeScreen changeBremsMin;
+    BremsMaxChangeScreen changeBremsMax;
 
-    WifiModeChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiModeChangeScreen;
-    WifiTxPowerChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiTxPowerChangeScreen;
+    WifiModeChangeScreen wifiModeChangeScreen;
+    WifiTxPowerChangeScreen wifiTxPowerChangeScreen;
 } displays;
 
 using DefaultScreen = decltype(displays.statusDisplay);
-//using DefaultScreen = decltype(displays.lockScreen);
 
 template<typename T> T &getRefByType() = delete;
 template<> decltype(displays.accessPointWifiSettingsMenu)                      &getRefByType<decltype(displays.accessPointWifiSettingsMenu)>()                      { return displays.accessPointWifiSettingsMenu; }

@@ -8,20 +8,23 @@
 #include "texts.h"
 
 namespace {
-template<typename Tscreen>
+class MainMenu;
+}
+
+namespace {
 class PoweroffDisplay : public Display
 {
 public:
     void start() override;
     void update() override;
     void redraw() override {};
+    void stop() override;
 
 private:
     unsigned int m_startTime{};
 };
 
-template<typename Tscreen>
-void PoweroffDisplay<Tscreen>::start()
+void PoweroffDisplay::start()
 {
     m_startTime = millis();
 
@@ -41,15 +44,15 @@ void PoweroffDisplay<Tscreen>::start()
     tft.drawString("Please stand still...", 20, 125, 4);
 }
 
-template<typename Tscreen>
-void PoweroffDisplay<Tscreen>::update()
+void PoweroffDisplay::update()
 {
     if (millis() - m_startTime >= 1000)
-    {
-        for (auto &controller : controllers)
-            controller.command.poweroff = false;
+        switchScreen<MainMenu>();
+}
 
-        switchScreen<Tscreen>();
-    }
+void PoweroffDisplay::stop()
+{
+    for (auto &controller : controllers)
+        controller.command.poweroff = false;
 }
 }

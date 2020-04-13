@@ -6,12 +6,16 @@
 #include <HardwareSerial.h>
 
 #include "demodisplay.h"
+#include "actions/switchscreenaction.h"
 
 namespace {
-template<typename Tscreen>
-class SpiroDisplay : public DemoDisplay<Tscreen>
+class DemosMenu;
+}
+
+namespace {
+class SpiroDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
 {
-    using Base = DemoDisplay<Tscreen>;
+    using Base = DemoDisplay;
 
 public:
     void start() override;
@@ -30,8 +34,7 @@ private:
     int n{}, r{}, colour{};
 };
 
-template<typename Tscreen>
-void SpiroDisplay<Tscreen>::start()
+void SpiroDisplay::start()
 {
     Base::start();
 
@@ -39,8 +42,7 @@ void SpiroDisplay<Tscreen>::start()
     tft.setRotation(3);
 }
 
-template<typename Tscreen>
-void SpiroDisplay<Tscreen>::redraw()
+void SpiroDisplay::redraw()
 {
     for (int j = 0; j < std::max(1, n); j++)
     {
@@ -95,15 +97,13 @@ void SpiroDisplay<Tscreen>::redraw()
     }
 }
 
-template<typename Tscreen>
-void SpiroDisplay<Tscreen>::stop()
+void SpiroDisplay::stop()
 {
     Base::stop();
     tft.setRotation(0);
 }
 
-template<typename Tscreen>
-unsigned int SpiroDisplay<Tscreen>::rainbow(int value)
+unsigned int SpiroDisplay::rainbow(int value)
 {
     // Value is expected to be in range 0-127
     // The value is converted to a spectrum colour from 0 = blue through to red = blue

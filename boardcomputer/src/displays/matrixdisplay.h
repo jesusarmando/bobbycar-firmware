@@ -1,15 +1,19 @@
 #pragma once
 
 #include "demodisplay.h"
+#include "actions/switchscreenaction.h"
 #include "globals.h"
 #include "utils.h"
 #include "texts.h"
 
 namespace {
-template<typename Tscreen>
-class MatrixDisplay : public DemoDisplay<Tscreen>
+class DemosMenu;
+}
+
+namespace {
+class MatrixDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
 {
-    using Base = DemoDisplay<Tscreen>;
+    using Base = DemoDisplay;
 
 public:
     void start() override;
@@ -30,8 +34,7 @@ private:
     uint16_t xPos = 0;
 };
 
-template<typename Tscreen>
-void MatrixDisplay<Tscreen>::start()
+void MatrixDisplay::start()
 {
     Base::start();
 
@@ -65,22 +68,19 @@ void MatrixDisplay<Tscreen>::start()
     }
 }
 
-template<typename Tscreen>
-void MatrixDisplay<Tscreen>::redraw()
+void MatrixDisplay::redraw()
 {
     yDraw = scroll_slow(320,5);
 }
 
-template<typename Tscreen>
-void MatrixDisplay<Tscreen>::stop()
+void MatrixDisplay::stop()
 {
     Base::stop();
     scrollAddress(0);
     tft.setRotation(0);
 }
 
-template<typename Tscreen>
-int MatrixDisplay<Tscreen>::scroll_slow(int lines, int wait)
+int MatrixDisplay::scroll_slow(int lines, int wait)
 {
     int yTemp = yStart;
 

@@ -18,6 +18,10 @@
 #include "texts.h"
 
 namespace {
+class DebugMenu;
+}
+
+namespace {
 class RandomText : public virtual TextInterface
 {
 public:
@@ -115,7 +119,6 @@ constexpr char TEXT_DYNAMICFONT[] = "Dynamic font";
 constexpr char TEXT_DYNAMICICON[] = "Dynamic icon";
 constexpr char TEXT_DEBUGTOGGLE[] = "Debug toggle";
 
-template<typename Tscreen>
 class DynamicDebugMenu :
     public MenuDisplay,
     public RandomText,
@@ -143,7 +146,7 @@ class DynamicDebugMenu :
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
 
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,         SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,         SwitchScreenAction<DebugMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

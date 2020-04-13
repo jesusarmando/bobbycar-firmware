@@ -5,21 +5,24 @@
 #include "staticmenudefinition.h"
 #include "utils.h"
 #include "actions/switchscreenaction.h"
+#include "actions/dummyaction.h"
 #include "actions/rebootaction.h"
 #include "icons/back.h"
 #include "esptexthelpers.h"
 #include "texts.h"
 
-#include "displays/menus/dynamicdebugmenu.h"
+namespace {
+class DynamicDebugMenu;
+class MainMenu;
+}
 
 namespace {
-template<typename Tscreen>
 class DebugMenu :
     public MenuDisplay,
     public StaticText<TEXT_DEBUG>,
     public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_REBOOT>,      RebootAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DYNAMICMENU>, SwitchScreenAction<DynamicDebugMenu<DebugMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICMENU>, SwitchScreenAction<DynamicDebugMenu>>,
         makeComponent<MenuItem, EspHeapSizeText,              StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, EspFreeHeapText,              StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, EspMinFreeHeapText,           StaticFont<2>, DisabledColor, DummyAction>,
@@ -38,7 +41,7 @@ class DebugMenu :
         makeComponent<MenuItem, EspSketchSizeText,            StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, EspSketchMd5Text,             StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, EspFreeSketchSpaceText,       StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,        SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,        SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

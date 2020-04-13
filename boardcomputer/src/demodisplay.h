@@ -1,11 +1,10 @@
 #pragma once
 
+#include "actioninterface.h"
 #include "display.h"
-#include "utils.h"
 
 namespace {
-template<typename Tscreen>
-class DemoDisplay : public Display
+class DemoDisplay : public Display, public virtual ActionInterface
 {
 public:
     void start() override;
@@ -17,21 +16,18 @@ private:
     bool m_pressed;
 };
 
-template<typename Tscreen>
-void DemoDisplay<Tscreen>::start()
+void DemoDisplay::start()
 {
     m_pressed = false;
 }
 
-template<typename Tscreen>
-void DemoDisplay<Tscreen>::update()
+void DemoDisplay::update()
 {
     if (m_pressed)
-        switchScreen<Tscreen>();
+        triggered();
 }
 
-template<typename Tscreen>
-void DemoDisplay<Tscreen>::button(bool pressed)
+void DemoDisplay::button(bool pressed)
 {
     if (!pressed)
         m_pressed = true;

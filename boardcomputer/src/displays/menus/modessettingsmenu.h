@@ -7,24 +7,26 @@
 #include "icons/back.h"
 #include "texts.h"
 
-#include "displays/menus/defaultmodesettingsmenu.h"
-#include "displays/menus/tempomatmodesettingsmenu.h"
-#include "displays/menus/larsmmodesettingsmenu.h"
-#include "displays/menus/bluetoothmodesettingsmenu.h"
-#include "displays/menus/websocketmodesettingsmenu.h"
+namespace {
+class DefaultModeSettingsMenu;
+class TempomatModeSettingsMenu;
+class LarsmModeSettingsMenu;
+class BluetoothModeSettingsMenu;
+class WebsocketModeSettingsMenu;
+class SettingsMenu;
+}
 
 namespace {
-template<typename Tscreen>
 class ModesSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_MODESSETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_DEFAULTMODESETTIGNS>,   SwitchScreenAction<DefaultModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_TEMPOMATMODESETTINGS>,  SwitchScreenAction<TempomatModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_LARSMMODESETTINGS>,     SwitchScreenAction<LarsmModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHMODESETTINGS>, SwitchScreenAction<BluetoothModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKETMODESETTINGS>, SwitchScreenAction<WebsocketModeSettingsMenu<ModesSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_DEFAULTMODESETTIGNS>,   SwitchScreenAction<DefaultModeSettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_TEMPOMATMODESETTINGS>,  SwitchScreenAction<TempomatModeSettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSMMODESETTINGS>,     SwitchScreenAction<LarsmModeSettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHMODESETTINGS>, SwitchScreenAction<BluetoothModeSettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKETMODESETTINGS>, SwitchScreenAction<WebsocketModeSettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  SwitchScreenAction<SettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

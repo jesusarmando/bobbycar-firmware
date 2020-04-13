@@ -15,8 +15,10 @@
 #include "texts.h"
 
 namespace {
+class SettingsMenu;
+}
 
-template<typename Tscreen>
+namespace {
 class BluetoothSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_BLUETOOTHSETTINGS>,
@@ -31,7 +33,7 @@ class BluetoothSettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHFLUSH>,        DisabledColor, BluetoothFlushAction>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHEND>,          DisabledColor, BluetoothEndAction>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHDISCONNECT>,   DisabledColor, BluetoothDisconnectAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                  SwitchScreenAction<SettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

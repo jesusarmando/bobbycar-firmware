@@ -8,12 +8,15 @@
 #include "texts.h"
 
 namespace {
-template<typename Tscreen>
+class ModesSettingsMenu;
+}
+
+namespace {
 class WebsocketModeSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_WEBSOCKETMODESETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_BACK>, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>, SwitchScreenAction<ModesSettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

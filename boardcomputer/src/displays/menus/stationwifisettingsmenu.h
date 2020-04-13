@@ -17,6 +17,10 @@
 #include "texts.h"
 
 namespace {
+class WifiSettingsMenu;
+}
+
+namespace {
 struct WifiIsConnectedText : public virtual TextInterface {
 public:
     String text() const override { return String{"isConnected: "} + (WiFi.isConnected() ? "true" : "false"); }
@@ -105,7 +109,6 @@ public:
     String text() const override { return String{"RSSI: "} + WiFi.RSSI(); }
 };
 
-template<typename Tscreen>
 class StationWifiSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_STATIONWIFISETTINGS>,
@@ -131,7 +134,7 @@ class StationWifiSettingsMenu :
         makeComponent<MenuItem, WifiPskText,                              StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiBssidText,                            StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiRssiText,                             StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                    SwitchScreenAction<WifiSettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

@@ -6,12 +6,16 @@
 #include <HardwareSerial.h>
 
 #include "demodisplay.h"
+#include "actions/switchscreenaction.h"
 
 namespace {
-template<typename Tscreen>
-class GameOfLifeDisplay : public DemoDisplay<Tscreen>
+class DemosMenu;
+}
+
+namespace {
+class GameOfLifeDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
 {
-    using Base = DemoDisplay<Tscreen>;
+    using Base = DemoDisplay;
 
 public:
     void start() override;
@@ -62,8 +66,7 @@ private:
     int gen = 0;
 };
 
-template<typename Tscreen>
-void GameOfLifeDisplay<Tscreen>::start()
+void GameOfLifeDisplay::start()
 {
     Base::start();
 
@@ -71,8 +74,7 @@ void GameOfLifeDisplay<Tscreen>::start()
     tft.fillScreen(TFT_BLACK);
 }
 
-template<typename Tscreen>
-void GameOfLifeDisplay<Tscreen>::redraw()
+void GameOfLifeDisplay::redraw()
 {
     if (gen == 0)
     {
@@ -94,15 +96,13 @@ void GameOfLifeDisplay<Tscreen>::redraw()
         gen = 0;
 }
 
-template<typename Tscreen>
-void GameOfLifeDisplay<Tscreen>::stop()
+void GameOfLifeDisplay::stop()
 {
     Base::stop();
     tft.setRotation(0);
 }
 
-template<typename Tscreen>
-void GameOfLifeDisplay<Tscreen>::drawGrid()
+void GameOfLifeDisplay::drawGrid()
 {
     uint16_t color = TFT_WHITE;
     for (int16_t x = 1; x < GRIDX - 1; x++) {
@@ -118,8 +118,7 @@ void GameOfLifeDisplay<Tscreen>::drawGrid()
     }
 }
 
-template<typename Tscreen>
-void GameOfLifeDisplay<Tscreen>::initGrid()
+void GameOfLifeDisplay::initGrid()
 {
     for (int16_t x = 0; x < GRIDX; x++) {
         for (int16_t y = 0; y < GRIDY; y++) {
@@ -139,8 +138,7 @@ void GameOfLifeDisplay<Tscreen>::initGrid()
     }
 }
 
-template<typename Tscreen>
-int GameOfLifeDisplay<Tscreen>::getNumberOfNeighbors(int x, int y)
+int GameOfLifeDisplay::getNumberOfNeighbors(int x, int y)
 {
     int n{};
     for (auto xOffset : {-1,0,1})
@@ -160,8 +158,7 @@ int GameOfLifeDisplay<Tscreen>::getNumberOfNeighbors(int x, int y)
     return n;
 }
 
-template<typename Tscreen>
-void GameOfLifeDisplay<Tscreen>::computeCA()
+void GameOfLifeDisplay::computeCA()
 {
     for (int16_t x = 1; x < GRIDX; x++) {
         for (int16_t y = 1; y < GRIDY; y++) {

@@ -11,32 +11,32 @@
 #include "globals.h"
 
 namespace {
+class BuzzerMenu;
+class SettingsMenu;
+}
+
+namespace {
 struct FrontFreqAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return front.command.buzzer.freq; } };
-template<typename Tscreen>
-using FrontFreqChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_SETFRONTFREQ>, FrontFreqAccessor, SwitchScreenAction<Tscreen>>;
+using FrontFreqChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_SETFRONTFREQ>, FrontFreqAccessor, SwitchScreenAction<BuzzerMenu>>;
 
 struct FrontPatternAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return front.command.buzzer.pattern; } };
-template<typename Tscreen>
-using FrontPatternChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_SETFRONTPATTERN>, FrontPatternAccessor, SwitchScreenAction<Tscreen>>;
+using FrontPatternChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_SETFRONTPATTERN>, FrontPatternAccessor, SwitchScreenAction<BuzzerMenu>>;
 
 struct BackFreqAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return back.command.buzzer.freq; } };
-template<typename Tscreen>
-using BackFreqChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_SETBACKFREQ>, BackFreqAccessor, SwitchScreenAction<Tscreen>>;
+using BackFreqChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_SETBACKFREQ>, BackFreqAccessor, SwitchScreenAction<BuzzerMenu>>;
 
 struct BackPatternAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return back.command.buzzer.pattern; } };
-template<typename Tscreen>
-using BackPatternChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_SETBACKPATTERN>, BackPatternAccessor, SwitchScreenAction<Tscreen>>;
+using BackPatternChangeScreen = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_SETBACKPATTERN>, BackPatternAccessor, SwitchScreenAction<BuzzerMenu>>;
 
-template<typename Tscreen>
 class BuzzerMenu :
     public MenuDisplay,
     public StaticText<TEXT_BUZZER>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_SETFRONTFREQ>,    SwitchScreenAction<FrontFreqChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETFRONTPATTERN>, SwitchScreenAction<FrontPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETBACKFREQ>,     SwitchScreenAction<BackFreqChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETBACKPATTERN>,  SwitchScreenAction<BackPatternChangeScreen<BuzzerMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,            SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_SETFRONTFREQ>,    SwitchScreenAction<FrontFreqChangeScreen>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETFRONTPATTERN>, SwitchScreenAction<FrontPatternChangeScreen>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBACKFREQ>,     SwitchScreenAction<BackFreqChangeScreen>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETBACKPATTERN>,  SwitchScreenAction<BackPatternChangeScreen>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,            SwitchScreenAction<SettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

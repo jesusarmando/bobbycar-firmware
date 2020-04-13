@@ -5,7 +5,7 @@
 #include <WString.h>
 
 #include "demodisplay.h"
-#include "display.h"
+#include "actions/switchscreenaction.h"
 #include "globals.h"
 #include "texts.h"
 #include "label.h"
@@ -13,10 +13,13 @@
 #include "modes/ignoreinputmode.h"
 
 namespace {
-template<typename Tscreen>
-class CalibrateDisplay : public DemoDisplay<Tscreen>
+class PotiSettingsMenu;
+}
+
+namespace {
+class CalibrateDisplay : public DemoDisplay, public SwitchScreenAction<PotiSettingsMenu>
 {
-    using Base = DemoDisplay<Tscreen>;
+    using Base = DemoDisplay;
 
 public:
     void start() override;
@@ -38,8 +41,7 @@ private:
     ProgressBar m_progressBar1{20, 230, 200, 10, 0, 1000};
 };
 
-template<typename Tscreen>
-void CalibrateDisplay<Tscreen>::start()
+void CalibrateDisplay::start()
 {
     Base::start();
 
@@ -63,8 +65,7 @@ void CalibrateDisplay<Tscreen>::start()
     m_progressBar1.start();
 }
 
-template<typename Tscreen>
-void CalibrateDisplay<Tscreen>::redraw()
+void CalibrateDisplay::redraw()
 {
     m_labels[0].redraw(String{gas});
     m_labels[1].redraw(String{raw_gas});
@@ -76,8 +77,7 @@ void CalibrateDisplay<Tscreen>::redraw()
     m_progressBar1.redraw(brems);
 }
 
-template<typename Tscreen>
-void CalibrateDisplay<Tscreen>::stop()
+void CalibrateDisplay::stop()
 {
     Base::stop();
 

@@ -5,13 +5,17 @@
 #include <Arduino.h>
 
 #include "demodisplay.h"
+#include "actions/switchscreenaction.h"
 #include "globals.h"
 
 namespace {
-template<typename Tscreen>
-class StarfieldDisplay : public DemoDisplay<Tscreen>
+class DemosMenu;
+}
+
+namespace {
+class StarfieldDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
 {
-    using Base = DemoDisplay<Tscreen>;
+    using Base = DemoDisplay;
 
 public:
     StarfieldDisplay();
@@ -33,8 +37,7 @@ private:
     uint8_t za, zb, zc, zx;
 };
 
-template<typename Tscreen>
-StarfieldDisplay<Tscreen>::StarfieldDisplay() :
+StarfieldDisplay::StarfieldDisplay() :
     za(random(256)),
     zb(random(256)),
     zc(random(256)),
@@ -42,8 +45,7 @@ StarfieldDisplay<Tscreen>::StarfieldDisplay() :
 {
 }
 
-template<typename Tscreen>
-void StarfieldDisplay<Tscreen>::start()
+void StarfieldDisplay::start()
 {
     Base::start();
 
@@ -56,8 +58,7 @@ void StarfieldDisplay<Tscreen>::start()
     //tft.fastSetup(); // Prepare plot window range for fast pixel plotting
 }
 
-template<typename Tscreen>
-void StarfieldDisplay<Tscreen>::redraw()
+void StarfieldDisplay::redraw()
 {
     uint8_t spawnDepthVariation = 255;
 
@@ -96,15 +97,13 @@ void StarfieldDisplay<Tscreen>::redraw()
     }
 }
 
-template<typename Tscreen>
-void StarfieldDisplay<Tscreen>::stop()
+void StarfieldDisplay::stop()
 {
     Base::stop();
     tft.setRotation(0);
 }
 
-template<typename Tscreen>
-uint8_t StarfieldDisplay<Tscreen>::rng()
+uint8_t StarfieldDisplay::rng()
 {
     zx++;
     za = (za^zc^zx);

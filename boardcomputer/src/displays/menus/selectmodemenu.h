@@ -16,6 +16,10 @@
 #include "modes/websocketmode.h"
 
 namespace {
+class MainMenu;
+}
+
+namespace {
 template<typename T1, T1 &target, typename T2, T2 value>
 class SetterAction : public ActionInterface
 {
@@ -28,17 +32,16 @@ using SetLarsmModeAction = SetterAction<ModeInterface*, currentMode, LarsmMode*,
 using SetBluetoothModeAction = SetterAction<ModeInterface*, currentMode, BluetoothMode*, &modes::bluetoothMode>;
 using SetWebsocketModeAction = SetterAction<ModeInterface*, currentMode, WebsocketMode*, &modes::websocketMode>;
 
-template<typename Tscreen>
 class SelectModeMenu :
     public MenuDisplay,
     public StaticText<TEXT_SELECTMODE>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_DEFAULT>,   MultiAction<SetDefaultModeAction, SwitchScreenAction<Tscreen>>>,
-        makeComponent<MenuItem, StaticText<TEXT_TEMPOMAT>,  MultiAction<SetTempomatModeAction, SwitchScreenAction<Tscreen>>>,
-        makeComponent<MenuItem, StaticText<TEXT_LARSM>,     MultiAction<SetLarsmModeAction, SwitchScreenAction<Tscreen>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTH>, MultiAction<SetBluetoothModeAction, SwitchScreenAction<Tscreen>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKET>, MultiAction<SetWebsocketModeAction, SwitchScreenAction<Tscreen>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,      SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_DEFAULT>,   MultiAction<SetDefaultModeAction, SwitchScreenAction<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_TEMPOMAT>,  MultiAction<SetTempomatModeAction, SwitchScreenAction<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_LARSM>,     MultiAction<SetLarsmModeAction, SwitchScreenAction<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTH>, MultiAction<SetBluetoothModeAction, SwitchScreenAction<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WEBSOCKET>, MultiAction<SetWebsocketModeAction, SwitchScreenAction<MainMenu>>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,      SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {
     using Base = MenuDisplay;
@@ -47,8 +50,7 @@ public:
     void start() override;
 };
 
-template<typename Tscreen>
-void SelectModeMenu<Tscreen>::start()
+void SelectModeMenu::start()
 {
     Base::start();
 

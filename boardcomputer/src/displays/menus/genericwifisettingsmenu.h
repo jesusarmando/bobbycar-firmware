@@ -15,6 +15,11 @@
 #include "texts.h"
 
 namespace {
+class GenericWifiSettingsMenu;
+class WifiSettingsMenu;
+}
+
+namespace {
 struct WifiStatusBitsText : public virtual TextInterface {
 public:
     String text() const override { return String{"statusBits: "} + WiFi.getStatusBits(); }
@@ -34,8 +39,7 @@ struct WifiModeAccessor : public virtual AccessorInterface<wifi_mode_t>
         // TODO: better error handling
     }
 };
-template<typename Tscreen>
-using WifiModeChangeScreen = makeComponent<ChangeValueDisplay<wifi_mode_t>, StaticText<TEXT_WIFICHANGEMODE>, WifiModeAccessor, SwitchScreenAction<Tscreen>>;
+using WifiModeChangeScreen = makeComponent<ChangeValueDisplay<wifi_mode_t>, StaticText<TEXT_WIFICHANGEMODE>, WifiModeAccessor, SwitchScreenAction<GenericWifiSettingsMenu>>;
 
 struct WifiSleepAccessor : public virtual AccessorInterface<bool>
 {
@@ -58,20 +62,18 @@ struct WifiTxPowerAccessor : public virtual AccessorInterface<wifi_power_t>
         // TODO: better error handling
     }
 };
-template<typename Tscreen>
-using WifiTxPowerChangeScreen = makeComponent<ChangeValueDisplay<wifi_power_t>, StaticText<TEXT_WIFICHANGETXPOWER>, WifiTxPowerAccessor, SwitchScreenAction<Tscreen>>;
+using WifiTxPowerChangeScreen = makeComponent<ChangeValueDisplay<wifi_power_t>, StaticText<TEXT_WIFICHANGETXPOWER>, WifiTxPowerAccessor, SwitchScreenAction<GenericWifiSettingsMenu>>;
 
-template<typename Tscreen>
 class GenericWifiSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_GENERICWIFISETTINGS>,
     public StaticMenuDefinition<
         makeComponent<MenuItem, WifiStatusBitsText,                 DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiChannelText,                    DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEMODE>,    SwitchScreenAction<WifiModeChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEMODE>,    SwitchScreenAction<WifiModeChangeScreen>>,
         makeComponent<MenuItem, StaticText<TEXT_WIFICHANGESLEEP>,   ToggleBoolAction, CheckboxIcon, WifiSleepAccessor>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGETXPOWER>, SwitchScreenAction<WifiTxPowerChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,              SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGETXPOWER>, SwitchScreenAction<WifiTxPowerChangeScreen>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,              SwitchScreenAction<WifiSettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

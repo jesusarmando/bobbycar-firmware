@@ -10,6 +10,10 @@
 #include "texts.h"
 
 namespace {
+class WifiSettingsMenu;
+}
+
+namespace {
 class WifiSoftApGetStationNumText : public virtual TextInterface {
 public:
     String text() const override { return String{"softAPgetStationNum: "} + WiFi.softAPgetStationNum(); }
@@ -43,7 +47,6 @@ public:
     String text() const override { return String{"softAPmacAddress: "} + WiFi.softAPmacAddress(); }
 };
 
-template<typename Tscreen>
 class AccessPointWifiSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_ACCESSPOINTWIFISETTINGS>,
@@ -57,7 +60,7 @@ class AccessPointWifiSettingsMenu :
         makeComponent<MenuItem, WifiSoftApIpV6Text,                    StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSoftApHostnameText,                StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSoftApMacAddressText,              StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,                 SwitchScreenAction<WifiSettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

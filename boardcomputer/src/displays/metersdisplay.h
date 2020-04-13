@@ -5,14 +5,18 @@
 #include <Arduino.h>
 
 #include "demodisplay.h"
+#include "actions/switchscreenaction.h"
 #include "globals.h"
 #include "utils.h"
 
 namespace {
-template<typename Tscreen>
-class MetersDisplay : public DemoDisplay<Tscreen>
+class DemosMenu;
+}
+
+namespace {
+class MetersDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
 {
-    using Base = DemoDisplay<Tscreen>;
+    using Base = DemoDisplay;
 
 public:
     void start() override;
@@ -45,8 +49,7 @@ private:
     int d = 0;
 };
 
-template<typename Tscreen>
-void MetersDisplay<Tscreen>::start()
+void MetersDisplay::start()
 {
     Base::start();
 
@@ -64,8 +67,7 @@ void MetersDisplay<Tscreen>::start()
     plotLinear("A5", 5 * d, 160);
 }
 
-template<typename Tscreen>
-void MetersDisplay<Tscreen>::redraw()
+void MetersDisplay::redraw()
 {
     d += 4; if (d >= 360) d = 0;
 
@@ -93,8 +95,7 @@ void MetersDisplay<Tscreen>::redraw()
     plotNeedle(count == 0 ? 0.f : convertToKmh(speedSum / count));
 }
 
-template<typename Tscreen>
-void MetersDisplay<Tscreen>::analogMeter()
+void MetersDisplay::analogMeter()
 {
     // Meter outline
     tft.fillRect(0, 0, 239, 126, TFT_GREY);
@@ -183,8 +184,7 @@ void MetersDisplay<Tscreen>::analogMeter()
     plotNeedle(0.f); // Put meter needle at 0
 }
 
-template<typename Tscreen>
-void MetersDisplay<Tscreen>::plotNeedle(float value)
+void MetersDisplay::plotNeedle(float value)
 {
     tft.setTextColor(TFT_BLACK, TFT_WHITE);
     char buf[8]; dtostrf(value, 4, 0, buf);
@@ -222,8 +222,7 @@ void MetersDisplay<Tscreen>::plotNeedle(float value)
     tft.drawLine(120 + 20 * ltx + 1, 140 - 20, osx + 1, osy, TFT_RED);
 }
 
-template<typename Tscreen>
-void MetersDisplay<Tscreen>::plotLinear(const char *label, int x, int y)
+void MetersDisplay::plotLinear(const char *label, int x, int y)
 {
     int w = 36;
     tft.drawRect(x, y, w, 155, TFT_GREY);
@@ -247,8 +246,7 @@ void MetersDisplay<Tscreen>::plotLinear(const char *label, int x, int y)
     tft.drawCentreString("---", x + w / 2, y + 155 - 18, 2);
 }
 
-template<typename Tscreen>
-void MetersDisplay<Tscreen>::plotPointer()
+void MetersDisplay::plotPointer()
 {
     int dy = 187;
     byte pw = 16;

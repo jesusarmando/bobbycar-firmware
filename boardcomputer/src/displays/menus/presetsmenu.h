@@ -9,7 +9,10 @@
 #include "texts.h"
 
 namespace {
-template<typename Tscreen>
+class MainMenu;
+}
+
+namespace {
 class PresetsMenu :
     public MenuDisplay,
     public StaticText<TEXT_PRESETS>,
@@ -18,7 +21,7 @@ class PresetsMenu :
         makeComponent<MenuItem, StaticText<TEXT_SIDEWALK>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_POLICE>,   DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_RACE>,     DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,     SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,     SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

@@ -10,7 +10,10 @@
 #include "modes/ignoreinputmode.h"
 
 namespace {
-template<typename Tscreen>
+class MainMenu;
+}
+
+namespace {
 class Lockscreen : public Display
 {
     using Base = Display;
@@ -49,8 +52,7 @@ private:
     IgnoreInputMode m_mode{0, ControlType::FieldOrientedControl, ControlMode::Speed};
 };
 
-template<typename Tscreen>
-void Lockscreen<Tscreen>::start()
+void Lockscreen::start()
 {
     m_numbers = {0,0,0,0};
     m_currentIndex = 0;
@@ -89,8 +91,7 @@ void Lockscreen<Tscreen>::start()
     m_labels[0].redraw(String(m_numbers[0]));
 }
 
-template<typename Tscreen>
-void Lockscreen<Tscreen>::redraw()
+void Lockscreen::redraw()
 {
     if (m_pressed)
     {
@@ -101,7 +102,7 @@ void Lockscreen<Tscreen>::redraw()
         {
             if (m_numbers == decltype(m_numbers){1,2,3,4})
             {
-                switchScreen<Tscreen>();
+                switchScreen<MainMenu>();
                 return;
             }
 
@@ -120,7 +121,7 @@ void Lockscreen<Tscreen>::redraw()
 
     if (m_rotated)
     {
-        m_numbers[m_currentIndex] += m_rotated;
+        m_numbers[m_currentIndex] -= m_rotated;
 
         if (m_numbers[m_currentIndex] < 0)
             m_numbers[m_currentIndex]+=10;
@@ -133,8 +134,7 @@ void Lockscreen<Tscreen>::redraw()
     }
 }
 
-template<typename Tscreen>
-void Lockscreen<Tscreen>::stop()
+void Lockscreen::stop()
 {
     Base::stop();
 
@@ -142,21 +142,18 @@ void Lockscreen<Tscreen>::stop()
         currentMode = m_oldMode;
 }
 
-template<typename Tscreen>
-void Lockscreen<Tscreen>::button(bool pressed)
+void Lockscreen::button(bool pressed)
 {
     if (!pressed)
         m_pressed = true;
 }
 
-template<typename Tscreen>
-void Lockscreen<Tscreen>::rotate(int offset)
+void Lockscreen::rotate(int offset)
 {
     m_rotated += offset;
 }
 
-template<typename Tscreen>
-void Lockscreen<Tscreen>::drawRect(int index, int offset, uint32_t color) const
+void Lockscreen::drawRect(int index, int offset, uint32_t color) const
 {
     tft.drawRect(m_labels[index].x()-offset, m_labels[index].y()-offset, boxWidth+(offset*2), boxHeight+(offset*2), color);
 }

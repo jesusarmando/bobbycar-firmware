@@ -11,22 +11,24 @@
 #include "modes/tempomatmode.h"
 
 namespace {
+class TempomatModeSettingsMenu;
+class ModesSettingsMenu;
+}
+
+namespace {
 struct TempomatModeCtrlTypAccessor : public RefAccessor<ControlType> { ControlType &getRef() const override { return modes::tempomatMode.ctrlTyp; } };
-template<typename Tscreen>
-using TempomatModeCtrlTypChangeScreen = makeComponent<ChangeValueDisplay<ControlType>, StaticText<TEXT_SETCONTROLMODE>, TempomatModeCtrlTypAccessor, SwitchScreenAction<Tscreen>>;
+using TempomatModeCtrlTypChangeScreen = makeComponent<ChangeValueDisplay<ControlType>, StaticText<TEXT_SETCONTROLMODE>, TempomatModeCtrlTypAccessor, SwitchScreenAction<TempomatModeSettingsMenu>>;
 
 struct TempomatModeCtrlModAccessor : public RefAccessor<ControlMode> { ControlMode &getRef() const override { return modes::tempomatMode.ctrlMod; } };
-template<typename Tscreen>
-using TempomatModeCtrlModChangeScreen = makeComponent<ChangeValueDisplay<ControlMode>, StaticText<TEXT_SETCONTROLMODE>, TempomatModeCtrlModAccessor, SwitchScreenAction<Tscreen>>;
+using TempomatModeCtrlModChangeScreen = makeComponent<ChangeValueDisplay<ControlMode>, StaticText<TEXT_SETCONTROLMODE>, TempomatModeCtrlModAccessor, SwitchScreenAction<TempomatModeSettingsMenu>>;
 
-template<typename Tscreen>
 class TempomatModeSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_TEMPOMATMODESETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_SETCONTROLTYPE>, SwitchScreenAction<TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETCONTROLMODE>, SwitchScreenAction<TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,           SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_SETCONTROLTYPE>, SwitchScreenAction<TempomatModeCtrlTypChangeScreen>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETCONTROLMODE>, SwitchScreenAction<TempomatModeCtrlModChangeScreen>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,           SwitchScreenAction<ModesSettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

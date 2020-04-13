@@ -4,6 +4,7 @@
 #include <WiFi.h>
 
 #include "demodisplay.h"
+#include "actions/switchscreenaction.h"
 
 #include "modeinterface.h"
 #include "globals.h"
@@ -13,52 +14,72 @@
 #include "icons/alert.h"
 
 namespace {
-template<int y>
-class MotorStatus
+class MainMenu;
+}
+
+namespace {
+class StatusDisplay : public DemoDisplay, public SwitchScreenAction<MainMenu>
 {
-public:
-    void start();
-    void redraw(const MotorFeedback &motor);
-
-private:
-    Label m_labelError{18, y}; // 18, 22
-    Label m_labelCurrent{40, y}; // 85, 22
-    Label m_labelSpeed{135, y}; // 75, 22
-    Label m_labelHallSensors{210, y}; // 30, 15
-};
-
-template<int y>
-class BoardStatus
-{
-public:
-    void start();
-    void redraw(const Controller &controller);
-
-private:
-    void drawWarning();
-
-    bool m_lastFeedbackValid{};
-
-    Label m_labelLeftPwm{65, y}; // 80, 22
-    Label m_labelRightPwm{155, y}; // 80, 22
-
-    Label m_labelVoltage{30, y+25}; // 85, 22
-    Label m_labelTemperature{150, y+25}; // 85, 22
-
-    MotorStatus<y+50> m_leftMotor;
-    MotorStatus<y+75> m_rightMotor;
-};
-
-template<typename Tscreen>
-class StatusDisplay : public DemoDisplay<Tscreen>
-{
-    using Base = DemoDisplay<Tscreen>;
+    using Base = DemoDisplay;
 
 public:
     void start() override;
     void redraw() override;
 
 private:
+    class BoardStatus
+    {
+    public:
+        BoardStatus(int y) :
+            m_y{y},
+            m_labelLeftPwm{65, y}, // 80, 22
+            m_labelRightPwm{155, y}, // 80, 22
+            m_labelVoltage{30, y+25}, // 85, 22
+            m_labelTemperature{150, y+25}, // 85, 22
+            m_leftMotor{y+50},
+            m_rightMotor{y+75}
+        {}
+
+        void start();
+        void redraw(const Controller &controller);
+
+    private:
+        void drawWarning();
+
+        class MotorStatus
+        {
+        public:
+            MotorStatus(int y) :
+                m_labelError{18, y}, // 18, 22,
+                m_labelCurrent{40, y}, // 85, 22
+                m_labelSpeed{135, y}, // 75, 22
+                m_labelHallSensors{210, y} // 30, 15
+            {}
+
+            void start();
+            void redraw(const MotorFeedback &motor);
+
+        private:
+            Label m_labelError;
+            Label m_labelCurrent;
+            Label m_labelSpeed;
+            Label m_labelHallSensors;
+        };
+
+        const int m_y;
+
+        bool m_lastFeedbackValid{};
+
+        Label m_labelLeftPwm;
+        Label m_labelRightPwm;
+
+        Label m_labelVoltage;
+        Label m_labelTemperature;
+
+        MotorStatus m_leftMotor;
+        MotorStatus m_rightMotor;
+    };
+
     Label m_labelRawGas{45, 0}; // 40, 15
     Label m_labelGas{90, 0}; // 60, 15
     ProgressBar m_progressBarGas{150, 0, 90, 15, 0, 1000};
@@ -67,8 +88,8 @@ private:
     Label m_labelBrems{90, 15}; // 60, 15
     ProgressBar m_progressBarBrems{150, 15, 90, 15, 0, 1000};
 
-    BoardStatus<42> m_frontStatus;
-    BoardStatus<142> m_backStatus;
+    BoardStatus m_frontStatus{42};
+    BoardStatus m_backStatus{142};
 
     Label m_labelWifiStatus{35, 266}; // 120, 15
     Label m_labelLimit0{205, 266}; // 35, 15
@@ -78,8 +99,7 @@ private:
     Label m_labelMode{165, 296}; // 75, 15
 };
 
-template<typename Tscreen>
-void StatusDisplay<Tscreen>::start()
+void StatusDisplay::start()
 {
     Base::start();
 
@@ -116,8 +136,7 @@ void StatusDisplay<Tscreen>::start()
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
-template<typename Tscreen>
-void StatusDisplay<Tscreen>::redraw()
+void StatusDisplay::redraw()
 {
     tft.setTextFont(2);
     m_labelRawGas.redraw(String{raw_gas});
@@ -139,18 +158,16 @@ void StatusDisplay<Tscreen>::redraw()
     m_labelMode.redraw(currentMode->displayName());
 }
 
-template<int y>
-void BoardStatus<y>::start()
+void StatusDisplay::BoardStatus::start()
 {
     tft.setTextFont(4);
-    tft.drawString("pwm:", 0, y);
+    tft.drawString("pwm:", 0, m_y);
     m_labelLeftPwm.start();
     m_labelRightPwm.start();
     drawWarning();
 }
 
-template<int y>
-void BoardStatus<y>::redraw(const Controller &controller)
+void StatusDisplay::BoardStatus::redraw(const Controller &controller)
 {
     tft.setTextFont(4);
 
@@ -159,19 +176,19 @@ void BoardStatus<y>::redraw(const Controller &controller)
 
     if (controller.feedbackValid != m_lastFeedbackValid)
     {
-        tft.fillRect(0, y+25, tft.width(), 75, TFT_BLACK);
+        tft.fillRect(0, m_y+25, tft.width(), 75, TFT_BLACK);
 
         if (controller.feedbackValid)
         {
             tft.setTextColor(TFT_WHITE);
 
-            tft.drawString("U=", 0, y+25, 4);
+            tft.drawString("U=", 0, m_y+25, 4);
             m_labelVoltage.start();
-            tft.drawString("T=", 120, y+25, 4);
+            tft.drawString("T=", 120, m_y+25, 4);
             m_labelTemperature.start();
-            tft.drawString("l:", 0, y+50, 4);
+            tft.drawString("l:", 0, m_y+50, 4);
             m_leftMotor.start();
-            tft.drawString("r:", 0, y+75, 4);
+            tft.drawString("r:", 0, m_y+75, 4);
             m_rightMotor.start();
 
             tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -191,20 +208,18 @@ void BoardStatus<y>::redraw(const Controller &controller)
     }
 }
 
-template<int y>
-void BoardStatus<y>::drawWarning()
+void StatusDisplay::BoardStatus::drawWarning()
 {
     tft.setTextColor(TFT_RED);
-    tft.drawString("No data!", 60, y+50, 4);
+    tft.drawString("No data!", 60, m_y+50, 4);
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
     tft.setSwapBytes(true);
-    tft.pushImage(10, y+40, icons::alert.WIDTH, icons::alert.HEIGHT, icons::alert.buffer);
+    tft.pushImage(10, m_y+40, icons::alert.WIDTH, icons::alert.HEIGHT, icons::alert.buffer);
     tft.setSwapBytes(false);
 }
 
-template<int y>
-void MotorStatus<y>::start()
+void StatusDisplay::BoardStatus::MotorStatus::start()
 {
     m_labelError.start();
     m_labelCurrent.start();
@@ -212,8 +227,7 @@ void MotorStatus<y>::start()
     m_labelHallSensors.start();
 }
 
-template<int y>
-void MotorStatus<y>::redraw(const MotorFeedback &motor)
+void StatusDisplay::BoardStatus::MotorStatus::redraw(const MotorFeedback &motor)
 {
     tft.setTextFont(4);
     tft.setTextColor(motor.error?TFT_RED:TFT_GREEN, TFT_BLACK);
