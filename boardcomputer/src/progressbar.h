@@ -4,32 +4,41 @@
 #include "utils.h"
 
 namespace {
-template<int x, int y, int width, int height, int min, int max, uint32_t color=TFT_YELLOW>
 class ProgressBar
 {
 public:
+    ProgressBar(int x, int y, int width, int height, int min, int max, uint32_t color=TFT_YELLOW) :
+        m_x{x}, m_y{y}, m_width{width}, m_height{height}, m_min{min}, m_max{max}, m_color{color}
+    {}
+
     void start();
     void redraw(int value);
 
 private:
-    int m_lastValue{x+1};
+    const int m_x;
+    const int m_y;
+    const int m_width;
+    const int m_height;
+    const int m_min;
+    const int m_max;
+    const uint32_t m_color;
+
+    int m_lastValue{m_x+1};
 };
 
-template<int x, int y, int width, int height, int min, int max, uint32_t color>
-void ProgressBar<x, y, width, height, min, max, color>::start()
+void ProgressBar::start()
 {
-    tft.drawRect(x, y, width, height, TFT_WHITE);
+    tft.drawRect(m_x, m_y, m_width, m_height, TFT_WHITE);
 }
 
-template<int x, int y, int width, int height, int min, int max, uint32_t color>
-void ProgressBar<x, y, width, height, min, max, color>::redraw(int value)
+void ProgressBar::redraw(int value)
 {
-    value = scaleBetween(value, min, max, x+1, x+width-1);
+    value = scaleBetween(value, m_min, m_max, m_x+1, m_x+m_width-1);
 
     if (value < m_lastValue)
-        tft.fillRect(value, y+1, m_lastValue-value, height-2, TFT_BLACK);
+        tft.fillRect(value, m_y+1, m_lastValue-value, m_height-2, TFT_BLACK);
     else if (value > m_lastValue)
-        tft.fillRect(m_lastValue, y+1, value-m_lastValue, height-2, color);
+        tft.fillRect(m_lastValue, m_y+1, value-m_lastValue, m_height-2, m_color);
 
     m_lastValue = value;
 }

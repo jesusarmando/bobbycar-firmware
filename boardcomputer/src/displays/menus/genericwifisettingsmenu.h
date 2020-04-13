@@ -8,7 +8,9 @@
 #include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/dummyaction.h"
+#include "actions/toggleboolaction.h"
 #include "actions/switchscreenaction.h"
+#include "checkboxicon.h"
 #include "icons/back.h"
 #include "texts.h"
 
@@ -45,8 +47,6 @@ struct WifiSleepAccessor : public virtual AccessorInterface<bool>
         // TODO: better error handling
     }
 };
-template<typename Tscreen>
-using WifiSleepChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_WIFICHANGESLEEP>, WifiSleepAccessor, SwitchScreenAction<Tscreen>>;
 
 struct WifiTxPowerAccessor : public virtual AccessorInterface<wifi_power_t>
 {
@@ -69,7 +69,7 @@ class GenericWifiSettingsMenu :
         makeComponent<MenuItem, WifiStatusBitsText,                 DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiChannelText,                    DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEMODE>,    SwitchScreenAction<WifiModeChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGESLEEP>,   SwitchScreenAction<WifiSleepChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGESLEEP>,   ToggleBoolAction, CheckboxIcon, WifiSleepAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_WIFICHANGETXPOWER>, SwitchScreenAction<WifiTxPowerChangeScreen<GenericWifiSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,              SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>>
     >

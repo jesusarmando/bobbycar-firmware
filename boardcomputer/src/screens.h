@@ -93,7 +93,6 @@ union X {
 
     DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeCtrlTyp;
     DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeCtrlMod;
-    DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeEnableFieldWeakeningSmoothening;
     DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeWeakeningSmoothening;
     DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeFrontPercentage;
     DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBackPercentage;
@@ -103,23 +102,11 @@ union X {
     DefaultModeBrems1WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBrems1Wert;
     DefaultModeBrems2WertChangeDisplay<DefaultModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeDefaultModeBrems2Wert;
 
-    FrontLeftEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontLeftEnabled;
-    FrontRightEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontRightEnabled;
-    BackLeftEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackLeftEnabled;
-    BackRightEnabledChangeScreen<EnableMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackRightEnabled;
-
-    FrontLeftInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontLeftInverted;
-    FrontRightInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeFrontRightInverted;
-    BackLeftInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackLeftInverted;
-    BackRightInvertedChangeScreen<InvertMenu<CommonSettingsMenu<SettingsMenu<MainMenu>>>> changeBackRightInverted;
-
-    FrontLedChangeScreen<SettingsMenu<MainMenu>> changeFrontLed;
-    BackLedChangeScreen<SettingsMenu<MainMenu>> changeBackLed;
-
     TempomatModeCtrlTypChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlTyp;
     TempomatModeCtrlModChangeScreen<TempomatModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> changeManualModeCtrlMod;
 
     LarsmModeModeChangeDisplay<LarsmModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> larsmModeModeChangeDisplay;
+    LarsmModeIterationsChangeDisplay<LarsmModeSettingsMenu<ModesSettingsMenu<SettingsMenu<MainMenu>>>> larsmModeIterationsChangeDisplay;
 
     GasMinChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMin;
     GasMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeGasMax;
@@ -127,11 +114,7 @@ union X {
     BremsMaxChangeScreen<PotiSettingsMenu<SettingsMenu<MainMenu>>> changeBremsMax;
 
     WifiModeChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiModeChangeScreen;
-    WifiSleepChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiSleepChangeScreen;
     WifiTxPowerChangeScreen<GenericWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiTxPowerChangeScreen;
-
-    WifiAutoConnectChangeScreen<StationWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiAutoConnectChangeScreen;
-    WifiAutoReconnectChangeScreen<StationWifiSettingsMenu<WifiSettingsMenu<SettingsMenu<MainMenu>>>> wifiAutoReconnectChangeScreen;
 } displays;
 
 using DefaultScreen = decltype(displays.statusDisplay);
@@ -189,7 +172,6 @@ template<> decltype(displays.changePhaseAdvMax)                                &
 
 template<> decltype(displays.changeDefaultModeCtrlTyp)                         &getRefByType<decltype(displays.changeDefaultModeCtrlTyp)>()                         { return displays.changeDefaultModeCtrlTyp; }
 template<> decltype(displays.changeDefaultModeCtrlMod)                         &getRefByType<decltype(displays.changeDefaultModeCtrlMod)>()                         { return displays.changeDefaultModeCtrlMod; }
-template<> decltype(displays.changeDefaultModeEnableFieldWeakeningSmoothening) &getRefByType<decltype(displays.changeDefaultModeEnableFieldWeakeningSmoothening)>() { return displays.changeDefaultModeEnableFieldWeakeningSmoothening; }
 template<> decltype(displays.changeDefaultModeWeakeningSmoothening)            &getRefByType<decltype(displays.changeDefaultModeWeakeningSmoothening)>()            { return displays.changeDefaultModeWeakeningSmoothening; }
 template<> decltype(displays.changeDefaultModeFrontPercentage)                 &getRefByType<decltype(displays.changeDefaultModeFrontPercentage)>()                 { return displays.changeDefaultModeFrontPercentage; }
 template<> decltype(displays.changeDefaultModeBackPercentage)                  &getRefByType<decltype(displays.changeDefaultModeBackPercentage)>()                  { return displays.changeDefaultModeBackPercentage; }
@@ -199,23 +181,11 @@ template<> decltype(displays.changeDefaultModeGas2Wert)                        &
 template<> decltype(displays.changeDefaultModeBrems1Wert)                      &getRefByType<decltype(displays.changeDefaultModeBrems1Wert)>()                      { return displays.changeDefaultModeBrems1Wert; }
 template<> decltype(displays.changeDefaultModeBrems2Wert)                      &getRefByType<decltype(displays.changeDefaultModeBrems2Wert)>()                      { return displays.changeDefaultModeBrems2Wert; }
 
-template<> decltype(displays.changeFrontLeftEnabled)                           &getRefByType<decltype(displays.changeFrontLeftEnabled)>()                           { return displays.changeFrontLeftEnabled; }
-template<> decltype(displays.changeFrontRightEnabled)                          &getRefByType<decltype(displays.changeFrontRightEnabled)>()                          { return displays.changeFrontRightEnabled; }
-template<> decltype(displays.changeBackLeftEnabled)                            &getRefByType<decltype(displays.changeBackLeftEnabled)>()                            { return displays.changeBackLeftEnabled; }
-template<> decltype(displays.changeBackRightEnabled)                           &getRefByType<decltype(displays.changeBackRightEnabled)>()                           { return displays.changeBackRightEnabled; }
-
-template<> decltype(displays.changeFrontLeftInverted)                          &getRefByType<decltype(displays.changeFrontLeftInverted)>()                          { return displays.changeFrontLeftInverted; }
-template<> decltype(displays.changeFrontRightInverted)                         &getRefByType<decltype(displays.changeFrontRightInverted)>()                         { return displays.changeFrontRightInverted; }
-template<> decltype(displays.changeBackLeftInverted)                           &getRefByType<decltype(displays.changeBackLeftInverted)>()                           { return displays.changeBackLeftInverted; }
-template<> decltype(displays.changeBackRightInverted)                          &getRefByType<decltype(displays.changeBackRightInverted)>()                          { return displays.changeBackRightInverted; }
-
-template<> decltype(displays.changeFrontLed)                                   &getRefByType<decltype(displays.changeFrontLed)>()                                   { return displays.changeFrontLed; }
-template<> decltype(displays.changeBackLed)                                    &getRefByType<decltype(displays.changeBackLed)>()                                    { return displays.changeBackLed; }
-
 template<> decltype(displays.changeManualModeCtrlTyp)                          &getRefByType<decltype(displays.changeManualModeCtrlTyp)>()                          { return displays.changeManualModeCtrlTyp; }
 template<> decltype(displays.changeManualModeCtrlMod)                          &getRefByType<decltype(displays.changeManualModeCtrlMod)>()                          { return displays.changeManualModeCtrlMod; }
 
 template<> decltype(displays.larsmModeModeChangeDisplay)                       &getRefByType<decltype(displays.larsmModeModeChangeDisplay)>()                       { return displays.larsmModeModeChangeDisplay; }
+template<> decltype(displays.larsmModeIterationsChangeDisplay)                 &getRefByType<decltype(displays.larsmModeIterationsChangeDisplay)>()                 { return displays.larsmModeIterationsChangeDisplay; }
 
 template<> decltype(displays.changeGasMin)                                     &getRefByType<decltype(displays.changeGasMin)>()                                     { return displays.changeGasMin; }
 template<> decltype(displays.changeGasMax)                                     &getRefByType<decltype(displays.changeGasMax)>()                                     { return displays.changeGasMax; }
@@ -223,10 +193,7 @@ template<> decltype(displays.changeBremsMin)                                   &
 template<> decltype(displays.changeBremsMax)                                   &getRefByType<decltype(displays.changeBremsMax)>()                                   { return displays.changeBremsMax; }
 
 template<> decltype(displays.wifiModeChangeScreen)                             &getRefByType<decltype(displays.wifiModeChangeScreen)>()                             { return displays.wifiModeChangeScreen; }
-template<> decltype(displays.wifiSleepChangeScreen)                            &getRefByType<decltype(displays.wifiSleepChangeScreen)>()                            { return displays.wifiSleepChangeScreen; }
 template<> decltype(displays.wifiTxPowerChangeScreen)                          &getRefByType<decltype(displays.wifiTxPowerChangeScreen)>()                          { return displays.wifiTxPowerChangeScreen; }
-template<> decltype(displays.wifiAutoConnectChangeScreen)                      &getRefByType<decltype(displays.wifiAutoConnectChangeScreen)>()                      { return displays.wifiAutoConnectChangeScreen; }
-template<> decltype(displays.wifiAutoReconnectChangeScreen)                    &getRefByType<decltype(displays.wifiAutoReconnectChangeScreen)>()                    { return displays.wifiAutoReconnectChangeScreen; }
 
 void deconstructScreen()
 {

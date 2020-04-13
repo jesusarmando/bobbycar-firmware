@@ -8,12 +8,10 @@ namespace {
 class Label
 {
 public:
-    Label(int x, int y, int width, int height) : m_x{x}, m_y{y}, m_width{width}, m_height{height} {}
+    Label(int x, int y) : m_x{x}, m_y{y} {}
 
     int x() const { return m_x; };
     int y() const { return m_y; };
-    int width() const { return m_width; };
-    int height() const { return m_height; };
 
     void start();
     bool redraw(const String &str, bool forceRedraw = false);
@@ -22,21 +20,23 @@ public:
 private:
     const int m_x;
     const int m_y;
-    const int m_width;
-    const int m_height;
 
-    int m_lastX;
     String m_lastStr;
     int m_lastFont;
     int m_lastColor;
+
+    int m_lastWidth;
+    int m_lastHeight;
 };
 
 void Label::start()
 {
-    m_lastX = m_x;
     m_lastStr.clear();
     m_lastFont = -1;
     m_lastColor = -1;
+
+    m_lastWidth = 0;
+    m_lastHeight = 0;
 }
 
 bool Label::redraw(const String &str, bool forceRedraw)
@@ -47,36 +47,34 @@ bool Label::redraw(const String &str, bool forceRedraw)
         !forceRedraw)
         return false;
 
-    const auto renderedX = tft.drawString(str, m_x, m_y) + m_x;
+    const auto renderedWidth = tft.drawString(str, m_x, m_y);
+    const auto renderedHeight = tft.fontHeight();
 
-    if (renderedX < m_lastX)
-        tft.fillRect(renderedX, m_y, m_lastX - renderedX, m_height, tft.textbgcolor);
+    if (renderedWidth < m_lastWidth)
+        tft.fillRect(m_x + renderedWidth, m_y,
+                     m_lastWidth - renderedWidth, m_lastHeight,
+                     tft.textbgcolor);
 
-    if (m_lastFont != -1 && m_lastFont != tft.textfont)
-    {
-        const auto newHeight = tft.fontHeight(tft.textfont);
-        const auto oldHeight = tft.fontHeight(m_lastFont);
+    if (renderedHeight < m_lastHeight)
+        tft.fillRect(m_x, m_y + renderedHeight,
+                     renderedWidth, m_lastHeight - renderedHeight,
+                     tft.textbgcolor);
 
-        if (newHeight < oldHeight)
-            tft.fillRect(m_x, m_y + newHeight, renderedX - m_x, oldHeight - newHeight, tft.textbgcolor);
-    }
-
-    m_lastX = renderedX;
     m_lastStr = str;
     m_lastFont = tft.textfont;
     m_lastColor = tft.textcolor;
+
+    m_lastWidth = renderedWidth;
+    m_lastHeight = renderedHeight;
 
     return true;
 }
 
 void Label::clear()
 {
-    m_lastStr.clear();
+    if (m_lastWidth || m_lastHeight)
+        tft.fillRect(m_x, m_y, m_lastWidth, m_lastHeight, TFT_BLACK);
 
-    if (m_x < m_lastX)
-    {
-        tft.fillRect(m_x, m_y, m_lastX - m_x, m_height, TFT_BLACK);
-        m_lastX = m_x;
-    }
+    start();
 }
 }

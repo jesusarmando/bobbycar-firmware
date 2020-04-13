@@ -28,14 +28,14 @@ private:
     IgnoreInputMode m_mode{0, ControlType::FieldOrientedControl, ControlMode::Torque};
 
     std::array<Label, 4> m_labels {{
-        Label{25, 50, 100, 23},
-        Label{25, 75, 100, 23},
-        Label{25, 100, 100, 23},
-        Label{25, 125, 100, 23}
+        Label{25, 50}, // 100, 23
+        Label{25, 75}, // 100, 23
+        Label{25, 100}, // 100, 23
+        Label{25, 125} // 100, 23
     }};
 
-    ProgressBar<20, 200, 200, 10, 0, 1000> m_progressBar0;
-    ProgressBar<20, 230, 200, 10, 0, 1000> m_progressBar1;
+    ProgressBar m_progressBar0{20, 200, 200, 10, 0, 1000};
+    ProgressBar m_progressBar1{20, 230, 200, 10, 0, 1000};
 };
 
 template<typename Tscreen>

@@ -13,10 +13,12 @@ public:
     void start() override;
     void update() override;
 
-    const char *displayName() const override { return "Larsmm"; }
+    const char *displayName() const override { return "Larsm"; }
 
     enum class Mode { Mode1, Mode2, Mode3, Mode4 };
     Mode mode{Mode::Mode4};
+
+    uint8_t iterations{5};
 
 private:
     float adc1_filtered;
@@ -39,7 +41,7 @@ void LarsmMode::start()
 
 void LarsmMode::update()
 {
-    for (int i = 0; i < 10; i++) // run 10 times to emulate 500Hz refreshrate
+    for (uint8_t i = 0; i < iterations; i++) // run multiple times to emulate higher refreshrate
     {
         // ####### larsm's bobby car code #######
 

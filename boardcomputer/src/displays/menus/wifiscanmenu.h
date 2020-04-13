@@ -8,7 +8,6 @@
 #include "menudisplay.h"
 #include "utils.h"
 #include "actions/multiaction.h"
-#include "actions/endwifiscanaction.h"
 #include "actions/switchscreenaction.h"
 #include "actions/dummyaction.h"
 #include "icons/back.h"
@@ -21,16 +20,17 @@ class WifiScanMenu : public MenuDisplay
     using Base = MenuDisplay;
 
 public:
-    String text() const override { return String{"Found "} + vec.size() + ((WiFi.scanComplete()==-1)?" (Scanning...)":""); }
+    String text() const override;
 
     void start() override;
     void update() override;
+    void stop() override;
 
     const std::reference_wrapper<MenuItem> *begin() const override { return &(*std::begin(refVec)); };
     const std::reference_wrapper<MenuItem> *end() const override { return &(*std::end(refVec)); };
 
 private:
-    makeComponent<MenuItem, StaticText<TEXT_BACK>, MultiAction<EndWifiScanAction, SwitchScreenAction<Tscreen>>, StaticMenuItemIcon<&icons::back>> m_backItem;
+    makeComponent<MenuItem, StaticText<TEXT_BACK>, SwitchScreenAction<Tscreen>, StaticMenuItemIcon<&icons::back>> m_backItem;
 
     std::vector<makeComponent<MenuItem, ChangeableText, DummyAction>> vec;
 
@@ -40,6 +40,18 @@ private:
 
     unsigned long m_lastScanComplete;
 };
+
+template<typename Tscreen>
+String WifiScanMenu<Tscreen>::text() const
+{
+    auto text = String{vec.size()} + " found";
+    switch (WiFi.scanComplete())
+    {
+    case WIFI_SCAN_RUNNING: text += " scanning"; break;
+    case WIFI_SCAN_FAILED: text += " error"; break;
+    }
+    return text;
+}
 
 template<typename Tscreen>
 void WifiScanMenu<Tscreen>::start()
@@ -93,5 +105,11 @@ void WifiScanMenu<Tscreen>::update()
     }
 
     Base::update();
+}
+
+template<typename Tscreen>
+void WifiScanMenu<Tscreen>::stop()
+{
+    WiFi.scanDelete();
 }
 }

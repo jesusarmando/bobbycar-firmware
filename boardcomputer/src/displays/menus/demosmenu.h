@@ -3,7 +3,6 @@
 #include "menudisplay.h"
 #include "staticmenudefinition.h"
 #include "utils.h"
-#include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
 #include "icons/back.h"

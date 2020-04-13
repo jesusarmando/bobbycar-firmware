@@ -135,6 +135,7 @@ constexpr char TEXT_INVERTBACKRIGHT[] = "Invert back right";
 //LarsmModeSettingsMenu
 constexpr char TEXT_LARSMMODESETTINGS[] = "Larsm mode settings";
 constexpr char TEXT_LARSMMODECHANGEMODE[] = "Change mode";
+constexpr char TEXT_LARSMMODECHANGEITERATIONS[] = "Change iterations";
 //constexpr char TEXT_BACK[] = "Back";
 
 //ModesSettingsMenu

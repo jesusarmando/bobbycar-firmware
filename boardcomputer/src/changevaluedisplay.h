@@ -3,28 +3,12 @@
 #include "display.h"
 #include "textinterface.h"
 #include "actioninterface.h"
+#include "accessorinterface.h"
 #include "label.h"
 #include "globals.h"
 #include "utils.h"
-#include "texts.h"
 
 namespace {
-template<typename T>
-struct AccessorInterface
-{
-    virtual T getValue() const = 0;
-    virtual void setValue(T value) = 0;
-};
-
-template<typename T>
-struct RefAccessor : public virtual AccessorInterface<T>
-{
-    virtual T& getRef() const = 0;
-
-    T getValue() const override { return getRef(); };
-    void setValue(T value) override { getRef() = value; };
-};
-
 class ChangeValueDisplayInterface : public Display, public virtual TextInterface, public virtual ActionInterface
 {
 public:
@@ -39,8 +23,8 @@ public:
     virtual void confirm() = 0;
 
 protected:
-    Label m_titleLabel{5, 5, 230, 25};
-    Label m_valueLabel{26, 81, 188, 53};
+    Label m_titleLabel{5, 5}; // 230, 25
+    Label m_valueLabel{26, 81}; // 188, 53
 };
 
 template<typename Tvalue>

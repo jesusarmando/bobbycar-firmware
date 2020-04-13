@@ -21,10 +21,10 @@ public:
     void redraw(const MotorFeedback &motor);
 
 private:
-    Label m_labelError{18, y, 18, 22};
-    Label m_labelCurrent{40, y, 85, 22};
-    Label m_labelSpeed{135, y, 75, 22};
-    Label m_labelHallSensors{210, y, 30, 15};
+    Label m_labelError{18, y}; // 18, 22
+    Label m_labelCurrent{40, y}; // 85, 22
+    Label m_labelSpeed{135, y}; // 75, 22
+    Label m_labelHallSensors{210, y}; // 30, 15
 };
 
 template<int y>
@@ -39,11 +39,11 @@ private:
 
     bool m_lastFeedbackValid{};
 
-    Label m_labelLeftPwm{65, y, 80, 22};
-    Label m_labelRightPwm{155, y, 80, 22};
+    Label m_labelLeftPwm{65, y}; // 80, 22
+    Label m_labelRightPwm{155, y}; // 80, 22
 
-    Label m_labelVoltage{30, y+25, 85, 22};
-    Label m_labelTemperature{150, y+25, 85, 22};
+    Label m_labelVoltage{30, y+25}; // 85, 22
+    Label m_labelTemperature{150, y+25}; // 85, 22
 
     MotorStatus<y+50> m_leftMotor;
     MotorStatus<y+75> m_rightMotor;
@@ -59,23 +59,23 @@ public:
     void redraw() override;
 
 private:
-    Label m_labelRawGas{45, 0, 40, 15};
-    Label m_labelGas{90, 0, 60, 15};
-    ProgressBar<150, 0, 90, 15, 0, 1000> m_progressBarGas;
+    Label m_labelRawGas{45, 0}; // 40, 15
+    Label m_labelGas{90, 0}; // 60, 15
+    ProgressBar m_progressBarGas{150, 0, 90, 15, 0, 1000};
 
-    Label m_labelRawBrems{45, 15, 40, 15};
-    Label m_labelBrems{90, 15, 60, 15};
-    ProgressBar<150, 15, 90, 15, 0, 1000> m_progressBarBrems;
+    Label m_labelRawBrems{45, 15}; // 40, 15
+    Label m_labelBrems{90, 15}; // 60, 15
+    ProgressBar m_progressBarBrems{150, 15, 90, 15, 0, 1000};
 
     BoardStatus<42> m_frontStatus;
     BoardStatus<142> m_backStatus;
 
-    Label m_labelWifiStatus{35, 266, 120, 15};
-    Label m_labelLimit0{205, 266, 35, 15};
-    Label m_labelIpAddress{25, 281, 130, 15};
-    Label m_labelLimit1{205, 281, 35, 15};
-    Label m_labelPerformance{85, 296, 40, 15};
-    Label m_labelMode{165, 296, 75, 15};
+    Label m_labelWifiStatus{35, 266}; // 120, 15
+    Label m_labelLimit0{205, 266}; // 35, 15
+    Label m_labelIpAddress{25, 281}; // 130, 15
+    Label m_labelLimit1{205, 281}; // 35, 15
+    Label m_labelPerformance{85, 296}; // 40, 15
+    Label m_labelMode{165, 296}; // 75, 15
 };
 
 template<typename Tscreen>

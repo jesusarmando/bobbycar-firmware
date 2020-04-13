@@ -1,5 +1,6 @@
 #pragma once
 
+#include "accessorinterface.h"
 #include "menudisplay.h"
 #include "staticmenudefinition.h"
 #include "utils.h"

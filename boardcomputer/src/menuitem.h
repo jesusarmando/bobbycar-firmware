@@ -7,6 +7,8 @@
 #include "actioninterface.h"
 
 namespace {
+using MenuItemIconInterface = IconInterface<24, 24>;
+
 using MenuItemIcon = Icon<24, 24>;
 
 template<const MenuItemIcon *T>

@@ -32,10 +32,10 @@ private:
     void drawRect(int index, int offset, uint32_t color) const;
 
     std::array<Label, 4> m_labels {{
-        Label{spacing, 100, boxWidth, boxHeight},
-        Label{spacing*2+boxWidth, 100, boxWidth, boxHeight},
-        Label{spacing*3+boxWidth*2, 100, boxWidth, boxHeight},
-        Label{spacing*4+boxWidth*3, 100, boxWidth, boxHeight}
+        Label{spacing, 100}, // boxWidth, boxHeight
+        Label{spacing*2+boxWidth, 100}, // boxWidth, boxHeight
+        Label{spacing*3+boxWidth*2, 100}, // boxWidth, boxHeight
+        Label{spacing*4+boxWidth*3, 100} // boxWidth, boxHeight
     }};
 
     std::array<int8_t, 4> m_numbers;
@@ -158,6 +158,6 @@ void Lockscreen<Tscreen>::rotate(int offset)
 template<typename Tscreen>
 void Lockscreen<Tscreen>::drawRect(int index, int offset, uint32_t color) const
 {
-    tft.drawRect(m_labels[index].x()-offset, m_labels[index].y()-offset, m_labels[index].width()+(offset*2), m_labels[index].height()+(offset*2), color);
+    tft.drawRect(m_labels[index].x()-offset, m_labels[index].y()-offset, boxWidth+(offset*2), boxHeight+(offset*2), color);
 }
 }

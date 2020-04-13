@@ -1,7 +1,6 @@
 #pragma once
 
 #include "menudisplay.h"
-#include "changevaluedisplay.h"
 #include "staticmenudefinition.h"
 #include "utils.h"
 #include "actions/multiaction.h"

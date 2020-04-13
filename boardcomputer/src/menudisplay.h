@@ -34,7 +34,7 @@ protected:
     void setSelectedIndex(int selectedIndex) { m_selectedIndex = selectedIndex; }
 
 private:
-    Label m_titleLabel{5, 5, 230, 25};
+    Label m_titleLabel{5, 5}; // 230, 25
 
     static constexpr auto iconWidth = 25;
     static constexpr auto horizontalSpacing = 10;
@@ -43,16 +43,16 @@ private:
     static constexpr auto verticalSpacing = 3;
 
     std::array<Label, 10> m_labels {{
-        Label{horizontalSpacing + iconWidth, topMargin+(0*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(1*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(2*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(3*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(4*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(5*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(6*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(7*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(8*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
-        Label{horizontalSpacing + iconWidth, topMargin+(9*(lineHeight+verticalSpacing)), 240-(horizontalSpacing*2)-iconWidth, lineHeight},
+        Label{horizontalSpacing + iconWidth, topMargin+(0*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(1*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(2*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(3*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(4*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(5*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(6*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(7*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(8*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
+        Label{horizontalSpacing + iconWidth, topMargin+(9*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
     }};
 
     std::array<const Icon<24, 24> *, 10> m_icons {{
@@ -160,7 +160,7 @@ void MenuDisplay::redraw()
         tft.drawRect(5,
                      label.y()-2,
                      240 - 10,
-                     label.height()+2,
+                     lineHeight+2,
                      color);
     };
 

@@ -5,7 +5,9 @@
 #include "utils.h"
 #include "changevaluedisplay.h"
 #include "menuitem.h"
+#include "actions/toggleboolaction.h"
 #include "actions/switchscreenaction.h"
+#include "checkboxicon.h"
 #include "icons/back.h"
 #include "texts.h"
 #include "modes/defaultmode.h"
@@ -20,8 +22,6 @@ template<typename Tscreen>
 using DefaultModeCtrlModChangeDisplay = makeComponent<ChangeValueDisplay<ControlMode>, StaticText<TEXT_SETCONTROLMODE>, DefaultModeCtrlModAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeEnableFieldWeakeningSmootheningAccessor : public RefAccessor<bool> { bool &getRef() const override { return modes::defaultMode.enableWeakeningSmoothening; } };
-template<typename Tscreen>
-using DefaultModeEnableFieldWeakeningSmootheningChangeDisplay = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_ENABLEWEAKENINGSMOOTHENING>, DefaultModeEnableFieldWeakeningSmootheningAccessor, SwitchScreenAction<Tscreen>>;
 
 struct DefaultModeWeakeningSmootheningAccessor : public RefAccessor<int16_t> { int16_t &getRef() const override { return modes::defaultMode.weakeningSmoothening; } };
 template<typename Tscreen>
@@ -62,7 +62,7 @@ class DefaultModeSettingsMenu :
     public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_SETCONTROLTYPE>,             SwitchScreenAction<DefaultModeCtrlTypChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETCONTROLMODE>,             SwitchScreenAction<DefaultModeCtrlModChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_ENABLEWEAKENINGSMOOTHENING>, SwitchScreenAction<DefaultModeEnableFieldWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_ENABLEWEAKENINGSMOOTHENING>, ToggleBoolAction, CheckboxIcon, DefaultModeEnableFieldWeakeningSmootheningAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_SETWEAKINGSMOOTHENING>,      SwitchScreenAction<DefaultModeWeakeningSmootheningChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTPERCENTAGE>,         SwitchScreenAction<DefaultModeFrontPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKPERCENTAGE>,          SwitchScreenAction<DefaultModeBackPercentageChangeDisplay<DefaultModeSettingsMenu<Tscreen>>>>,

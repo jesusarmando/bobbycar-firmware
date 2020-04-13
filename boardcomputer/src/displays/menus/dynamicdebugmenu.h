@@ -10,9 +10,11 @@
 #include "utils.h"
 #include "menuitem.h"
 #include "actions/dummyaction.h"
+#include "actions/toggleboolaction.h"
 #include "actions/switchscreenaction.h"
 #include "icons/back.h"
 #include "icons/lock.h"
+#include "checkboxicon.h"
 #include "texts.h"
 
 namespace {
@@ -77,10 +79,10 @@ private:
     mutable int m_font;
 };
 
-class RandomIcon : public virtual IconInterface<24, 24>
+class RandomIcon : public virtual MenuItemIconInterface
 {
 public:
-    const Icon<24, 24> *icon() const override
+    const MenuItemIcon *icon() const override
     {
         const auto now = millis();
         if (!m_nextUpdate || now >= m_nextUpdate)
@@ -100,10 +102,18 @@ private:
     mutable const Icon<24, 24> *m_icon;
 };
 
+bool toggle;
+struct ToggleAccessor : public virtual RefAccessor<bool>
+{
+public:
+    bool &getRef() const override { return toggle; }
+};
+
 constexpr char TEXT_DUMMYITEM[] = "Dummy item";
 constexpr char TEXT_DYNAMICCOLOR[] = "Dynamic color";
 constexpr char TEXT_DYNAMICFONT[] = "Dynamic font";
 constexpr char TEXT_DYNAMICICON[] = "Dynamic icon";
+constexpr char TEXT_DEBUGTOGGLE[] = "Debug toggle";
 
 template<typename Tscreen>
 class DynamicDebugMenu :
@@ -120,9 +130,10 @@ class DynamicDebugMenu :
 
         // now the interesting bits
         makeComponent<MenuItem, RandomText,                    DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, RandomColor,  DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont,  DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DYNAMICICON>,  DummyAction, RandomIcon>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, RandomColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICICON>,  RandomIcon, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DEBUGTOGGLE>,  ToggleBoolAction, CheckboxIcon, ToggleAccessor>,
 
         // more padding
         makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,

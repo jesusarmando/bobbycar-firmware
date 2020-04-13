@@ -5,13 +5,14 @@
 #include "menudisplay.h"
 #include "staticmenudefinition.h"
 #include "utils.h"
-#include "changevaluedisplay.h"
 #include "menuitem.h"
 #include "actions/dummyaction.h"
 #include "actions/switchscreenaction.h"
 #include "actions/wifireconnectaction.h"
 #include "actions/wifidisconnectaction.h"
+#include "actions/toggleboolaction.h"
 #include "actions/wifienableipv6action.h"
+#include "checkboxicon.h"
 #include "icons/back.h"
 #include "texts.h"
 
@@ -31,8 +32,6 @@ struct WifiAutoConnectAccessor : public virtual AccessorInterface<bool>
         // TODO: better error handling
     }
 };
-template<typename Tscreen>
-using WifiAutoConnectChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_WIFICHANGEAUTOCONNECT>, WifiAutoConnectAccessor, SwitchScreenAction<Tscreen>>;
 
 struct WifiAutoReconnectAccessor : public virtual AccessorInterface<bool>
 {
@@ -44,8 +43,6 @@ struct WifiAutoReconnectAccessor : public virtual AccessorInterface<bool>
         // TODO: better error handling
     }
 };
-template<typename Tscreen>
-using WifiAutoReconnectChangeScreen = makeComponent<ChangeValueDisplay<bool>, StaticText<TEXT_WIFICHANGEAUTORECONNECT>, WifiAutoReconnectAccessor, SwitchScreenAction<Tscreen>>;
 
 struct WifiLocalIpText : public virtual TextInterface {
 public:
@@ -116,8 +113,8 @@ class StationWifiSettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_WIFIRECONNECT>,           WifiReconnectAction>,
         makeComponent<MenuItem, StaticText<TEXT_WIFIDISCONNECT>,          WifiDisconnectAction>,
         makeComponent<MenuItem, WifiIsConnectedText,                      StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTOCONNECT>,   SwitchScreenAction<WifiAutoConnectChangeScreen<StationWifiSettingsMenu<Tscreen>>>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTORECONNECT>, SwitchScreenAction<WifiAutoReconnectChangeScreen<StationWifiSettingsMenu<Tscreen>>>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTOCONNECT>,   ToggleBoolAction, CheckboxIcon, WifiAutoConnectAccessor>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFICHANGEAUTORECONNECT>, ToggleBoolAction, CheckboxIcon, WifiAutoReconnectAccessor>,
         makeComponent<MenuItem, WifiLocalIpText,                          StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiMacAddressText,                       StaticFont<2>, DisabledColor, DummyAction>,
         makeComponent<MenuItem, WifiSubnetMaskText,                       StaticFont<2>, DisabledColor, DummyAction>,
