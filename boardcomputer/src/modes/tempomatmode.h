@@ -42,16 +42,13 @@ void TempomatMode::update()
         pwm += (gas/1000.) - (brems/1000.);
     }
 
-    for (auto &controller : controllers)
+    for (MotorState &motor : motors())
     {
-        auto &command = controller.command;
-        for (MotorState *motor : {&command.left, &command.right})
-        {
-            motor->ctrlTyp = ctrlTyp;
-            motor->ctrlMod = ctrlMod;
-            motor->pwm = pwm;
-        }
+        motor.ctrlTyp = ctrlTyp;
+        motor.ctrlMod = ctrlMod;
+        motor.pwm = pwm;
     }
+
     fixCommonParams();
 
     sendCommands();

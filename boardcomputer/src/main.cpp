@@ -32,8 +32,8 @@ void setup()
     //WiFi.begin("realraum", "r3alraum");
     WiFi.begin("McDonalds Free WiFi 2.4GHz", "Passwort_123");
 
-    controllers[0].serial.begin(38400, SERIAL_8N1, PINS_RX1, PINS_TX1);
-    controllers[1].serial.begin(38400, SERIAL_8N1, PINS_RX2, PINS_TX2);
+    front.serial.get().begin(38400, SERIAL_8N1, PINS_RX1, PINS_TX1);
+    back.serial.get().begin(38400, SERIAL_8N1, PINS_RX2, PINS_TX2);
 
     raw_gas = 0;
     raw_brems = 0;
@@ -112,7 +112,7 @@ void loop()
         performance.lastTime = now;
     }
 
-    for (auto &controller : controllers)
+    for (Controller &controller : controllers())
         controller.parser.update();
 
     handleSerial();

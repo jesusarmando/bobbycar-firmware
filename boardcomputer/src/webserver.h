@@ -127,7 +127,7 @@ void WebHandler::renderLiveData(AsyncResponseStream &response)
         response.print(performance.last);
     }
 
-    for (const Controller &controller : controllers)
+    for (const Controller &controller : controllers())
     {
         HtmlTag fieldset(response, "fieldset");
 

@@ -28,7 +28,7 @@ void PoweroffDisplay::start()
 {
     m_startTime = millis();
 
-    for (auto &controller : controllers)
+    for (Controller &controller : controllers())
         controller.command.poweroff = true;
 
     tft.fillScreen(TFT_BLACK);
@@ -52,7 +52,7 @@ void PoweroffDisplay::update()
 
 void PoweroffDisplay::stop()
 {
-    for (auto &controller : controllers)
+    for (Controller &controller : controllers())
         controller.command.poweroff = false;
 }
 }

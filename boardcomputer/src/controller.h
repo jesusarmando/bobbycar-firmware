@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "../../common.h"
 
 #include "feedbackparser.h"
@@ -13,7 +15,7 @@ struct Controller {
     {
     }
 
-    HardwareSerial &serial;
+    std::reference_wrapper<HardwareSerial> serial;
 
     bool invertLeft{}, invertRight{};
 

@@ -27,8 +27,7 @@ struct {
     int16_t phaseAdvMax;  // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
 } settings;
 
-std::array<Controller, 2> controllers{Controller{Serial1}, Controller{Serial2}};
-Controller &front = controllers[0], &back = controllers[1];
+Controller front{Serial1}, back{Serial2};
 
 struct {
     unsigned long lastTime = millis();
@@ -49,31 +48,4 @@ public:
     static void rotate(int offset) { if (currentDisplay) currentDisplay->rotate(offset); }
     static void button(bool pressed) { if (currentDisplay) currentDisplay->button(pressed); }
 };
-
-void applyDefaultSettings()
-{
-    gasMin = defaultGasMin;
-    gasMax = defaultGasMax;
-    bremsMin = defaultBremsMin;
-    bremsMax = defaultBremsMax;
-
-    front.command.left.enable = defaultEnableFrontLeft;
-    front.command.right.enable = defaultEnableFrontRight;
-    back.command.left.enable = defaultEnableBackLeft;
-    back.command.right.enable = defaultEnableBackRight;
-
-    front.invertLeft = defaultInvertFrontLeft;
-    front.invertRight = defaultInvertFrontRight;
-    back.invertLeft = defaultInvertBackLeft;
-    back.invertRight = defaultInvertBackRight;
-
-    settings.iMotMax = defaultIMotMax;
-    settings.iDcMax = defaultIDcMax;
-    settings.nMotMax = defaultNMotMax;
-    settings.fieldWeakMax = defaultFieldWeakMax;
-    settings.phaseAdvMax = defaultPhaseAdvMax;
-
-    for (auto &controller : controllers)
-        controller.command.buzzer = {};
-}
 }

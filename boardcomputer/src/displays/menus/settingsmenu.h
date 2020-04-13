@@ -1,5 +1,7 @@
 #pragma once
 
+#include <HardwareSerial.h>
+
 #include "menudisplay.h"
 #include "staticmenudefinition.h"
 #include "utils.h"
@@ -24,6 +26,15 @@ class MainMenu;
 }
 
 namespace {
+struct SwapFrontBackAccessor : public virtual AccessorInterface<bool>
+{
+    bool getValue() const override { return &front.serial.get() == &Serial2; }
+    void setValue(bool value) override
+    {
+        front.serial = value ? Serial2 : Serial1;
+        back.serial = value ? Serial1 : Serial2;
+    }
+};
 struct FrontLedAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.command.led; } };
 struct BackLedAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.command.led; } };
 
@@ -36,6 +47,7 @@ class SettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHSETTINGS>, SwitchScreenAction<BluetoothSettingsMenu>, StaticMenuItemIcon<&icons::bluetooth>>,
         makeComponent<MenuItem, StaticText<TEXT_MODESSETTINGS>,     SwitchScreenAction<ModesSettingsMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_POTISETTINGS>,      SwitchScreenAction<PotiSettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_SWAPFRONTBACK>,     ToggleBoolAction, CheckboxIcon, SwapFrontBackAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_BUZZER>,            SwitchScreenAction<BuzzerMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>,       ToggleBoolAction, CheckboxIcon, FrontLedAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,        ToggleBoolAction, CheckboxIcon, BackLedAccessor>,

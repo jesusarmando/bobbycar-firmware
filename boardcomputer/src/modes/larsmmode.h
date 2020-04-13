@@ -101,15 +101,11 @@ void LarsmMode::update()
         speed = CLAMP(speed, -1000, 1000);  // clamp output
     }
 
-    for (auto &controller : controllers)
+    for (MotorState &motor : motors())
     {
-        auto &command = controller.command;
-        for (MotorState *motor : {&command.left, &command.right})
-        {
-            motor->ctrlTyp = ControlType::Commutation;
-            motor->ctrlMod = ControlMode::Voltage;
-            motor->pwm = speed + weak;
-        }
+        motor.ctrlTyp = ControlType::Commutation;
+        motor.ctrlMod = ControlMode::Voltage;
+        motor.pwm = speed + weak;
     }
 
     fixCommonParams();

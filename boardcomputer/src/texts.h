@@ -24,6 +24,15 @@ constexpr char TEXT_BLUETOOTHDISCONNECT[] = "disconnect()";
 constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
 //constexpr char TEXT_BACK[] = "Back";
 
+//DebugMenu
+constexpr char TEXT_FRONTCOMMAND[] = "Front command";
+constexpr char TEXT_FRONTLEFTCOMMAND[] = "Front left command";
+constexpr char TEXT_FRONTRIGHTCOMMAND[] = "Front right command";
+constexpr char TEXT_BACKCOMMAND[] = "Back command";
+constexpr char TEXT_BACKLEFTCOMMAND[] = "Back left command";
+constexpr char TEXT_BACKRIGHTCOMMAND[] = "Back right command";
+//constexpr char TEXT_BACK[] = "Back";
+
 //MainMenu
 constexpr char TEXT_MAINMENU[] = "Main menu";
 constexpr char TEXT_STATUS[] = "Status";
@@ -43,6 +52,10 @@ constexpr char TEXT_WIFISETTINGS[] = "WiFi settings";
 //constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
 constexpr char TEXT_MODESSETTINGS[] = "Modes settings";
 constexpr char TEXT_POTISETTINGS[] = "Poti settings";
+constexpr char TEXT_SWAPFRONTBACK[] = "Swap front/back";
+constexpr char TEXT_BUZZER[] = "Buzzer";
+constexpr char TEXT_SETFRONTLED[] = "Set front LED";
+constexpr char TEXT_SETBACKLED[] = "Set back LED";
 //constexpr char TEXT_ABOUT[] = "About";
 //constexpr char TEXT_BACK[] = "Back";
 
@@ -87,9 +100,6 @@ constexpr char TEXT_SETINVERTED[] = "Set inverted";
 
 //DebugMenu
 //constexpr char TEXT_DEBUG[] = "Debug";
-constexpr char TEXT_BUZZER[] = "Buzzer";
-constexpr char TEXT_SETFRONTLED[] = "Set front LED";
-constexpr char TEXT_SETBACKLED[] = "Set back LED";
 constexpr char TEXT_DYNAMICMENU[] = "Dynamic menu";
 //constexpr char TEXT_BACK[] = "Back";
 

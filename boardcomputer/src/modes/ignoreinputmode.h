@@ -27,15 +27,11 @@ private:
 
 void IgnoreInputMode::update()
 {
-    for (auto &controller : controllers)
+    for (MotorState &motor : motors())
     {
-        auto &command = controller.command;
-        for (MotorState *motor : {&command.left, &command.right})
-        {
-            motor->ctrlTyp = m_ctrlTyp;
-            motor->ctrlMod = m_ctrlMod;
-            motor->pwm = m_pwm;
-        }
+        motor.ctrlTyp = m_ctrlTyp;
+        motor.ctrlMod = m_ctrlMod;
+        motor.pwm = m_pwm;
     }
 
     fixCommonParams();

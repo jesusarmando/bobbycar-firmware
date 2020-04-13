@@ -84,21 +84,18 @@ void BluetoothMode::update()
         return;
     }
 
-    controllers[0].command.left.pwm = doc["frontLeft"].as<int16_t>();
-    controllers[0].command.right.pwm = doc["frontRight"].as<int16_t>();
-    controllers[1].command.left.pwm = doc["backLeft"].as<int16_t>();
-    controllers[1].command.right.pwm = doc["backRight"].as<int16_t>();
+    front.command.left.pwm = doc["frontLeft"].as<int16_t>();
+    front.command.right.pwm = doc["frontRight"].as<int16_t>();
+    back.command.left.pwm = doc["backLeft"].as<int16_t>();
+    back.command.right.pwm = doc["backRight"].as<int16_t>();
 
-    for (Controller &controller : controllers)
+    for (MotorState &motor : motors())
     {
-        Command &command = controller.command;
-        for (MotorState *motor : {&command.left, &command.right})
-        {
-            motor->enable = true;
-            motor->ctrlTyp = ControlType::FieldOrientedControl;
-            motor->ctrlMod = ControlMode::Torque;
-        }
+        motor.enable = true;
+        motor.ctrlTyp = ControlType::FieldOrientedControl;
+        motor.ctrlMod = ControlMode::Torque;
     }
+
     fixCommonParams();
 
     sendCommands();

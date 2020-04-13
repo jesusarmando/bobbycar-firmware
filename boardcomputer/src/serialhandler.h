@@ -11,8 +11,6 @@ namespace {
 wl_status_t last_status;
 IPAddress last_ip;
 
-bool power_toggle{false};
-
 void handleSerial()
 {
     const auto status = WiFi.status();
@@ -37,13 +35,22 @@ void handleSerial()
 
         switch (c)
         {
-        case 't':
-        case 'T':
-            power_toggle = !power_toggle;
-            Serial.printf("power: %d\n", power_toggle);
-            for (auto &controller : controllers)
-                controller.command.poweroff = power_toggle;
+        case 'p':
+        case 'P':
+        {
+            const auto firstPower = front.command.poweroff;
+            for (Controller &controller : controllers())
+                controller.command.poweroff = !firstPower;
             break;
+        }
+        case 'l':
+        case 'L':
+        {
+            const auto firstLed = front.command.led;
+            for (Controller &controller : controllers())
+                controller.command.led = !firstLed;
+            break;
+        }
         case '0':
         case '1':
         case '2':
@@ -54,7 +61,7 @@ void handleSerial()
         case '7':
         case '8':
         case '9':
-            for (auto &controller : controllers)
+            for (Controller &controller : controllers())
                 controller.command.buzzer.freq = c-'0';
             break;
         case 'A':
@@ -63,7 +70,7 @@ void handleSerial()
         case 'B':
             InputDispatcher::rotate(1);
             break;
-        case ' ':
+        case 'C':
             InputDispatcher::button(true);
             InputDispatcher::button(false);
             break;

@@ -9,6 +9,10 @@
 #include "globals.h"
 
 namespace {
+template<typename ...T>
+class makeComponent : public T...
+{};
+
 template<typename T>
 T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
     if (x < std::min(in_min, in_max))
@@ -29,14 +33,47 @@ float convertFromKmh(float val)
     return val * 32.133;
 }
 
-String toString(bool value)
+template<typename T>
+String toString(T value)
+{
+    return String{} + value;
+}
+
+template<>
+String toString<bool>(bool value)
 {
     return value ? "true" : "false";
 }
 
-String toString(wl_status_t status)
+template<>
+String toString<ControlType>(ControlType value)
 {
-    switch (status)
+    switch (value)
+    {
+    case ControlType::Commutation: return "Commutation";
+    case ControlType::Sinusoidal: return "Sinusoidal";
+    case ControlType::FieldOrientedControl: return "FieldOrientedControl";
+    }
+    return String("Unknown: ") + int(value);
+}
+
+template<>
+String toString<ControlMode>(ControlMode value)
+{
+    switch (value)
+    {
+    case ControlMode::OpenMode: return "OpenMode";
+    case ControlMode::Voltage: return "Voltage";
+    case ControlMode::Speed: return "Speed";
+    case ControlMode::Torque: return "Torque";
+    }
+    return String("Unknown: ") + int(value);
+}
+
+template<>
+String toString<wl_status_t>(wl_status_t value)
+{
+    switch (value)
     {
     case WL_NO_SHIELD: return "WL_NO_SHIELD";
     case WL_IDLE_STATUS: return "WL_IDLE_STATUS";
@@ -48,19 +85,43 @@ String toString(wl_status_t status)
     case WL_DISCONNECTED: return "WL_DISCONNECTED";
     }
 
-    return String("Unknown: ") + int(status);
+    return String("Unknown: ") + int(value);
+}
+
+std::array<std::reference_wrapper<Controller>, 2> controllers()
+{
+    return {front, back};
+}
+
+std::array<std::reference_wrapper<MotorState>, 2> motorsInController(Controller &controller)
+{
+    return {std::ref(controller.command.left), std::ref(controller.command.right)};
+}
+
+std::array<std::reference_wrapper<const MotorState>, 2> motorsInController(const Controller &controller)
+{
+    return {std::ref(controller.command.left), std::ref(controller.command.right)};
+}
+
+std::array<std::reference_wrapper<MotorState>, 4> motors()
+{
+    return {
+        std::ref(front.command.left), std::ref(front.command.right),
+        std::ref(back.command.left), std::ref(back.command.right)
+    };
 }
 
 void fixCommonParams()
 {
-    for (auto &controller : controllers)
-    {
-        controller.command.left.iMotMax = controller.command.right.iMotMax = settings.iMotMax;
-        controller.command.left.iDcMax = controller.command.right.iDcMax = settings.iDcMax;
-        controller.command.left.nMotMax = controller.command.right.nMotMax = settings.nMotMax;
-        controller.command.left.fieldWeakMax = controller.command.right.fieldWeakMax = settings.fieldWeakMax;
-        controller.command.left.phaseAdvMax = controller.command.right.phaseAdvMax = settings.phaseAdvMax;
-    }
+    for (Controller &controller : controllers())
+        for (MotorState &motor : motorsInController(controller))
+        {
+            motor.iMotMax = settings.iMotMax;
+            motor.iDcMax = settings.iDcMax;
+            motor.nMotMax = settings.nMotMax;
+            motor.fieldWeakMax = settings.fieldWeakMax;
+            motor.phaseAdvMax = settings.phaseAdvMax;
+        }
 
     if (front.invertLeft)
         front.command.left.pwm = -front.command.left.pwm;
@@ -74,11 +135,11 @@ void fixCommonParams()
 
 void sendCommands()
 {
-    for (auto &controller : controllers)
+    for (Controller &controller : controllers())
     {
         controller.command.start = Command::VALID_HEADER;
         controller.command.checksum = calculateChecksum(controller.command);
-        controller.serial.write((uint8_t *) &controller.command, sizeof(controller.command));
+        controller.serial.get().write((uint8_t *) &controller.command, sizeof(controller.command));
     }
 }
 
@@ -101,7 +162,30 @@ void scrollAddress(uint16_t VSP) {
   tft.writedata(VSP);
 }
 
-template<typename ...T>
-class makeComponent : public T...
-{};
+void applyDefaultSettings()
+{
+    gasMin = defaultGasMin;
+    gasMax = defaultGasMax;
+    bremsMin = defaultBremsMin;
+    bremsMax = defaultBremsMax;
+
+    front.command.left.enable = defaultEnableFrontLeft;
+    front.command.right.enable = defaultEnableFrontRight;
+    back.command.left.enable = defaultEnableBackLeft;
+    back.command.right.enable = defaultEnableBackRight;
+
+    front.invertLeft = defaultInvertFrontLeft;
+    front.invertRight = defaultInvertFrontRight;
+    back.invertLeft = defaultInvertBackLeft;
+    back.invertRight = defaultInvertBackRight;
+
+    settings.iMotMax = defaultIMotMax;
+    settings.iDcMax = defaultIDcMax;
+    settings.nMotMax = defaultNMotMax;
+    settings.fieldWeakMax = defaultFieldWeakMax;
+    settings.phaseAdvMax = defaultPhaseAdvMax;
+
+    for (Controller &controller : controllers())
+        controller.command.buzzer = {};
+}
 }

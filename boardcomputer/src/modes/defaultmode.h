@@ -86,16 +86,13 @@ void DefaultMode::update()
     lastPwm = pwm;
     lastTime = now;
 
-    for (Controller &controller : controllers)
-    {
-        Command &command = controller.command;
-        for (MotorState *motor : {&command.left, &command.right})
+    for (Controller &controller : controllers())
+        for (MotorState &motor : motorsInController(controller))
         {
-            motor->ctrlTyp = ctrlTyp;
-            motor->ctrlMod = ctrlMod;
-            motor->pwm = pwm / 100. * (&controller == &controllers[0] ? frontPercentage : backPercentage);
+            motor.ctrlTyp = ctrlTyp;
+            motor.ctrlMod = ctrlMod;
+            motor.pwm = pwm / 100. * (&controller == &front ? frontPercentage : backPercentage);
         }
-    }
 
     fixCommonParams();
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 
 #include <HardwareSerial.h>
 
@@ -10,7 +11,7 @@ namespace {
 class FeedbackParser
 {
 public:
-    FeedbackParser(HardwareSerial &serial, bool &feedbackValid, Feedback &feedback) :
+    FeedbackParser(const std::reference_wrapper<HardwareSerial> &serial, bool &feedbackValid, Feedback &feedback) :
         m_serial{serial}, m_feedbackValid{feedbackValid}, m_feedback{feedback}
     {
     }
@@ -18,9 +19,9 @@ public:
     void update()
     {
         // Check for new data availability in the Serial buffer
-        while (m_serial.available())
+        while (m_serial.get().available())
         {
-            m_incomingByte    = m_serial.read();                                // Read the incoming byte
+            m_incomingByte    = m_serial.get().read();                                // Read the incoming byte
             m_bufStartFrame = ((uint16_t)(m_incomingBytePrev) << 8) +  m_incomingByte; // Construct the start frame
 
             //Serial.printf("received: %x\r\n", m_incomingByte);
@@ -78,7 +79,7 @@ private:
     uint8_t m_incomingBytePrev{};
 
     unsigned long m_lastFeedback{millis()};
-    HardwareSerial &m_serial;
+    const std::reference_wrapper<HardwareSerial> &m_serial;
     bool &m_feedbackValid;
     Feedback &m_feedback, m_newFeedback;
 };

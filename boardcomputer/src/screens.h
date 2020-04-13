@@ -5,6 +5,7 @@
 #include "displays/menus/bluetoothsettingsmenu.h"
 #include "displays/menus/bluetoothmodesettingsmenu.h"
 #include "displays/menus/buzzermenu.h"
+#include "displays/menus/commanddebugmenu.h"
 #include "displays/menus/commonsettingsmenu.h"
 #include "displays/menus/debugmenu.h"
 #include "displays/menus/defaultmodesettingsmenu.h"
@@ -16,6 +17,7 @@
 #include "displays/menus/mainmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
 #include "displays/menus/modessettingsmenu.h"
+#include "displays/menus/motorstatedebugmenu.h"
 #include "displays/menus/presetsmenu.h"
 #include "displays/menus/potisettingsmenu.h"
 #include "displays/menus/selectmodemenu.h"
@@ -48,6 +50,8 @@ union X {
     BluetoothSettingsMenu bluetoothSettingsMenu;
     BluetoothModeSettingsMenu bluetoothModeSettingsMenu;
     BuzzerMenu buzzerMenu;
+    FrontCommandDebugMenu frontCommandDebugMenu;
+    BackCommandDebugMenu backCommandDebugMenu;
     CommonSettingsMenu commonSettingsMenu;
     DebugMenu debugMenu;
     DefaultModeSettingsMenu defaultModeSettingsMenu;
@@ -59,6 +63,10 @@ union X {
     MainMenu mainMenu;
     TempomatModeSettingsMenu tempomatModeSettingsMenu;
     ModesSettingsMenu modesSettingsMenu;
+    FrontLeftMotorStateDebugMenu frontLeftMotorStateDebugMenu;
+    FrontRightMotorStateDebugMenu frontRightMotorStateDebugMenu;
+    BackLeftMotorStateDebugMenu backLeftMotorStateDebugMenu;
+    BackRightMotorStateDebugMenu backRightMotorStateDebugMenu;
     PotiSettingsMenu potiSettingsMenu;
     PresetsMenu presetsMenu;
     SelectModeMenu selectModeMenu;
@@ -125,6 +133,8 @@ template<> decltype(displays.accessPointWifiSettingsMenu)                      &
 template<> decltype(displays.bluetoothSettingsMenu)                            &getRefByType<decltype(displays.bluetoothSettingsMenu)>()                            { return displays.bluetoothSettingsMenu; }
 template<> decltype(displays.bluetoothModeSettingsMenu)                        &getRefByType<decltype(displays.bluetoothModeSettingsMenu)>()                        { return displays.bluetoothModeSettingsMenu; }
 template<> decltype(displays.buzzerMenu)                                       &getRefByType<decltype(displays.buzzerMenu)>()                                       { return displays.buzzerMenu; }
+template<> decltype(displays.frontCommandDebugMenu)                            &getRefByType<decltype(displays.frontCommandDebugMenu)>()                            { return displays.frontCommandDebugMenu; }
+template<> decltype(displays.backCommandDebugMenu)                             &getRefByType<decltype(displays.backCommandDebugMenu)>()                             { return displays.backCommandDebugMenu; }
 template<> decltype(displays.commonSettingsMenu)                               &getRefByType<decltype(displays.commonSettingsMenu)>()                               { return displays.commonSettingsMenu; }
 template<> decltype(displays.debugMenu)                                        &getRefByType<decltype(displays.debugMenu)>()                                        { return displays.debugMenu; }
 template<> decltype(displays.defaultModeSettingsMenu)                          &getRefByType<decltype(displays.defaultModeSettingsMenu)>()                          { return displays.defaultModeSettingsMenu; }
@@ -136,6 +146,10 @@ template<> decltype(displays.larsmModeSettingsMenu)                            &
 template<> decltype(displays.mainMenu)                                         &getRefByType<decltype(displays.mainMenu)>()                                         { return displays.mainMenu; }
 template<> decltype(displays.tempomatModeSettingsMenu)                         &getRefByType<decltype(displays.tempomatModeSettingsMenu)>()                         { return displays.tempomatModeSettingsMenu; }
 template<> decltype(displays.modesSettingsMenu)                                &getRefByType<decltype(displays.modesSettingsMenu)>()                                { return displays.modesSettingsMenu; }
+template<> decltype(displays.frontLeftMotorStateDebugMenu)                     &getRefByType<decltype(displays.frontLeftMotorStateDebugMenu)>()                     { return displays.frontLeftMotorStateDebugMenu; }
+template<> decltype(displays.frontRightMotorStateDebugMenu)                    &getRefByType<decltype(displays.frontRightMotorStateDebugMenu)>()                    { return displays.frontRightMotorStateDebugMenu; }
+template<> decltype(displays.backLeftMotorStateDebugMenu)                      &getRefByType<decltype(displays.backLeftMotorStateDebugMenu)>()                      { return displays.backLeftMotorStateDebugMenu; }
+template<> decltype(displays.backRightMotorStateDebugMenu)                     &getRefByType<decltype(displays.backRightMotorStateDebugMenu)>()                     { return displays.backRightMotorStateDebugMenu; }
 template<> decltype(displays.potiSettingsMenu)                                 &getRefByType<decltype(displays.potiSettingsMenu)>()                                 { return displays.potiSettingsMenu; }
 template<> decltype(displays.presetsMenu)                                      &getRefByType<decltype(displays.presetsMenu)>()                                      { return displays.presetsMenu; }
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }

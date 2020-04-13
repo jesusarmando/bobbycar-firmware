@@ -80,7 +80,7 @@ void MetersDisplay::redraw()
     float speedSum{0.f};
     uint8_t count{0};
 
-    for (const auto &controller : controllers)
+    for (const Controller &controller : controllers())
     {
         if (!controller.feedbackValid)
             continue;

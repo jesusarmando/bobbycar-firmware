@@ -1,7 +1,5 @@
 #pragma once
 
-#include <array>
-
 #include <Arduino.h>
 #include <WString.h>
 
@@ -12,13 +10,19 @@
 #include "actions/dummyaction.h"
 #include "actions/toggleboolaction.h"
 #include "actions/switchscreenaction.h"
-#include "icons/back.h"
 #include "icons/lock.h"
 #include "checkboxicon.h"
+#include "icons/back.h"
 #include "texts.h"
 
 namespace {
 class MainMenu;
+class FrontCommandDebugMenu;
+class FrontLeftMotorStateDebugMenu;
+class FrontRightMotorStateDebugMenu;
+class BackCommandDebugMenu;
+class BackLeftMotorStateDebugMenu;
+class BackRightMotorStateDebugMenu;
 }
 
 namespace {
@@ -124,13 +128,13 @@ class DebugMenu :
     public MenuDisplay,
     public RandomText,
     public StaticMenuDefinition<
-        // some padding to allow for scrolling
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTCOMMAND>,        SwitchScreenAction<FrontCommandDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTLEFTCOMMAND>,    SwitchScreenAction<FrontLeftMotorStateDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTRIGHTCOMMAND>,   SwitchScreenAction<FrontRightMotorStateDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKCOMMAND>,         SwitchScreenAction<BackCommandDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKLEFTCOMMAND>,     SwitchScreenAction<BackLeftMotorStateDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKRIGHTCOMMAND>,    SwitchScreenAction<BackRightMotorStateDebugMenu>>,
 
-        // now the interesting bits
         makeComponent<MenuItem, RandomText,                    DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, RandomColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont, DummyAction>,
@@ -138,12 +142,6 @@ class DebugMenu :
         makeComponent<MenuItem, StaticText<TEXT_STATICICON>,   StaticMenuItemIcon<&icons::lock>, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DEBUGTOGGLE>,  ToggleBoolAction, CheckboxIcon, ToggleAccessor>,
         makeComponent<MenuItem, RandomText,                    RandomColor, RandomFont, RandomIcon, DummyAction>,
-
-        // more padding
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
 
         makeComponent<MenuItem, StaticText<TEXT_BACK>,         SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
     >
