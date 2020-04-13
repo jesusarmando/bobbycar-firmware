@@ -60,5 +60,5 @@ constexpr char TEXT_ESPSKETCHMD5[] = "Sketch MD5: ";
 using EspSketchMd5Text = StaticallyCachedText<EspStatusTextHelper<TEXT_ESPSKETCHMD5, String, &EspClass::getSketchMD5>>; // caching because of slow
 
 constexpr char TEXT_ESPFREESKETCHSPACE[] = "Free sketch space: ";
-using EspFreeSketchSpaceText = StaticallyCachedText<EspStatusTextHelper<TEXT_ESPFREESKETCHSPACE, uint32_t, &EspClass::getFreeSketchSpace>>; // caching because of slow
+using EspFreeSketchSpaceText = EspStatusTextHelper<TEXT_ESPFREESKETCHSPACE, uint32_t, &EspClass::getFreeSketchSpace>;
 }

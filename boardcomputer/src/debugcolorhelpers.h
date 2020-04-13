@@ -4,9 +4,12 @@
 #include "globals.h"
 
 namespace {
-template<Controller &controller>
-class FeedbackColor : public virtual ColorInterface { public: int color() const { return controller.feedbackValid ? TFT_DARKGREY : TFT_RED; } };
+template<Controller &Tcontroller, int TsuccessColor>
+class FeedbackColor : public virtual ColorInterface { public: int color() const { return Tcontroller.feedbackValid ? TsuccessColor : TFT_RED; } };
 
-using FrontFeedbackColor = FeedbackColor<front>;
-using BackFeedbackColor = FeedbackColor<back>;
+template<int TsuccessColor>
+using FrontFeedbackColor = FeedbackColor<front, TsuccessColor>;
+
+template<int TsuccessColor>
+using BackFeedbackColor = FeedbackColor<back, TsuccessColor>;
 }

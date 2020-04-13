@@ -16,19 +16,19 @@ class DebugMenu;
 }
 
 namespace {
-template<const char *Ttext, typename Ttexts, typename ColorInterface>
+template<const char *Ttext, typename Ttexts, template<int> class ColorInterface>
 class MotorFeedbackDebugMenu :
     public MenuDisplay,
     public StaticText<Ttext>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, typename Ttexts::AngleText,        ColorInterface, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::SpeedText,        ColorInterface, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::SpeedKmhText,     ColorInterface, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::ErrorText,        ColorInterface, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::CurrentText,      ColorInterface, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::CurrentFixedText, ColorInterface, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::ChopsText,        ColorInterface, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::HallText,         ColorInterface, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::AngleText,        ColorInterface<TFT_DARKGREY>, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::SpeedText,        ColorInterface<TFT_DARKGREY>, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::SpeedKmhText,     ColorInterface<TFT_DARKGREY>, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::ErrorText,        ColorInterface<TFT_DARKGREY>, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::CurrentText,      ColorInterface<TFT_DARKGREY>, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::CurrentFixedText, ColorInterface<TFT_DARKGREY>, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::ChopsText,        ColorInterface<TFT_DARKGREY>, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::HallText,         ColorInterface<TFT_DARKGREY>, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,                             SwitchScreenAction<DebugMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};

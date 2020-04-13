@@ -10,7 +10,7 @@ public:
     void start() override;
     void update() override;
 
-    void button(bool pressed) override;
+    void button() override;
 
 private:
     bool m_pressed;
@@ -27,9 +27,8 @@ void DemoDisplay::update()
         triggered();
 }
 
-void DemoDisplay::button(bool pressed)
+void DemoDisplay::button()
 {
-    if (!pressed)
-        m_pressed = true;
+    m_pressed = true;
 }
 }

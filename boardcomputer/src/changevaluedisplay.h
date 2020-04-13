@@ -38,7 +38,7 @@ public:
     void redraw() override;
 
     void rotate(int offset) override;
-    void button(bool pressed) override;
+    void button() override;
 
     int shownValue() const { return m_value; }
     void setShownValue(int value) { m_value = value; }
@@ -118,10 +118,9 @@ void ChangeValueDisplay<Tvalue>::rotate(int offset)
 }
 
 template<typename Tvalue>
-void ChangeValueDisplay<Tvalue>::button(bool pressed)
+void ChangeValueDisplay<Tvalue>::button()
 {
-    if (!pressed)
-        m_pressed = true;
+    m_pressed = true;
 }
 
 template<typename Tvalue>

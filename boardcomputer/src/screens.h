@@ -266,7 +266,38 @@ void initScreen()
 
 void updateDisplay()
 {
+    if (rotated)
+    {
+        const auto rotatedCopy = rotated;
+        rotated = 0;
+
+        currentDisplay->rotate(rotatedCopy);
+    }
+
+    if (requestFullRedraw)
+    {
+        requestFullRedraw = false;
+
+        tft.init();
+
+        Serial.println("todo: implement full redraw");
+    }
+
+    if (buttonLongPressed)
+    {
+        buttonLongPressed = false;
+        Serial.println("todo: implement long press");
+    }
+
+    if (buttonPressed)
+    {
+        buttonPressed = false;
+
+        currentDisplay->button();
+    }
+
     currentDisplay->update();
+
     if (changeScreenCallback)
     {
         changeScreenCallback();

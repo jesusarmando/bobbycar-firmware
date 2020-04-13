@@ -43,9 +43,40 @@ ModeInterface *currentMode{};
 
 Display *currentDisplay{};
 
-class InputDispatcher {
+int rotated{};
+bool requestFullRedraw{};
+bool buttonLongPressed{};
+bool buttonPressed{};
+
+class InputDispatcher
+{
 public:
-    static void rotate(int offset) { if (currentDisplay) currentDisplay->rotate(offset); }
-    static void button(bool pressed) { if (currentDisplay) currentDisplay->button(pressed); }
+    static void rotate(int offset)
+    {
+        rotated += offset;
+    }
+
+    static void button(bool pressed)
+    {
+        static unsigned long pressBegin = 0;
+
+        const auto now = millis();
+
+        if (pressed)
+            pressBegin = now;
+        else
+        {
+            const auto duration = now - pressBegin;
+
+            if (duration < 1000)
+                buttonPressed = true;
+            else if (duration < 3000)
+                buttonLongPressed = true;
+            else
+                requestFullRedraw = true;
+
+            pressBegin = 0;
+        }
+    }
 };
 }

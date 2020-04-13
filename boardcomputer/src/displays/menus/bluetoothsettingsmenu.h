@@ -23,11 +23,11 @@ class BluetoothSettingsMenu :
     public MenuDisplay,
     public StaticText<TEXT_BLUETOOTHSETTINGS>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, BluetoothAvailableText,                 DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, BluetoothHasClientText,                 DisabledColor, StaticFont<2>, DummyAction>,
-//        makeComponent<MenuItem, BluetoothConnectedText,                 DisabledColor, StaticFont<2>, DummyAction>, // crashes
-        makeComponent<MenuItem, BluetoothIsReadyText,                   DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, BluetoothIsReadyMasterText,             DisabledColor, StaticFont<2>, DummyAction>,
+        makeComponent<MenuItem, BluetoothAvailableText,                 DisabledColor, DummyAction>,
+        makeComponent<MenuItem, BluetoothHasClientText,                 DisabledColor, DummyAction>,
+//        makeComponent<MenuItem, BluetoothConnectedText,                 DisabledColor, DummyAction>, // crashes
+        makeComponent<MenuItem, BluetoothIsReadyText,                   DisabledColor, DummyAction>,
+        makeComponent<MenuItem, BluetoothIsReadyMasterText,             DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHBEGIN>,        BluetoothBeginAction>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHBEGINMASTER>,  BluetoothBeginMasterAction>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHFLUSH>,        BluetoothFlushAction>,

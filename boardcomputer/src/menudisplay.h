@@ -21,7 +21,7 @@ public:
     void stop() override;
 
     void rotate(int offset) override;
-    void button(bool pressed) override;
+    void button() override;
 
     virtual void itemPressed(int index) { (begin()+index)->get().triggered(); }
 
@@ -234,9 +234,8 @@ void MenuDisplay::rotate(int offset)
     m_rotateOffset += offset;
 }
 
-void MenuDisplay::button(bool pressed)
+void MenuDisplay::button()
 {
-    if (!pressed)
-        m_pressed = true;
+    m_pressed = true;
 }
 }

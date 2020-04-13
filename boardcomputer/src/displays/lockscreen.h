@@ -28,7 +28,7 @@ public:
     void redraw() override;
     void stop() override;
 
-    void button(bool pressed) override;
+    void button() override;
     void rotate(int offset) override;
 
 private:
@@ -142,10 +142,9 @@ void Lockscreen::stop()
         currentMode = m_oldMode;
 }
 
-void Lockscreen::button(bool pressed)
+void Lockscreen::button()
 {
-    if (!pressed)
-        m_pressed = true;
+    m_pressed = true;
 }
 
 void Lockscreen::rotate(int offset)

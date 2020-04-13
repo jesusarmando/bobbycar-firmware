@@ -49,8 +49,8 @@ String WifiScanMenu::text() const
     auto text = String{vec.size()} + " found";
     switch (WiFi.scanComplete())
     {
-    case WIFI_SCAN_RUNNING: text += " scanning"; break;
-    case WIFI_SCAN_FAILED: text += " error"; break;
+    case WIFI_SCAN_RUNNING: text += " (scanning)"; break;
+    case WIFI_SCAN_FAILED: text += " (error)"; break;
     }
     return text;
 }

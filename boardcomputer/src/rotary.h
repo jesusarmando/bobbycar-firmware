@@ -61,10 +61,10 @@ void Rotary<HANDLER, CLK, DT, SW>::updateSwitch()
         return;
     m_lastMillis = now;
 
-    const bool currentSw = digitalRead(SwPin);
+    const bool currentSw = !bool(digitalRead(SwPin));
     if (currentSw != m_lastSw)
     {
-        HANDLER::button(!currentSw);
+        HANDLER::button(currentSw);
         m_lastSw = currentSw;
     }
 }

@@ -18,7 +18,7 @@ public:
     virtual void stop() {}
 
     virtual void rotate(int offset) {}
-    virtual void button(bool pressed) {}
+    virtual void button() {}
 
     virtual MenuDisplay *asMenuDisplay() { return nullptr; }
     virtual const MenuDisplay *asMenuDisplay() const { return nullptr; }
