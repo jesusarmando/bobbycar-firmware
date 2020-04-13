@@ -201,8 +201,8 @@ void StatusDisplay::BoardStatus::redraw(const Controller &controller)
 
     if (controller.feedbackValid)
     {
-        m_labelVoltage.redraw(String{controller.feedback.batVoltage/100.} + 'V');
-        m_labelTemperature.redraw(String{controller.feedback.boardTemp/10.} + 'C');
+        m_labelVoltage.redraw(String{fixBatVoltage(controller.feedback.batVoltage)} + 'V');
+        m_labelTemperature.redraw(String{fixBoardTemp(controller.feedback.boardTemp)} + 'C');
         m_leftMotor.redraw(controller.feedback.left);
         m_rightMotor.redraw(controller.feedback.right);
     }
@@ -234,11 +234,11 @@ void StatusDisplay::BoardStatus::MotorStatus::redraw(const MotorFeedback &motor)
     m_labelError.redraw(String{motor.error});
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
-    m_labelCurrent.redraw(String{std::abs(motor.current/50.)} + 'A');
+    m_labelCurrent.redraw(String{fixCurrent(motor.current)} + 'A');
     m_labelSpeed.redraw(String{convertToKmh(motor.speed)});
 
     tft.setTextFont(2);
-    m_labelHallSensors.redraw(String{} + (motor.hallA ? '1' : '0') + (motor.hallB ? '1' : '0') + (motor.hallC ? '1' : '0'));
+    m_labelHallSensors.redraw(hallString(motor));
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }

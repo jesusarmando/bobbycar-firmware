@@ -14,15 +14,22 @@
 #include "checkboxicon.h"
 #include "icons/back.h"
 #include "texts.h"
+#include "debugcolorhelpers.h"
 
 namespace {
 class MainMenu;
 class FrontCommandDebugMenu;
+class BackCommandDebugMenu;
 class FrontLeftMotorStateDebugMenu;
 class FrontRightMotorStateDebugMenu;
-class BackCommandDebugMenu;
 class BackLeftMotorStateDebugMenu;
 class BackRightMotorStateDebugMenu;
+class FrontFeedbackDebugMenu;
+class BackFeedbackDebugMenu;
+class FrontLeftMotorFeedbackDebugMenu;
+class FrontRightMotorFeedbackDebugMenu;
+class BackLeftMotorFeedbackDebugMenu;
+class BackRightMotorFeedbackDebugMenu;
 }
 
 namespace {
@@ -128,14 +135,24 @@ class DebugMenu :
     public MenuDisplay,
     public RandomText,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_FRONTCOMMAND>,        SwitchScreenAction<FrontCommandDebugMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_FRONTLEFTCOMMAND>,    SwitchScreenAction<FrontLeftMotorStateDebugMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_FRONTRIGHTCOMMAND>,   SwitchScreenAction<FrontRightMotorStateDebugMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACKCOMMAND>,         SwitchScreenAction<BackCommandDebugMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACKLEFTCOMMAND>,     SwitchScreenAction<BackLeftMotorStateDebugMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_BACKRIGHTCOMMAND>,    SwitchScreenAction<BackRightMotorStateDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTCOMMAND>,         SwitchScreenAction<FrontCommandDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKCOMMAND>,          SwitchScreenAction<BackCommandDebugMenu>>,
+        makeComponent<MenuItem, StaticText<nullptr>,                   DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTLEFTCOMMAND>,     SwitchScreenAction<FrontLeftMotorStateDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTRIGHTCOMMAND>,    SwitchScreenAction<FrontRightMotorStateDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKLEFTCOMMAND>,      SwitchScreenAction<BackLeftMotorStateDebugMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKRIGHTCOMMAND>,     SwitchScreenAction<BackRightMotorStateDebugMenu>>,
+        makeComponent<MenuItem, StaticText<nullptr>,                   DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTFEEDBACK>,        SwitchScreenAction<FrontFeedbackDebugMenu>, FrontFeedbackColor>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKFEEDBACK>,         SwitchScreenAction<BackFeedbackDebugMenu>, BackFeedbackColor>,
+        makeComponent<MenuItem, StaticText<nullptr>,                   DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTLEFTFEEDBACK>,    SwitchScreenAction<FrontLeftMotorFeedbackDebugMenu>, FrontFeedbackColor>,
+        makeComponent<MenuItem, StaticText<TEXT_FRONTRIGHTFEEDBACK>,   SwitchScreenAction<FrontRightMotorFeedbackDebugMenu>, FrontFeedbackColor>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKLEFTFEEDBACK>,     SwitchScreenAction<BackLeftMotorFeedbackDebugMenu>, BackFeedbackColor>,
+        makeComponent<MenuItem, StaticText<TEXT_BACKRIGHTFEEDBACK>,    SwitchScreenAction<BackRightMotorFeedbackDebugMenu>, BackFeedbackColor>,
+        makeComponent<MenuItem, StaticText<nullptr>,                   DummyAction>,
+        makeComponent<MenuItem, RandomText,                            DummyAction>,
 
-        makeComponent<MenuItem, RandomText,                    DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, RandomColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_DYNAMICICON>,  RandomIcon, DummyAction>,

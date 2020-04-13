@@ -20,15 +20,15 @@ class MotorStateDebugMenu :
     public MenuDisplay,
     public StaticText<Ttext>,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, typename Ttexts::EnableText,       DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::PwmText,          DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::CtrlTypText,      DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::CtrlModText,      DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::IMotMaxText,      DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::IDcMaxText,       DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::NMotMaxText,      DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::FieldWeakMaxText, DisabledColor, StaticFont<2>, DummyAction>,
-        makeComponent<MenuItem, typename Ttexts::PhaseAdvMaxText,  DisabledColor, StaticFont<2>, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::EnableText,       DisabledColor, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::PwmText,          DisabledColor, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::CtrlTypText,      DisabledColor, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::CtrlModText,      DisabledColor, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::IMotMaxText,      DisabledColor, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::IDcMaxText,       DisabledColor, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::NMotMaxText,      DisabledColor, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::FieldWeakMaxText, DisabledColor, DummyAction>,
+        makeComponent<MenuItem, typename Ttexts::PhaseAdvMaxText,  DisabledColor, DummyAction>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,    SwitchScreenAction<DebugMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};

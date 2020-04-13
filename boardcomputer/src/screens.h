@@ -11,12 +11,14 @@
 #include "displays/menus/defaultmodesettingsmenu.h"
 #include "displays/menus/demosmenu.h"
 #include "displays/menus/enablemenu.h"
+#include "displays/menus/feedbackdebugmenu.h"
 #include "displays/menus/genericwifisettingsmenu.h"
 #include "displays/menus/invertmenu.h"
 #include "displays/menus/larsmmodesettingsmenu.h"
 #include "displays/menus/mainmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
 #include "displays/menus/modessettingsmenu.h"
+#include "displays/menus/motorfeedbackdebugmenu.h"
 #include "displays/menus/motorstatedebugmenu.h"
 #include "displays/menus/presetsmenu.h"
 #include "displays/menus/potisettingsmenu.h"
@@ -57,6 +59,8 @@ union X {
     DefaultModeSettingsMenu defaultModeSettingsMenu;
     DemosMenu demosMenu;
     EnableMenu enableMenu;
+    FrontFeedbackDebugMenu frontFeedbackDebugMenu;
+    BackFeedbackDebugMenu backFeedbackDebugMenu;
     GenericWifiSettingsMenu genericWifiSettingsMenu;
     InvertMenu invertMenu;
     LarsmModeSettingsMenu larsmModeSettingsMenu;
@@ -67,6 +71,10 @@ union X {
     FrontRightMotorStateDebugMenu frontRightMotorStateDebugMenu;
     BackLeftMotorStateDebugMenu backLeftMotorStateDebugMenu;
     BackRightMotorStateDebugMenu backRightMotorStateDebugMenu;
+    FrontLeftMotorFeedbackDebugMenu frontLeftMotorFeedbackDebugMenu;
+    FrontRightMotorFeedbackDebugMenu frontRightMotorFeedbackDebugMenu;
+    BackLeftMotorFeedbackDebugMenu backLeftMotorFeedbackDebugMenu;
+    BackRightMotorFeedbackDebugMenu backRightMotorFeedbackDebugMenu;
     PotiSettingsMenu potiSettingsMenu;
     PresetsMenu presetsMenu;
     SelectModeMenu selectModeMenu;
@@ -140,6 +148,8 @@ template<> decltype(displays.debugMenu)                                        &
 template<> decltype(displays.defaultModeSettingsMenu)                          &getRefByType<decltype(displays.defaultModeSettingsMenu)>()                          { return displays.defaultModeSettingsMenu; }
 template<> decltype(displays.demosMenu)                                        &getRefByType<decltype(displays.demosMenu)>()                                        { return displays.demosMenu; }
 template<> decltype(displays.enableMenu)                                       &getRefByType<decltype(displays.enableMenu)>()                                       { return displays.enableMenu; }
+template<> decltype(displays.frontFeedbackDebugMenu)                           &getRefByType<decltype(displays.frontFeedbackDebugMenu)>()                           { return displays.frontFeedbackDebugMenu; }
+template<> decltype(displays.backFeedbackDebugMenu)                            &getRefByType<decltype(displays.backFeedbackDebugMenu)>()                            { return displays.backFeedbackDebugMenu; }
 template<> decltype(displays.genericWifiSettingsMenu)                          &getRefByType<decltype(displays.genericWifiSettingsMenu)>()                          { return displays.genericWifiSettingsMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
 template<> decltype(displays.larsmModeSettingsMenu)                            &getRefByType<decltype(displays.larsmModeSettingsMenu)>()                            { return displays.larsmModeSettingsMenu; }
@@ -150,6 +160,10 @@ template<> decltype(displays.frontLeftMotorStateDebugMenu)                     &
 template<> decltype(displays.frontRightMotorStateDebugMenu)                    &getRefByType<decltype(displays.frontRightMotorStateDebugMenu)>()                    { return displays.frontRightMotorStateDebugMenu; }
 template<> decltype(displays.backLeftMotorStateDebugMenu)                      &getRefByType<decltype(displays.backLeftMotorStateDebugMenu)>()                      { return displays.backLeftMotorStateDebugMenu; }
 template<> decltype(displays.backRightMotorStateDebugMenu)                     &getRefByType<decltype(displays.backRightMotorStateDebugMenu)>()                     { return displays.backRightMotorStateDebugMenu; }
+template<> decltype(displays.frontLeftMotorFeedbackDebugMenu)                  &getRefByType<decltype(displays.frontLeftMotorFeedbackDebugMenu)>()                  { return displays.frontLeftMotorFeedbackDebugMenu; }
+template<> decltype(displays.frontRightMotorFeedbackDebugMenu)                 &getRefByType<decltype(displays.frontRightMotorFeedbackDebugMenu)>()                 { return displays.frontRightMotorFeedbackDebugMenu; }
+template<> decltype(displays.backLeftMotorFeedbackDebugMenu)                   &getRefByType<decltype(displays.backLeftMotorFeedbackDebugMenu)>()                   { return displays.backLeftMotorFeedbackDebugMenu; }
+template<> decltype(displays.backRightMotorFeedbackDebugMenu)                  &getRefByType<decltype(displays.backRightMotorFeedbackDebugMenu)>()                  { return displays.backRightMotorFeedbackDebugMenu; }
 template<> decltype(displays.potiSettingsMenu)                                 &getRefByType<decltype(displays.potiSettingsMenu)>()                                 { return displays.potiSettingsMenu; }
 template<> decltype(displays.presetsMenu)                                      &getRefByType<decltype(displays.presetsMenu)>()                                      { return displays.presetsMenu; }
 template<> decltype(displays.selectModeMenu)                                   &getRefByType<decltype(displays.selectModeMenu)>()                                   { return displays.selectModeMenu; }

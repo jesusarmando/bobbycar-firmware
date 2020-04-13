@@ -26,11 +26,17 @@ constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
 
 //DebugMenu
 constexpr char TEXT_FRONTCOMMAND[] = "Front command";
+constexpr char TEXT_BACKCOMMAND[] = "Back command";
 constexpr char TEXT_FRONTLEFTCOMMAND[] = "Front left command";
 constexpr char TEXT_FRONTRIGHTCOMMAND[] = "Front right command";
-constexpr char TEXT_BACKCOMMAND[] = "Back command";
 constexpr char TEXT_BACKLEFTCOMMAND[] = "Back left command";
 constexpr char TEXT_BACKRIGHTCOMMAND[] = "Back right command";
+constexpr char TEXT_FRONTFEEDBACK[] = "Front feedback";
+constexpr char TEXT_BACKFEEDBACK[] = "Back feedback";
+constexpr char TEXT_FRONTLEFTFEEDBACK[] = "Front left feedback";
+constexpr char TEXT_FRONTRIGHTFEEDBACK[] = "Front right feedback";
+constexpr char TEXT_BACKLEFTFEEDBACK[] = "Back left feedback";
+constexpr char TEXT_BACKRIGHTFEEDBACK[] = "Back right feedback";
 //constexpr char TEXT_BACK[] = "Back";
 
 //MainMenu

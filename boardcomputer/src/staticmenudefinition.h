@@ -856,4 +856,65 @@ private:
         std::ref<MenuItem>(item22)
     }};
 };
+
+template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13, typename T14, typename T15, typename T16, typename T17, typename T18, typename T19, typename T20, typename T21, typename T22, typename T23>
+class StaticMenuDefinition<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23> : public virtual MenuDefinitionInterface
+{
+public:
+    const std::reference_wrapper<MenuItem> *begin() const override { return std::begin(arr); };
+    const std::reference_wrapper<MenuItem> *end() const override { return std::end(arr); };
+
+private:
+    T0 item0;
+    T1 item1;
+    T2 item2;
+    T3 item3;
+    T4 item4;
+    T5 item5;
+    T6 item6;
+    T7 item7;
+    T8 item8;
+    T9 item9;
+    T10 item10;
+    T11 item11;
+    T12 item12;
+    T13 item13;
+    T14 item14;
+    T15 item15;
+    T16 item16;
+    T17 item17;
+    T18 item18;
+    T19 item19;
+    T20 item20;
+    T21 item21;
+    T22 item22;
+    T23 item23;
+
+    const std::array<std::reference_wrapper<MenuItem>, 24> arr{{
+        std::ref<MenuItem>(item0),
+        std::ref<MenuItem>(item1),
+        std::ref<MenuItem>(item2),
+        std::ref<MenuItem>(item3),
+        std::ref<MenuItem>(item4),
+        std::ref<MenuItem>(item5),
+        std::ref<MenuItem>(item6),
+        std::ref<MenuItem>(item7),
+        std::ref<MenuItem>(item8),
+        std::ref<MenuItem>(item9),
+        std::ref<MenuItem>(item10),
+        std::ref<MenuItem>(item11),
+        std::ref<MenuItem>(item12),
+        std::ref<MenuItem>(item13),
+        std::ref<MenuItem>(item14),
+        std::ref<MenuItem>(item15),
+        std::ref<MenuItem>(item16),
+        std::ref<MenuItem>(item17),
+        std::ref<MenuItem>(item18),
+        std::ref<MenuItem>(item19),
+        std::ref<MenuItem>(item20),
+        std::ref<MenuItem>(item21),
+        std::ref<MenuItem>(item22),
+        std::ref<MenuItem>(item23)
+    }};
+};
 }

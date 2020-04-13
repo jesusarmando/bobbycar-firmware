@@ -33,6 +33,26 @@ float convertFromKmh(float val)
     return val * 32.133;
 }
 
+float fixCurrent(int16_t value)
+{
+    return std::abs(value/50.);
+}
+
+float fixBatVoltage(int16_t value)
+{
+    return value/100.;
+}
+
+float fixBoardTemp(int16_t value)
+{
+    return value/10.;
+}
+
+String hallString(const MotorFeedback &motor)
+{
+    return String{} + (motor.hallA ? '1' : '0') + (motor.hallB ? '1' : '0') + (motor.hallC ? '1' : '0');
+}
+
 template<typename T>
 String toString(T value)
 {
