@@ -153,7 +153,7 @@ void MenuDisplay::redraw()
 
     const auto drawItemRect = [](const auto &label, const auto color){
         tft.drawRect(5,
-                     label.y()-2,
+                     label.y()-1,
                      240 - 10,
                      lineHeight+2,
                      color);
@@ -165,19 +165,14 @@ void MenuDisplay::redraw()
         const auto relativeIndex = index - m_scrollOffset;
         const auto selected = index == m_selectedIndex;
 
-        bool forceLabelRedraw{};
-
         if (selected)
             newHighlightedIndex = relativeIndex;
         else if (relativeIndex == m_highlightedIndex)
-        {
             drawItemRect(*labelsIter, TFT_BLACK);
-            forceLabelRedraw = true;
-        }
 
         tft.setTextFont(menuIter->get().font());
         tft.setTextColor(menuIter->get().color(), TFT_BLACK);
-        const auto labelDrawn = labelsIter->redraw(menuIter->get().text(), forceLabelRedraw);
+        const auto labelDrawn = labelsIter->redraw(menuIter->get().text());
 
         if (menuIter->get().icon() != *iconsIter)
         {
