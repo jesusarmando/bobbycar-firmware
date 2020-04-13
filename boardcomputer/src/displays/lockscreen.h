@@ -24,6 +24,7 @@ class Lockscreen : public Display
 
 public:
     void start() override;
+    void initScreen() override;
     void update() override {}
     void redraw() override;
     void stop() override;
@@ -61,7 +62,10 @@ void Lockscreen::start()
 
     m_oldMode = currentMode;
     currentMode = &m_mode;
+}
 
+void Lockscreen::initScreen()
+{
     tft.fillScreen(TFT_BLACK);
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);

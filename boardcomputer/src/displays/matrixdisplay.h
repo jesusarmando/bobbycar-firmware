@@ -16,7 +16,7 @@ class MatrixDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
     using Base = DemoDisplay;
 
 public:
-    void start() override;
+    void initScreen() override;
     void redraw() override;
     void stop() override;
 
@@ -34,10 +34,8 @@ private:
     uint16_t xPos = 0;
 };
 
-void MatrixDisplay::start()
+void MatrixDisplay::initScreen()
 {
-    Base::start();
-
     tft.setRotation(2);
     tft.fillScreen(TFT_BLACK);
     setupScrollArea(TOP_FIXED_AREA, BOT_FIXED_AREA);

@@ -240,6 +240,7 @@ void switchScreenImpl(Args&&... args)
     new (&ref) T{std::forward<Args>(args)...};
     currentDisplay = &ref;
     ref.start();
+    ref.initScreen();
     ref.update();
     ref.redraw();
 }
@@ -280,7 +281,7 @@ void updateDisplay()
 
         tft.init();
 
-        Serial.println("todo: implement full redraw");
+        currentDisplay->initScreen();
     }
 
     if (buttonLongPressed)

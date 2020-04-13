@@ -18,7 +18,7 @@ class GameOfLifeDisplay : public DemoDisplay, public SwitchScreenAction<DemosMen
     using Base = DemoDisplay;
 
 public:
-    void start() override;
+    void initScreen() override;
     void redraw() override;
     void stop() override;
 
@@ -66,10 +66,8 @@ private:
     int gen = 0;
 };
 
-void GameOfLifeDisplay::start()
+void GameOfLifeDisplay::initScreen()
 {
-    Base::start();
-
     tft.setRotation(3);
     tft.fillScreen(TFT_BLACK);
 }

@@ -35,6 +35,10 @@ void handleSerial()
 
         switch (c)
         {
+        case 'r':
+        case 'R':
+            tft.init();
+            break;
         case 'p':
         case 'P':
         {

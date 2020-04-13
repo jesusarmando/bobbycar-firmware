@@ -19,7 +19,7 @@ class MetersDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
     using Base = DemoDisplay;
 
 public:
-    void start() override;
+    void initScreen() override;
     void redraw() override;
 
 private:
@@ -49,10 +49,8 @@ private:
     int d = 0;
 };
 
-void MetersDisplay::start()
+void MetersDisplay::initScreen()
 {
-    Base::start();
-
     tft.fillScreen(TFT_BLACK);
 
     analogMeter(); // Draw analogue meter

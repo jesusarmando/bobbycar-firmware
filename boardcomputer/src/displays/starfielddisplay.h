@@ -20,7 +20,7 @@ class StarfieldDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu
 public:
     StarfieldDisplay();
 
-    void start() override;
+    void initScreen() override;
     void redraw() override;
     void stop() override;
 
@@ -45,10 +45,8 @@ StarfieldDisplay::StarfieldDisplay() :
 {
 }
 
-void StarfieldDisplay::start()
+void StarfieldDisplay::initScreen()
 {
-    Base::start();
-
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
 

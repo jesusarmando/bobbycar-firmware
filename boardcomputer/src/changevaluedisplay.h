@@ -12,7 +12,7 @@ namespace {
 class ChangeValueDisplayInterface : public Display, public virtual TextInterface, public virtual ActionInterface
 {
 public:
-    void start() override;
+    void initScreen() override;
 
     ChangeValueDisplayInterface *asChangeValueDisplayInterface() override { return this; }
     const ChangeValueDisplayInterface *asChangeValueDisplayInterface() const override { return this; }
@@ -52,7 +52,7 @@ private:
     bool m_pressed{};
 };
 
-void ChangeValueDisplayInterface::start()
+void ChangeValueDisplayInterface::initScreen()
 {
     tft.fillScreen(TFT_BLACK);
 
@@ -74,8 +74,6 @@ void ChangeValueDisplayInterface::start()
 template<typename Tvalue>
 void ChangeValueDisplay<Tvalue>::start()
 {
-    Base::start();
-
     m_value = static_cast<AccessorInterface<Tvalue>*>(this)->getValue();
 
     m_rotateOffset = 0;

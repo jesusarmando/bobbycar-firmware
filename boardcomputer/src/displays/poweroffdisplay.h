@@ -16,6 +16,7 @@ class PoweroffDisplay : public Display
 {
 public:
     void start() override;
+    void initScreen() override;
     void update() override;
     void redraw() override {};
     void stop() override;
@@ -30,7 +31,10 @@ void PoweroffDisplay::start()
 
     for (Controller &controller : controllers())
         controller.command.poweroff = true;
+}
 
+void PoweroffDisplay::initScreen()
+{
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_YELLOW);
 

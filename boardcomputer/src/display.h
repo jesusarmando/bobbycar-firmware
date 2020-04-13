@@ -13,6 +13,7 @@ public:
     virtual ~Display() = default;
 
     virtual void start() = 0;
+    virtual void initScreen() = 0;
     virtual void update() = 0;
     virtual void redraw() = 0;
     virtual void stop() {}

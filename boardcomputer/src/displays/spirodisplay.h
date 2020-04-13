@@ -18,7 +18,7 @@ class SpiroDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
     using Base = DemoDisplay;
 
 public:
-    void start() override;
+    void initScreen() override;
     void redraw() override;
     void stop() override;
 
@@ -34,10 +34,8 @@ private:
     int n{}, r{}, colour{};
 };
 
-void SpiroDisplay::start()
+void SpiroDisplay::initScreen()
 {
-    Base::start();
-
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(3);
 }

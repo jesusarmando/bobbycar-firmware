@@ -20,7 +20,7 @@ class PingPongDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
 public:
     PingPongDisplay();
 
-    void start() override;
+    void initScreen() override;
     void redraw() override;
     void stop() override;
 
@@ -87,10 +87,8 @@ PingPongDisplay::PingPongDisplay() :
     calc_target_y();
 }
 
-void PingPongDisplay::start()
+void PingPongDisplay::initScreen()
 {
-    Base::start();
-
     tft.fillScreen(TFT_BLACK);
     tft.setRotation(1);
 

@@ -23,6 +23,7 @@ class CalibrateDisplay : public DemoDisplay, public SwitchScreenAction<PotiSetti
 
 public:
     void start() override;
+    void initScreen() override;
     void redraw() override;
     void stop() override;
 
@@ -47,7 +48,10 @@ void CalibrateDisplay::start()
 
     m_oldMode = currentMode;
     currentMode = &m_mode;
+}
 
+void CalibrateDisplay::initScreen()
+{
     tft.fillScreen(TFT_BLACK);
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW);

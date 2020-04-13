@@ -23,7 +23,7 @@ class StatusDisplay : public DemoDisplay, public SwitchScreenAction<MainMenu>
     using Base = DemoDisplay;
 
 public:
-    void start() override;
+    void initScreen() override;
     void redraw() override;
 
 private:
@@ -99,10 +99,8 @@ private:
     Label m_labelMode{165, 296}; // 75, 15
 };
 
-void StatusDisplay::start()
+void StatusDisplay::initScreen()
 {
-    Base::start();
-
     tft.fillScreen(TFT_BLACK);
     tft.setTextFont(2);
     tft.setTextColor(TFT_WHITE);

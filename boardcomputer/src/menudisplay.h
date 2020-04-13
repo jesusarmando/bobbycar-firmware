@@ -16,6 +16,7 @@ class MenuDisplay : public Display, public virtual TextInterface, public virtual
 {
 public:
     void start() override;
+    void initScreen() override;
     void update() override;
     void redraw() override;
     void stop() override;
@@ -55,18 +56,7 @@ private:
         Label{horizontalSpacing + iconWidth, topMargin+(9*(lineHeight+verticalSpacing))}, // 240-(horizontalSpacing*2)-iconWidth, lineHeight
     }};
 
-    std::array<const Icon<24, 24> *, 10> m_icons {{
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr
-    }};
+    std::array<const Icon<24, 24> *, 10> m_icons;
 
     int m_selectedIndex;
     int m_scrollOffset;
@@ -84,7 +74,10 @@ void MenuDisplay::start()
 
     m_rotateOffset = 0;
     m_pressed = false;
+}
 
+void MenuDisplay::initScreen()
+{
     tft.fillScreen(TFT_BLACK);
 
     m_titleLabel.start();
@@ -95,6 +88,8 @@ void MenuDisplay::start()
 
     for (auto iter = begin(); iter != end(); iter++)
         iter->get().start();
+
+    m_icons.fill(nullptr);
 }
 
 void MenuDisplay::update()
