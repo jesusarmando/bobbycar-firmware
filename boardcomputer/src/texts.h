@@ -1,6 +1,10 @@
 #pragma once
 
 namespace {
+//AboutMenu
+constexpr char TEXT_ABOUT[] = "About";
+constexpr char TEXT_BACK[] = "Back";
+
 //AccessPointWifiSettingsMenu
 constexpr char TEXT_ACCESSPOINTWIFISETTINGS[] = "Access Point WiFi settings";
 constexpr char TEXT_WIFISOFTAPENABLEIPV6[] = "softAPenableIpV6()";
@@ -13,7 +17,7 @@ constexpr char TEXT_BLUETOOTHBEGINMASTER[] = "begin() Master";
 constexpr char TEXT_BLUETOOTHFLUSH[] = "flush()";
 constexpr char TEXT_BLUETOOTHEND[] = "end()";
 constexpr char TEXT_BLUETOOTHDISCONNECT[] = "disconnect()";
-constexpr char TEXT_BACK[] = "Back";
+//constexpr char TEXT_BACK[] = "Back";
 
 
 //BluetoothModeSettingsMenu
@@ -28,8 +32,9 @@ constexpr char TEXT_PRESETS[] = "Presets";
 constexpr char TEXT_SETTINGS[] = "Settings";
 constexpr char TEXT_LOCKVEHICLE[] = "Lock vehicle";
 constexpr char TEXT_DEMOS[] = "Demos";
-constexpr char TEXT_DEBUG[] = "Debug";
 constexpr char TEXT_POWEROFF[] = "Poweroff";
+constexpr char TEXT_REBOOT[] = "Reboot";
+constexpr char TEXT_DEBUG[] = "Debug";
 
 //SettingsMenu
 //constexpr char TEXT_SETTINGS[] = "Settings";
@@ -38,8 +43,7 @@ constexpr char TEXT_WIFISETTINGS[] = "WiFi settings";
 //constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
 constexpr char TEXT_MODESSETTINGS[] = "Modes settings";
 constexpr char TEXT_POTISETTINGS[] = "Poti settings";
-constexpr char TEXT_REBOOT[] = "Reboot";
-constexpr char TEXT_VERSION[] = "Version";
+//constexpr char TEXT_ABOUT[] = "About";
 //constexpr char TEXT_BACK[] = "Back";
 
 //StationWifiSettingsMenu

@@ -1,47 +1,151 @@
 #pragma once
 
-#include "accessorinterface.h"
+#include <array>
+
+#include <Arduino.h>
+#include <WString.h>
+
 #include "menudisplay.h"
 #include "staticmenudefinition.h"
 #include "utils.h"
-#include "actions/switchscreenaction.h"
+#include "menuitem.h"
 #include "actions/dummyaction.h"
-#include "actions/rebootaction.h"
+#include "actions/toggleboolaction.h"
+#include "actions/switchscreenaction.h"
 #include "icons/back.h"
-#include "esptexthelpers.h"
+#include "icons/lock.h"
+#include "checkboxicon.h"
 #include "texts.h"
 
 namespace {
-class DynamicDebugMenu;
 class MainMenu;
 }
 
 namespace {
+class RandomText : public virtual TextInterface
+{
+public:
+    String text() const override
+    {
+        const auto now = millis();
+        if (!m_nextUpdate || now >= m_nextUpdate)
+        {
+            m_title = String{"Dynamic text: "} + random(0, 100);
+            m_nextUpdate = now + random(0, 1000);
+        }
+
+        return m_title;
+    }
+
+private:
+    mutable unsigned long m_nextUpdate{};
+    mutable String m_title;
+};
+
+class RandomColor : public virtual ColorInterface
+{
+public:
+    int color() const override
+    {
+        const auto now = millis();
+        if (!m_nextUpdate || now >= m_nextUpdate)
+        {
+            const auto count = std::distance(std::begin(default_4bit_palette), std::end(default_4bit_palette));
+            m_color = default_4bit_palette[random(0, count)];
+            m_nextUpdate = now + random(0, 1000);
+        }
+
+        return m_color;
+    }
+
+private:
+    mutable unsigned long m_nextUpdate{};
+    mutable int m_color;
+};
+
+class RandomFont : public virtual FontInterface
+{
+public:
+    int font() const override
+    {
+        const auto now = millis();
+        if (!m_nextUpdate || now >= m_nextUpdate)
+        {
+            m_font = random(1, 5);
+            m_nextUpdate = now + random(0, 1000);
+        }
+
+        return m_font;
+    }
+
+private:
+    mutable unsigned long m_nextUpdate{};
+    mutable int m_font;
+};
+
+class RandomIcon : public virtual MenuItemIconInterface
+{
+public:
+    const MenuItemIcon *icon() const override
+    {
+        const auto now = millis();
+        if (!m_nextUpdate || now >= m_nextUpdate)
+        {
+            if (m_icon)
+                m_icon = nullptr;
+            else
+                m_icon = &icons::lock;
+            m_nextUpdate = now + random(0, 1000);
+        }
+
+        return m_icon;
+    }
+
+private:
+    mutable unsigned long m_nextUpdate{};
+    mutable const Icon<24, 24> *m_icon;
+};
+
+bool toggle;
+struct ToggleAccessor : public virtual RefAccessor<bool>
+{
+public:
+    bool &getRef() const override { return toggle; }
+};
+
+constexpr char TEXT_DUMMYITEM[] = "Dummy item";
+constexpr char TEXT_DYNAMICCOLOR[] = "Dynamic color";
+constexpr char TEXT_DYNAMICFONT[] = "Dynamic font";
+constexpr char TEXT_DYNAMICICON[] = "Dynamic icon";
+constexpr char TEXT_STATICICON[] = "Static icon";
+constexpr char TEXT_DEBUGTOGGLE[] = "Toggle";
+
 class DebugMenu :
     public MenuDisplay,
-    public StaticText<TEXT_DEBUG>,
+    public RandomText,
     public StaticMenuDefinition<
-        makeComponent<MenuItem, StaticText<TEXT_REBOOT>,      RebootAction>,
-        makeComponent<MenuItem, StaticText<TEXT_DYNAMICMENU>, SwitchScreenAction<DynamicDebugMenu>>,
-        makeComponent<MenuItem, EspHeapSizeText,              StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspFreeHeapText,              StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspMinFreeHeapText,           StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspMaxAllocHeapText,          StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspPsramSizeText,             StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspFreePsramText,             StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspMinFreePsramText,          StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspMaxAllocPsramText,         StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspChipRevisionText,          StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspCpuFreqMHzText,            StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspCycleCountText,            StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspSdkVersionText,            StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspFlashChipSizeText,         StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspFlashChipSpeedText,        StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspFlashChipModeText,         StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspSketchSizeText,            StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspSketchMd5Text,             StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, EspFreeSketchSpaceText,       StaticFont<2>, DisabledColor, DummyAction>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,        SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
+        // some padding to allow for scrolling
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+
+        // now the interesting bits
+        makeComponent<MenuItem, RandomText,                    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICCOLOR>, RandomColor, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICFONT>,  RandomFont, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DYNAMICICON>,  RandomIcon, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_STATICICON>,   StaticMenuItemIcon<&icons::lock>, DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DEBUGTOGGLE>,  ToggleBoolAction, CheckboxIcon, ToggleAccessor>,
+        makeComponent<MenuItem, RandomText,                    RandomColor, RandomFont, RandomIcon, DummyAction>,
+
+        // more padding
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+        makeComponent<MenuItem, StaticText<TEXT_DUMMYITEM>,    DummyAction>,
+
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,         SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

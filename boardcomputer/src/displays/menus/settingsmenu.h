@@ -6,6 +6,8 @@
 #include "actions/toggleboolaction.h"
 #include "actions/switchscreenaction.h"
 #include "checkboxicon.h"
+#include "icons/wifi.h"
+#include "icons/bluetooth.h"
 #include "icons/back.h"
 #include "texts.h"
 #include "globals.h"
@@ -17,7 +19,7 @@ class BluetoothSettingsMenu;
 class ModesSettingsMenu;
 class PotiSettingsMenu;
 class BuzzerMenu;
-class VersionDisplay;
+class AboutMenu;
 class MainMenu;
 }
 
@@ -30,14 +32,14 @@ class SettingsMenu :
     public StaticText<TEXT_SETTINGS>,
     public StaticMenuDefinition<
         makeComponent<MenuItem, StaticText<TEXT_COMMONSETTINGS>,    SwitchScreenAction<CommonSettingsMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_WIFISETTINGS>,      SwitchScreenAction<WifiSettingsMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHSETTINGS>, SwitchScreenAction<BluetoothSettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_WIFISETTINGS>,      SwitchScreenAction<WifiSettingsMenu>, StaticMenuItemIcon<&icons::wifi>>,
+        makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHSETTINGS>, SwitchScreenAction<BluetoothSettingsMenu>, StaticMenuItemIcon<&icons::bluetooth>>,
         makeComponent<MenuItem, StaticText<TEXT_MODESSETTINGS>,     SwitchScreenAction<ModesSettingsMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_POTISETTINGS>,      SwitchScreenAction<PotiSettingsMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_BUZZER>,            SwitchScreenAction<BuzzerMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>,       ToggleBoolAction, CheckboxIcon, FrontLedAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,        ToggleBoolAction, CheckboxIcon, BackLedAccessor>,
-        makeComponent<MenuItem, StaticText<TEXT_VERSION>,           SwitchScreenAction<VersionDisplay>>,
+        makeComponent<MenuItem, StaticText<TEXT_ABOUT>,             SwitchScreenAction<AboutMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,              SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};

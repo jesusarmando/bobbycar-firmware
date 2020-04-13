@@ -4,9 +4,12 @@
 #include "staticmenudefinition.h"
 #include "menuitem.h"
 #include "actions/switchscreenaction.h"
+#include "actions/rebootaction.h"
 #include "texts.h"
-#include "icons/back.h"
+#include "icons/settings.h"
 #include "icons/lock.h"
+#include "icons/poweroff.h"
+#include "icons/back.h"
 
 namespace {
 class StatusDisplay;
@@ -27,10 +30,11 @@ class MainMenu :
         makeComponent<MenuItem, StaticText<TEXT_STATUS>,      SwitchScreenAction<StatusDisplay>, StaticMenuItemIcon<&icons::back>>,
         makeComponent<MenuItem, StaticText<TEXT_SELECTMODE>,  SwitchScreenAction<SelectModeMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_PRESETS>,     SwitchScreenAction<PresetsMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_SETTINGS>,    SwitchScreenAction<SettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_SETTINGS>,    SwitchScreenAction<SettingsMenu>, StaticMenuItemIcon<&icons::settings>>,
         makeComponent<MenuItem, StaticText<TEXT_LOCKVEHICLE>, SwitchScreenAction<Lockscreen>, StaticMenuItemIcon<&icons::lock>>,
         makeComponent<MenuItem, StaticText<TEXT_DEMOS>,       SwitchScreenAction<DemosMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_POWEROFF>,    SwitchScreenAction<PoweroffDisplay>>,
+        makeComponent<MenuItem, StaticText<TEXT_POWEROFF>,    SwitchScreenAction<PoweroffDisplay>, StaticMenuItemIcon<&icons::poweroff>>,
+        makeComponent<MenuItem, StaticText<TEXT_REBOOT>,      RebootAction>,
         makeComponent<MenuItem, StaticText<TEXT_DEBUG>,       SwitchScreenAction<DebugMenu>>
     >
 {};

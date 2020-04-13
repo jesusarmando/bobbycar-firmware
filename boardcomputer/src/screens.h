@@ -1,5 +1,6 @@
 #pragma once
 
+#include "displays/menus/aboutmenu.h"
 #include "displays/menus/accesspointwifisettingsmenu.h"
 #include "displays/menus/bluetoothsettingsmenu.h"
 #include "displays/menus/bluetoothmodesettingsmenu.h"
@@ -8,7 +9,6 @@
 #include "displays/menus/debugmenu.h"
 #include "displays/menus/defaultmodesettingsmenu.h"
 #include "displays/menus/demosmenu.h"
-#include "displays/menus/dynamicdebugmenu.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/genericwifisettingsmenu.h"
 #include "displays/menus/invertmenu.h"
@@ -34,7 +34,6 @@
 #include "displays/spirodisplay.h"
 #include "displays/starfielddisplay.h"
 #include "displays/statusdisplay.h"
-#include "displays/versiondisplay.h"
 
 #include "globals.h"
 #include "utils.h"
@@ -44,7 +43,7 @@ union X {
     X() {}
     ~X() { ((Display&)statusDisplay).~Display(); }
 
-    MainMenu mainMenu;
+    AboutMenu aboutMenu;
     AccessPointWifiSettingsMenu accessPointWifiSettingsMenu;
     BluetoothSettingsMenu bluetoothSettingsMenu;
     BluetoothModeSettingsMenu bluetoothModeSettingsMenu;
@@ -53,11 +52,11 @@ union X {
     DebugMenu debugMenu;
     DefaultModeSettingsMenu defaultModeSettingsMenu;
     DemosMenu demosMenu;
-    DynamicDebugMenu dynamicDebugMenu;
     EnableMenu enableMenu;
     GenericWifiSettingsMenu genericWifiSettingsMenu;
     InvertMenu invertMenu;
     LarsmModeSettingsMenu larsmModeSettingsMenu;
+    MainMenu mainMenu;
     TempomatModeSettingsMenu tempomatModeSettingsMenu;
     ModesSettingsMenu modesSettingsMenu;
     PotiSettingsMenu potiSettingsMenu;
@@ -79,7 +78,6 @@ union X {
     SpiroDisplay spiroDisplay;
     StarfieldDisplay starFieldDisplay;
     StatusDisplay statusDisplay;
-    VersionDisplay versionDisplay;
 
     FrontFreqChangeScreen changeFrontFreq;
     FrontPatternChangeScreen changeFrontPattern;
@@ -122,6 +120,7 @@ union X {
 using DefaultScreen = decltype(displays.statusDisplay);
 
 template<typename T> T &getRefByType() = delete;
+template<> decltype(displays.aboutMenu)                                        &getRefByType<decltype(displays.aboutMenu)>()                                        { return displays.aboutMenu; }
 template<> decltype(displays.accessPointWifiSettingsMenu)                      &getRefByType<decltype(displays.accessPointWifiSettingsMenu)>()                      { return displays.accessPointWifiSettingsMenu; }
 template<> decltype(displays.bluetoothSettingsMenu)                            &getRefByType<decltype(displays.bluetoothSettingsMenu)>()                            { return displays.bluetoothSettingsMenu; }
 template<> decltype(displays.bluetoothModeSettingsMenu)                        &getRefByType<decltype(displays.bluetoothModeSettingsMenu)>()                        { return displays.bluetoothModeSettingsMenu; }
@@ -130,7 +129,6 @@ template<> decltype(displays.commonSettingsMenu)                               &
 template<> decltype(displays.debugMenu)                                        &getRefByType<decltype(displays.debugMenu)>()                                        { return displays.debugMenu; }
 template<> decltype(displays.defaultModeSettingsMenu)                          &getRefByType<decltype(displays.defaultModeSettingsMenu)>()                          { return displays.defaultModeSettingsMenu; }
 template<> decltype(displays.demosMenu)                                        &getRefByType<decltype(displays.demosMenu)>()                                        { return displays.demosMenu; }
-template<> decltype(displays.dynamicDebugMenu)                                 &getRefByType<decltype(displays.dynamicDebugMenu)>()                                 { return displays.dynamicDebugMenu; }
 template<> decltype(displays.enableMenu)                                       &getRefByType<decltype(displays.enableMenu)>()                                       { return displays.enableMenu; }
 template<> decltype(displays.genericWifiSettingsMenu)                          &getRefByType<decltype(displays.genericWifiSettingsMenu)>()                          { return displays.genericWifiSettingsMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
@@ -157,7 +155,6 @@ template<> decltype(displays.poweroffDisplay)                                  &
 template<> decltype(displays.spiroDisplay)                                     &getRefByType<decltype(displays.spiroDisplay)>()                                     { return displays.spiroDisplay; }
 template<> decltype(displays.starFieldDisplay)                                 &getRefByType<decltype(displays.starFieldDisplay)>()                                 { return displays.starFieldDisplay; }
 template<> decltype(displays.statusDisplay)                                    &getRefByType<decltype(displays.statusDisplay)>()                                    { return displays.statusDisplay; }
-template<> decltype(displays.versionDisplay)                                   &getRefByType<decltype(displays.versionDisplay)>()                                   { return displays.versionDisplay; }
 
 template<> decltype(displays.changeFrontFreq)                                  &getRefByType<decltype(displays.changeFrontFreq)>()                                  { return displays.changeFrontFreq; }
 template<> decltype(displays.changeFrontPattern)                               &getRefByType<decltype(displays.changeFrontPattern)>()                               { return displays.changeFrontPattern; }
