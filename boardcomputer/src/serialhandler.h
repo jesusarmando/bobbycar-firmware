@@ -57,11 +57,11 @@ void handleSerial()
         }
         case 'r':
         case 'R':
-            settingsSaver.load(settings);
+            loadSettings();
             break;
         case 's':
         case 'S':
-            settingsSaver.save(settings);
+            saveSettings();
             break;
         case '0':
         case '1':

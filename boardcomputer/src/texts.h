@@ -199,6 +199,7 @@ constexpr char TEXT_CALIBRATE[] = "Calibrate";
 //constexpr char TEXT_PRESETS[] = "Presets";
 constexpr char TEXT_DEFAULTEVERYTHING[] = "Default everything";
 constexpr char TEXT_DEFAULTLIMITS[] = "Default limits";
+constexpr char TEXT_KIDSLIMITS[] = "Kids limits";
 constexpr char TEXT_DEFAULTPOTI[] = "Default poti";
 constexpr char TEXT_DEFAULTHARDWARE[] = "Default hardware";
 constexpr char TEXT_STREET[] = "Street";

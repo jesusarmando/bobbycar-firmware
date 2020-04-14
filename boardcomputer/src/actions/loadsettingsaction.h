@@ -1,12 +1,12 @@
 #pragma once
 
 #include "actioninterface.h"
-#include "globals.h"
+#include "utils.h"
 
 namespace {
 class LoadSettingsAction : public virtual ActionInterface
 {
 public:
-    void triggered() override { settingsSaver.load(settings); }
+    void triggered() override { loadSettings(); }
 };
 }

@@ -9,7 +9,7 @@ namespace {
 template<typename T>
 struct RefAccessorSaveSettings : public virtual RefAccessor<T>
 {
-    void setValue(T value) override { RefAccessor<T>::setValue(value); settingsSaver.save(settings); };
+    void setValue(T value) override { RefAccessor<T>::setValue(value); saveSettings(); };
 };
 
 struct IMotMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.limits.iMotMax; } };

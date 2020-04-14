@@ -202,4 +202,14 @@ void updateSwapFrontBack()
     front.serial = settings.hardware.swapFrontBack ? Serial2 : Serial1;
     back.serial = settings.hardware.swapFrontBack ? Serial1 : Serial2;
 }
+
+void loadSettings()
+{
+    settingsSaver.load(settings);
+}
+
+void saveSettings()
+{
+    settingsSaver.save(settings);
+}
 }

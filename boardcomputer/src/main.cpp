@@ -32,7 +32,7 @@ void setup()
     settings = presets::defaultSettings;
 
     if (settingsSaver.init())
-        settingsSaver.load(settings);
+        loadSettings();
 
     updateSwapFrontBack();
 

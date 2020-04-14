@@ -10,6 +10,13 @@ constexpr Settings::Limits defaultLimits {
     .fieldWeakMax = 5,
     .phaseAdvMax = 40
 };
+constexpr Settings::Limits kidsLimits {
+    .iMotMax = 5,
+    .iDcMax = 7,
+    .nMotMax = 500,
+    .fieldWeakMax = 2,
+    .phaseAdvMax = 20
+};
 
 constexpr Settings::Hardware::Poti defaultPoti {
     .sampleCount = 100,
