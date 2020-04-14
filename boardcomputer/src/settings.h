@@ -9,7 +9,7 @@ enum class LarsmModeMode : uint8_t { Mode1, Mode2, Mode3, Mode4 };
 
 struct Settings
 {
-    struct {
+    struct Limits {
         int16_t iMotMax;      // [A] Maximum motor current limit
         int16_t iDcMax;       // [A] Maximum DC Link current limit (This is the current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
         int16_t nMotMax;      // [rpm] Maximum motor speed limit
@@ -17,11 +17,11 @@ struct Settings
         int16_t phaseAdvMax;  // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
     } limits;
 
-    struct {
+    struct Hardware {
         bool enableFrontLeft, enableFrontRight, enableBackLeft, enableBackRight;
         bool invertFrontLeft, invertFrontRight, invertBackLeft, invertBackRight;
 
-        struct {
+        struct Poti {
             int16_t sampleCount;
             int16_t gasMin, gasMax, bremsMin, bremsMax;
         } poti;
@@ -29,7 +29,7 @@ struct Settings
         bool swapFrontBack;
     } hardware;
 
-    struct {
+    struct DefaultMode {
         ControlType ctrlTyp;
         ControlMode ctrlMod;
         bool enableSmoothing;
@@ -43,23 +43,23 @@ struct Settings
         int16_t brems2_wert;
     } defaultMode;
 
-    struct {
+    struct TempomatMode {
         ControlType ctrlTyp;
         ControlMode ctrlMod;
     } tempomatMode;
 
-    struct {
+    struct LarsmMode {
         LarsmModeMode mode;
         uint8_t iterations;
     } larsmMode;
 
 
     template<typename T>
-    void forEverySetting(T &&callable);
+    void executeForEverySetting(T &&callable);
 };
 
 template<typename T>
-void Settings::forEverySetting(T &&callable)
+void Settings::executeForEverySetting(T &&callable)
 {
     callable("iMotMax", limits.iMotMax);
     callable("iDcMax", limits.iDcMax);

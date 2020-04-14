@@ -96,7 +96,7 @@ bool SettingsSaver::load(Settings &settings)
 {
     bool result{true};
 
-    settings.forEverySetting([&](const char *key, auto &value)
+    settings.executeForEverySetting([&](const char *key, auto &value)
     {
         esp_err_t err = nvsGetterHelper<std::remove_reference_t<decltype(value)>>::nvs_get(my_handle, key, &value);
         if (err != ESP_OK)
@@ -134,7 +134,7 @@ bool SettingsSaver::save(Settings &settings)
 {
     bool result{true};
 
-    settings.forEverySetting([&](const char *key, auto value)
+    settings.executeForEverySetting([&](const char *key, auto value)
     {
         esp_err_t err = nvsSetterHelper<decltype(value)>::nvs_set(my_handle, key, value);
         if (err != ESP_OK)

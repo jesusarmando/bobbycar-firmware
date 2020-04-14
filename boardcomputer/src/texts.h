@@ -197,7 +197,10 @@ constexpr char TEXT_CALIBRATE[] = "Calibrate";
 
 //PresetsMenu
 //constexpr char TEXT_PRESETS[] = "Presets";
-constexpr char TEXT_DEFAULT[] = "Default";
+constexpr char TEXT_DEFAULTEVERYTHING[] = "Default everything";
+constexpr char TEXT_DEFAULTLIMITS[] = "Default limits";
+constexpr char TEXT_DEFAULTPOTI[] = "Default poti";
+constexpr char TEXT_DEFAULTHARDWARE[] = "Default hardware";
 constexpr char TEXT_STREET[] = "Street";
 constexpr char TEXT_SIDEWALK[] = "Sidewalk";
 constexpr char TEXT_POLICE[] = "Police";
@@ -205,7 +208,7 @@ constexpr char TEXT_RACE[] = "Race";
 
 //SelectModeMenu
 //constexpr char TEXT_SELECTMODE[] = "Select mode";
-//constexpr char TEXT_DEFAULT[] = "Default";
+constexpr char TEXT_DEFAULT[] = "Default";
 constexpr char TEXT_TEMPOMAT[] = "Tempomat";
 constexpr char TEXT_LARSM[] = "Larsm";
 constexpr char TEXT_BLUETOOTH[] = "Bluetooth";
