@@ -176,6 +176,8 @@ void MenuDisplay::redraw()
 
         if (menuIter->get().icon() != *iconsIter)
         {
+            tft.fillRect(5, labelsIter->y()+1, 24, 24, TFT_BLACK);
+
             auto icon = menuIter->get().icon();
             if (icon)
             {
@@ -183,8 +185,6 @@ void MenuDisplay::redraw()
                 tft.pushImage(5, labelsIter->y()+1, icon->WIDTH, icon->HEIGHT, icon->buffer);
                 tft.setSwapBytes(false);
             }
-            else
-                tft.fillRect(5, labelsIter->y()+1, 24, 24, TFT_BLACK);
             *iconsIter = icon;
         }
 

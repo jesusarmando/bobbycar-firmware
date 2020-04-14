@@ -6,15 +6,17 @@
 #include "displays/menus/bluetoothmodesettingsmenu.h"
 #include "displays/menus/buzzermenu.h"
 #include "displays/menus/commanddebugmenu.h"
-#include "displays/menus/commonsettingsmenu.h"
 #include "displays/menus/debugmenu.h"
 #include "displays/menus/defaultmodesettingsmenu.h"
 #include "displays/menus/demosmenu.h"
+#include "displays/menus/dynamicdebugmenu.h"
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/feedbackdebugmenu.h"
 #include "displays/menus/genericwifisettingsmenu.h"
+#include "displays/menus/hardwaresettingsmenu.h"
 #include "displays/menus/invertmenu.h"
 #include "displays/menus/larsmmodesettingsmenu.h"
+#include "displays/menus/limitssettingsmenu.h"
 #include "displays/menus/mainmenu.h"
 #include "displays/menus/tempomatmodesettingsmenu.h"
 #include "displays/menus/modessettingsmenu.h"
@@ -41,6 +43,7 @@
 
 #include "globals.h"
 #include "utils.h"
+#include "icons/logo.h"
 
 namespace {
 union X {
@@ -54,16 +57,18 @@ union X {
     BuzzerMenu buzzerMenu;
     FrontCommandDebugMenu frontCommandDebugMenu;
     BackCommandDebugMenu backCommandDebugMenu;
-    CommonSettingsMenu commonSettingsMenu;
     DebugMenu debugMenu;
     DefaultModeSettingsMenu defaultModeSettingsMenu;
     DemosMenu demosMenu;
+    DynamicDebugMenu dynamicDebugMenu;
     EnableMenu enableMenu;
     FrontFeedbackDebugMenu frontFeedbackDebugMenu;
     BackFeedbackDebugMenu backFeedbackDebugMenu;
     GenericWifiSettingsMenu genericWifiSettingsMenu;
+    HardwareSettingsMenu hardwareSettingsMenu;
     InvertMenu invertMenu;
     LarsmModeSettingsMenu larsmModeSettingsMenu;
+    LimitsSettingsMenu limitsSettingsMenu;
     MainMenu mainMenu;
     TempomatModeSettingsMenu tempomatModeSettingsMenu;
     ModesSettingsMenu modesSettingsMenu;
@@ -109,7 +114,7 @@ union X {
 
     DefaultModeCtrlTypChangeDisplay changeDefaultModeCtrlTyp;
     DefaultModeCtrlModChangeDisplay changeDefaultModeCtrlMod;
-    DefaultModeWeakeningSmootheningChangeDisplay changeDefaultModeWeakeningSmoothening;
+    DefaultModeSmoothingChangeDisplay changeDefaultModeSmoothing;
     DefaultModeFrontPercentageChangeDisplay changeDefaultModeFrontPercentage;
     DefaultModeBackPercentageChangeDisplay changeDefaultModeBackPercentage;
     DefaultModeAddSchwelleChangeDisplay changeDefaultModeAddSchwelle;
@@ -124,6 +129,7 @@ union X {
     LarsmModeModeChangeDisplay larsmModeModeChangeDisplay;
     LarsmModeIterationsChangeDisplay larsmModeIterationsChangeDisplay;
 
+    SampleCountChangeScreen sampleCountChangeScreen;
     GasMinChangeScreen changeGasMin;
     GasMaxChangeScreen changeGasMax;
     BremsMinChangeScreen changeBremsMin;
@@ -133,8 +139,6 @@ union X {
     WifiTxPowerChangeScreen wifiTxPowerChangeScreen;
 } displays;
 
-using DefaultScreen = decltype(displays.statusDisplay);
-
 template<typename T> T &getRefByType() = delete;
 template<> decltype(displays.aboutMenu)                                        &getRefByType<decltype(displays.aboutMenu)>()                                        { return displays.aboutMenu; }
 template<> decltype(displays.accessPointWifiSettingsMenu)                      &getRefByType<decltype(displays.accessPointWifiSettingsMenu)>()                      { return displays.accessPointWifiSettingsMenu; }
@@ -143,16 +147,18 @@ template<> decltype(displays.bluetoothModeSettingsMenu)                        &
 template<> decltype(displays.buzzerMenu)                                       &getRefByType<decltype(displays.buzzerMenu)>()                                       { return displays.buzzerMenu; }
 template<> decltype(displays.frontCommandDebugMenu)                            &getRefByType<decltype(displays.frontCommandDebugMenu)>()                            { return displays.frontCommandDebugMenu; }
 template<> decltype(displays.backCommandDebugMenu)                             &getRefByType<decltype(displays.backCommandDebugMenu)>()                             { return displays.backCommandDebugMenu; }
-template<> decltype(displays.commonSettingsMenu)                               &getRefByType<decltype(displays.commonSettingsMenu)>()                               { return displays.commonSettingsMenu; }
 template<> decltype(displays.debugMenu)                                        &getRefByType<decltype(displays.debugMenu)>()                                        { return displays.debugMenu; }
 template<> decltype(displays.defaultModeSettingsMenu)                          &getRefByType<decltype(displays.defaultModeSettingsMenu)>()                          { return displays.defaultModeSettingsMenu; }
 template<> decltype(displays.demosMenu)                                        &getRefByType<decltype(displays.demosMenu)>()                                        { return displays.demosMenu; }
+template<> decltype(displays.dynamicDebugMenu)                                 &getRefByType<decltype(displays.dynamicDebugMenu)>()                                 { return displays.dynamicDebugMenu; }
 template<> decltype(displays.enableMenu)                                       &getRefByType<decltype(displays.enableMenu)>()                                       { return displays.enableMenu; }
 template<> decltype(displays.frontFeedbackDebugMenu)                           &getRefByType<decltype(displays.frontFeedbackDebugMenu)>()                           { return displays.frontFeedbackDebugMenu; }
 template<> decltype(displays.backFeedbackDebugMenu)                            &getRefByType<decltype(displays.backFeedbackDebugMenu)>()                            { return displays.backFeedbackDebugMenu; }
 template<> decltype(displays.genericWifiSettingsMenu)                          &getRefByType<decltype(displays.genericWifiSettingsMenu)>()                          { return displays.genericWifiSettingsMenu; }
+template<> decltype(displays.hardwareSettingsMenu)                             &getRefByType<decltype(displays.hardwareSettingsMenu)>()                             { return displays.hardwareSettingsMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
 template<> decltype(displays.larsmModeSettingsMenu)                            &getRefByType<decltype(displays.larsmModeSettingsMenu)>()                            { return displays.larsmModeSettingsMenu; }
+template<> decltype(displays.limitsSettingsMenu)                               &getRefByType<decltype(displays.limitsSettingsMenu)>()                               { return displays.limitsSettingsMenu; }
 template<> decltype(displays.mainMenu)                                         &getRefByType<decltype(displays.mainMenu)>()                                         { return displays.mainMenu; }
 template<> decltype(displays.tempomatModeSettingsMenu)                         &getRefByType<decltype(displays.tempomatModeSettingsMenu)>()                         { return displays.tempomatModeSettingsMenu; }
 template<> decltype(displays.modesSettingsMenu)                                &getRefByType<decltype(displays.modesSettingsMenu)>()                                { return displays.modesSettingsMenu; }
@@ -198,7 +204,7 @@ template<> decltype(displays.changePhaseAdvMax)                                &
 
 template<> decltype(displays.changeDefaultModeCtrlTyp)                         &getRefByType<decltype(displays.changeDefaultModeCtrlTyp)>()                         { return displays.changeDefaultModeCtrlTyp; }
 template<> decltype(displays.changeDefaultModeCtrlMod)                         &getRefByType<decltype(displays.changeDefaultModeCtrlMod)>()                         { return displays.changeDefaultModeCtrlMod; }
-template<> decltype(displays.changeDefaultModeWeakeningSmoothening)            &getRefByType<decltype(displays.changeDefaultModeWeakeningSmoothening)>()            { return displays.changeDefaultModeWeakeningSmoothening; }
+template<> decltype(displays.changeDefaultModeSmoothing)            &getRefByType<decltype(displays.changeDefaultModeSmoothing)>()            { return displays.changeDefaultModeSmoothing; }
 template<> decltype(displays.changeDefaultModeFrontPercentage)                 &getRefByType<decltype(displays.changeDefaultModeFrontPercentage)>()                 { return displays.changeDefaultModeFrontPercentage; }
 template<> decltype(displays.changeDefaultModeBackPercentage)                  &getRefByType<decltype(displays.changeDefaultModeBackPercentage)>()                  { return displays.changeDefaultModeBackPercentage; }
 template<> decltype(displays.changeDefaultModeAddSchwelle)                     &getRefByType<decltype(displays.changeDefaultModeAddSchwelle)>()                     { return displays.changeDefaultModeAddSchwelle; }
@@ -213,6 +219,7 @@ template<> decltype(displays.changeManualModeCtrlMod)                          &
 template<> decltype(displays.larsmModeModeChangeDisplay)                       &getRefByType<decltype(displays.larsmModeModeChangeDisplay)>()                       { return displays.larsmModeModeChangeDisplay; }
 template<> decltype(displays.larsmModeIterationsChangeDisplay)                 &getRefByType<decltype(displays.larsmModeIterationsChangeDisplay)>()                 { return displays.larsmModeIterationsChangeDisplay; }
 
+template<> decltype(displays.sampleCountChangeScreen)                          &getRefByType<decltype(displays.sampleCountChangeScreen)>()                          { return displays.sampleCountChangeScreen; }
 template<> decltype(displays.changeGasMin)                                     &getRefByType<decltype(displays.changeGasMin)>()                                     { return displays.changeGasMin; }
 template<> decltype(displays.changeGasMax)                                     &getRefByType<decltype(displays.changeGasMax)>()                                     { return displays.changeGasMax; }
 template<> decltype(displays.changeBremsMin)                                   &getRefByType<decltype(displays.changeBremsMin)>()                                   { return displays.changeBremsMin; }
@@ -259,10 +266,11 @@ void switchScreen(Args&&... args)
 void initScreen()
 {
     tft.init();
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setRotation(0);
-    tft.drawString("Booting...", 32, 64, 4);
+    tft.fillScreen(TFT_WHITE);
+    tft.setTextColor(TFT_BLACK);
+    tft.pushImage(0, 40, icons::logo.WIDTH, icons::logo.HEIGHT, icons::logo.buffer);
+    tft.drawString("Bobbycar-OS", 32, 200, 4);
+    tft.drawString("booting...", 32, 225, 4);
 }
 
 void updateDisplay()
@@ -272,7 +280,8 @@ void updateDisplay()
         const auto rotatedCopy = rotated;
         rotated = 0;
 
-        currentDisplay->rotate(rotatedCopy);
+        if (currentDisplay)
+            currentDisplay->rotate(rotatedCopy);
     }
 
     if (requestFullRedraw)
@@ -281,7 +290,8 @@ void updateDisplay()
 
         tft.init();
 
-        currentDisplay->initScreen();
+        if (currentDisplay)
+            currentDisplay->initScreen();
     }
 
     if (buttonLongPressed)
@@ -294,10 +304,12 @@ void updateDisplay()
     {
         buttonPressed = false;
 
-        currentDisplay->button();
+        if (currentDisplay)
+            currentDisplay->button();
     }
 
-    currentDisplay->update();
+    if (currentDisplay)
+        currentDisplay->update();
 
     if (changeScreenCallback)
     {
@@ -308,6 +320,7 @@ void updateDisplay()
 
 void redrawDisplay()
 {
-    currentDisplay->redraw();
+    if (currentDisplay)
+        currentDisplay->redraw();
 }
 }

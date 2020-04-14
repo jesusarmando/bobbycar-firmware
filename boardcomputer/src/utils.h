@@ -123,6 +123,16 @@ std::array<std::reference_wrapper<const MotorState>, 2> motorsInController(const
     return {std::ref(controller.command.left), std::ref(controller.command.right)};
 }
 
+std::array<std::reference_wrapper<MotorFeedback>, 2> motorFeedbacksInController(Controller &controller)
+{
+    return {std::ref(controller.feedback.left), std::ref(controller.feedback.right)};
+}
+
+std::array<std::reference_wrapper<const MotorFeedback>, 2> motorFeedbacksInController(const Controller &controller)
+{
+    return {std::ref(controller.feedback.left), std::ref(controller.feedback.right)};
+}
+
 std::array<std::reference_wrapper<MotorState>, 4> motors()
 {
     return {
@@ -136,20 +146,25 @@ void fixCommonParams()
     for (Controller &controller : controllers())
         for (MotorState &motor : motorsInController(controller))
         {
-            motor.iMotMax = settings.iMotMax;
-            motor.iDcMax = settings.iDcMax;
-            motor.nMotMax = settings.nMotMax;
-            motor.fieldWeakMax = settings.fieldWeakMax;
-            motor.phaseAdvMax = settings.phaseAdvMax;
+            motor.iMotMax = settings.limits.iMotMax;
+            motor.iDcMax = settings.limits.iDcMax;
+            motor.nMotMax = settings.limits.nMotMax;
+            motor.fieldWeakMax = settings.limits.fieldWeakMax;
+            motor.phaseAdvMax = settings.limits.phaseAdvMax;
         }
 
-    if (front.invertLeft)
+    front.command.left.enable = settings.hardware.enableFrontLeft;
+    front.command.right.enable = settings.hardware.enableFrontRight;
+    back.command.left.enable = settings.hardware.enableBackLeft;
+    back.command.right.enable = settings.hardware.enableBackRight;
+
+    if (settings.hardware.invertFrontLeft)
         front.command.left.pwm = -front.command.left.pwm;
-    if (front.invertRight)
+    if (settings.hardware.invertFrontRight)
         front.command.right.pwm = -front.command.right.pwm;
-    if (back.invertLeft)
+    if (settings.hardware.invertBackLeft)
         back.command.left.pwm = -back.command.left.pwm;
-    if (back.invertRight)
+    if (settings.hardware.invertBackRight)
         back.command.right.pwm = -back.command.right.pwm;
 }
 
@@ -182,30 +197,9 @@ void scrollAddress(uint16_t VSP) {
   tft.writedata(VSP);
 }
 
-void applyDefaultSettings()
+void updateSwapFrontBack()
 {
-    gasMin = defaultGasMin;
-    gasMax = defaultGasMax;
-    bremsMin = defaultBremsMin;
-    bremsMax = defaultBremsMax;
-
-    front.command.left.enable = defaultEnableFrontLeft;
-    front.command.right.enable = defaultEnableFrontRight;
-    back.command.left.enable = defaultEnableBackLeft;
-    back.command.right.enable = defaultEnableBackRight;
-
-    front.invertLeft = defaultInvertFrontLeft;
-    front.invertRight = defaultInvertFrontRight;
-    back.invertLeft = defaultInvertBackLeft;
-    back.invertRight = defaultInvertBackRight;
-
-    settings.iMotMax = defaultIMotMax;
-    settings.iDcMax = defaultIDcMax;
-    settings.nMotMax = defaultNMotMax;
-    settings.fieldWeakMax = defaultFieldWeakMax;
-    settings.phaseAdvMax = defaultPhaseAdvMax;
-
-    for (Controller &controller : controllers())
-        controller.command.buzzer = {};
+    front.serial = settings.hardware.swapFrontBack ? Serial2 : Serial1;
+    back.serial = settings.hardware.swapFrontBack ? Serial1 : Serial2;
 }
 }

@@ -8,7 +8,7 @@
 #include "actions/switchscreenaction.h"
 #include "icons/back.h"
 #include "texts.h"
-#include "modes/tempomatmode.h"
+#include "settingsaccessors.h"
 
 namespace {
 class TempomatModeSettingsMenu;
@@ -16,10 +16,7 @@ class ModesSettingsMenu;
 }
 
 namespace {
-struct TempomatModeCtrlTypAccessor : public RefAccessor<ControlType> { ControlType &getRef() const override { return modes::tempomatMode.ctrlTyp; } };
 using TempomatModeCtrlTypChangeScreen = makeComponent<ChangeValueDisplay<ControlType>, StaticText<TEXT_SETCONTROLMODE>, TempomatModeCtrlTypAccessor, SwitchScreenAction<TempomatModeSettingsMenu>>;
-
-struct TempomatModeCtrlModAccessor : public RefAccessor<ControlMode> { ControlMode &getRef() const override { return modes::tempomatMode.ctrlMod; } };
 using TempomatModeCtrlModChangeScreen = makeComponent<ChangeValueDisplay<ControlMode>, StaticText<TEXT_SETCONTROLMODE>, TempomatModeCtrlModAccessor, SwitchScreenAction<TempomatModeSettingsMenu>>;
 
 class TempomatModeSettingsMenu :

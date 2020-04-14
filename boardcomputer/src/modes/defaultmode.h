@@ -5,7 +5,6 @@
 #include <Arduino.h>
 
 #include "modeinterface.h"
-#include "../../common.h"
 #include "globals.h"
 #include "utils.h"
 
@@ -17,20 +16,10 @@ public:
 
     const char *displayName() const override { return "Default"; }
 
-    ControlType ctrlTyp = ControlType::FieldOrientedControl;
-    ControlMode ctrlMod = ControlMode::Torque;
-    bool enableWeakeningSmoothening{true};
-    int16_t weakeningSmoothening{20};
-    int16_t frontPercentage{100}, backPercentage{100};
-
-    int16_t add_schwelle;
-    int16_t gas1_wert;
-    int16_t gas2_wert;
-    int16_t brems1_wert;
-    int16_t brems2_wert;
-
     bool waitForGasLoslass{false};
     bool waitForBremsLoslass{false};
+
+private:
     unsigned long lastTime{millis()};
     float lastPwm{0};
 };
@@ -62,26 +51,26 @@ void DefaultMode::update()
     const auto now = millis();
 
     float pwm;
-    if (gas_squared >= add_schwelle)
+    if (gas_squared >= settings.defaultMode.add_schwelle)
     {
-        pwm = (gas_squared/1000.*gas1_wert) + (brems_squared/1000.*brems1_wert);
+        pwm = (gas_squared/1000.*settings.defaultMode.gas1_wert) + (brems_squared/1000.*settings.defaultMode.brems1_wert);
 
-        if (enableWeakeningSmoothening && (pwm > 1000. || lastPwm > 1000.))
+        if (settings.defaultMode.enableSmoothing && (pwm > 1000. || lastPwm > 1000.))
         {
             if (lastPwm < pwm)
             {
-                pwm = std::min(pwm, lastPwm+(weakeningSmoothening*(now-lastTime)/100.f));
+                pwm = std::min(pwm, lastPwm+(settings.defaultMode.smoothing*(now-lastTime)/100.f));
                 if (pwm < 1000.)
                     pwm = 1000.;
             }
             else if (lastPwm > pwm)
             {
-                pwm = std::max(pwm, lastPwm-(weakeningSmoothening*(now-lastTime)/100.f));
+                pwm = std::max(pwm, lastPwm-(settings.defaultMode.smoothing*(now-lastTime)/100.f));
             }
         }
     }
     else
-        pwm = (gas_squared/1000.*gas2_wert) - (brems_squared/1000.*brems2_wert);
+        pwm = (gas_squared/1000.*settings.defaultMode.gas2_wert) - (brems_squared/1000.*settings.defaultMode.brems2_wert);
 
     lastPwm = pwm;
     lastTime = now;
@@ -89,9 +78,9 @@ void DefaultMode::update()
     for (Controller &controller : controllers())
         for (MotorState &motor : motorsInController(controller))
         {
-            motor.ctrlTyp = ctrlTyp;
-            motor.ctrlMod = ctrlMod;
-            motor.pwm = pwm / 100. * (&controller == &front ? frontPercentage : backPercentage);
+            motor.ctrlTyp = settings.defaultMode.ctrlTyp;
+            motor.ctrlMod = settings.defaultMode.ctrlMod;
+            motor.pwm = pwm / 100. * (&controller == &front ? settings.defaultMode.frontPercentage : settings.defaultMode.backPercentage);
         }
 
     fixCommonParams();

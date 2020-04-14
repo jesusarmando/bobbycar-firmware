@@ -10,14 +10,13 @@ class HardwareSerial;
 
 namespace {
 struct Controller {
-    Controller(HardwareSerial &serial) :
-        serial{serial}
+    Controller(HardwareSerial &serial, bool &enableLeft, bool &enableRight, bool &invertLeft, bool &invertRight) :
+        serial{serial}, enableLeft{enableLeft}, enableRight{enableRight}, invertLeft{invertLeft}, invertRight{invertRight}
     {
     }
 
     std::reference_wrapper<HardwareSerial> serial;
-
-    bool invertLeft{}, invertRight{};
+    bool &enableLeft, &enableRight, &invertLeft, &invertRight;
 
     Command command{};
 

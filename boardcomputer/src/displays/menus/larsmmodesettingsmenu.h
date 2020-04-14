@@ -8,7 +8,7 @@
 #include "actions/switchscreenaction.h"
 #include "icons/back.h"
 #include "texts.h"
-#include "modes/larsmmode.h"
+#include "settingsaccessors.h"
 
 namespace {
 class LarsmModeSettingsMenu;
@@ -16,10 +16,7 @@ class ModesSettingsMenu;
 }
 
 namespace {
-struct LarsmModeModeAccessor : public RefAccessor<LarsmMode::Mode> { LarsmMode::Mode &getRef() const override { return modes::larsmMode.mode; } };
-using LarsmModeModeChangeDisplay = makeComponent<ChangeValueDisplay<LarsmMode::Mode>, StaticText<TEXT_LARSMMODECHANGEMODE>, LarsmModeModeAccessor, SwitchScreenAction<LarsmModeSettingsMenu>>;
-
-struct LarsmModeIterationsAccessor : public RefAccessor<uint8_t> { uint8_t &getRef() const override { return modes::larsmMode.iterations; } };
+using LarsmModeModeChangeDisplay = makeComponent<ChangeValueDisplay<LarsmModeMode>, StaticText<TEXT_LARSMMODECHANGEMODE>, LarsmModeModeAccessor, SwitchScreenAction<LarsmModeSettingsMenu>>;
 using LarsmModeIterationsChangeDisplay = makeComponent<ChangeValueDisplay<uint8_t>, StaticText<TEXT_LARSMMODECHANGEITERATIONS>, LarsmModeIterationsAccessor, SwitchScreenAction<LarsmModeSettingsMenu>>;
 
 class LarsmModeSettingsMenu :

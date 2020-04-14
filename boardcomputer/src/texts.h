@@ -25,6 +25,8 @@ constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
 //constexpr char TEXT_BACK[] = "Back";
 
 //DebugMenu
+constexpr char TEXT_LOADSETTINGS[] = "Load settings";
+constexpr char TEXT_SAVESETTINGS[] = "Save settings";
 constexpr char TEXT_FRONTCOMMAND[] = "Front command";
 constexpr char TEXT_BACKCOMMAND[] = "Back command";
 constexpr char TEXT_FRONTLEFTCOMMAND[] = "Front left command";
@@ -53,16 +55,23 @@ constexpr char TEXT_DEBUG[] = "Debug";
 
 //SettingsMenu
 //constexpr char TEXT_SETTINGS[] = "Settings";
-constexpr char TEXT_COMMONSETTINGS[] = "Common settings";
+constexpr char TEXT_LIMITSSETTINGS[] = "Limits settings";
 constexpr char TEXT_WIFISETTINGS[] = "WiFi settings";
 //constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
 constexpr char TEXT_MODESSETTINGS[] = "Modes settings";
-constexpr char TEXT_POTISETTINGS[] = "Poti settings";
-constexpr char TEXT_SWAPFRONTBACK[] = "Swap front/back";
+constexpr char TEXT_HARDWARESETTINGS[] = "Hardware settings";
 constexpr char TEXT_BUZZER[] = "Buzzer";
 constexpr char TEXT_SETFRONTLED[] = "Set front LED";
 constexpr char TEXT_SETBACKLED[] = "Set back LED";
 //constexpr char TEXT_ABOUT[] = "About";
+//constexpr char TEXT_BACK[] = "Back";
+
+//HardwareSettings
+//constexpr char TEXT_HARDWARESETTINGS[] = "Hardware settings";
+constexpr char TEXT_SETENABLED[] = "Set enabled";
+constexpr char TEXT_SETINVERTED[] = "Set inverted";
+constexpr char TEXT_POTISETTINGS[] = "Poti settings";
+constexpr char TEXT_SWAPFRONTBACK[] = "Swap front/back";
 //constexpr char TEXT_BACK[] = "Back";
 
 //StationWifiSettingsMenu
@@ -92,16 +101,14 @@ constexpr char TEXT_SETBACKFREQ[] = "Set back freq";
 constexpr char TEXT_SETBACKPATTERN[] = "Set back pattern";
 //constexpr char TEXT_BACK[] = "Back";
 
-//CommonSettingsMenu
-//constexpr char TEXT_COMMONSETTINGS[] = "Common settings";
+//LimitsSettingsMenu
+//constexpr char TEXT_LIMITSSETTINGS[] = "Common settings";
 constexpr char TEXT_SETIMOTMAX[] = "Set iMotMax";
 constexpr char TEXT_SETIDCMAX[] = "Set iDcMax";
 constexpr char TEXT_SETNMOTMAXKMH[] = "Set nMotMax (kmh)";
 constexpr char TEXT_SETNMOTMAX[] = "Set nMotMax";
 constexpr char TEXT_SETFIELDWEAKMAX[] = "Set fieldWeakMax";
 constexpr char TEXT_SETPHASEADVMAX[] = "Set phaseAdvMax";
-constexpr char TEXT_SETENABLED[] = "Set enabled";
-constexpr char TEXT_SETINVERTED[] = "Set inverted";
 //constexpr char TEXT_BACK[] = "Back";
 
 //DebugMenu
@@ -113,8 +120,8 @@ constexpr char TEXT_DYNAMICMENU[] = "Dynamic menu";
 //constexpr char TEXT_DEFAULTMODESETTINGS[] = "Default mode settings";
 constexpr char TEXT_SETCONTROLTYPE[] = "Set control type";
 constexpr char TEXT_SETCONTROLMODE[] = "Set control mode";
-constexpr char TEXT_ENABLEWEAKENINGSMOOTHENING[] = "Enable weakening smoothening";
-constexpr char TEXT_SETWEAKINGSMOOTHENING[] = "Set weaking smoothening";
+constexpr char TEXT_ENABLESMOOTHING[] = "Enable smoothing";
+constexpr char TEXT_SETSMOOTHING[] = "Set smoothing";
 constexpr char TEXT_SETFRONTPERCENTAGE[] = "Set front percentage";
 constexpr char TEXT_SETBACKPERCENTAGE[] = "Set back percentage";
 constexpr char TEXT_SETADDSCHWELLE[] = "Set add Schwelle";
@@ -180,6 +187,7 @@ constexpr char TEXT_WEBSOCKETMODESETTINGS[] = "Websocket mode settings";
 
 //PotiSettingsMenu
 //constexpr char TEXT_POTISETTINGS[] = "Poti settings";
+constexpr char TEXT_SETSAMPLECOUNT[] = "Set sampleCount";
 constexpr char TEXT_SETGASMIN[] = "Set gasMin";
 constexpr char TEXT_SETGASMAX[] = "Set gasMax";
 constexpr char TEXT_SETBREMSMIN[] = "Set bremsMin";
@@ -189,6 +197,7 @@ constexpr char TEXT_CALIBRATE[] = "Calibrate";
 
 //PresetsMenu
 //constexpr char TEXT_PRESETS[] = "Presets";
+constexpr char TEXT_DEFAULT[] = "Default";
 constexpr char TEXT_STREET[] = "Street";
 constexpr char TEXT_SIDEWALK[] = "Sidewalk";
 constexpr char TEXT_POLICE[] = "Police";
@@ -196,7 +205,7 @@ constexpr char TEXT_RACE[] = "Race";
 
 //SelectModeMenu
 //constexpr char TEXT_SELECTMODE[] = "Select mode";
-constexpr char TEXT_DEFAULT[] = "Default";
+//constexpr char TEXT_DEFAULT[] = "Default";
 constexpr char TEXT_TEMPOMAT[] = "Tempomat";
 constexpr char TEXT_LARSM[] = "Larsm";
 constexpr char TEXT_BLUETOOTH[] = "Bluetooth";

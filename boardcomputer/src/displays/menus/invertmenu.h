@@ -9,18 +9,13 @@
 #include "checkboxicon.h"
 #include "icons/back.h"
 #include "texts.h"
-#include "globals.h"
+#include "settingsaccessors.h"
 
 namespace {
-class CommonSettingsMenu;
+class HardwareSettingsMenu;
 }
 
 namespace {
-struct FrontLeftInvertedAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.invertLeft; } };
-struct FrontRightInvertedAccessor : public RefAccessor<bool> { bool &getRef() const override { return front.invertRight; } };
-struct BackLeftInvertedAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.invertLeft; } };
-struct BackRightInvertedAccessor : public RefAccessor<bool> { bool &getRef() const override { return back.invertRight; } };
-
 class InvertMenu :
     public MenuDisplay,
     public StaticText<TEXT_SETINVERTED>,
@@ -29,7 +24,7 @@ class InvertMenu :
         makeComponent<MenuItem, StaticText<TEXT_INVERTFRONTRIGHT>, ToggleBoolAction, CheckboxIcon, FrontRightInvertedAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_INVERTBACKLEFT>,   ToggleBoolAction, CheckboxIcon, BackLeftInvertedAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_INVERTBACKRIGHT>,  ToggleBoolAction, CheckboxIcon, BackRightInvertedAccessor>,
-        makeComponent<MenuItem, StaticText<TEXT_BACK>,             SwitchScreenAction<CommonSettingsMenu>, StaticMenuItemIcon<&icons::back>>
+        makeComponent<MenuItem, StaticText<TEXT_BACK>,             SwitchScreenAction<HardwareSettingsMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};
 }

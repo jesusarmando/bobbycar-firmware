@@ -12,6 +12,7 @@
 #include "screens.h"
 #include "rotary.h"
 #include "serialhandler.h"
+#include "presets.h"
 
 namespace {
 ModeInterface *lastMode{};
@@ -26,6 +27,14 @@ void setup()
     Serial.println("setup()");
 
     initScreen();
+    initRotary();
+
+    settings = presets::defaultSettings;
+
+    if (settingsSaver.init())
+        settingsSaver.load(settings);
+
+    updateSwapFrontBack();
 
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("bobbyquad", "Passwort_123");
@@ -40,20 +49,13 @@ void setup()
     gas = 0;
     brems = 0;
 
-    applyDefaultSettings();
-
-    // applyDefaultSettings is in global, global cannot include default mode, circular dependency
-    modes::defaultMode.add_schwelle = defaultDefaultModeAddSchwelle;
-    modes::defaultMode.gas1_wert = defaultDefaultModeGas1Wert;
-    modes::defaultMode.gas2_wert = defaultDefaultModeGas2Wert;
-    modes::defaultMode.brems1_wert = defaultDefaultModeBrems1Wert;
-    modes::defaultMode.brems2_wert = defaultDefaultModeBrems2Wert;
+    for (Controller &controller : controllers())
+        controller.command.buzzer = {};
 
     currentMode = &modes::defaultMode;
 
     initWebserver();
-    switchScreen<DefaultScreen>();
-    initRotary();
+    switchScreen<StatusDisplay>();
 }
 
 void loop()
@@ -64,20 +66,19 @@ void loop()
         lastModeUpdate = now;
     else if (now - lastModeUpdate >= 1000/50)
     {
-        constexpr auto times = 100;
-        const auto read_n_times = [](int pin){
+        const auto sampleMultipleTimes = [](int pin){
             analogRead(pin);
             double sum{};
-            for (int i = 0; i < times; i++)
+            for (int i = 0; i < settings.hardware.poti.sampleCount; i++)
                 sum += analogRead(pin);
-            return sum/times;
+            return sum/settings.hardware.poti.sampleCount;
         };
 
-        raw_gas = read_n_times(PINS_GAS);
-        gas = scaleBetween<float>(raw_gas, gasMin, gasMax, 0., 1000.);
+        raw_gas = sampleMultipleTimes(PINS_GAS);
+        gas = scaleBetween<float>(raw_gas, settings.hardware.poti.gasMin, settings.hardware.poti.gasMax, 0., 1000.);
 
-        raw_brems = read_n_times(PINS_BREMS);
-        brems = scaleBetween<float>(raw_brems, bremsMin, bremsMax, 0., 1000.);
+        raw_brems = sampleMultipleTimes(PINS_BREMS);
+        brems = scaleBetween<float>(raw_brems, settings.hardware.poti.bremsMin, settings.hardware.poti.bremsMax, 0., 1000.);
 
         if (lastMode != currentMode)
         {

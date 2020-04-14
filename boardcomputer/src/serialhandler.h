@@ -35,8 +35,8 @@ void handleSerial()
 
         switch (c)
         {
-        case 'r':
-        case 'R':
+        case 'i':
+        case 'I':
             tft.init();
             break;
         case 'p':
@@ -55,6 +55,14 @@ void handleSerial()
                 controller.command.led = !firstLed;
             break;
         }
+        case 'r':
+        case 'R':
+            settingsSaver.load(settings);
+            break;
+        case 's':
+        case 'S':
+            settingsSaver.save(settings);
+            break;
         case '0':
         case '1':
         case '2':

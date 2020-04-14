@@ -25,8 +25,8 @@ class MultiAction<T, Tmore...> : public virtual MultiAction<Tmore...>
 public:
     void triggered() override
     {
-        MultiAction<Tmore...>::triggered();
         m_action.triggered();
+        MultiAction<Tmore...>::triggered();
     }
 
 private:

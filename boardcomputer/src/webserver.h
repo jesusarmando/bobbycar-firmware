@@ -5,7 +5,6 @@
 
 #include "htmlutils.h"
 #include "globals.h"
-#include "settings.h"
 #include "menudisplay.h"
 #include "changevaluedisplay.h"
 
@@ -410,55 +409,55 @@ void WebHandler::handleCommonParams(AsyncWebServerRequest *request)
 
                 breakLine(response);
 
-                numberInput(response, settings.iMotMax, "iMotMax", "Maximum current:");
+                numberInput(response, settings.limits.iMotMax, "iMotMax", "Maximum current:");
 
                 breakLine(response);
 
-                numberInput(response, settings.iDcMax, "iDcMax", "Maximum link current:");
+                numberInput(response, settings.limits.iDcMax, "iDcMax", "Maximum link current:");
 
                 breakLine(response);
 
-                numberInput(response, settings.nMotMax, "nMotMax", "Maximum speed:");
+                numberInput(response, settings.limits.nMotMax, "nMotMax", "Maximum speed:");
 
                 breakLine(response);
 
-                numberInput(response, settings.fieldWeakMax, "fieldWeakMax", "Maximum field weakening current:");
+                numberInput(response, settings.limits.fieldWeakMax, "fieldWeakMax", "Maximum field weakening current:");
 
                 breakLine(response);
 
-                numberInput(response, settings.phaseAdvMax, "phaseAdvMax", "Maximum phase adv angle:");
+                numberInput(response, settings.limits.phaseAdvMax, "phaseAdvMax", "Maximum phase adv angle:");
 
                 breakLine(response);
 
-                checkboxInput(response, front.command.left.enable, "enableFrontLeft", "Enable front left:");
+                checkboxInput(response, settings.hardware.enableFrontLeft, "enableFrontLeft", "Enable front left:");
 
                 breakLine(response);
 
-                checkboxInput(response, front.command.right.enable, "enableFrontRight", "Enable front right:");
+                checkboxInput(response, settings.hardware.enableFrontRight, "enableFrontRight", "Enable front right:");
 
                 breakLine(response);
 
-                checkboxInput(response, back.command.left.enable, "enableBackLeft", "Enable back left:");
+                checkboxInput(response, settings.hardware.enableBackLeft, "enableBackLeft", "Enable back left:");
 
                 breakLine(response);
 
-                checkboxInput(response, back.command.right.enable, "enableBackRight", "Enable back right:");
+                checkboxInput(response, settings.hardware.enableBackRight, "enableBackRight", "Enable back right:");
 
                 breakLine(response);
 
-                checkboxInput(response, front.invertLeft, "invertFrontLeft", "Invert front left:");
+                checkboxInput(response, settings.hardware.invertFrontLeft, "invertFrontLeft", "Invert front left:");
 
                 breakLine(response);
 
-                checkboxInput(response, front.invertRight, "invertFrontRight", "Invert front right:");
+                checkboxInput(response, settings.hardware.invertFrontRight, "invertFrontRight", "Invert front right:");
 
                 breakLine(response);
 
-                checkboxInput(response, back.invertLeft, "invertBackLeft", "Invert back left:");
+                checkboxInput(response, settings.hardware.invertBackLeft, "invertBackLeft", "Invert back left:");
 
                 breakLine(response);
 
-                checkboxInput(response, back.invertRight, "invertBackRight", "Invert back right:");
+                checkboxInput(response, settings.hardware.invertBackRight, "invertBackRight", "Invert back right:");
 
                 breakLine(response);
 
@@ -520,9 +519,9 @@ void WebHandler::handleDefaultModeParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"ctrlTyp1\" name=\"ctrlTyp\" required");
-                    selectOption(response, "Commutation", "Commutation", modes::defaultMode.ctrlTyp == ControlType::Commutation);
-                    selectOption(response, "Sinusoidal", "Sinusoidal", modes::defaultMode.ctrlTyp == ControlType::Sinusoidal);
-                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes::defaultMode.ctrlTyp == ControlType::FieldOrientedControl);
+                    selectOption(response, "Commutation", "Commutation", settings.defaultMode.ctrlTyp == ControlType::Commutation);
+                    selectOption(response, "Sinusoidal", "Sinusoidal", settings.defaultMode.ctrlTyp == ControlType::Sinusoidal);
+                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", settings.defaultMode.ctrlTyp == ControlType::FieldOrientedControl);
                 }
 
                 breakLine(response);
@@ -534,47 +533,47 @@ void WebHandler::handleDefaultModeParams(AsyncWebServerRequest *request)
                 {
                     HtmlTag select(response, "select", " id=\"ctrlMod1\" name=\"ctrlMod\" required");
 
-                    selectOption(response, "OpenMode", "Open Mode", modes::defaultMode.ctrlMod == ControlMode::OpenMode);
-                    selectOption(response, "Voltage", "Voltage", modes::defaultMode.ctrlMod == ControlMode::Voltage);
-                    selectOption(response, "Speed", "Speed", modes::defaultMode.ctrlMod == ControlMode::Speed);
-                    selectOption(response, "Torque", "Torque", modes::defaultMode.ctrlMod == ControlMode::Torque);
+                    selectOption(response, "OpenMode", "Open Mode", settings.defaultMode.ctrlMod == ControlMode::OpenMode);
+                    selectOption(response, "Voltage", "Voltage", settings.defaultMode.ctrlMod == ControlMode::Voltage);
+                    selectOption(response, "Speed", "Speed", settings.defaultMode.ctrlMod == ControlMode::Speed);
+                    selectOption(response, "Torque", "Torque", settings.defaultMode.ctrlMod == ControlMode::Torque);
                 }
 
                 breakLine(response);
 
-                checkboxInput(response, modes::defaultMode.enableWeakeningSmoothening, "enableWeakeningSmoothening", "Enable Weakening Smoothening:");
+                checkboxInput(response, settings.defaultMode.enableSmoothing, "enableSmoothing", "Enable smoothing:");
 
                 breakLine(response);
 
-                numberInput(response, modes::defaultMode.weakeningSmoothening, "weakeningSmoothening", "Weakening Smoothening:");
+                numberInput(response, settings.defaultMode.smoothing, "smoothing", "Smoothing:");
 
                 breakLine(response);
 
-                numberInput(response, modes::defaultMode.frontPercentage, "frontPercentage", "Front percentage:");
+                numberInput(response, settings.defaultMode.frontPercentage, "frontPercentage", "Front percentage:");
 
                 breakLine(response);
 
-                numberInput(response, modes::defaultMode.backPercentage, "backPercentage", "Back percentage:");
+                numberInput(response, settings.defaultMode.backPercentage, "backPercentage", "Back percentage:");
 
                 breakLine(response);
 
-                numberInput(response, modes::defaultMode.add_schwelle, "add_schwelle", "add_schwelle:");
+                numberInput(response, settings.defaultMode.add_schwelle, "add_schwelle", "add_schwelle:");
 
                 breakLine(response);
 
-                numberInput(response, modes::defaultMode.gas1_wert, "gas1_wert", "gas1_wert:");
+                numberInput(response, settings.defaultMode.gas1_wert, "gas1_wert", "gas1_wert:");
 
                 breakLine(response);
 
-                numberInput(response, modes::defaultMode.gas2_wert, "gas2_wert", "gas2_wert:");
+                numberInput(response, settings.defaultMode.gas2_wert, "gas2_wert", "gas2_wert:");
 
                 breakLine(response);
 
-                numberInput(response, modes::defaultMode.brems1_wert, "brems1_wert", "brems1_wert:");
+                numberInput(response, settings.defaultMode.brems1_wert, "brems1_wert", "brems1_wert:");
 
                 breakLine(response);
 
-                numberInput(response, modes::defaultMode.brems2_wert, "brems2_wert", "brems2_wert:");
+                numberInput(response, settings.defaultMode.brems2_wert, "brems2_wert", "brems2_wert:");
 
                 breakLine(response);
 
@@ -631,10 +630,6 @@ void WebHandler::handleTempomatModeParams(AsyncWebServerRequest *request)
                     response.print("Tempomat Mode:");
                 }
 
-                checkboxInput(response, modes::tempomatMode.potiControl, "potiControl", "Poti control:");
-
-                breakLine(response);
-
                 numberInput(response, modes::tempomatMode.pwm, "pwm", "Pwm:");
 
                 breakLine(response);
@@ -645,9 +640,9 @@ void WebHandler::handleTempomatModeParams(AsyncWebServerRequest *request)
 
                 {
                     HtmlTag select(response, "select", " id=\"ctrlTyp\" name=\"ctrlTyp\" required");
-                    selectOption(response, "Commutation", "Commutation", modes::tempomatMode.ctrlTyp == ControlType::Commutation);
-                    selectOption(response, "Sinusoidal", "Sinusoidal", modes::tempomatMode.ctrlTyp == ControlType::Sinusoidal);
-                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", modes::tempomatMode.ctrlTyp == ControlType::FieldOrientedControl);
+                    selectOption(response, "Commutation", "Commutation", settings.tempomatMode.ctrlTyp == ControlType::Commutation);
+                    selectOption(response, "Sinusoidal", "Sinusoidal", settings.tempomatMode.ctrlTyp == ControlType::Sinusoidal);
+                    selectOption(response, "FieldOrientedControl", "Field Oriented Control", settings.tempomatMode.ctrlTyp == ControlType::FieldOrientedControl);
                 }
 
                 breakLine(response);
@@ -659,10 +654,10 @@ void WebHandler::handleTempomatModeParams(AsyncWebServerRequest *request)
                 {
                     HtmlTag select(response, "select", " id=\"ctrlMod\" name=\"ctrlMod\" required");
 
-                    selectOption(response, "OpenMode", "Open Mode", modes::tempomatMode.ctrlMod == ControlMode::OpenMode);
-                    selectOption(response, "Voltage", "Voltage", modes::tempomatMode.ctrlMod == ControlMode::Voltage);
-                    selectOption(response, "Speed", "Speed", modes::tempomatMode.ctrlMod == ControlMode::Speed);
-                    selectOption(response, "Torque", "Torque", modes::tempomatMode.ctrlMod == ControlMode::Torque);
+                    selectOption(response, "OpenMode", "Open Mode", settings.tempomatMode.ctrlMod == ControlMode::OpenMode);
+                    selectOption(response, "Voltage", "Voltage", settings.tempomatMode.ctrlMod == ControlMode::Voltage);
+                    selectOption(response, "Speed", "Speed", settings.tempomatMode.ctrlMod == ControlMode::Speed);
+                    selectOption(response, "Torque", "Torque", settings.tempomatMode.ctrlMod == ControlMode::Torque);
                 }
 
                 breakLine(response);
@@ -719,19 +714,19 @@ void WebHandler::handlePotiParams(AsyncWebServerRequest *request)
                     response.print("Poti calibration:");
                 }
 
-                numberInput(response, gasMin, "gasMin", "gasMin:");
+                numberInput(response, settings.hardware.poti.gasMin, "gasMin", "gasMin:");
 
                 breakLine(response);
 
-                numberInput(response, gasMax, "gasMax", "gasMax:");
+                numberInput(response, settings.hardware.poti.gasMax, "gasMax", "gasMax:");
 
                 breakLine(response);
 
-                numberInput(response, bremsMin, "bremsMin", "bremsMin:");
+                numberInput(response, settings.hardware.poti.bremsMin, "bremsMin", "bremsMin:");
 
                 breakLine(response);
 
-                numberInput(response, bremsMax, "bremsMax", "bremsMax:");
+                numberInput(response, settings.hardware.poti.bremsMax, "bremsMax", "bremsMax:");
 
                 breakLine(response);
 
@@ -826,38 +821,38 @@ void WebHandler::handleSetCommonParams(AsyncWebServerRequest *request)
 
     {
         AsyncWebParameter* p = request->getParam("iMotMax");
-        settings.iMotMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.limits.iMotMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("iDcMax");
-        settings.iDcMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.limits.iDcMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("nMotMax");
-        settings.nMotMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.limits.nMotMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("fieldWeakMax");
-        settings.fieldWeakMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.limits.fieldWeakMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("phaseAdvMax");
-        settings.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.limits.phaseAdvMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
-    front.command.left.enable = request->hasParam("enableFrontLeft") && request->getParam("enableFrontLeft")->value() == "on";
-    front.command.right.enable = request->hasParam("enableFrontRight") && request->getParam("enableFrontRight")->value() == "on";
-    back.command.left.enable = request->hasParam("enableBackLeft") && request->getParam("enableBackLeft")->value() == "on";
-    back.command.right.enable = request->hasParam("enableBackRight") && request->getParam("enableBackRight")->value() == "on";
+    settings.hardware.enableFrontLeft = request->hasParam("enableFrontLeft") && request->getParam("enableFrontLeft")->value() == "on";
+    settings.hardware.enableFrontRight = request->hasParam("enableFrontRight") && request->getParam("enableFrontRight")->value() == "on";
+    settings.hardware.enableBackLeft = request->hasParam("enableBackLeft") && request->getParam("enableBackLeft")->value() == "on";
+    settings.hardware.enableBackRight = request->hasParam("enableBackRight") && request->getParam("enableBackRight")->value() == "on";
 
-    front.invertLeft = request->hasParam("invertFrontLeft") && request->getParam("invertFrontLeft")->value() == "on";
-    front.invertRight = request->hasParam("invertFrontRight") && request->getParam("invertFrontRight")->value() == "on";
-    back.invertLeft = request->hasParam("invertBackLeft") && request->getParam("invertBackLeft")->value() == "on";
-    back.invertRight = request->hasParam("invertBackRight") && request->getParam("invertBackRight")->value() == "on";
+    settings.hardware.invertFrontLeft = request->hasParam("invertFrontLeft") && request->getParam("invertFrontLeft")->value() == "on";
+    settings.hardware.invertFrontRight = request->hasParam("invertFrontRight") && request->getParam("invertFrontRight")->value() == "on";
+    settings.hardware.invertBackLeft = request->hasParam("invertBackLeft") && request->getParam("invertBackLeft")->value() == "on";
+    settings.hardware.invertBackRight = request->hasParam("invertBackRight") && request->getParam("invertBackRight")->value() == "on";
 
     request->redirect("/commonParams");
 }
@@ -882,11 +877,11 @@ void WebHandler::handleSetDefaultModeParams(AsyncWebServerRequest *request)
         return;
     }
 
-    if (!request->hasParam("weakeningSmoothening"))
+    if (!request->hasParam("smoothing"))
     {
         AsyncResponseStream &response = *request->beginResponseStream("text/plain");
         response.setCode(400);
-        response.print("no weakeningSmoothening specified");
+        response.print("no smoothing specified");
         request->send(&response);
         return;
     }
@@ -960,11 +955,11 @@ void WebHandler::handleSetDefaultModeParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("ctrlTyp");
 
         if (p->value() == "Commutation")
-            modes::defaultMode.ctrlTyp = ControlType::Commutation;
+            settings.defaultMode.ctrlTyp = ControlType::Commutation;
         else if (p->value() == "Sinusoidal")
-            modes::defaultMode.ctrlTyp = ControlType::Sinusoidal;
+            settings.defaultMode.ctrlTyp = ControlType::Sinusoidal;
         else if (p->value() == "FieldOrientedControl")
-            modes::defaultMode.ctrlTyp = ControlType::FieldOrientedControl;
+            settings.defaultMode.ctrlTyp = ControlType::FieldOrientedControl;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -979,13 +974,13 @@ void WebHandler::handleSetDefaultModeParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("ctrlMod");
 
         if (p->value() == "OpenMode")
-            modes::defaultMode.ctrlMod = ControlMode::OpenMode;
+            settings.defaultMode.ctrlMod = ControlMode::OpenMode;
         else if (p->value() == "Voltage")
-            modes::defaultMode.ctrlMod = ControlMode::Voltage;
+            settings.defaultMode.ctrlMod = ControlMode::Voltage;
         else if (p->value() == "Speed")
-            modes::defaultMode.ctrlMod = ControlMode::Speed;
+            settings.defaultMode.ctrlMod = ControlMode::Speed;
         else if (p->value() == "Torque")
-            modes::defaultMode.ctrlMod = ControlMode::Torque;
+            settings.defaultMode.ctrlMod = ControlMode::Torque;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -996,54 +991,54 @@ void WebHandler::handleSetDefaultModeParams(AsyncWebServerRequest *request)
         }
     }
 
-    modes::defaultMode.enableWeakeningSmoothening = request->hasParam("enableWeakeningSmoothening") && request->getParam("enableWeakeningSmoothening")->value() == "on";
+    settings.defaultMode.enableSmoothing = request->hasParam("enableSmoothing") && request->getParam("enableSmoothing")->value() == "on";
 
     {
-        AsyncWebParameter* p = request->getParam("weakeningSmoothening");
+        AsyncWebParameter* p = request->getParam("smoothing");
 
-        modes::defaultMode.weakeningSmoothening = strtol(p->value().c_str(), nullptr, 10);
+        settings.defaultMode.smoothing = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("frontPercentage");
 
-        modes::defaultMode.frontPercentage = strtol(p->value().c_str(), nullptr, 10);
+        settings.defaultMode.frontPercentage = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("backPercentage");
 
-        modes::defaultMode.backPercentage = strtol(p->value().c_str(), nullptr, 10);
+        settings.defaultMode.backPercentage = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("add_schwelle");
 
-        modes::defaultMode.add_schwelle = strtol(p->value().c_str(), nullptr, 10);
+        settings.defaultMode.add_schwelle = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("gas1_wert");
 
-        modes::defaultMode.gas1_wert = strtol(p->value().c_str(), nullptr, 10);
+        settings.defaultMode.gas1_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("gas2_wert");
 
-        modes::defaultMode.gas2_wert = strtol(p->value().c_str(), nullptr, 10);
+        settings.defaultMode.gas2_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("brems1_wert");
 
-        modes::defaultMode.brems1_wert = strtol(p->value().c_str(), nullptr, 10);
+        settings.defaultMode.brems1_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("brems2_wert");
 
-        modes::defaultMode.brems2_wert = strtol(p->value().c_str(), nullptr, 10);
+        settings.defaultMode.brems2_wert = strtol(p->value().c_str(), nullptr, 10);
     }
 
     request->redirect("/defaultModeParams");
@@ -1080,8 +1075,6 @@ void WebHandler::handleSetTempomatModeParams(AsyncWebServerRequest *request)
 
 
 
-    modes::tempomatMode.potiControl = request->hasParam("potiControl") && request->getParam("potiControl")->value() == "on";
-
     {
         AsyncWebParameter* p = request->getParam("pwm");
 
@@ -1092,11 +1085,11 @@ void WebHandler::handleSetTempomatModeParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("ctrlTyp");
 
         if (p->value() == "Commutation")
-            modes::tempomatMode.ctrlTyp = ControlType::Commutation;
+            settings.tempomatMode.ctrlTyp = ControlType::Commutation;
         else if (p->value() == "Sinusoidal")
-            modes::tempomatMode.ctrlTyp = ControlType::Sinusoidal;
+            settings.tempomatMode.ctrlTyp = ControlType::Sinusoidal;
         else if (p->value() == "FieldOrientedControl")
-            modes::tempomatMode.ctrlTyp = ControlType::FieldOrientedControl;
+            settings.tempomatMode.ctrlTyp = ControlType::FieldOrientedControl;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -1111,13 +1104,13 @@ void WebHandler::handleSetTempomatModeParams(AsyncWebServerRequest *request)
         AsyncWebParameter* p = request->getParam("ctrlMod");
 
         if (p->value() == "OpenMode")
-            modes::tempomatMode.ctrlMod = ControlMode::OpenMode;
+            settings.tempomatMode.ctrlMod = ControlMode::OpenMode;
         else if (p->value() == "Voltage")
-            modes::tempomatMode.ctrlMod = ControlMode::Voltage;
+            settings.tempomatMode.ctrlMod = ControlMode::Voltage;
         else if (p->value() == "Speed")
-            modes::tempomatMode.ctrlMod = ControlMode::Speed;
+            settings.tempomatMode.ctrlMod = ControlMode::Speed;
         else if (p->value() == "Torque")
-            modes::tempomatMode.ctrlMod = ControlMode::Torque;
+            settings.tempomatMode.ctrlMod = ControlMode::Torque;
         else
         {
             AsyncResponseStream &response = *request->beginResponseStream("text/plain");
@@ -1174,25 +1167,25 @@ void WebHandler::handleSetPotiParams(AsyncWebServerRequest *request)
     {
         AsyncWebParameter* p = request->getParam("gasMin");
 
-        gasMin = strtol(p->value().c_str(), nullptr, 10);
+        settings.hardware.poti.gasMin = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("gasMax");
 
-        gasMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.hardware.poti.gasMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("bremsMin");
 
-        bremsMin = strtol(p->value().c_str(), nullptr, 10);
+        settings.hardware.poti.bremsMin = strtol(p->value().c_str(), nullptr, 10);
     }
 
     {
         AsyncWebParameter* p = request->getParam("bremsMax");
 
-        bremsMax = strtol(p->value().c_str(), nullptr, 10);
+        settings.hardware.poti.bremsMax = strtol(p->value().c_str(), nullptr, 10);
     }
 
     request->redirect("/potiParams");
