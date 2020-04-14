@@ -108,9 +108,13 @@ union X {
     IMotMaxChangeScreen changeIMotMax;
     IDcMaxChangeScreen changeIDcMax;
     NMotMaxKmhChangeScreen changeNMotMaxKmh;
-    NMotMaxChangeScreen changeNMotMax;
+    NMotMaxRpmChangeScreen changeNMotMaxRpm;
     FieldWeakMaxChangeScreen changeFieldWeakMax;
     PhaseAdvMaxChangeScreen changePhaseAdvMax;
+
+    WheelDiameterMmChangeScreen wheelDiameterMmChangeScreen;
+    WheelDiameterInchChangeScreen wheelDiameterInchChangeScreen;
+    NumMagnetPolesChangeScreen numMagnetPolesChangeScreen;
 
     DefaultModeCtrlTypChangeDisplay changeDefaultModeCtrlTyp;
     DefaultModeCtrlModChangeDisplay changeDefaultModeCtrlMod;
@@ -198,13 +202,17 @@ template<> decltype(displays.changeBackPattern)                                &
 template<> decltype(displays.changeIMotMax)                                    &getRefByType<decltype(displays.changeIMotMax)>()                                    { return displays.changeIMotMax; }
 template<> decltype(displays.changeIDcMax)                                     &getRefByType<decltype(displays.changeIDcMax)>()                                     { return displays.changeIDcMax; }
 template<> decltype(displays.changeNMotMaxKmh)                                 &getRefByType<decltype(displays.changeNMotMaxKmh)>()                                 { return displays.changeNMotMaxKmh; }
-template<> decltype(displays.changeNMotMax)                                    &getRefByType<decltype(displays.changeNMotMax)>()                                    { return displays.changeNMotMax; }
+template<> decltype(displays.changeNMotMaxRpm)                                 &getRefByType<decltype(displays.changeNMotMaxRpm)>()                                 { return displays.changeNMotMaxRpm; }
 template<> decltype(displays.changeFieldWeakMax)                               &getRefByType<decltype(displays.changeFieldWeakMax)>()                               { return displays.changeFieldWeakMax; }
 template<> decltype(displays.changePhaseAdvMax)                                &getRefByType<decltype(displays.changePhaseAdvMax)>()                                { return displays.changePhaseAdvMax; }
 
+template<> decltype(displays.wheelDiameterMmChangeScreen)                      &getRefByType<decltype(displays.wheelDiameterMmChangeScreen)>()                      { return displays.wheelDiameterMmChangeScreen; }
+template<> decltype(displays.wheelDiameterInchChangeScreen)                    &getRefByType<decltype(displays.wheelDiameterInchChangeScreen)>()                    { return displays.wheelDiameterInchChangeScreen; }
+template<> decltype(displays.numMagnetPolesChangeScreen)                       &getRefByType<decltype(displays.numMagnetPolesChangeScreen)>()                       { return displays.numMagnetPolesChangeScreen; }
+
 template<> decltype(displays.changeDefaultModeCtrlTyp)                         &getRefByType<decltype(displays.changeDefaultModeCtrlTyp)>()                         { return displays.changeDefaultModeCtrlTyp; }
 template<> decltype(displays.changeDefaultModeCtrlMod)                         &getRefByType<decltype(displays.changeDefaultModeCtrlMod)>()                         { return displays.changeDefaultModeCtrlMod; }
-template<> decltype(displays.changeDefaultModeSmoothing)            &getRefByType<decltype(displays.changeDefaultModeSmoothing)>()            { return displays.changeDefaultModeSmoothing; }
+template<> decltype(displays.changeDefaultModeSmoothing)                       &getRefByType<decltype(displays.changeDefaultModeSmoothing)>()                       { return displays.changeDefaultModeSmoothing; }
 template<> decltype(displays.changeDefaultModeFrontPercentage)                 &getRefByType<decltype(displays.changeDefaultModeFrontPercentage)>()                 { return displays.changeDefaultModeFrontPercentage; }
 template<> decltype(displays.changeDefaultModeBackPercentage)                  &getRefByType<decltype(displays.changeDefaultModeBackPercentage)>()                  { return displays.changeDefaultModeBackPercentage; }
 template<> decltype(displays.changeDefaultModeAddSchwelle)                     &getRefByType<decltype(displays.changeDefaultModeAddSchwelle)>()                     { return displays.changeDefaultModeAddSchwelle; }

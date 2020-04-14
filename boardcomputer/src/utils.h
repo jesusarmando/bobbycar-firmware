@@ -25,12 +25,22 @@ T scaleBetween(T x, T in_min, T in_max, T out_min, T out_max) {
 
 float convertToKmh(float val)
 {
-    return val / 32.133;
+    return val /* / settings.hardware.numMagnetPoles */ / 60.f * settings.hardware.wheelDiameter / 1000.f * 3.14159265359f * 3.6f;
 }
 
 float convertFromKmh(float val)
 {
-    return val * 32.133;
+    return val /* * settings.hardware.numMagnetPoles */ * 60.f / settings.hardware.wheelDiameter * 1000.f / 3.14159265359f / 3.6f;
+}
+
+float convertToInch(float val)
+{
+    return val / 25.4f;
+}
+
+float convertFromInch(float val)
+{
+    return val * 25.4f;
 }
 
 float fixCurrent(int16_t value)

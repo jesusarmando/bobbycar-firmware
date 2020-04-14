@@ -39,6 +39,8 @@ constexpr Settings::Hardware defaultHardware {
 
     .poti = defaultPoti,
 
+    .wheelDiameter = 165,
+    .numMagnetPoles = 15,
     .swapFrontBack = false
 };
 

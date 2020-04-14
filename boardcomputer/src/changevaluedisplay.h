@@ -28,7 +28,21 @@ protected:
 };
 
 template<typename Tvalue>
-class ChangeValueDisplay : public ChangeValueDisplayInterface, public virtual AccessorInterface<Tvalue>
+class ChangeValueDisplaySettingsInterface
+{
+public:
+    virtual Tvalue step() const { return 1; };
+};
+
+template<typename Tvalue, typename Tratio>
+class RatioNumberStep : public virtual ChangeValueDisplaySettingsInterface<Tvalue>
+{
+public:
+    Tvalue step() const override { return Tvalue(Tratio::num) / Tratio::den; }
+};
+
+template<typename Tvalue>
+class ChangeValueDisplay : public ChangeValueDisplayInterface, public virtual AccessorInterface<Tvalue>, public virtual ChangeValueDisplaySettingsInterface<Tvalue>
 {
     using Base = ChangeValueDisplayInterface;
 
@@ -88,7 +102,7 @@ void ChangeValueDisplay<Tvalue>::update()
         const auto rotateOffset = m_rotateOffset;
         m_rotateOffset = 0;
 
-        m_value -= rotateOffset;
+        m_value -= rotateOffset * static_cast<ChangeValueDisplaySettingsInterface<Tvalue>*>(this)->step();
     }
     else
     {

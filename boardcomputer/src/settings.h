@@ -26,6 +26,8 @@ struct Settings
             int16_t gasMin, gasMax, bremsMin, bremsMax;
         } poti;
 
+        int16_t wheelDiameter; // in mm
+        int16_t numMagnetPoles; // virtual RPM per one real RPM
         bool swapFrontBack;
     } hardware;
 

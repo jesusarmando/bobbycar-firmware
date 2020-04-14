@@ -68,6 +68,9 @@ constexpr char TEXT_SETBACKLED[] = "Set back LED";
 
 //HardwareSettings
 //constexpr char TEXT_HARDWARESETTINGS[] = "Hardware settings";
+constexpr char TEXT_WHEELDIAMETERMM[] = "Wheel diameter (mm)";
+constexpr char TEXT_WHEELDIAMETERINCH[] = "Wheel diameter (inch)";
+constexpr char TEXT_NUMMAGNETPOLES[] = "Num magnet poles";
 constexpr char TEXT_SETENABLED[] = "Set enabled";
 constexpr char TEXT_SETINVERTED[] = "Set inverted";
 constexpr char TEXT_POTISETTINGS[] = "Poti settings";

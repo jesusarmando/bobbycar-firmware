@@ -17,9 +17,9 @@ struct IDcMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRe
 struct NMotMaxKmhAccessor : public virtual AccessorInterface<int16_t>
 {
     int16_t getValue() const override { return convertToKmh(settings.limits.nMotMax); }
-    void setValue(int16_t value) override { settings.limits.nMotMax = convertFromKmh(value); }
+    void setValue(int16_t value) override { settings.limits.nMotMax = convertFromKmh(value); saveSettings(); }
 };
-struct NMotMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.limits.nMotMax; } };
+struct NMotMaxRpmAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.limits.nMotMax; } };
 struct FieldWeakMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.limits.fieldWeakMax; } };
 struct PhaseAdvMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.limits.phaseAdvMax; } };
 
@@ -39,6 +39,13 @@ struct GasMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRe
 struct BremsMinAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.hardware.poti.bremsMin; } };
 struct BremsMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.hardware.poti.bremsMax; } };
 
+struct WheelDiameterMmAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.hardware.wheelDiameter; } };
+struct WheelDiameterInchAccessor : public virtual AccessorInterface<float>
+{
+    float getValue() const override { return convertToInch(settings.hardware.wheelDiameter); }
+    void setValue(float value) override { settings.hardware.wheelDiameter = convertFromInch(value); saveSettings(); }
+};
+struct NumMagnetPolesAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.hardware.numMagnetPoles; } };
 struct SwapFrontBackAccessor : public RefAccessorSaveSettings<bool> {
     bool &getRef() const override { return settings.hardware.swapFrontBack; }
     void setValue(bool value) override { RefAccessorSaveSettings<bool>::setValue(value); updateSwapFrontBack(); };
