@@ -182,7 +182,7 @@ void MenuDisplay::redraw()
 
         tft.setTextFont(item.font());
         tft.setTextColor(item.color(), TFT_BLACK);
-        const auto labelDrawn = labelsIter->redraw(item.text());
+        labelsIter->redraw(item.text());
 
         if (item.icon() != *iconsIter)
         {
@@ -198,7 +198,7 @@ void MenuDisplay::redraw()
             *iconsIter = icon;
         }
 
-        if (selected && (labelDrawn || relativeIndex != m_highlightedIndex))
+        if (selected && (relativeIndex != m_highlightedIndex))
         {
             drawItemRect(*labelsIter, TFT_WHITE);
         }

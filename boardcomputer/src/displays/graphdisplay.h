@@ -17,6 +17,7 @@ class GraphDisplay : public DemoDisplay, public SwitchScreenAction<GraphsMenu>, 
     using Base = DemoDisplay;
 
 public:
+    void start() override;
     void initScreen() override;
     void redraw() override;
 
@@ -42,9 +43,15 @@ private:
 
     std::array<int, 200> m_lastPixels;
 
-    float m_min{0.};
-    float m_max{1000.};
+    float m_min;
+    float m_max;
 };
+
+void GraphDisplay::start()
+{
+    m_min = 0.f;
+    m_max = 10.f;
+}
 
 void GraphDisplay::initScreen()
 {
@@ -74,6 +81,25 @@ void GraphDisplay::render(bool delta)
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
     m_titleLabel.redraw(text());
+
+    {
+        const auto minmax = std::minmax_element(std::cbegin(getBuffer()), std::cend(getBuffer()));
+
+        if (*minmax.first < m_min)
+            m_min = *minmax.first*0.9f;
+        else if (*minmax.first > m_min*1.1f)
+            m_min = *minmax.first*1.1f;
+
+        if (*minmax.second > m_max)
+            m_max = *minmax.second*1.1f;
+        else if (*minmax.first < m_max*0.9f)
+            m_max = *minmax.second*1.1f;
+    }
+
+    if (m_min > 0 && m_max > 0)
+        m_min = 0;
+    if (m_min < 0 && m_max < 0)
+        m_max = 0;
 
     tft.setTextFont(2);
     tft.setTextColor(TFT_WHITE, TFT_BLACK);

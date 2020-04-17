@@ -248,6 +248,8 @@ void updateAccumulators()
     if (count)
         avgSpeed /= count;
 
+    sumCurrent = fixCurrent(sumCurrent);
+
     avgSpeedKmh = convertToKmh(avgSpeed);
 }
 }
