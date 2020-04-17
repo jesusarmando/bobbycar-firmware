@@ -24,7 +24,7 @@ public:
     void rotate(int offset) override;
     void button() override;
 
-    virtual void itemPressed(int index) { (begin()+index)->get().triggered(); }
+    virtual void itemPressed(int index);
 
     MenuDisplay *asMenuDisplay() override { return this; }
     const MenuDisplay *asMenuDisplay() const override { return this; }
@@ -86,8 +86,9 @@ void MenuDisplay::initScreen()
     for (auto &label : m_labels)
         label.start();
 
-    for (auto iter = begin(); iter != end(); iter++)
-        iter->get().start();
+    runForEveryMenuItem([](MenuItem &item){
+        item.start();
+    });
 
     m_icons.fill(nullptr);
 }
@@ -99,7 +100,12 @@ void MenuDisplay::update()
         const auto offset = m_rotateOffset;
         m_rotateOffset = 0;
 
-        const auto itemCount = std::distance(begin(), end());
+        const auto itemCount = [&](){
+            int i{0};
+            runForEveryMenuItem([&](MenuItem&){ i++; });
+            return i;
+        }();
+
         if (itemCount)
         {
             if (m_selectedIndex == -1)
@@ -123,8 +129,9 @@ void MenuDisplay::update()
             m_scrollOffset = 0;
         }
 
-        for (auto iter = begin(); iter != end(); iter++)
-            iter->get().update();
+        runForEveryMenuItem([&](MenuItem &item){
+            item.update();
+        });
     }
     else
     {
@@ -140,10 +147,7 @@ void MenuDisplay::redraw()
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
     m_titleLabel.redraw(text());
 
-    const auto menuBegin = begin();
-    const auto menuEnd = end();
-
-    auto menuIter = menuBegin + m_scrollOffset;
+    int i{0};
 
     auto labelsIter = std::begin(m_labels);
 
@@ -159,9 +163,15 @@ void MenuDisplay::redraw()
                      color);
     };
 
-    for (; menuIter != menuEnd && labelsIter != std::end(m_labels); menuIter++, labelsIter++, iconsIter++)
-    {
-        const auto index = std::distance(menuBegin, menuIter);
+    runForEveryMenuItem([&](MenuItem &item){
+        const auto index = i++;
+
+        if (index < m_scrollOffset)
+            return;
+
+        if (labelsIter == std::end(m_labels))
+            return;
+
         const auto relativeIndex = index - m_scrollOffset;
         const auto selected = index == m_selectedIndex;
 
@@ -170,19 +180,19 @@ void MenuDisplay::redraw()
         else if (relativeIndex == m_highlightedIndex)
             drawItemRect(*labelsIter, TFT_BLACK);
 
-        tft.setTextFont(menuIter->get().font());
-        tft.setTextColor(menuIter->get().color(), TFT_BLACK);
-        const auto labelDrawn = labelsIter->redraw(menuIter->get().text());
+        tft.setTextFont(item.font());
+        tft.setTextColor(item.color(), TFT_BLACK);
+        const auto labelDrawn = labelsIter->redraw(item.text());
 
-        if (menuIter->get().icon() != *iconsIter)
+        if (item.icon() != *iconsIter)
         {
             tft.fillRect(5, labelsIter->y()+1, 24, 24, TFT_BLACK);
 
-            auto icon = menuIter->get().icon();
+            auto icon = item.icon();
             if (icon)
             {
                 tft.setSwapBytes(true);
-                tft.pushImage(5, labelsIter->y()+1, icon->WIDTH, icon->HEIGHT, icon->buffer);
+                tft.pushImage(6, labelsIter->y()+1, icon->WIDTH, icon->HEIGHT, icon->buffer);
                 tft.setSwapBytes(false);
             }
             *iconsIter = icon;
@@ -192,7 +202,10 @@ void MenuDisplay::redraw()
         {
             drawItemRect(*labelsIter, TFT_WHITE);
         }
-    }
+
+        labelsIter++;
+        iconsIter++;
+    });
 
     for (; labelsIter != std::end(m_labels); labelsIter++, iconsIter++)
     {
@@ -215,8 +228,9 @@ void MenuDisplay::redraw()
 
 void MenuDisplay::stop()
 {
-    for (auto iter = begin(); iter != end(); iter++)
-        iter->get().stop();
+    runForEveryMenuItem([](MenuItem &item){
+        item.stop();
+    });
 }
 
 void MenuDisplay::rotate(int offset)
@@ -227,5 +241,15 @@ void MenuDisplay::rotate(int offset)
 void MenuDisplay::button()
 {
     m_pressed = true;
+}
+
+void MenuDisplay::itemPressed(int index)
+{
+    int i{0};
+
+    runForEveryMenuItem([&](MenuItem &item){
+        if (i++ == index)
+            item.triggered();
+    });
 }
 }

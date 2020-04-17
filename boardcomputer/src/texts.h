@@ -46,6 +46,7 @@ constexpr char TEXT_MAINMENU[] = "Main menu";
 constexpr char TEXT_STATUS[] = "Status";
 constexpr char TEXT_SELECTMODE[] = "Select mode";
 constexpr char TEXT_PRESETS[] = "Presets";
+constexpr char TEXT_GRAPHS[] = "Graphs";
 constexpr char TEXT_SETTINGS[] = "Settings";
 constexpr char TEXT_LOCKVEHICLE[] = "Lock vehicle";
 constexpr char TEXT_DEMOS[] = "Demos";
@@ -152,6 +153,17 @@ constexpr char TEXT_WIFICHANGEMODE[] = "Change mode";
 constexpr char TEXT_WIFICHANGESLEEP[] = "Change sleep";
 constexpr char TEXT_WIFICHANGETXPOWER[] = "Change tx power";
 constexpr char TEXT_WIFISCAN[] = "WiFi scan";
+//constexpr char TEXT_BACK[] = "Back";
+
+//GraphsMenu
+//constexpr char TEXT_GRAPHS[] = "Graphs";
+constexpr char TEXT_GAS[] = "Gas";
+constexpr char TEXT_BREMS[] = "Brems";
+constexpr char TEXT_AVGSPEED[] = "Avg. speed";
+constexpr char TEXT_AVGSPEEDKMH[] = "Avg. speed KMH";
+constexpr char TEXT_SUMCURRENT[] = "Sum current";
+constexpr char TEXT_FRONTVOLTAGE[] = "Front voltage";
+constexpr char TEXT_BACKVOLTAGE[] = "Back voltage";
 //constexpr char TEXT_BACK[] = "Back";
 
 //InvertMenu

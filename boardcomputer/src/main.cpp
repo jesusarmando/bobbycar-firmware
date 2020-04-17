@@ -13,11 +13,17 @@
 #include "rotary.h"
 #include "serialhandler.h"
 #include "presets.h"
+#include "statistics.h"
 
 namespace {
 ModeInterface *lastMode{};
 unsigned long lastModeUpdate{};
+unsigned long lastStatsUpdate{};
 unsigned long lastDisplayRedraw{};
+
+constexpr auto modeUpdateRate = 50;
+constexpr auto statsUpdateRate = 50;
+constexpr auto displayRedrawRate = 50;
 }
 
 void setup()
@@ -64,7 +70,7 @@ void loop()
 
     if (!lastModeUpdate)
         lastModeUpdate = now;
-    else if (now - lastModeUpdate >= 1000/50)
+    else if (now - lastModeUpdate >= 1000/modeUpdateRate)
     {
         const auto sampleMultipleTimes = [](int pin){
             analogRead(pin);
@@ -97,9 +103,18 @@ void loop()
         performance.current++;
     }
 
+    if (!lastStatsUpdate)
+        lastStatsUpdate = now;
+    else if (now - lastStatsUpdate >= 1000/statsUpdateRate)
+    {
+        updateAccumulators();
+        pushStats();
+        lastStatsUpdate = now;
+    }
+
     updateDisplay();
 
-    if (!lastDisplayRedraw || now - lastDisplayRedraw >= 1000/60)
+    if (!lastDisplayRedraw || now - lastDisplayRedraw >= 1000/displayRedrawRate)
     {
         redrawDisplay();
 

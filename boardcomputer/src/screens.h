@@ -13,6 +13,7 @@
 #include "displays/menus/enablemenu.h"
 #include "displays/menus/feedbackdebugmenu.h"
 #include "displays/menus/genericwifisettingsmenu.h"
+#include "displays/menus/graphsmenu.h"
 #include "displays/menus/hardwaresettingsmenu.h"
 #include "displays/menus/invertmenu.h"
 #include "displays/menus/larsmmodesettingsmenu.h"
@@ -65,6 +66,7 @@ union X {
     FrontFeedbackDebugMenu frontFeedbackDebugMenu;
     BackFeedbackDebugMenu backFeedbackDebugMenu;
     GenericWifiSettingsMenu genericWifiSettingsMenu;
+    GraphsMenu graphsMenu;
     HardwareSettingsMenu hardwareSettingsMenu;
     InvertMenu invertMenu;
     LarsmModeSettingsMenu larsmModeSettingsMenu;
@@ -141,6 +143,14 @@ union X {
 
     WifiModeChangeScreen wifiModeChangeScreen;
     WifiTxPowerChangeScreen wifiTxPowerChangeScreen;
+
+    GasGraphDisplay gasGraphDisplay;
+    BremsGraphDisplay bremsGraphDisplay;
+    AvgSpeedGraphDisplay avgSpeedGraphDisplay;
+    AvgSpeedKmhGraphDisplay avgSpeedKmhGraphDisplay;
+    SumCurrentGraphDisplay sumCurrentGraphDisplay;
+    FrontVoltageGraphDisplay frontVoltageGraphDisplay;
+    BackVoltageGraphDisplay backVoltageGraphDisplay;
 } displays;
 
 template<typename T> T &getRefByType() = delete;
@@ -159,6 +169,7 @@ template<> decltype(displays.enableMenu)                                       &
 template<> decltype(displays.frontFeedbackDebugMenu)                           &getRefByType<decltype(displays.frontFeedbackDebugMenu)>()                           { return displays.frontFeedbackDebugMenu; }
 template<> decltype(displays.backFeedbackDebugMenu)                            &getRefByType<decltype(displays.backFeedbackDebugMenu)>()                            { return displays.backFeedbackDebugMenu; }
 template<> decltype(displays.genericWifiSettingsMenu)                          &getRefByType<decltype(displays.genericWifiSettingsMenu)>()                          { return displays.genericWifiSettingsMenu; }
+template<> decltype(displays.graphsMenu)                                       &getRefByType<decltype(displays.graphsMenu)>()                                       { return displays.graphsMenu; }
 template<> decltype(displays.hardwareSettingsMenu)                             &getRefByType<decltype(displays.hardwareSettingsMenu)>()                             { return displays.hardwareSettingsMenu; }
 template<> decltype(displays.invertMenu)                                       &getRefByType<decltype(displays.invertMenu)>()                                       { return displays.invertMenu; }
 template<> decltype(displays.larsmModeSettingsMenu)                            &getRefByType<decltype(displays.larsmModeSettingsMenu)>()                            { return displays.larsmModeSettingsMenu; }
@@ -235,6 +246,14 @@ template<> decltype(displays.changeBremsMax)                                   &
 
 template<> decltype(displays.wifiModeChangeScreen)                             &getRefByType<decltype(displays.wifiModeChangeScreen)>()                             { return displays.wifiModeChangeScreen; }
 template<> decltype(displays.wifiTxPowerChangeScreen)                          &getRefByType<decltype(displays.wifiTxPowerChangeScreen)>()                          { return displays.wifiTxPowerChangeScreen; }
+
+template<> decltype(displays.gasGraphDisplay)                                  &getRefByType<decltype(displays.gasGraphDisplay)>()                                  { return displays.gasGraphDisplay; }
+template<> decltype(displays.bremsGraphDisplay)                                &getRefByType<decltype(displays.bremsGraphDisplay)>()                                { return displays.bremsGraphDisplay; }
+template<> decltype(displays.avgSpeedGraphDisplay)                             &getRefByType<decltype(displays.avgSpeedGraphDisplay)>()                             { return displays.avgSpeedGraphDisplay; }
+template<> decltype(displays.avgSpeedKmhGraphDisplay)                          &getRefByType<decltype(displays.avgSpeedKmhGraphDisplay)>()                          { return displays.avgSpeedKmhGraphDisplay; }
+template<> decltype(displays.sumCurrentGraphDisplay)                           &getRefByType<decltype(displays.sumCurrentGraphDisplay)>()                           { return displays.sumCurrentGraphDisplay; }
+template<> decltype(displays.frontVoltageGraphDisplay)                         &getRefByType<decltype(displays.frontVoltageGraphDisplay)>()                         { return displays.frontVoltageGraphDisplay; }
+template<> decltype(displays.backVoltageGraphDisplay)                          &getRefByType<decltype(displays.backVoltageGraphDisplay)>()                          { return displays.backVoltageGraphDisplay; }
 
 void deconstructScreen()
 {

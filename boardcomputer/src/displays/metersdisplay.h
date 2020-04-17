@@ -75,22 +75,7 @@ void MetersDisplay::redraw()
 
     plotPointer();
 
-    float speedSum{0.f};
-    uint8_t count{0};
-
-    for (const Controller &controller : controllers())
-    {
-        if (!controller.feedbackValid)
-            continue;
-
-        speedSum +=
-                controller.feedback.left.speed * (controller.invertLeft ? -1 : 1) +
-                controller.feedback.right.speed * (controller.invertRight ? -1 : 1);
-
-        count +=2;
-    }
-
-    plotNeedle(count == 0 ? 0.f : convertToKmh(speedSum / count));
+    plotNeedle(avgSpeedKmh);
 }
 
 void MetersDisplay::analogMeter()

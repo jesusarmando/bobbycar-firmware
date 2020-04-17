@@ -29,17 +29,17 @@ public:
     void update() override;
     void stop() override;
 
-    const std::reference_wrapper<MenuItem> *begin() const override { return &(*std::begin(refVec)); };
-    const std::reference_wrapper<MenuItem> *end() const override { return &(*std::end(refVec)); };
+    void runForEveryMenuItem(std::function<void(MenuItem&)> &&callback) override
+    {
+        for (auto &item : vec)
+            callback(item);
+        callback(m_backItem);
+    }
 
 private:
     makeComponent<MenuItem, StaticText<TEXT_BACK>, SwitchScreenAction<WifiSettingsMenu>, StaticMenuItemIcon<&icons::back>> m_backItem;
 
     std::vector<makeComponent<MenuItem, ChangeableText, DummyAction>> vec;
-
-    std::vector<std::reference_wrapper<MenuItem>> refVec{{
-        std::ref<MenuItem>(m_backItem)
-    }};
 
     unsigned long m_lastScanComplete;
 };
@@ -82,11 +82,6 @@ void WifiScanMenu::update()
                 vec.back().stop();
                 vec.pop_back();
             }
-
-            refVec.clear();
-            for (auto &item : vec)
-                refVec.emplace_back(std::ref(item));
-            refVec.emplace_back(std::ref(m_backItem));
         }
 
         const auto now = millis();
@@ -97,7 +92,7 @@ void WifiScanMenu::update()
 
             m_lastScanComplete = now;
         }
-        else if (now - m_lastScanComplete >= 1000)
+        else if (now - m_lastScanComplete >= 2000)
         {
             m_lastScanComplete = 0;
             WiFi.scanNetworks(true);

@@ -18,6 +18,7 @@ using pin_t = int;
 
 int16_t raw_gas, raw_brems;
 float gas, brems;
+float avgSpeed, avgSpeedKmh, sumCurrent;
 
 Settings settings;
 SettingsSaver settingsSaver;

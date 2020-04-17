@@ -10,6 +10,8 @@
 #include "checkboxicon.h"
 #include "icons/wifi.h"
 #include "icons/bluetooth.h"
+#include "icons/buzzer.h"
+#include "icons/info.h"
 #include "icons/back.h"
 #include "texts.h"
 #include "globals.h"
@@ -38,10 +40,10 @@ class SettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHSETTINGS>, SwitchScreenAction<BluetoothSettingsMenu>, StaticMenuItemIcon<&icons::bluetooth>>,
         makeComponent<MenuItem, StaticText<TEXT_MODESSETTINGS>,     SwitchScreenAction<ModesSettingsMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_HARDWARESETTINGS>,  SwitchScreenAction<HardwareSettingsMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_BUZZER>,            SwitchScreenAction<BuzzerMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_BUZZER>,            SwitchScreenAction<BuzzerMenu>, StaticMenuItemIcon<&icons::buzzer>>,
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>,       ToggleBoolAction, CheckboxIcon, FrontLedAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,        ToggleBoolAction, CheckboxIcon, BackLedAccessor>,
-        makeComponent<MenuItem, StaticText<TEXT_ABOUT>,             SwitchScreenAction<AboutMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_ABOUT>,             SwitchScreenAction<AboutMenu>, StaticMenuItemIcon<&icons::info>>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,              SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};

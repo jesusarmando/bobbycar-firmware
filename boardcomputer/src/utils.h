@@ -222,4 +222,32 @@ void saveSettings()
 {
     settingsSaver.save(settings);
 }
+
+void updateAccumulators()
+{
+    avgSpeed = 0.f;
+    sumCurrent = 0.f;
+    uint8_t count{0};
+
+    for (const Controller &controller : controllers())
+    {
+        if (!controller.feedbackValid)
+            continue;
+
+        avgSpeed +=
+                controller.feedback.left.speed * (controller.invertLeft ? -1 : 1) +
+                controller.feedback.right.speed * (controller.invertRight ? -1 : 1);
+
+        sumCurrent +=
+                controller.feedback.left.current +
+                controller.feedback.right.current;
+
+        count +=2;
+    }
+
+    if (count)
+        avgSpeed /= count;
+
+    avgSpeedKmh = convertToKmh(avgSpeed);
+}
 }

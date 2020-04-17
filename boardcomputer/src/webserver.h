@@ -1248,15 +1248,12 @@ void WebHandler::handleDisplay(AsyncWebServerRequest *request)
 
                 HtmlTag ul(response, "ul");
 
-                const auto menuBegin = menuDisplay->begin();
-                const auto menuEnd = menuDisplay->end();
-                const auto selectedIndex = menuDisplay->selectedIndex();
-                for (auto iter = menuBegin; iter != menuEnd; iter++)
-                {
-                    HtmlTag li(response, "li", std::distance(menuBegin, iter)==selectedIndex?" style=\"border: 1px solid black;\"":"");
-                    HtmlTag a(response, "a", String(" href=\"/displayAction?action=triggerItem&index=") + std::distance(menuDisplay->begin(), iter) + "\"");
-                    response.print(iter->get().text());
-                }
+                int i{0};
+                menuDisplay->runForEveryMenuItem([selectedIndex=menuDisplay->selectedIndex(),&response,&i](MenuItem &item){
+                    HtmlTag li(response, "li", selectedIndex==i?" style=\"border: 1px solid black;\"":"");
+                    HtmlTag a(response, "a", String(" href=\"/displayAction?action=triggerItem&index=") + (i++) + "\"");
+                    response.print(item.text());
+                });
             }
             else if (auto changeValueDisplay = currentDisplay->asChangeValueDisplayInterface())
             {
@@ -1340,16 +1337,7 @@ void WebHandler::handleDisplayAction(AsyncWebServerRequest *request)
             AsyncWebParameter* p = request->getParam("index");
             const auto index = strtol(p->value().c_str(), nullptr, 10);
 
-            if (index < 0 || index >= std::distance(menuDisplay->begin(), menuDisplay->end()))
-            {
-                AsyncResponseStream &response = *request->beginResponseStream("text/plain");
-                response.setCode(400);
-                response.print("index out of range");
-                request->send(&response);
-                return;
-            }
-
-            (menuDisplay->begin() + index)->get().triggered();
+            menuDisplay->itemPressed(index);
 
             request->redirect("/display");
         }
