@@ -10,6 +10,7 @@
 #include "checkboxicon.h"
 #include "icons/wifi.h"
 #include "icons/bluetooth.h"
+#include "icons/hardware.h"
 #include "icons/buzzer.h"
 #include "icons/info.h"
 #include "icons/back.h"
@@ -39,7 +40,7 @@ class SettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_WIFISETTINGS>,      SwitchScreenAction<WifiSettingsMenu>, StaticMenuItemIcon<&icons::wifi>>,
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHSETTINGS>, SwitchScreenAction<BluetoothSettingsMenu>, StaticMenuItemIcon<&icons::bluetooth>>,
         makeComponent<MenuItem, StaticText<TEXT_MODESSETTINGS>,     SwitchScreenAction<ModesSettingsMenu>>,
-        makeComponent<MenuItem, StaticText<TEXT_HARDWARESETTINGS>,  SwitchScreenAction<HardwareSettingsMenu>>,
+        makeComponent<MenuItem, StaticText<TEXT_HARDWARESETTINGS>,  SwitchScreenAction<HardwareSettingsMenu>, StaticMenuItemIcon<&icons::hardware>>,
         makeComponent<MenuItem, StaticText<TEXT_BUZZER>,            SwitchScreenAction<BuzzerMenu>, StaticMenuItemIcon<&icons::buzzer>>,
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>,       ToggleBoolAction, CheckboxIcon, FrontLedAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,        ToggleBoolAction, CheckboxIcon, BackLedAccessor>,
