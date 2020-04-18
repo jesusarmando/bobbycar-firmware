@@ -13,21 +13,28 @@
 #include "modes/ignoreinputmode.h"
 
 namespace {
+class StatusDisplay;
 class PotiSettingsMenu;
 }
 
 namespace {
-class CalibrateDisplay : public DemoDisplay, public SwitchScreenAction<PotiSettingsMenu>
+class CalibrateDisplay : public DemoDisplay
 {
     using Base = DemoDisplay;
 
 public:
+    CalibrateDisplay() = default;
+    CalibrateDisplay(bool bootup);
+
     void start() override;
     void initScreen() override;
     void redraw() override;
     void stop() override;
 
+    void triggered() override;
+
 private:
+    const bool m_bootup{false};
     ModeInterface *m_oldMode;
     IgnoreInputMode m_mode{0, ControlType::FieldOrientedControl, ControlMode::Torque};
 
@@ -42,10 +49,13 @@ private:
     ProgressBar m_progressBar1{20, 230, 200, 10, 0, 1000};
 };
 
+CalibrateDisplay::CalibrateDisplay(bool bootup) :
+    m_bootup{bootup}
+{
+}
+
 void CalibrateDisplay::start()
 {
-    Base::start();
-
     m_oldMode = currentMode;
     currentMode = &m_mode;
 }
@@ -83,9 +93,15 @@ void CalibrateDisplay::redraw()
 
 void CalibrateDisplay::stop()
 {
-    Base::stop();
-
     if (currentMode == &m_mode)
         currentMode = m_oldMode;
+}
+
+void CalibrateDisplay::triggered()
+{
+    if (m_bootup)
+        switchScreen<StatusDisplay>();
+    else
+        switchScreen<PotiSettingsMenu>();
 }
 }

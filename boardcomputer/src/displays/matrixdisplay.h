@@ -73,7 +73,6 @@ void MatrixDisplay::redraw()
 
 void MatrixDisplay::stop()
 {
-    Base::stop();
     scrollAddress(0);
     tft.setRotation(0);
 }

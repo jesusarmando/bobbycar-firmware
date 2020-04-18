@@ -291,7 +291,7 @@ template<typename T, typename... Args>
 void switchScreen(Args&&... args)
 {
     if (currentDisplay)
-        changeScreenCallback = [args...](){ switchScreenImpl<T>(std::forward<Args>(args)...); };
+        changeScreenCallback = [&args...](){ switchScreenImpl<T>(std::forward<Args>(args)...); };
     else
         switchScreenImpl<T>(std::forward<Args>(args)...);
 }

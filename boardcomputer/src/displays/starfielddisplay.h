@@ -97,7 +97,6 @@ void StarfieldDisplay::redraw()
 
 void StarfieldDisplay::stop()
 {
-    Base::stop();
     tft.setRotation(0);
 }
 

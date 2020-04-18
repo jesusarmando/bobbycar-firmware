@@ -97,7 +97,6 @@ void SpiroDisplay::redraw()
 
 void SpiroDisplay::stop()
 {
-    Base::stop();
     tft.setRotation(0);
 }
 

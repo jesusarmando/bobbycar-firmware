@@ -108,7 +108,6 @@ void GameOfLifeDisplay::redraw()
 
 void GameOfLifeDisplay::stop()
 {
-    Base::stop();
     tft.setRotation(0);
     m_data = nullptr;
 }

@@ -12,10 +12,10 @@ class Display {
 public:
     virtual ~Display() = default;
 
-    virtual void start() = 0;
-    virtual void initScreen() = 0;
-    virtual void update() = 0;
-    virtual void redraw() = 0;
+    virtual void start() {};
+    virtual void initScreen() {};
+    virtual void update() {};
+    virtual void redraw() {};
     virtual void stop() {}
 
     virtual void rotate(int offset) {}

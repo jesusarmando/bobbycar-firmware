@@ -61,7 +61,13 @@ void setup()
     currentMode = &modes::defaultMode;
 
     initWebserver();
-    switchScreen<StatusDisplay>();
+
+    readPotis();
+
+    if (gas > 200.f || brems > 200.f)
+        switchScreen<CalibrateDisplay>(true);
+    else
+        switchScreen<StatusDisplay>();
 }
 
 void loop()
@@ -72,19 +78,7 @@ void loop()
         lastModeUpdate = now;
     else if (now - lastModeUpdate >= 1000/modeUpdateRate)
     {
-        const auto sampleMultipleTimes = [](int pin){
-            analogRead(pin);
-            double sum{};
-            for (int i = 0; i < settings.hardware.poti.sampleCount; i++)
-                sum += analogRead(pin);
-            return sum/settings.hardware.poti.sampleCount;
-        };
-
-        raw_gas = sampleMultipleTimes(PINS_GAS);
-        gas = scaleBetween<float>(raw_gas, settings.hardware.poti.gasMin, settings.hardware.poti.gasMax, 0., 1000.);
-
-        raw_brems = sampleMultipleTimes(PINS_BREMS);
-        brems = scaleBetween<float>(raw_brems, settings.hardware.poti.bremsMin, settings.hardware.poti.bremsMax, 0., 1000.);
+        readPotis();
 
         if (lastMode != currentMode)
         {

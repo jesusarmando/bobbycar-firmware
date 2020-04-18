@@ -107,7 +107,6 @@ void PingPongDisplay::redraw()
 
 void PingPongDisplay::stop()
 {
-    Base::stop();
     tft.setRotation(0);
 }
 
