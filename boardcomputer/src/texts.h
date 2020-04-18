@@ -164,6 +164,8 @@ constexpr char TEXT_AVGSPEEDKMH[] = "Avg. speed KMH";
 constexpr char TEXT_SUMCURRENT[] = "Sum current";
 constexpr char TEXT_FRONTVOLTAGE[] = "Front voltage";
 constexpr char TEXT_BACKVOLTAGE[] = "Back voltage";
+constexpr char TEXT_DUALGRAPHS[] = "Dual graphs";
+constexpr char TEXT_MULTIGRAPHS[] = "Multi graphs";
 //constexpr char TEXT_BACK[] = "Back";
 
 //InvertMenu

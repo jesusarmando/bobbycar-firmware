@@ -13,7 +13,7 @@ class GraphsMenu;
 }
 
 namespace {
-class GraphDisplay : public DemoDisplay, public SwitchScreenAction<GraphsMenu>, public virtual TextInterface, public virtual StatisticsInterface
+class MultiGraphDisplay : public DemoDisplay, public SwitchScreenAction<GraphsMenu>
 {
     using Base = DemoDisplay;
 
@@ -27,25 +27,25 @@ private:
 
     Label m_titleLabel{5, 5}; // 230, 25
 
-    Graph m_graph{0, 40, 270};
+    GraphBase<200, 2> m_graph{0, 40, 270};
 };
 
-void GraphDisplay::initScreen()
+void MultiGraphDisplay::initScreen()
 {
     tft.fillScreen(TFT_BLACK);
 
     m_titleLabel.start();
     tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
 
-    m_graph.start({getBuffer()});
+    m_graph.start({statistics::gas, statistics::brems});
 }
 
-void GraphDisplay::redraw()
+void MultiGraphDisplay::redraw()
 {
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-    m_titleLabel.redraw(text());
+    m_titleLabel.redraw("Gas/Brems multi");
 
-    m_graph.redraw({getBuffer()});
+    m_graph.redraw({statistics::gas, statistics::brems});
 }
 }

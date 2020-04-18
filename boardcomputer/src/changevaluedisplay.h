@@ -4,7 +4,7 @@
 #include "textinterface.h"
 #include "actioninterface.h"
 #include "accessorinterface.h"
-#include "label.h"
+#include "widgets/label.h"
 #include "globals.h"
 #include "utils.h"
 

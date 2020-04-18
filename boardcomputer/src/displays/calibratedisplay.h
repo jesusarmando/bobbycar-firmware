@@ -8,8 +8,8 @@
 #include "actions/switchscreenaction.h"
 #include "globals.h"
 #include "texts.h"
-#include "label.h"
-#include "progressbar.h"
+#include "widgets/label.h"
+#include "widgets/progressbar.h"
 #include "modes/ignoreinputmode.h"
 
 namespace {

@@ -13,7 +13,7 @@ class GraphsMenu;
 }
 
 namespace {
-class GraphDisplay : public DemoDisplay, public SwitchScreenAction<GraphsMenu>, public virtual TextInterface, public virtual StatisticsInterface
+class DualGraphDisplay : public DemoDisplay, public SwitchScreenAction<GraphsMenu>
 {
     using Base = DemoDisplay;
 
@@ -22,30 +22,30 @@ public:
     void redraw() override;
 
 private:
-    static constexpr int screenHeight = 320, topMargin = 40, bottomMargin = 10, labelOffset = -5;
-    static constexpr int graphHeight = screenHeight-topMargin-bottomMargin;
-
     Label m_titleLabel{5, 5}; // 230, 25
 
-    Graph m_graph{0, 40, 270};
+    Graph m_graph0{0, 40, 133};
+    Graph m_graph1{0, 179, 133};
 };
 
-void GraphDisplay::initScreen()
+void DualGraphDisplay::initScreen()
 {
     tft.fillScreen(TFT_BLACK);
 
     m_titleLabel.start();
     tft.fillRect(0, 34, tft.width(), 3, TFT_WHITE);
 
-    m_graph.start({getBuffer()});
+    m_graph0.start({statistics::gas});
+    m_graph1.start({statistics::brems});
 }
 
-void GraphDisplay::redraw()
+void DualGraphDisplay::redraw()
 {
     tft.setTextFont(4);
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-    m_titleLabel.redraw(text());
+    m_titleLabel.redraw("Gas/Brems dual");
 
-    m_graph.redraw({getBuffer()});
+    m_graph0.redraw({statistics::gas});
+    m_graph1.redraw({statistics::brems});
 }
 }

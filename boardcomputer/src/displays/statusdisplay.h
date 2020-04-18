@@ -9,8 +9,8 @@
 #include "modeinterface.h"
 #include "globals.h"
 #include "utils.h"
-#include "label.h"
-#include "progressbar.h"
+#include "widgets/label.h"
+#include "widgets/progressbar.h"
 #include "icons/alert.h"
 
 namespace {

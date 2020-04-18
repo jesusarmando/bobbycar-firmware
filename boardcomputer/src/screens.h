@@ -32,10 +32,12 @@
 #include "displays/menus/wifiscanmenu.h"
 #include "displays/menus/wifisettingsmenu.h"
 #include "displays/calibratedisplay.h"
+#include "displays/dualgraphdisplay.h"
 #include "displays/gameoflifedisplay.h"
 #include "displays/lockscreen.h"
 #include "displays/matrixdisplay.h"
 #include "displays/metersdisplay.h"
+#include "displays/multigraphdisplay.h"
 #include "displays/pingpongdisplay.h"
 #include "displays/poweroffdisplay.h"
 #include "displays/spirodisplay.h"
@@ -92,10 +94,12 @@ union X {
     WifiSettingsMenu wifiSettingsMenu;
 
     CalibrateDisplay calibrateDisplay;
+    DualGraphDisplay dualGraphDisplay;
     GameOfLifeDisplay gameOfLifeDisplay;
     Lockscreen lockScreen;
     MatrixDisplay matrixDisplay;
     MetersDisplay metersDisplay;
+    MultiGraphDisplay multiGraphDisplay;
     PingPongDisplay pingPongDisplay;
     PoweroffDisplay poweroffDisplay;
     SpiroDisplay spiroDisplay;
@@ -195,10 +199,12 @@ template<> decltype(displays.wifiScanMenu)                                     &
 template<> decltype(displays.wifiSettingsMenu)                                 &getRefByType<decltype(displays.wifiSettingsMenu)>()                                 { return displays.wifiSettingsMenu; }
 
 template<> decltype(displays.calibrateDisplay)                                 &getRefByType<decltype(displays.calibrateDisplay)>()                                 { return displays.calibrateDisplay; }
+template<> decltype(displays.dualGraphDisplay)                                 &getRefByType<decltype(displays.dualGraphDisplay)>()                                 { return displays.dualGraphDisplay; }
 template<> decltype(displays.gameOfLifeDisplay)                                &getRefByType<decltype(displays.gameOfLifeDisplay)>()                                { return displays.gameOfLifeDisplay; }
 template<> decltype(displays.lockScreen)                                       &getRefByType<decltype(displays.lockScreen)>()                                       { return displays.lockScreen; }
 template<> decltype(displays.matrixDisplay)                                    &getRefByType<decltype(displays.matrixDisplay)>()                                    { return displays.matrixDisplay; }
 template<> decltype(displays.metersDisplay)                                    &getRefByType<decltype(displays.metersDisplay)>()                                    { return displays.metersDisplay; }
+template<> decltype(displays.multiGraphDisplay)                                &getRefByType<decltype(displays.multiGraphDisplay)>()                                { return displays.multiGraphDisplay; }
 template<> decltype(displays.pingPongDisplay)                                  &getRefByType<decltype(displays.pingPongDisplay)>()                                  { return displays.pingPongDisplay; }
 template<> decltype(displays.poweroffDisplay)                                  &getRefByType<decltype(displays.poweroffDisplay)>()                                  { return displays.poweroffDisplay; }
 template<> decltype(displays.spiroDisplay)                                     &getRefByType<decltype(displays.spiroDisplay)>()                                     { return displays.spiroDisplay; }

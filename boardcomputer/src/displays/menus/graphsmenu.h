@@ -11,6 +11,8 @@
 
 namespace {
 class MainMenu;
+class DualGraphDisplay;
+class MultiGraphDisplay;
 }
 
 namespace {
@@ -33,6 +35,8 @@ class GraphsMenu :
         makeComponent<MenuItem, StaticText<TEXT_SUMCURRENT>,  SwitchScreenAction<SumCurrentGraphDisplay>>,
         makeComponent<MenuItem, StaticText<TEXT_FRONTVOLTAGE>,  SwitchScreenAction<FrontVoltageGraphDisplay>>,
         makeComponent<MenuItem, StaticText<TEXT_BACKVOLTAGE>,  SwitchScreenAction<BackVoltageGraphDisplay>>,
+        makeComponent<MenuItem, StaticText<TEXT_DUALGRAPHS>,  SwitchScreenAction<DualGraphDisplay>>,
+        makeComponent<MenuItem, StaticText<TEXT_MULTIGRAPHS>,  SwitchScreenAction<MultiGraphDisplay>>,
         makeComponent<MenuItem, StaticText<TEXT_BACK>,      SwitchScreenAction<MainMenu>, StaticMenuItemIcon<&icons::back>>
     >
 {};

@@ -131,10 +131,10 @@ public:
     }
 
     ring_buffer_const_iterator operator+(difference_type n) const {
-        return {container, front, index + n};
+        return ring_buffer_const_iterator(*container, front, index + n);
     }
     ring_buffer_const_iterator operator-(difference_type n) const {
-        return {container, front, index - n};
+        return ring_buffer_const_iterator{*container, front, index - n};
     }
 
     reference operator*() const {

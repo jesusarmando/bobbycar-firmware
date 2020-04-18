@@ -6,7 +6,7 @@
 
 #include "display.h"
 #include "textinterface.h"
-#include "label.h"
+#include "widgets/label.h"
 #include "globals.h"
 #include "menudefinitioninterface.h"
 #include "menuitem.h"

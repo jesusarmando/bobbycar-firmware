@@ -3,7 +3,7 @@
 #include <array>
 
 #include "display.h"
-#include "label.h"
+#include "widgets/label.h"
 #include "globals.h"
 #include "utils.h"
 #include "texts.h"
