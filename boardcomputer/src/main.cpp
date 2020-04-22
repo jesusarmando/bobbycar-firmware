@@ -14,6 +14,8 @@
 #include "serialhandler.h"
 #include "presets.h"
 #include "statistics.h"
+#include "actions/bluetoothbeginmasteraction.h"
+#include "actions/bluetoothconnectbmsaction.h"
 
 namespace {
 ModeInterface *lastMode{};
@@ -46,6 +48,10 @@ void setup()
     WiFi.softAP("bobbyquad", "Passwort_123");
     //WiFi.begin("realraum", "r3alraum");
     WiFi.begin("McDonalds Free WiFi 2.4GHz", "Passwort_123");
+
+    BluetoothBeginMasterAction{}.triggered();
+    if (settings.autoConnectBms)
+        BluetoothConnectBmsAction{}.triggered();
 
     front.serial.get().begin(38400, SERIAL_8N1, PINS_RX1, PINS_TX1);
     back.serial.get().begin(38400, SERIAL_8N1, PINS_RX2, PINS_TX2);
@@ -126,4 +132,6 @@ void loop()
         controller.parser.update();
 
     handleSerial();
+
+    bms::update();
 }

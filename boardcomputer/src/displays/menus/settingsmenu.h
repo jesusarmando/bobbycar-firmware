@@ -16,6 +16,7 @@
 #include "icons/back.h"
 #include "texts.h"
 #include "globals.h"
+#include "settingsaccessors.h"
 
 namespace {
 class LimitsSettingsMenu;
@@ -41,6 +42,7 @@ class SettingsMenu :
         makeComponent<MenuItem, StaticText<TEXT_BLUETOOTHSETTINGS>, SwitchScreenAction<BluetoothSettingsMenu>, StaticMenuItemIcon<&icons::bluetooth>>,
         makeComponent<MenuItem, StaticText<TEXT_MODESSETTINGS>,     SwitchScreenAction<ModesSettingsMenu>>,
         makeComponent<MenuItem, StaticText<TEXT_HARDWARESETTINGS>,  SwitchScreenAction<HardwareSettingsMenu>, StaticMenuItemIcon<&icons::hardware>>,
+        makeComponent<MenuItem, StaticText<TEXT_AUTOCONNECTBMS>,    ToggleBoolAction, CheckboxIcon, AutoConnectBmsAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_BUZZER>,            SwitchScreenAction<BuzzerMenu>, StaticMenuItemIcon<&icons::buzzer>>,
         makeComponent<MenuItem, StaticText<TEXT_SETFRONTLED>,       ToggleBoolAction, CheckboxIcon, FrontLedAccessor>,
         makeComponent<MenuItem, StaticText<TEXT_SETBACKLED>,        ToggleBoolAction, CheckboxIcon, BackLedAccessor>,

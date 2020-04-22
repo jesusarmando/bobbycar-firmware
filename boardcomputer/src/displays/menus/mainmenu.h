@@ -10,6 +10,7 @@
 #include "icons/modes.h"
 #include "icons/presets.h"
 #include "icons/graph.h"
+#include "icons/bms.h"
 #include "icons/settings.h"
 #include "icons/lock.h"
 #include "icons/demos.h"
@@ -21,6 +22,7 @@ class StatusDisplay;
 class SelectModeMenu;
 class PresetsMenu;
 class GraphsMenu;
+class BmsMenu;
 class SettingsMenu;
 class Lockscreen;
 class DemosMenu;
@@ -37,6 +39,7 @@ class MainMenu :
         makeComponent<MenuItem, StaticText<TEXT_SELECTMODE>,  SwitchScreenAction<SelectModeMenu>, StaticMenuItemIcon<&icons::modes>>,
         makeComponent<MenuItem, StaticText<TEXT_PRESETS>,     SwitchScreenAction<PresetsMenu>, StaticMenuItemIcon<&icons::presets>>,
         makeComponent<MenuItem, StaticText<TEXT_GRAPHS>,      SwitchScreenAction<GraphsMenu>, StaticMenuItemIcon<&icons::graph>>,
+        makeComponent<MenuItem, StaticText<TEXT_BMS>,         SwitchScreenAction<BmsMenu>, StaticMenuItemIcon<&icons::bms>>,
         makeComponent<MenuItem, StaticText<TEXT_SETTINGS>,    SwitchScreenAction<SettingsMenu>, StaticMenuItemIcon<&icons::settings>>,
         makeComponent<MenuItem, StaticText<TEXT_LOCKVEHICLE>, SwitchScreenAction<Lockscreen>, StaticMenuItemIcon<&icons::lock>>,
         makeComponent<MenuItem, StaticText<TEXT_DEMOS>,       SwitchScreenAction<DemosMenu>, StaticMenuItemIcon<&icons::demos>>,

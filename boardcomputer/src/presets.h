@@ -69,6 +69,7 @@ constexpr Settings::LarsmMode defaultLarsmMode {
 };
 
 constexpr Settings defaultSettings{
+    .autoConnectBms = true,
     .limits = defaultLimits,
     .hardware = defaultHardware,
     .defaultMode = defaultDefaultMode,

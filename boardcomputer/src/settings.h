@@ -9,6 +9,8 @@ enum class LarsmModeMode : uint8_t { Mode1, Mode2, Mode3, Mode4 };
 
 struct Settings
 {
+    bool autoConnectBms;
+
     struct Limits {
         int16_t iMotMax;      // [A] Maximum motor current limit
         int16_t iDcMax;       // [A] Maximum DC Link current limit (This is the current protection. Above this value, current chopping is applied. To avoid this make sure that I_DC_MAX = I_MOT_MAX + 2A)
@@ -63,6 +65,8 @@ struct Settings
 template<typename T>
 void Settings::executeForEverySetting(T &&callable)
 {
+    callable("autoConnectBms", autoConnectBms);
+
     callable("iMotMax", limits.iMotMax);
     callable("iDcMax", limits.iDcMax);
     callable("nMotMax", limits.nMotMax);

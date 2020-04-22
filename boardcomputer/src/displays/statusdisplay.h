@@ -15,6 +15,8 @@
 
 namespace {
 class MainMenu;
+class BmsDisplay;
+class MetersDisplay;
 }
 
 namespace {
@@ -25,6 +27,8 @@ class StatusDisplay : public DemoDisplay, public SwitchScreenAction<MainMenu>
 public:
     void initScreen() override;
     void redraw() override;
+
+    void rotate(int offset) override;
 
 private:
     class BoardStatus
@@ -154,6 +158,14 @@ void StatusDisplay::redraw()
     m_labelLimit1.redraw(String{front.command.left.iDcMax} + "A");
     m_labelPerformance.redraw(String{performance.last});
     m_labelMode.redraw(currentMode->displayName());
+}
+
+void StatusDisplay::rotate(int offset)
+{
+    if (offset < 0)
+        switchScreen<BmsDisplay>();
+    else if (offset > 0)
+        switchScreen<MetersDisplay>();
 }
 
 void StatusDisplay::BoardStatus::start()

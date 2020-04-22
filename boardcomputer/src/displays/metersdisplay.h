@@ -10,17 +10,21 @@
 #include "utils.h"
 
 namespace {
-class DemosMenu;
+class MainMenu;
+class StatusDisplay;
+class BmsDisplay;
 }
 
 namespace {
-class MetersDisplay : public DemoDisplay, public SwitchScreenAction<DemosMenu>
+class MetersDisplay : public DemoDisplay, public SwitchScreenAction<MainMenu>
 {
     using Base = DemoDisplay;
 
 public:
     void initScreen() override;
     void redraw() override;
+
+    void rotate(int offset) override;
 
 private:
     //  Draw the analogue meter on the screen
@@ -76,6 +80,14 @@ void MetersDisplay::redraw()
     plotPointer();
 
     plotNeedle(avgSpeedKmh);
+}
+
+void MetersDisplay::rotate(int offset)
+{
+    if (offset < 0)
+        switchScreen<StatusDisplay>();
+    else if (offset > 0)
+        switchScreen<BmsDisplay>();
 }
 
 void MetersDisplay::analogMeter()

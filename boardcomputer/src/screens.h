@@ -4,6 +4,7 @@
 #include "displays/menus/accesspointwifisettingsmenu.h"
 #include "displays/menus/bluetoothsettingsmenu.h"
 #include "displays/menus/bluetoothmodesettingsmenu.h"
+#include "displays/menus/bmsmenu.h"
 #include "displays/menus/buzzermenu.h"
 #include "displays/menus/commanddebugmenu.h"
 #include "displays/menus/debugmenu.h"
@@ -31,6 +32,7 @@
 #include "displays/menus/websocketmodesettingsmenu.h"
 #include "displays/menus/wifiscanmenu.h"
 #include "displays/menus/wifisettingsmenu.h"
+#include "displays/bmsdisplay.h"
 #include "displays/calibratedisplay.h"
 #include "displays/dualgraphdisplay.h"
 #include "displays/gameoflifedisplay.h"
@@ -57,6 +59,7 @@ union X {
     AccessPointWifiSettingsMenu accessPointWifiSettingsMenu;
     BluetoothSettingsMenu bluetoothSettingsMenu;
     BluetoothModeSettingsMenu bluetoothModeSettingsMenu;
+    BmsMenu bmsMenu;
     BuzzerMenu buzzerMenu;
     FrontCommandDebugMenu frontCommandDebugMenu;
     BackCommandDebugMenu backCommandDebugMenu;
@@ -93,6 +96,7 @@ union X {
     WifiScanMenu wifiScanMenu;
     WifiSettingsMenu wifiSettingsMenu;
 
+    BmsDisplay bmsDisplay;
     CalibrateDisplay calibrateDisplay;
     DualGraphDisplay dualGraphDisplay;
     GameOfLifeDisplay gameOfLifeDisplay;
@@ -162,6 +166,7 @@ template<> decltype(displays.aboutMenu)                                        &
 template<> decltype(displays.accessPointWifiSettingsMenu)                      &getRefByType<decltype(displays.accessPointWifiSettingsMenu)>()                      { return displays.accessPointWifiSettingsMenu; }
 template<> decltype(displays.bluetoothSettingsMenu)                            &getRefByType<decltype(displays.bluetoothSettingsMenu)>()                            { return displays.bluetoothSettingsMenu; }
 template<> decltype(displays.bluetoothModeSettingsMenu)                        &getRefByType<decltype(displays.bluetoothModeSettingsMenu)>()                        { return displays.bluetoothModeSettingsMenu; }
+template<> decltype(displays.bmsMenu)                                          &getRefByType<decltype(displays.bmsMenu)>()                                          { return displays.bmsMenu; }
 template<> decltype(displays.buzzerMenu)                                       &getRefByType<decltype(displays.buzzerMenu)>()                                       { return displays.buzzerMenu; }
 template<> decltype(displays.frontCommandDebugMenu)                            &getRefByType<decltype(displays.frontCommandDebugMenu)>()                            { return displays.frontCommandDebugMenu; }
 template<> decltype(displays.backCommandDebugMenu)                             &getRefByType<decltype(displays.backCommandDebugMenu)>()                             { return displays.backCommandDebugMenu; }
@@ -198,6 +203,7 @@ template<> decltype(displays.websocketModeSettingsMenu)                        &
 template<> decltype(displays.wifiScanMenu)                                     &getRefByType<decltype(displays.wifiScanMenu)>()                                     { return displays.wifiScanMenu; }
 template<> decltype(displays.wifiSettingsMenu)                                 &getRefByType<decltype(displays.wifiSettingsMenu)>()                                 { return displays.wifiSettingsMenu; }
 
+template<> decltype(displays.bmsDisplay)                                       &getRefByType<decltype(displays.bmsDisplay)>()                                       { return displays.bmsDisplay; }
 template<> decltype(displays.calibrateDisplay)                                 &getRefByType<decltype(displays.calibrateDisplay)>()                                 { return displays.calibrateDisplay; }
 template<> decltype(displays.dualGraphDisplay)                                 &getRefByType<decltype(displays.dualGraphDisplay)>()                                 { return displays.dualGraphDisplay; }
 template<> decltype(displays.gameOfLifeDisplay)                                &getRefByType<decltype(displays.gameOfLifeDisplay)>()                                { return displays.gameOfLifeDisplay; }

@@ -24,6 +24,16 @@ constexpr char TEXT_BLUETOOTHDISCONNECT[] = "disconnect()";
 constexpr char TEXT_BLUETOOTHMODESETTINGS[] = "Bluetooth mode settings";
 //constexpr char TEXT_BACK[] = "Back";
 
+//BmsMenu
+constexpr char TEXT_BMS[] = "BMS";
+constexpr char TEXT_CONNECTBMS[] = "Connect BMS";
+constexpr char TEXT_DISCONNECTBMS[] = "Disonnect BMS";
+constexpr char TEXT_TURNONCHARGE[] = "Turn on charge";
+constexpr char TEXT_TURNOFFCHARGE[] = "Turn off charge";
+constexpr char TEXT_TURNONDISCHARGE[] = "Turn on discharge";
+constexpr char TEXT_TURNOFFDISCHARGE[] = "Turn off discharge";
+//constexpr char TEXT_BACK[] = "Back";
+
 //DebugMenu
 constexpr char TEXT_LOADSETTINGS[] = "Load settings";
 constexpr char TEXT_SAVESETTINGS[] = "Save settings";
@@ -47,6 +57,7 @@ constexpr char TEXT_STATUS[] = "Status";
 constexpr char TEXT_SELECTMODE[] = "Select mode";
 constexpr char TEXT_PRESETS[] = "Presets";
 constexpr char TEXT_GRAPHS[] = "Graphs";
+//constexpr char TEXT_BMS[] = "BMS";
 constexpr char TEXT_SETTINGS[] = "Settings";
 constexpr char TEXT_LOCKVEHICLE[] = "Lock vehicle";
 constexpr char TEXT_DEMOS[] = "Demos";
@@ -61,6 +72,7 @@ constexpr char TEXT_WIFISETTINGS[] = "WiFi settings";
 //constexpr char TEXT_BLUETOOTHSETTINGS[] = "Bluetooth settings";
 constexpr char TEXT_MODESSETTINGS[] = "Modes settings";
 constexpr char TEXT_HARDWARESETTINGS[] = "Hardware settings";
+constexpr char TEXT_AUTOCONNECTBMS[] = "Auto connect BMS";
 constexpr char TEXT_BUZZER[] = "Buzzer";
 constexpr char TEXT_SETFRONTLED[] = "Set front LED";
 constexpr char TEXT_SETBACKLED[] = "Set back LED";

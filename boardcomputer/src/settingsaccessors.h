@@ -12,6 +12,8 @@ struct RefAccessorSaveSettings : public virtual RefAccessor<T>
     void setValue(T value) override { RefAccessor<T>::setValue(value); saveSettings(); };
 };
 
+struct AutoConnectBmsAccessor : public RefAccessorSaveSettings<bool> { bool &getRef() const override { return settings.autoConnectBms; } };
+
 struct IMotMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.limits.iMotMax; } };
 struct IDcMaxAccessor : public RefAccessorSaveSettings<int16_t> { int16_t &getRef() const override { return settings.limits.iDcMax; } };
 struct NMotMaxKmhAccessor : public virtual AccessorInterface<int16_t>

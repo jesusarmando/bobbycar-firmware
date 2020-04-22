@@ -1,7 +1,7 @@
 #pragma once
 
 #include "globals.h"
-#include "ringbuffer.h"
+#include "ring-buffer.h"
 #include "utils.h"
 
 namespace {
